@@ -1,6 +1,9 @@
 
 cmake_minimum_required(VERSION 3.0)
 project(main)
+
+# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -O0 -g -Wfatal-errors")
+
 set(SOURCE main.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE})
 
@@ -11,7 +14,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${BGFX_INCLUDE_DIRS})
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC __STDC_LIMIT_MACROS __STDC_FORMAT_MACROS __STDC_CONSTANT_MACROS)
 
-find_package(OpenGL REQUIRED)
+# find_package(OpenGL REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC 
     $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
@@ -23,7 +26,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
     $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
     glfw
-    OpenGL::GL
+    # OpenGL::GL
     )
 
 
