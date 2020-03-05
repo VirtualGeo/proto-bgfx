@@ -25,7 +25,7 @@ GLFWwindow *window = nullptr;
 
 int main(int argc, char const *argv[])
 {
-    std::cout << "hello bgfx" << std::endl;
+    std::cout << "hello bgfx !!!" << std::endl;
 
     init();
 
@@ -93,7 +93,7 @@ void init()
 
     bgfx::Init bgfxInit;
     // bgfxInit.type = bgfx::RendererType::OpenGL;
-    bgfxInit.type = bgfx::RendererType::Count;
+    bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a renderer
     bgfxInit.resolution.width = WIN_WIDTH;
     bgfxInit.resolution.height = WIN_HEIGHT;
     bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
