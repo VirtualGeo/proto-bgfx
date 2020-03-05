@@ -9,7 +9,7 @@
 // int main(int argc, const char * argv[]) {
 //     std::cout << "test :)" << '\n'; 
 
-//     bgfx::init();
+//     // bgfx::init();
 
 //     return 0;
 // }
@@ -53,11 +53,11 @@ int main()
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }    
+    // if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    // {
+    //     std::cout << "Failed to initialize GLAD" << std::endl;
+    //     return -1;
+    // }    
 
     // render loop
     // -----------
