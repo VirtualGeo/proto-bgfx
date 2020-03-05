@@ -21,4 +21,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
     $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
     $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
-)
+    )
+
+
+# find_package(glfw3 3.3 REQUIRED)
+# set(GLFW_BU)
