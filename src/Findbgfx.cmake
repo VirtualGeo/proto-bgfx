@@ -37,8 +37,26 @@ find_library(BGFX_LIBRARY_DEBUG NAMES bgfxd
     PATH_SUFFIXES
     lib
 )
+find_library(BGFX_LIBRARY_RELEASE NAMES bgfx
+     PATHS 
+     /usr
+     /usr/local
+     ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+)
 
 find_library(BIMG_LIBRARY_DEBUG NAMES bimgd
+     PATHS 
+     /usr
+     /usr/local
+     ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+)
+find_library(BIMG_LIBRARY_RELEASE NAMES bimg
      PATHS 
      /usr
      /usr/local
@@ -57,35 +75,6 @@ find_library(BX_LIBRARY_DEBUG NAMES bxd
     PATH_SUFFIXES
     lib
 )
-find_library(ASTCCODEC_LIBRARY_RELEASE NAMES astc-codec
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-)
-find_library(ASTCCODEC_LIBRARY_DEBUG NAMES astc-codecd
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-)
-
-find_library(BGFX_LIBRARY_RELEASE NAMES bgfx
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-)
-
 find_library(BX_LIBRARY_RELEASE NAMES bx
      PATHS 
      /usr
@@ -95,7 +84,8 @@ find_library(BX_LIBRARY_RELEASE NAMES bx
     PATH_SUFFIXES
     lib
 )
-find_library(BIMG_LIBRARY_RELEASE NAMES bimg
+
+find_library(ASTCCODEC_LIBRARY_DEBUG NAMES astc-codecd
      PATHS 
      /usr
      /usr/local
@@ -104,6 +94,17 @@ find_library(BIMG_LIBRARY_RELEASE NAMES bimg
     PATH_SUFFIXES
     lib
 )
+find_library(ASTCCODEC_LIBRARY_RELEASE NAMES astc-codec
+     PATHS 
+     /usr
+     /usr/local
+     ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+)
+
+
 
 # set (BGFX_LIBRARIES_DEBUG "${BX_LIBRARY_DEBUG};${BGFX_LIBRARY_DEBUG}")
 # set (BGFX_LIBRARIES_RELEASE "${BX_LIBRARY_RELEASE};${BGFX_LIBRARY_RELEASE}")
