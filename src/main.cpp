@@ -6,15 +6,16 @@
 #include "GLFW/glfw3.h"
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include "GLFW/glfw3native.h"
-#include <bx/uint32_t.h>
-#include <bx/file.h>
 #include "logo.h"
+#include <bx/file.h>
+#include <bx/macros.h>
+#include <bx/uint32_t.h>
 // #include "bgfx/vertexdecl.h"
 
-#include <stdio.h>
+#include <chrono>
 #include <direct.h>
 #include <iostream>
-#include <chrono>
+#include <stdio.h>
 #include <thread>
 // #include <filesystem>
 
@@ -36,65 +37,40 @@ bgfx::IndexBufferHandle ibh;
 bgfx::ProgramHandle program;
 unsigned int counter = 0;
 
-struct PosColorVertex
-{
-    float x;
-    float y;
-    float z;
-    uint32_t abgr;
+struct PosColorVertex {
+	float x;
+	float y;
+	float z;
+	uint32_t abgr;
 };
 
-static PosColorVertex cubeVertices[] =
-    {
-        {-1.0f, 1.0f, 1.0f, 0xff000000},
-        {1.0f, 1.0f, 1.0f, 0xff0000ff},
-        {-1.0f, -1.0f, 1.0f, 0xff00ff00},
-        {1.0f, -1.0f, 1.0f, 0xff00ffff},
-        {-1.0f, 1.0f, -1.0f, 0xffff0000},
-        {1.0f, 1.0f, -1.0f, 0xffff00ff},
-        {-1.0f, -1.0f, -1.0f, 0xffffff00},
-        {1.0f, -1.0f, -1.0f, 0xffffffff},
+static PosColorVertex cubeVertices[] = {
+	{-1.0f, 1.0f, 1.0f, 0xff000000},   {1.0f, 1.0f, 1.0f, 0xff0000ff},
+	{-1.0f, -1.0f, 1.0f, 0xff00ff00},  {1.0f, -1.0f, 1.0f, 0xff00ffff},
+	{-1.0f, 1.0f, -1.0f, 0xffff0000},  {1.0f, 1.0f, -1.0f, 0xffff00ff},
+	{-1.0f, -1.0f, -1.0f, 0xffffff00}, {1.0f, -1.0f, -1.0f, 0xffffffff},
 };
 
-static const uint16_t cubeTriList[] =
-    {
-        0,
-        1,
-        2,
-        1,
-        3,
-        2,
-        4,
-        6,
-        5,
-        5,
-        6,
-        7,
-        0,
-        2,
-        4,
-        4,
-        2,
-        6,
-        1,
-        5,
-        3,
-        5,
-        7,
-        3,
-        0,
-        4,
-        1,
-        4,
-        5,
-        1,
-        2,
-        3,
-        6,
-        6,
-        3,
-        7,
+static const uint16_t cubeTriList[] = {
+	0, 1, 2, 1, 3, 2, 4, 6, 5, 5, 6, 7, 0, 2, 4, 4, 2, 6,
+	1, 5, 3, 5, 7, 3, 0, 4, 1, 4, 5, 1, 2, 3, 6, 6, 3, 7,
 };
+
+static const char *s_ptNames[]{
+	"Triangle List",
+	// "Triangle Strip",
+	// "Lines",
+	// "Line Strip",
+	// "Points",
+};
+
+static const uint64_t s_ptState[]{
+	UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
+	// BGFX_STATE_PT_LINES,
+	// BGFX_STATE_PT_LINESTRIP,
+	// BGFX_STATE_PT_POINTS,
+};
+// BX_STATIC_ASSERT(BX_COUNTOF(s_ptState) == BX_COUNTOF(s_ptNames));
 
 // #define WIN32_LEAN_AND_MEAN
 // #include <windows.h>
@@ -131,236 +107,248 @@ static const uint16_t cubeTriList[] =
 // 	return 0;
 // }
 
-int main(int argc, char const *argv[])
-{
-    std::cout << "hello bgfx !!!" << std::endl;
+int main(int argc, char const *argv[]) {
+	std::cout << "hello bgfx !!!" << std::endl;
 
-    init();
+	init();
 
-    // while (true)
-    while (!glfwWindowShouldClose(window))
-    {
-        processInput(window);
+	// while (true)
+	while (!glfwWindowShouldClose(window)) {
+		processInput(window);
 
-        update();
-        // bgfx::frame();
+		update();
+		// bgfx::frame();
 
-        counter++;
-        std::this_thread::sleep_for(std::chrono::milliseconds(16));
+		counter++;
+		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
-        // glfwSwapBuffers(window);
-        glfwPollEvents();
-        std::cout << "update " << counter << std::endl;
-    }
+		// glfwSwapBuffers(window);
+		glfwPollEvents();
+		std::cout << "update " << counter << std::endl;
+	}
 
-    shutdown();
-    // bgfx::shutdown(); // question : after or before glfwTerminate ?
-    // glfwTerminate();
+	shutdown();
+	// bgfx::shutdown(); // question : after or before glfwTerminate ?
+	// glfwTerminate();
 
-    return 0;
+	return 0;
 }
 
-void update()
-{
-    bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
-    bgfx::touch(0);
+void update() {
+	bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
+	bgfx::touch(0);
 
-    bgfx::dbgTextClear();
-    // bgfx::dbgTextImage(
-    //     bx::max<uint16_t>(uint16_t(WIN_WIDTH / 2 / 8), 20) - 20, bx::max<uint16_t>(uint16_t(WIN_HEIGHT / 2 / 16), 6) - 6, 40, 12, s_logo, 160);
+	bgfx::dbgTextClear();
+	bgfx::dbgTextImage(bx::max<uint16_t>(uint16_t(WIN_WIDTH / 2 / 8), 20) - 20,
+					   bx::max<uint16_t>(uint16_t(WIN_HEIGHT / 2 / 16), 6) - 6,
+					   40, 12, s_logo, 160);
 
-    bgfx::dbgTextPrintf(0, 1, 0x0f, "Color can be changed with ANSI \x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b[14;me\x1b[0m code too.");
+	bgfx::dbgTextPrintf(0, 1, 0x0f,
+						"Color can be changed with ANSI "
+						"\x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b["
+						"14;me\x1b[0m code too.");
 
-    bgfx::dbgTextPrintf(80, 1, 0x0f, "\x1b[;0m    \x1b[;1m    \x1b[; 2m    \x1b[; 3m    \x1b[; 4m    \x1b[; 5m    \x1b[; 6m    \x1b[; 7m    \x1b[0m");
-    bgfx::dbgTextPrintf(80, 2, 0x0f, "\x1b[;8m    \x1b[;9m    \x1b[;10m    \x1b[;11m    \x1b[;12m    \x1b[;13m    \x1b[;14m    \x1b[;15m    \x1b[0m");
+	bgfx::dbgTextPrintf(
+		80, 1, 0x0f,
+		"\x1b[;0m    \x1b[;1m    \x1b[; 2m    \x1b[; 3m    \x1b[; 4m    \x1b[; "
+		"5m    \x1b[; 6m    \x1b[; 7m    \x1b[0m");
+	bgfx::dbgTextPrintf(
+		80, 2, 0x0f,
+		"\x1b[;8m    \x1b[;9m    \x1b[;10m    \x1b[;11m    \x1b[;12m    "
+		"\x1b[;13m    \x1b[;14m    \x1b[;15m    \x1b[0m");
 
-    const bgfx::Stats *stats = bgfx::getStats();
-    bgfx::dbgTextPrintf(0, 2, 0x0f, "Backbuffer %dW x %dH in pixels, debug text %dW x %dH in characters.", stats->width, stats->height, stats->textWidth, stats->textHeight);
+	const bgfx::Stats *stats = bgfx::getStats();
+	bgfx::dbgTextPrintf(
+		0, 2, 0x0f,
+		"Backbuffer %dW x %dH in pixels, debug text %dW x %dH in characters.",
+		stats->width, stats->height, stats->textWidth, stats->textHeight);
 
-    // ------------------------- RENDER SCENE
-    const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
-    const bx::Vec3 eye = {0.0f, 0.0f, -15.0f};
-    // {
-    float view[16];
-    bx::mtxLookAt(view, eye, at);
+	// ------------------------- RENDER SCENE
+	const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
+	const bx::Vec3 eye = {0.0f, 0.0f, -15.0f};
+	// {
+	float view[16];
+	bx::mtxLookAt(view, eye, at);
 
-    float proj[16];
-    bx::mtxProj(proj, 60.0f, float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
-    // bgfx::setViewTransform(0, view, proj);
-    bgfx::setViewTransform(0, view, proj);
+	float proj[16];
+	bx::mtxProj(proj, 60.0f, float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f,
+				bgfx::getCaps()->homogeneousDepth);
+	// bgfx::setViewTransform(0, view, proj);
+	bgfx::setViewTransform(0, view, proj);
 
-    // }
-    // bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
-    // bgfx::touch(0);
+	// }
+	// bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
+	// bgfx::touch(0);
 
+	float mtx[16];
+	bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
+	bgfx::setTransform(mtx);
 
-    float mtx[16];
-    bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
-    bgfx::setTransform(mtx);
+	// bgfx::submit(0, program);
+	bgfx::setVertexBuffer(0, vbh);
+	bgfx::setIndexBuffer(ibh);
 
-    // bgfx::submit(0, program);
-    bgfx::setVertexBuffer(0, vbh);
-    bgfx::setIndexBuffer(ibh);
+	uint64_t state = 0 | BGFX_STATE_WRITE_R | BGFX_STATE_WRITE_G |
+					 BGFX_STATE_WRITE_B | BGFX_STATE_WRITE_A |
+					 BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
+					 BGFX_STATE_CULL_CW | BGFX_STATE_MSAA | s_ptState[0];
 
-    bgfx::submit(0, program);
+	bgfx::setState(state);
 
-    bgfx::frame();
+	bgfx::submit(0, program);
+
+	bgfx::frame();
 }
 
-void init()
-{
+void init() {
+	glfwInit();
+	window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Hello, bgfx from glfw!",
+							  NULL, NULL);
+	if (window == NULL) {
+		// std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		throw std::runtime_error("Failed to create GLFW window");
+		// exit(-1);
+	}
+	glfwMakeContextCurrent(window); // question : what does this fonction ?
+	// glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    glfwInit();
-    window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Hello, bgfx from glfw!", NULL, NULL);
-    if (window == NULL)
-    {
-        // std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        throw std::runtime_error("Failed to create GLFW window");
-        // exit(-1);
-    }
-    glfwMakeContextCurrent(window); // question : what does this fonction ?
-    // glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	bgfx::PlatformData pd;
+	pd.nwh = glfwGetWin32Window(window);
+	bgfx::setPlatformData(pd);
 
-    bgfx::PlatformData pd;
-    pd.nwh = glfwGetWin32Window(window);
-    bgfx::setPlatformData(pd);
+	bgfx::Init bgfxInit;
+	// bgfxInit.type = bgfx::RendererType::OpenGL;
+	bgfxInit.type =
+		bgfx::RendererType::Count; // Automatically choose a renderer
+	bgfxInit.resolution.width = WIN_WIDTH;
+	bgfxInit.resolution.height = WIN_HEIGHT;
+	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+	bgfx::init(bgfxInit);
 
-    bgfx::Init bgfxInit;
-    // bgfxInit.type = bgfx::RendererType::OpenGL;
-    bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a renderer
-    bgfxInit.resolution.width = WIN_WIDTH;
-    bgfxInit.resolution.height = WIN_HEIGHT;
-    bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-    bgfx::init(bgfxInit);
+	bgfx::setDebug(BGFX_DEBUG_TEXT);
 
-    bgfx::setDebug(BGFX_DEBUG_TEXT);
+	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f,
+					   0);
+	bgfx::setViewRect(0, 0, 0, WIN_WIDTH, WIN_HEIGHT);
+	bgfx::touch(0);
 
-    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
-    bgfx::setViewRect(0, 0, 0, WIN_WIDTH, WIN_HEIGHT);
-    bgfx::touch(0);
+	glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
-    glfwMakeContextCurrent(nullptr); // question : why we can do it ?
+	// ------------- INIT GEOMETRY
+	// bgfx::VertexDecl pcvDecl; // question : out of date ?
+	bgfx::VertexLayout ms_layout;
+	ms_layout.begin()
+		.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+		.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+		.end();
 
-    // ------------- INIT GEOMETRY
-    // bgfx::VertexDecl pcvDecl; // question : out of date ?
-    bgfx::VertexLayout ms_layout;
-    ms_layout.begin()
-        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-        .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-        .end();
+	// bgfx::VertexBufferHandle vbh;
+	vbh = bgfx::createVertexBuffer(
+		bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), ms_layout);
 
-    // bgfx::VertexBufferHandle vbh;
-    vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), ms_layout);
+	ibh = bgfx::createIndexBuffer(
+		bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
 
-    ibh = bgfx::createIndexBuffer(bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
+	// ----------------- INIT SHADER
+	// fileReader = BX_NEW(allocator, fileReader);
+	bgfx::ShaderHandle vsh = loadShader("cubes.vert");
+	bgfx::ShaderHandle fsh = loadShader("cubes.frag");
+	bgfx::ProgramHandle program = bgfx::createProgram(vsh, fsh, true);
 
-    // ----------------- INIT SHADER
-    // fileReader = BX_NEW(allocator, fileReader);
-    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
-    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
-    bgfx::ProgramHandle program = bgfx::createProgram(vsh, fsh, true);
-
-    // bgfx::ProgramHandle program;
-    // program = loadProgram("cubes.vert", "cubes.frag");
+	// bgfx::ProgramHandle program;
+	// program = loadProgram("cubes.vert", "cubes.frag");
 }
 
-void shutdown()
-{
-    glfwMakeContextCurrent(window);
-    bgfx::destroy(ibh);
-    bgfx::destroy(vbh);
-    bgfx::shutdown();
+void shutdown() {
+	glfwMakeContextCurrent(window);
+	bgfx::destroy(ibh);
+	bgfx::destroy(vbh);
+	bgfx::shutdown();
 
-    glfwMakeContextCurrent(nullptr);
-    glfwDestroyWindow(window);
-    // window = nullptr; // question : necessary ?
-    glfwTerminate();
+	glfwMakeContextCurrent(nullptr);
+	glfwDestroyWindow(window);
+	// window = nullptr; // question : necessary ?
+	glfwTerminate();
 }
 
-void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, true);
-    }
+void processInput(GLFWwindow *window) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
 }
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
-    // glViewport(0, 0, width, height);
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+	// glViewport(0, 0, width, height);
 }
 
-bgfx::ShaderHandle loadShader(const char *FILENAME)
-{
-    const char *shaderPath = "???";
+bgfx::ShaderHandle loadShader(const char *FILENAME) {
+	const char *shaderPath = "???";
 
-    switch (bgfx::getRendererType())
-    {
-    case bgfx::RendererType::Noop:
-    case bgfx::RendererType::Direct3D9:
-        shaderPath = "shaders/bin/dx9/";
-        break;
-    case bgfx::RendererType::Direct3D11:
-    case bgfx::RendererType::Direct3D12:
-        shaderPath = "shaders/bin/dx11/";
-        break;
-    case bgfx::RendererType::Gnm:
-        shaderPath = "shaders/bin/pssl/";
-        break;
-    case bgfx::RendererType::Metal:
-        shaderPath = "shaders/bin/metal/";
-        break;
-    case bgfx::RendererType::OpenGL:
-        shaderPath = "shaders/bin/glsl/";
-        break;
-    case bgfx::RendererType::OpenGLES:
-        shaderPath = "shaders/bin/essl/";
-        break;
-    case bgfx::RendererType::Vulkan:
-        shaderPath = "shaders/bin/spirv/";
-        break;
-    }
+	switch (bgfx::getRendererType()) {
+	case bgfx::RendererType::Noop:
+	case bgfx::RendererType::Direct3D9:
+		shaderPath = "shaders/bin/dx9/";
+		break;
+	case bgfx::RendererType::Direct3D11:
+	case bgfx::RendererType::Direct3D12:
+		shaderPath = "shaders/bin/dx11/";
+		break;
+	case bgfx::RendererType::Gnm:
+		shaderPath = "shaders/bin/pssl/";
+		break;
+	case bgfx::RendererType::Metal:
+		shaderPath = "shaders/bin/metal/";
+		break;
+	case bgfx::RendererType::OpenGL:
+		shaderPath = "shaders/bin/glsl/";
+		break;
+	case bgfx::RendererType::OpenGLES:
+		shaderPath = "shaders/bin/essl/";
+		break;
+	case bgfx::RendererType::Vulkan:
+		shaderPath = "shaders/bin/spirv/";
+		break;
+	}
 
-    size_t shaderLen = strlen(shaderPath);
-    size_t fileLen = strlen(FILENAME);
-    char *filePath = (char *)malloc(shaderLen + fileLen + 5);
-    memcpy(filePath, shaderPath, shaderLen);
-    memcpy(&filePath[shaderLen], FILENAME, fileLen);
-    memcpy(&filePath[shaderLen + fileLen], ".bin\0", 5);
+	size_t shaderLen = strlen(shaderPath);
+	size_t fileLen = strlen(FILENAME);
+	char *filePath = (char *)malloc(shaderLen + fileLen + 5);
+	memcpy(filePath, shaderPath, shaderLen);
+	memcpy(&filePath[shaderLen], FILENAME, fileLen);
+	memcpy(&filePath[shaderLen + fileLen], ".bin\0", 5);
 
-    // std::cout << "current path : " << std::filesystem::current_path() << std::endl;
-    // char buff[80];
-    // GetCurrentDirectory(buff, 80);
+	// std::cout << "current path : " << std::filesystem::current_path() <<
+	// std::endl; char buff[80]; GetCurrentDirectory(buff, 80);
 
-    // FILE *file = fopen(FILENAME, "rb");
-    // FILE *file = fopen(filePath, "rb");
-    // bx::FileReaderI * fileReader = nullptr;
-    // bx::AllocatorI * allocator = nullptr;
-    // allocator = & bx::DefaultAllocator;
-    // fileReader = BX_NEW(allocator, FileReader);
+	// FILE *file = fopen(FILENAME, "rb");
+	// FILE *file = fopen(filePath, "rb");
+	// bx::FileReaderI * fileReader = nullptr;
+	// bx::AllocatorI * allocator = nullptr;
+	// allocator = & bx::DefaultAllocator;
+	// fileReader = BX_NEW(allocator, FileReader);
 
-    // FILE *file = fopen("shaders/bin/cubes.vert.bin", "rb");
-    FILE *file = fopen(filePath, "rb");
-    if (file == NULL)
-    {
-        // perror(std::string("Failed to load ")+  std::string(FILENAME));
-        std::cout << "Failed to load '" << filePath << "' '" << FILENAME << "'" << std::endl;
+	// FILE *file = fopen("shaders/bin/cubes.vert.bin", "rb");
+	FILE *file = fopen(filePath, "rb");
+	if (file == NULL) {
+		// perror(std::string("Failed to load ")+  std::string(FILENAME));
+		std::cout << "Failed to load '" << filePath << "' '" << FILENAME << "'"
+				  << std::endl;
 
-        // throw std::runtime_error("Failed to load " + std::string(FILENAME));
+		// throw std::runtime_error("Failed to load " + std::string(FILENAME));
 
-        exit(-1);
-    }
-    fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    fseek(file, 0, SEEK_SET);
+		exit(-1);
+	}
+	fseek(file, 0, SEEK_END);
+	long fileSize = ftell(file);
+	fseek(file, 0, SEEK_SET);
 
-    const bgfx::Memory *mem = bgfx::alloc(fileSize + 1);
-    fread(mem->data, 1, fileSize, file);
-    mem->data[mem->size - 1] = '\0';
-    fclose(file);
+	const bgfx::Memory *mem = bgfx::alloc(fileSize + 1);
+	fread(mem->data, 1, fileSize, file);
+	mem->data[mem->size - 1] = '\0';
+	fclose(file);
 
-    free(filePath);
+	free(filePath);
 
-    return bgfx::createShader(mem);
+	return bgfx::createShader(mem);
 }

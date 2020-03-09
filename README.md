@@ -1,7 +1,7 @@
 # proto-bgfx
 
 ## Dependencies
-* bgfx.cmake (system library)
+* bgfx, bx, bimg (system library)
 * glfw (submodule)
 
 ---
