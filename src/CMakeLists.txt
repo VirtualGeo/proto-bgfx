@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
-project(main VERSION 1.0 LANGUAGES CXX)
+project(src VERSION 1.0 LANGUAGES CXX)
 
 
 # set(SOURCE main.cpp)
 file(GLOB_RECURSE SOURCE *.cpp *.h)
 # message("#####################out shaders : " ${OUT_SHADERS})
+message(${PROJECT_NAME})
 add_executable(${PROJECT_NAME} ${SOURCE} ${OUT_SHADERS})
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})

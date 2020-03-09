@@ -166,8 +166,8 @@ void update()
     bgfx::touch(0);
 
     bgfx::dbgTextClear();
-    bgfx::dbgTextImage(
-        bx::max<uint16_t>(uint16_t(WIN_WIDTH / 2 / 8), 20) - 20, bx::max<uint16_t>(uint16_t(WIN_HEIGHT / 2 / 16), 6) - 6, 40, 12, s_logo, 160);
+    // bgfx::dbgTextImage(
+    //     bx::max<uint16_t>(uint16_t(WIN_WIDTH / 2 / 8), 20) - 20, bx::max<uint16_t>(uint16_t(WIN_HEIGHT / 2 / 16), 6) - 6, 40, 12, s_logo, 160);
 
     bgfx::dbgTextPrintf(0, 1, 0x0f, "Color can be changed with ANSI \x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b[14;me\x1b[0m code too.");
 
@@ -181,26 +181,26 @@ void update()
     const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
     const bx::Vec3 eye = {0.0f, 0.0f, -15.0f};
     // {
-        float view[16];
-        bx::mtxLookAt(view, eye, at);
+    float view[16];
+    bx::mtxLookAt(view, eye, at);
 
-        float proj[16];
-        bx::mtxProj(proj, 60.0f, float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
-        // bgfx::setViewTransform(0, view, proj);
-     bgfx::setViewTransform(0, view, proj);
+    float proj[16];
+    bx::mtxProj(proj, 60.0f, float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+    // bgfx::setViewTransform(0, view, proj);
+    bgfx::setViewTransform(0, view, proj);
 
     // }
-        // bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
+    // bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
     // bgfx::touch(0);
 
-    bgfx::setVertexBuffer(0, vbh);
-    bgfx::setIndexBuffer(ibh);
 
     float mtx[16];
     bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
-    bgfx::setTransform(mtx);        
+    bgfx::setTransform(mtx);
 
     // bgfx::submit(0, program);
+    bgfx::setVertexBuffer(0, vbh);
+    bgfx::setIndexBuffer(ibh);
 
     bgfx::submit(0, program);
 
@@ -245,7 +245,10 @@ void init()
     // ------------- INIT GEOMETRY
     // bgfx::VertexDecl pcvDecl; // question : out of date ?
     bgfx::VertexLayout ms_layout;
-    ms_layout.begin().add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float).add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true).end();
+    ms_layout.begin()
+        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+        .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+        .end();
 
     // bgfx::VertexBufferHandle vbh;
     vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), ms_layout);
@@ -265,6 +268,8 @@ void init()
 void shutdown()
 {
     glfwMakeContextCurrent(window);
+    bgfx::destroy(ibh);
+    bgfx::destroy(vbh);
     bgfx::shutdown();
 
     glfwMakeContextCurrent(nullptr);
@@ -354,6 +359,8 @@ bgfx::ShaderHandle loadShader(const char *FILENAME)
     fread(mem->data, 1, fileSize, file);
     mem->data[mem->size - 1] = '\0';
     fclose(file);
+
+    free(filePath);
 
     return bgfx::createShader(mem);
 }

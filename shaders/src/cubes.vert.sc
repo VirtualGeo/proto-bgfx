@@ -7,8 +7,8 @@ $output v_color0
  */
 
 //#include "../common/common.sh"
-#include <common.sh>
-//#include <bgfx_shader.sh>
+//#include <common.sh>
+#include <bgfx_shader.sh>
 
 
 void main()
