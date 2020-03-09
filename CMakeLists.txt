@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -O0 -g -Wfatal-errors")
 
 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # find_package(glfw3 3.3 REQUIRED)
 # ------------------------------ GLFW
@@ -55,7 +56,6 @@ set(IN_SHADERS
 set(OUT_SHADERS )
 
 macro(COMPILE_SHADER SHADER)
-    message("################ COMPILE_SHADER : " ${SHADER})
     get_shader_infos(${SHADER} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)
     if(OK)
         if(WIN32)
@@ -74,24 +74,11 @@ macro(COMPILE_SHADER SHADER)
             set(OPTIMIZATION "")
         endif(WIN32)
 
-        message("
-                shaderc
-                    -f ${SHADER_SRC_DIR}/${SHADER}
-                    -o ${SHADER_DIR}/bin/${BIN_SHADER_NAME}
-                    --platform ${PLATFORM}
-                    --type ${SHADER_TYPE}
-                    --verbose
-                    --profile ${PROFILE}
-                    -i ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src
-                    ${OPTIMIZATION}
-                    ")
 
         add_custom_command(
             OUTPUT ${SHADER_DIR}/bin/${BIN_SHADER_NAME}
             COMMAND
-                # cmake -E echo "################ SHADERC"
                 D:/bgfx.cmake/bgfx-install/bin/shaderc
-                # "D:\\bgfx.cmake\\bgfx-install\\bin\\shaderc.exe"
                     -f ${SHADER_SRC_DIR}/${SHADER}
                     -o ${SHADER_DIR}/bin/${BIN_SHADER_NAME}
                     --platform ${PLATFORM}
@@ -103,17 +90,14 @@ macro(COMPILE_SHADER SHADER)
             MAIN_DEPENDENCY ${SHADER_SRC_DIR}/${SHADER}
             COMMENT "Compiling ${SHADER_TYPE} shader ${SHADER_NAME}"
         )
-        # message()
         message(${SHADER_SRC_DIR}/${SHADER})
         # add_custom_target(src DEPENDS ${SHADER_DIR}/bin/${BIN_SHADER_NAME})
-        message("############## Compiling ${SHADER_TYPE} shader ${SHADER_NAME}")
 
         list(APPEND OUT_SHADERS ${SHADER_DIR}/bin/${BIN_SHADER_NAME})
     endif()
 endmacro(COMPILE_SHADER)
 
 
-message("########## OUT_SHADERS : " ${OUT_SHADERS})
 # file(GLOB shaders shaders/src/*.sc)
 
 
