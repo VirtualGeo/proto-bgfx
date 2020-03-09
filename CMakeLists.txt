@@ -89,7 +89,9 @@ macro(COMPILE_SHADER SHADER)
         add_custom_command(
             OUTPUT ${SHADER_DIR}/bin/${BIN_SHADER_NAME}
             COMMAND
-                shaderc
+                # cmake -E echo "################ SHADERC"
+                D:/bgfx.cmake/bgfx-install/bin/shaderc
+                # "D:\\bgfx.cmake\\bgfx-install\\bin\\shaderc.exe"
                     -f ${SHADER_SRC_DIR}/${SHADER}
                     -o ${SHADER_DIR}/bin/${BIN_SHADER_NAME}
                     --platform ${PLATFORM}
@@ -98,9 +100,11 @@ macro(COMPILE_SHADER SHADER)
                     --profile ${PROFILE}
                     -i ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src
                     ${OPTIMIZATION}
-            MAIN_DEPENDENCY ${SHADER_DIR}/src/${SHADER}
+            MAIN_DEPENDENCY ${SHADER_SRC_DIR}/${SHADER}
             COMMENT "Compiling ${SHADER_TYPE} shader ${SHADER_NAME}"
         )
+        # message()
+        message(${SHADER_SRC_DIR}/${SHADER})
         # add_custom_target(src DEPENDS ${SHADER_DIR}/bin/${BIN_SHADER_NAME})
         message("############## Compiling ${SHADER_TYPE} shader ${SHADER_NAME}")
 
@@ -108,11 +112,6 @@ macro(COMPILE_SHADER SHADER)
     endif()
 endmacro(COMPILE_SHADER)
 
-message("############### BEGIN SHADERS LOOP : " ${IN_SHADERS})
-foreach(SHADER ${IN_SHADERS})
-    message("#################### SHADER : " ${SHADER})
-    compile_shader(${SHADER})
-endforeach()
 
 message("########## OUT_SHADERS : " ${OUT_SHADERS})
 # file(GLOB shaders shaders/src/*.sc)

@@ -110,7 +110,9 @@ static const uint64_t s_ptState[]{
 int main(int argc, char const *argv[]) {
 	std::cout << "hello bgfx !!!" << std::endl;
 
+
 	init();
+
 
 	// while (true)
 	while (!glfwWindowShouldClose(window)) {
@@ -138,30 +140,30 @@ void update() {
 	bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
 	bgfx::touch(0);
 
-	bgfx::dbgTextClear();
-	bgfx::dbgTextImage(bx::max<uint16_t>(uint16_t(WIN_WIDTH / 2 / 8), 20) - 20,
-					   bx::max<uint16_t>(uint16_t(WIN_HEIGHT / 2 / 16), 6) - 6,
-					   40, 12, s_logo, 160);
+	// bgfx::dbgTextClear();
+	// bgfx::dbgTextImage(bx::max<uint16_t>(uint16_t(WIN_WIDTH / 2 / 8), 20) - 20,
+	// 				   bx::max<uint16_t>(uint16_t(WIN_HEIGHT / 2 / 16), 6) - 6,
+	// 				   40, 12, s_logo, 160);
 
-	bgfx::dbgTextPrintf(0, 1, 0x0f,
-						"Color can be changed with ANSI "
-						"\x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b["
-						"14;me\x1b[0m code too.");
+	// bgfx::dbgTextPrintf(0, 1, 0x0f,
+	// 					"Color can be changed with ANSI "
+	// 					"\x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b["
+	// 					"14;me\x1b[0m code too.");
 
-	bgfx::dbgTextPrintf(
-		80, 1, 0x0f,
-		"\x1b[;0m    \x1b[;1m    \x1b[; 2m    \x1b[; 3m    \x1b[; 4m    \x1b[; "
-		"5m    \x1b[; 6m    \x1b[; 7m    \x1b[0m");
-	bgfx::dbgTextPrintf(
-		80, 2, 0x0f,
-		"\x1b[;8m    \x1b[;9m    \x1b[;10m    \x1b[;11m    \x1b[;12m    "
-		"\x1b[;13m    \x1b[;14m    \x1b[;15m    \x1b[0m");
+	// bgfx::dbgTextPrintf(
+	// 	80, 1, 0x0f,
+	// 	"\x1b[;0m    \x1b[;1m    \x1b[; 2m    \x1b[; 3m    \x1b[; 4m    \x1b[; "
+	// 	"5m    \x1b[; 6m    \x1b[; 7m    \x1b[0m");
+	// bgfx::dbgTextPrintf(
+	// 	80, 2, 0x0f,
+	// 	"\x1b[;8m    \x1b[;9m    \x1b[;10m    \x1b[;11m    \x1b[;12m    "
+	// 	"\x1b[;13m    \x1b[;14m    \x1b[;15m    \x1b[0m");
 
-	const bgfx::Stats *stats = bgfx::getStats();
-	bgfx::dbgTextPrintf(
-		0, 2, 0x0f,
-		"Backbuffer %dW x %dH in pixels, debug text %dW x %dH in characters.",
-		stats->width, stats->height, stats->textWidth, stats->textHeight);
+	// const bgfx::Stats *stats = bgfx::getStats();
+	// bgfx::dbgTextPrintf(
+	// 	0, 2, 0x0f,
+	// 	"Backbuffer %dW x %dH in pixels, debug text %dW x %dH in characters.",
+	// 	stats->width, stats->height, stats->textWidth, stats->textHeight);
 
 	// ------------------------- RENDER SCENE
 	const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
@@ -202,6 +204,7 @@ void update() {
 
 void init() {
 	glfwInit();
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Hello, bgfx from glfw!",
 							  NULL, NULL);
 	if (window == NULL) {
@@ -210,30 +213,41 @@ void init() {
 		throw std::runtime_error("Failed to create GLFW window");
 		// exit(-1);
 	}
-	glfwMakeContextCurrent(window); // question : what does this fonction ?
+	// glfwMakeContextCurrent(window); // question : what does this fonction ?
 	// glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	// bgfx::RenderFrame();
+	bgfx::renderFrame();
 
-	bgfx::PlatformData pd;
-	pd.nwh = glfwGetWin32Window(window);
-	bgfx::setPlatformData(pd);
+	// bgfx::PlatformData pd;
+	// pd.nwh = glfwGetWin32Window(window);
+	// bgfx::setPlatformData(pd);
 
-	bgfx::Init bgfxInit;
+	bgfx::Init bgfxInit = {};
 	// bgfxInit.type = bgfx::RendererType::OpenGL;
+	bgfxInit.platformData.nwh = glfwGetWin32Window(window);
+
 	bgfxInit.type =
 		bgfx::RendererType::Count; // Automatically choose a renderer
 	bgfxInit.resolution.width = WIN_WIDTH;
 	bgfxInit.resolution.height = WIN_HEIGHT;
 	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-	bgfx::init(bgfxInit);
+	// bgfx::init(bgfxInit);
+    if (!bgfx::init(bgfxInit))
+	{
+        exit(1);
+		// return 1;
+	}
+
 
 	bgfx::setDebug(BGFX_DEBUG_TEXT);
+	// bgfx::setDebug(BGFX_DEBUG_WIREFRAME);
 
 	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f,
 					   0);
 	bgfx::setViewRect(0, 0, 0, WIN_WIDTH, WIN_HEIGHT);
 	bgfx::touch(0);
 
-	glfwMakeContextCurrent(nullptr); // question : why we can do it ?
+	// glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
 	// ------------- INIT GEOMETRY
 	// bgfx::VertexDecl pcvDecl; // question : out of date ?
@@ -254,7 +268,7 @@ void init() {
 	// fileReader = BX_NEW(allocator, fileReader);
 	bgfx::ShaderHandle vsh = loadShader("cubes.vert");
 	bgfx::ShaderHandle fsh = loadShader("cubes.frag");
-	bgfx::ProgramHandle program = bgfx::createProgram(vsh, fsh, true);
+	program = bgfx::createProgram(vsh, fsh, true);
 
 	// bgfx::ProgramHandle program;
 	// program = loadProgram("cubes.vert", "cubes.frag");
@@ -285,31 +299,32 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 bgfx::ShaderHandle loadShader(const char *FILENAME) {
 	const char *shaderPath = "???";
 
-	switch (bgfx::getRendererType()) {
-	case bgfx::RendererType::Noop:
-	case bgfx::RendererType::Direct3D9:
-		shaderPath = "shaders/bin/dx9/";
-		break;
-	case bgfx::RendererType::Direct3D11:
-	case bgfx::RendererType::Direct3D12:
-		shaderPath = "shaders/bin/dx11/";
-		break;
-	case bgfx::RendererType::Gnm:
-		shaderPath = "shaders/bin/pssl/";
-		break;
-	case bgfx::RendererType::Metal:
-		shaderPath = "shaders/bin/metal/";
-		break;
-	case bgfx::RendererType::OpenGL:
-		shaderPath = "shaders/bin/glsl/";
-		break;
-	case bgfx::RendererType::OpenGLES:
-		shaderPath = "shaders/bin/essl/";
-		break;
-	case bgfx::RendererType::Vulkan:
-		shaderPath = "shaders/bin/spirv/";
-		break;
-	}
+	// switch (bgfx::getRendererType()) {
+	// case bgfx::RendererType::Noop:
+	// case bgfx::RendererType::Direct3D9:
+	// 	shaderPath = "shaders/bin/dx9/";
+	// 	break;
+	// case bgfx::RendererType::Direct3D11:
+	// case bgfx::RendererType::Direct3D12:
+	// 	shaderPath = "shaders/bin/dx11/";
+	// 	break;
+	// case bgfx::RendererType::Gnm:
+	// 	shaderPath = "shaders/bin/pssl/";
+	// 	break;
+	// case bgfx::RendererType::Metal:
+	// 	shaderPath = "shaders/bin/metal/";
+	// 	break;
+	// case bgfx::RendererType::OpenGL:
+	// 	shaderPath = "shaders/bin/glsl/";
+	// 	break;
+	// case bgfx::RendererType::OpenGLES:
+	// 	shaderPath = "shaders/bin/essl/";
+	// 	break;
+	// case bgfx::RendererType::Vulkan:
+	// 	shaderPath = "shaders/bin/spirv/";
+	// 	break;
+	// }
+	shaderPath = "shaders/bin/";
 
 	size_t shaderLen = strlen(shaderPath);
 	size_t fileLen = strlen(FILENAME);
