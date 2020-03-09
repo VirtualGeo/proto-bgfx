@@ -126,7 +126,7 @@ int main(int argc, char const *argv[]) {
 
 		// glfwSwapBuffers(window);
 		glfwPollEvents();
-		// std::cout << "update " << counter << std::endl;
+		std::cout << "update " << counter << std::endl;
 	}
 
 	shutdown();
@@ -230,16 +230,18 @@ void init() {
 		bgfx::RendererType::Count; // Automatically choose a renderer
 	bgfxInit.resolution.width = WIN_WIDTH;
 	bgfxInit.resolution.height = WIN_HEIGHT;
-	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+	// bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+	bgfxInit.resolution.reset = BGFX_RESET_NONE; // question
 	// bgfx::init(bgfxInit);
     if (!bgfx::init(bgfxInit))
 	{
-        exit(1);
+        throw std::runtime_error("Failed to initialize bgfx");
+        // exit(1);
 		// return 1;
 	}
 
 
-	bgfx::setDebug(BGFX_DEBUG_TEXT);
+	// bgfx::setDebug(BGFX_DEBUG_TEXT);
 	// bgfx::setDebug(BGFX_DEBUG_WIREFRAME);
 
 	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f,

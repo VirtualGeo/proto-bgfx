@@ -102,4 +102,5 @@ endmacro(COMPILE_SHADER)
 
 
 add_subdirectory(Modules/glfw)
+add_subdirectory(Modules/tinyobjloader)
 add_subdirectory(src)
