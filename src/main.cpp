@@ -11,6 +11,8 @@
 #include <bx/macros.h>
 #include <bx/uint32_t.h>
 // #include "bgfx/vertexdecl.h"
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
 
 #include <chrono>
 #include <direct.h>
@@ -18,6 +20,9 @@
 #include <stdio.h>
 #include <thread>
 // #include <filesystem>
+#include <glm/glm.hpp>
+// #include <assert.h>
+#include <cassert>
 
 #define WIN_WIDTH 640
 #define WIN_HEIGHT 480
@@ -41,14 +46,24 @@ struct PosColorVertex {
 	float x;
 	float y;
 	float z;
-	uint32_t abgr;
+	// uint32_t abgr;
+	float nx;
+	float ny;
+	float nz;
 };
 
+// static PosColorVertex cubeVertices[] = {
+// 	{-1.0f, 1.0f, 1.0f, 0xff000000},   {1.0f, 1.0f, 1.0f, 0xff0000ff},
+// 	{-1.0f, -1.0f, 1.0f, 0xff00ff00},  {1.0f, -1.0f, 1.0f, 0xff00ffff},
+// 	{-1.0f, 1.0f, -1.0f, 0xffff0000},  {1.0f, 1.0f, -1.0f, 0xffff00ff},
+// 	{-1.0f, -1.0f, -1.0f, 0xffffff00}, {1.0f, -1.0f, -1.0f, 0xffffffff},
+// };
+
 static PosColorVertex cubeVertices[] = {
-	{-1.0f, 1.0f, 1.0f, 0xff000000},   {1.0f, 1.0f, 1.0f, 0xff0000ff},
-	{-1.0f, -1.0f, 1.0f, 0xff00ff00},  {1.0f, -1.0f, 1.0f, 0xff00ffff},
-	{-1.0f, 1.0f, -1.0f, 0xffff0000},  {1.0f, 1.0f, -1.0f, 0xffff00ff},
-	{-1.0f, -1.0f, -1.0f, 0xffffff00}, {1.0f, -1.0f, -1.0f, 0xffffffff},
+	{-1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f},   {1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f},
+	{-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f},  {1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f},
+	{-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f},  {1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f},
+	{-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f}, {1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f},
 };
 
 static const uint16_t cubeTriList[] = {
@@ -72,6 +87,20 @@ static const uint64_t s_ptState[]{
 };
 // BX_STATIC_ASSERT(BX_COUNTOF(s_ptState) == BX_COUNTOF(s_ptNames));
 
+// struct Vertex {
+// 	glm::vec3 position;
+// 	glm::vec3 normal;
+// 	// glm::vec2 uvTexture;
+// };
+
+struct Vertex {
+	float x;
+	float y;
+	float z;
+	float nx;
+	float ny;
+	float nz;
+};
 // #define WIN32_LEAN_AND_MEAN
 // #include <windows.h>
 // #include <Shlwapi.h>
@@ -110,9 +139,7 @@ static const uint64_t s_ptState[]{
 int main(int argc, char const *argv[]) {
 	std::cout << "hello bgfx !!!" << std::endl;
 
-
 	init();
-
 
 	// while (true)
 	while (!glfwWindowShouldClose(window)) {
@@ -141,9 +168,9 @@ void update() {
 	bgfx::touch(0);
 
 	// bgfx::dbgTextClear();
-	// bgfx::dbgTextImage(bx::max<uint16_t>(uint16_t(WIN_WIDTH / 2 / 8), 20) - 20,
-	// 				   bx::max<uint16_t>(uint16_t(WIN_HEIGHT / 2 / 16), 6) - 6,
-	// 				   40, 12, s_logo, 160);
+	// bgfx::dbgTextImage(bx::max<uint16_t>(uint16_t(WIN_WIDTH / 2 / 8), 20) -
+	// 20, 				   bx::max<uint16_t>(uint16_t(WIN_HEIGHT / 2 / 16), 6) -
+	// 6, 40, 12, s_logo, 160);
 
 	// bgfx::dbgTextPrintf(0, 1, 0x0f,
 	// 					"Color can be changed with ANSI "
@@ -167,7 +194,7 @@ void update() {
 
 	// ------------------------- RENDER SCENE
 	const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
-	const bx::Vec3 eye = {0.0f, 0.0f, -15.0f};
+	const bx::Vec3 eye = {0.0f, 0.0f, -2.0f};
 	// {
 	float view[16];
 	bx::mtxLookAt(view, eye, at);
@@ -201,6 +228,8 @@ void update() {
 
 	bgfx::frame();
 }
+std::vector<Vertex> vertices;
+std::vector<uint16_t> triangle_list;
 
 void init() {
 	glfwInit();
@@ -230,16 +259,14 @@ void init() {
 		bgfx::RendererType::Count; // Automatically choose a renderer
 	bgfxInit.resolution.width = WIN_WIDTH;
 	bgfxInit.resolution.height = WIN_HEIGHT;
-	// bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-	bgfxInit.resolution.reset = BGFX_RESET_NONE; // question
+	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+	// bgfxInit.resolution.reset = BGFX_RESET_NONE; // question
 	// bgfx::init(bgfxInit);
-    if (!bgfx::init(bgfxInit))
-	{
-        throw std::runtime_error("Failed to initialize bgfx");
-        // exit(1);
+	if (!bgfx::init(bgfxInit)) {
+		throw std::runtime_error("Failed to initialize bgfx");
+		// exit(1);
 		// return 1;
 	}
-
 
 	// bgfx::setDebug(BGFX_DEBUG_TEXT);
 	// bgfx::setDebug(BGFX_DEBUG_WIREFRAME);
@@ -256,20 +283,106 @@ void init() {
 	bgfx::VertexLayout ms_layout;
 	ms_layout.begin()
 		.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-		.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+		.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+		// .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+		// .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
 		.end();
 
 	// bgfx::VertexBufferHandle vbh;
-	vbh = bgfx::createVertexBuffer(
-		bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), ms_layout);
 
+	// std::string inputFile = "D:/proto-bgfx/Assets/Sponza/sponza.obj";
+	std::string inputFile = "D:/proto-bgfx/Assets/Teapot/teapot.obj";
+	tinyobj::attrib_t attrib;
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
+
+	std::string warn;
+	std::string err;
+
+	const bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,
+									  inputFile.c_str());
+
+	if (!warn.empty()) {
+		std::cout << warn << std::endl;
+	}
+
+	if (!err.empty()) {
+		std::cerr << err << std::endl;
+	}
+
+	if (!ret) {
+        throw std::runtime_error("");
+		// exit(1);
+	}
+
+	if (attrib.vertices.empty() || attrib.normals.empty() || attrib.texcoords.empty()) {
+		throw std::runtime_error("bad vertices");
+	}
+	// std::vector<float[8]> vertices;
+	// std::vector<Vertex> vertices;
+	vertices.clear();
+	// std::vector<uint16_t> triangle_list;
+
+	// attrib.vertices;
+	// Loop over shapes
+	for (size_t s = 0; s < shapes.size(); s++) {
+		// Loop over faces(polygon)
+		size_t index_offset = 0;
+		for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
+			int fv = shapes[s].mesh.num_face_vertices[f];
+
+			// Loop over vertices in the face.
+			for (size_t v = 0; v < fv; v++) {
+				// access to vertex
+				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+				tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
+				tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
+				tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
+				tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
+				tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
+				tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
+				// tinyobj::real_t tx =
+				// 	attrib.texcoords[2 * idx.texcoord_index + 0];
+				// tinyobj::real_t ty =
+				// 	attrib.texcoords[2 * idx.texcoord_index + 1];
+				
+				// vertices.push_back({{vx, vy, vz}, {nx, ny, nz}}); // question : emplace_back ?
+				vertices.push_back({vx, vy, vz, nx, ny, nz}); // question : emplace_back ?
+				// Optional: vertex colors
+				// tinyobj::real_t red = attrib.colors[3*idx.vertex_index+0];
+				// tinyobj::real_t green = attrib.colors[3*idx.vertex_index+1];
+				// tinyobj::real_t blue = attrib.colors[3*idx.vertex_index+2];
+				triangle_list.push_back(uint16_t(triangle_list.size()));
+			}
+			index_offset += fv;
+
+			// per-face material
+			shapes[s].mesh.material_ids[f];
+		}
+	}
+
+	// vbh = bgfx::createVertexBuffer(
+	// 	bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), ms_layout);
+	// ibh = bgfx::createIndexBuffer(
+	// 	bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
+	const uint16_t stride = ms_layout.getStride();
+
+	// const bgfx::Memory * mem = bgfx::alloc(vertices.size * stride);
+	// bx::memCopy(vertices, )
+	// vbh = bgfx::createVertexBuffer(mem, ms_layout);
+	assert(stride == sizeof(Vertex));
+
+	vbh = bgfx::createVertexBuffer(
+		bgfx::makeRef(vertices.data(), sizeof(Vertex) * vertices.size()), ms_layout);
 	ibh = bgfx::createIndexBuffer(
-		bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
+		bgfx::makeRef(triangle_list.data(), sizeof(uint16_t) * triangle_list.size()));
 
 	// ----------------- INIT SHADER
 	// fileReader = BX_NEW(allocator, fileReader);
 	bgfx::ShaderHandle vsh = loadShader("cubes.vert");
 	bgfx::ShaderHandle fsh = loadShader("cubes.frag");
+	// bgfx::ShaderHandle vsh = loadShader("mesh.vert");
+	// bgfx::ShaderHandle fsh = loadShader("mesh.frag");
 	program = bgfx::createProgram(vsh, fsh, true);
 
 	// bgfx::ProgramHandle program;
@@ -280,6 +393,7 @@ void shutdown() {
 	glfwMakeContextCurrent(window);
 	bgfx::destroy(ibh);
 	bgfx::destroy(vbh);
+	bgfx::destroy(program);
 	bgfx::shutdown();
 
 	glfwMakeContextCurrent(nullptr);

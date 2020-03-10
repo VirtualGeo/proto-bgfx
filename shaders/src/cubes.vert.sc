@@ -1,5 +1,5 @@
-$input a_position, a_color0
-$output v_color0
+$input a_position, a_normal
+$output v_color0, v_normal
 
 /*
  * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
@@ -14,5 +14,10 @@ $output v_color0
 void main()
 {
 	gl_Position = mul(u_modelViewProj, vec4(a_position, 1.0) );
-	v_color0 = a_color0;
+	//v_color0 = a_color0;
+	
+	//v_normal = a_normal;
+	//vec3 normal = a_normal.xyz*2.0 - 1.0;
+	vec3 normal = a_normal;
+	v_normal = mul(u_modelView, vec4(normal, 0.0) ).xyz;
 }

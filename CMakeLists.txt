@@ -51,6 +51,10 @@ endfunction(GET_SHADER_INFOS)
 set(IN_SHADERS
     cubes.vert.sc 
     cubes.frag.sc
+    # blinnphong_vert.sc
+    # blinnphong_frag.sc
+    # mesh_vert.sc
+    # mesh_frag.sc
 )
 
 set(OUT_SHADERS )
@@ -103,4 +107,5 @@ endmacro(COMPILE_SHADER)
 
 add_subdirectory(Modules/glfw)
 add_subdirectory(Modules/tinyobjloader)
+add_subdirectory(Modules/glm)
 add_subdirectory(src)
