@@ -13,7 +13,12 @@
 // #include "bgfx/vertexdecl.h"
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
-#include "stb/stb_image.h"
+// #include "stb_image.h"
+// #include <stb_image.h>
+// #include "stb/stb_image.h"
+// #define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+// #include <stb/stb_image.h>
 
 #include <chrono>
 #include <direct.h>
@@ -64,10 +69,14 @@ struct PosColorVertex {
 // };
 
 static PosColorVertex cubeVertices[] = {
-	{-1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f},   {1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f},
-	{-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f},  {1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f},
-	{-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f},  {1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f},
-	{-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f}, {1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f},
+	{-1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f},
+	{1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f},
+	{-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f},
+	{1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f},
+	{-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f},
+	{1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f},
+	{-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f},
+	{1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f},
 };
 
 static const uint16_t cubeTriList[] = {
@@ -317,11 +326,12 @@ void init() {
 	}
 
 	if (!ret) {
-        throw std::runtime_error("");
+		throw std::runtime_error("");
 		// exit(1);
 	}
 
-	if (attrib.vertices.empty() || attrib.normals.empty() || attrib.texcoords.empty()) {
+	if (attrib.vertices.empty() || attrib.normals.empty() ||
+		attrib.texcoords.empty()) {
 		throw std::runtime_error("bad vertices");
 	}
 	// std::vector<float[8]> vertices;
@@ -351,9 +361,11 @@ void init() {
 					attrib.texcoords[2 * idx.texcoord_index + 0];
 				tinyobj::real_t ty =
 					attrib.texcoords[2 * idx.texcoord_index + 1];
-				
-				// vertices.push_back({{vx, vy, vz}, {nx, ny, nz}}); // question : emplace_back ?
-				vertices.push_back({vx, vy, vz, nx, ny, nz, tx, ty}); // question : emplace_back ?
+
+				// vertices.push_back({{vx, vy, vz}, {nx, ny, nz}}); // question
+				// : emplace_back ?
+				vertices.push_back({vx, vy, vz, nx, ny, nz, tx,
+									ty}); // question : emplace_back ?
 				// Optional: vertex colors
 				// tinyobj::real_t red = attrib.colors[3*idx.vertex_index+0];
 				// tinyobj::real_t green = attrib.colors[3*idx.vertex_index+1];
@@ -379,9 +391,10 @@ void init() {
 	assert(stride == sizeof(Vertex));
 
 	vbh = bgfx::createVertexBuffer(
-		bgfx::makeRef(vertices.data(), sizeof(Vertex) * vertices.size()), ms_layout);
-	ibh = bgfx::createIndexBuffer(
-		bgfx::makeRef(triangle_list.data(), sizeof(uint16_t) * triangle_list.size()));
+		bgfx::makeRef(vertices.data(), sizeof(Vertex) * vertices.size()),
+		ms_layout);
+	ibh = bgfx::createIndexBuffer(bgfx::makeRef(
+		triangle_list.data(), sizeof(uint16_t) * triangle_list.size()));
 
 	// ----------------- INIT SHADER
 	// fileReader = BX_NEW(allocator, fileReader);
@@ -393,7 +406,8 @@ void init() {
 
 	s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
 
-	m_texture = loadTexture("textures/checkerboard.png");
+	// m_texture = loadTexture("textures/checkerboard.png");
+	m_texture = loadTexture("Assets/Sponza/textures/background_ddn.tga");
 
 	// bgfx::ProgramHandle program;
 	// program = loadProgram("cubes.vert", "cubes.frag");
@@ -494,14 +508,28 @@ bgfx::ShaderHandle loadShader(const char *FILENAME) {
 	return bgfx::createShader(mem);
 }
 
-bgfx::TextureHandle loadTexture(const char *FILENAME) {
+bgfx::TextureHandle loadTexture(const char *filename) {
 
 	int width;
 	int height;
 	int comp;
-	unsigned char * image = stbi
-	// return bgfx::createTexture2D();
+	unsigned char *image =
+		stbi_load(filename, &width, &height, &comp, STBI_rgb);
 
+	if (image == nullptr) {
+		// throw(std::string("Failed to load texture : ") + std::string(filename));
+		// throw(std::string("Failed to load texture : "));
+ 		throw std::runtime_error("Failed to load texture");
+	}
+
+	stbi_image_free(image);
+	image = nullptr;
+	// return bgfx::createTexture2D();
+	bool hasMips = false;
+
+	return bgfx::createTexture2D(uint16_t(width), uint16_t(height), hasMips, 1,
+								 bgfx::TextureFormat::Enum::RGB8);
 	// ibh = bgfx::createIndexBuffer(
-		// bgfx::makeRef(triangle_list.data(), sizeof(uint16_t) * triangle_list.size()));
+	// bgfx::makeRef(triangle_list.data(), sizeof(uint16_t) *
+	// triangle_list.size()));
 }
