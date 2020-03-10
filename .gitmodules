@@ -10,3 +10,6 @@
 [submodule "Modules/glm"]
 	path = Modules/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "Modules/stb"]
+	path = Modules/stb
+	url = https://github.com/extemporelang/stb.git
