@@ -13,6 +13,7 @@
 // #include "bgfx/vertexdecl.h"
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
+#include "stb/stb_image.h"
 
 #include <chrono>
 #include <direct.h>
@@ -33,6 +34,7 @@ void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void update();
 bgfx::ShaderHandle loadShader(const char *FILENAME);
+bgfx::TextureHandle loadTexture(const char *FILENAME);
 
 // ----------------- GLOBAL VARS
 GLFWwindow *window = nullptr;
@@ -41,6 +43,8 @@ bgfx::IndexBufferHandle ibh;
 // bx::FileReaderI * fileReader = nullptr;
 bgfx::ProgramHandle program;
 unsigned int counter = 0;
+bgfx::UniformHandle s_texColor;
+bgfx::TextureHandle m_texture;
 
 struct PosColorVertex {
 	float x;
@@ -100,6 +104,8 @@ struct Vertex {
 	float nx;
 	float ny;
 	float nz;
+	float tx;
+	float ty;
 };
 // #define WIN32_LEAN_AND_MEAN
 // #include <windows.h>
@@ -284,7 +290,7 @@ void init() {
 	ms_layout.begin()
 		.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
 		.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-		// .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+		.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
 		// .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
 		.end();
 
@@ -341,13 +347,13 @@ void init() {
 				tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
 				tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
 				tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
-				// tinyobj::real_t tx =
-				// 	attrib.texcoords[2 * idx.texcoord_index + 0];
-				// tinyobj::real_t ty =
-				// 	attrib.texcoords[2 * idx.texcoord_index + 1];
+				tinyobj::real_t tx =
+					attrib.texcoords[2 * idx.texcoord_index + 0];
+				tinyobj::real_t ty =
+					attrib.texcoords[2 * idx.texcoord_index + 1];
 				
 				// vertices.push_back({{vx, vy, vz}, {nx, ny, nz}}); // question : emplace_back ?
-				vertices.push_back({vx, vy, vz, nx, ny, nz}); // question : emplace_back ?
+				vertices.push_back({vx, vy, vz, nx, ny, nz, tx, ty}); // question : emplace_back ?
 				// Optional: vertex colors
 				// tinyobj::real_t red = attrib.colors[3*idx.vertex_index+0];
 				// tinyobj::real_t green = attrib.colors[3*idx.vertex_index+1];
@@ -384,6 +390,10 @@ void init() {
 	// bgfx::ShaderHandle vsh = loadShader("mesh.vert");
 	// bgfx::ShaderHandle fsh = loadShader("mesh.frag");
 	program = bgfx::createProgram(vsh, fsh, true);
+
+	s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
+
+	m_texture = loadTexture("textures/checkerboard.png");
 
 	// bgfx::ProgramHandle program;
 	// program = loadProgram("cubes.vert", "cubes.frag");
@@ -482,4 +492,16 @@ bgfx::ShaderHandle loadShader(const char *FILENAME) {
 	free(filePath);
 
 	return bgfx::createShader(mem);
+}
+
+bgfx::TextureHandle loadTexture(const char *FILENAME) {
+
+	int width;
+	int height;
+	int comp;
+	unsigned char * image = stbi
+	// return bgfx::createTexture2D();
+
+	// ibh = bgfx::createIndexBuffer(
+		// bgfx::makeRef(triangle_list.data(), sizeof(uint16_t) * triangle_list.size()));
 }
