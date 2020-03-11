@@ -52,8 +52,8 @@ struct Vertex {
 	float nx;
 	float ny;
 	float nz;
-	// float tx;
-	// float ty;
+	float tx;
+	float ty;
 };
 
 struct Mesh {
@@ -65,7 +65,7 @@ struct Mesh {
 		m_layout.begin()
 			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-			// .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
 			// .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
 			.end();
 
@@ -96,6 +96,7 @@ struct Mesh {
 
 		if (attrib.vertices.empty() || attrib.normals.empty() ||
 			attrib.texcoords.empty()) {
+			std::cout << "Mesh: vertex load failed '" << filePath << "'" << std::endl;
 			throw std::runtime_error("bad vertices");
 		}
 		// std::vector<float[8]> vertices;
@@ -105,10 +106,10 @@ struct Mesh {
 
 		// std::vector<Vertex> vertices;
 		// std::vector<uint16_t> triangle_list;
-        m_vertices.clear();
-        m_indices.clear();
-        m_vertices.reserve(1000);
-        m_indices.reserve(1000);
+		m_vertices.clear();
+		m_indices.clear();
+		m_vertices.reserve(1000);
+		m_indices.reserve(1000);
 
 		// attrib.vertices;
 		// Loop over shapes
@@ -144,9 +145,9 @@ struct Mesh {
 					// vertices.push_back({{vx, vy, vz}, {nx, ny, nz}}); //
 					// question : emplace_back ?
 					// vertices.push_back({vx, vy, vz, nx, ny, nz, tx,
-										// ty}); // question : emplace_back ?
-					m_vertices.push_back(
-						{vx, vy, vz, nx, ny, nz}); // question : emplace_back ?
+					// ty}); // question : emplace_back ?
+					m_vertices.push_back({vx, vy, vz, nx, ny, nz, tx,
+										  ty}); // question : emplace_back ?
 					// Optional: vertex colors
 					// tinyobj::real_t red =
 					// attrib.colors[3*idx.vertex_index+0]; tinyobj::real_t
@@ -193,6 +194,8 @@ struct Mesh {
 			m_layout);
 		m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(
 			m_indices.data(), sizeof(uint16_t) * m_indices.size()));
+
+		// std::cout << m_vertices << std::endl;
 	}
 
 	void submit(bgfx::ViewId id, bgfx::ProgramHandle program, const float *mtx,
@@ -212,10 +215,10 @@ struct Mesh {
 		// m_indices = nullptr;
 		bgfx::destroy(m_vbh);
 		bgfx::destroy(m_ibh);
-        // bgfx::destroy(m_layout);
+		// bgfx::destroy(m_layout);
 	}
 	// bgfx::
-    // uint8_t _align[4];
+	// uint8_t _align[4];
 	// uint16_t m_numVertices;
 	// uint8_t *m_vertices;
 	// uint32_t m_numIndices;

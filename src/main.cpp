@@ -139,6 +139,7 @@ void init() {
 	if (g_window == NULL) {
 		// std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
+		std::cout << "Failed to create GLFW window" << std::endl;
 		throw std::runtime_error("Failed to create GLFW window");
 		// exit(-1);
 	}
@@ -163,6 +164,7 @@ void init() {
 	// bgfxInit.resolution.reset = BGFX_RESET_NONE; // question
 	// bgfx::init(bgfxInit);
 	if (!bgfx::init(bgfxInit)) {
+		std::cout << "Failed to initialize bgfx" << std::endl;
 		throw std::runtime_error("Failed to initialize bgfx");
 		// exit(1);
 		// return 1;
@@ -180,6 +182,7 @@ void init() {
 
 	// std::string inputFile = "D:/proto-bgfx/Assets/Sponza/sponza.obj";
 	g_mesh = new Mesh("D:/proto-bgfx/Assets/Teapot/teapot.obj");
+	// g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/teapot/teapot.obj");
 
 	// ----------------- INIT SHADER
 	// fileReader = BX_NEW(allocator, fileReader);
@@ -192,7 +195,10 @@ void init() {
 	g_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
 
 	// g_texture = loadTexture("textures/checkerboard.png");
-	g_texture = loadTexture("Assets/Sponza/textures/background_ddn.tga");
+	// g_texture = loadTexture("Assets/Sponza/textures/background_ddn.tga");
+	// g_texture = loadTexture("Assets/McGuire/teapot/default.png");
+	// g_texture = loadTexture("D:/proto-bgfx/Assets/Teapot/default.png");
+	loadTexture("D:/proto-bgfx/Assets/Teapot/default.png");
 
 	// bgfx::ProgramHandle program;
 	// program = loadProgram("cubes.vert", "cubes.frag");
@@ -267,6 +273,7 @@ void update() {
 	// bgfx::setIndexBuffer(ibh);
 	// bgfx::setTransform(mtx);
 	// bgfx::setState(state);
+	bgfx::setTexture(0, g_texColor, g_texture);
 	g_mesh->submit(0, g_program, mtx, state);
 	// g_mesh->submit(0, g_program, mtx, stateTransparent);
 	// g_mesh->submit(0, g_program, mtx, stateOpaque);
@@ -277,18 +284,20 @@ void update() {
 }
 
 void shutdown() {
+	// glfwMakeContextCurrent(nullptr);
+	glfwDestroyWindow(g_window);
+	// window = nullptr; // question : necessary ?
+	glfwTerminate();
 	// glfwMakeContextCurrent(g_window);
+
 	// bgfx::destroy(ibh);
 	// bgfx::destroy(vbh);
 	delete g_mesh;
 	g_mesh = nullptr;
 	bgfx::destroy(g_program);
+	bgfx::destroy(g_texture);
+	bgfx::destroy(g_texColor);
 	bgfx::shutdown();
-
-	// glfwMakeContextCurrent(nullptr);
-	glfwDestroyWindow(g_window);
-	// window = nullptr; // question : necessary ?
-	glfwTerminate();
 }
 
 void processInput(GLFWwindow *window) {
@@ -373,28 +382,69 @@ bgfx::ShaderHandle loadShader(const char *FILENAME) {
 	return bgfx::createShader(mem);
 }
 
+unsigned char *image = nullptr;
+
+const bgfx::Memory *stippleTex;
+
 bgfx::TextureHandle loadTexture(const char *filename) {
 
 	int width;
 	int height;
-	int comp;
-	unsigned char *image =
-		stbi_load(filename, &width, &height, &comp, STBI_rgb);
+	int nbChannel;
+	// unsigned char *image =
+	// stbi_load(filename, &width, &height, &comp, STBI_rgb);
+	image = stbi_load(filename, &width, &height, &nbChannel, STBI_rgb);
+	size_t imageSize = width * height * nbChannel;
+	assert(nbChannel == 3);
 
 	if (image == nullptr) {
 		// throw(std::string("Failed to load texture : ") +
 		// std::string(filename)); throw(std::string("Failed to load texture :
 		// "));
+		std::cout << "Failed to load texture" << std::endl;
 		throw std::runtime_error("Failed to load texture");
 	}
-
-	stbi_image_free(image);
-	image = nullptr;
+	// stbi_image_free(image);
+	// image = nullptr;
 	// return bgfx::createTexture2D();
 	bool hasMips = false;
+	// struct KnightPos {
+	// 	int32_t m_x;
+	// 	int32_t m_y;
+	// };
 
-	return bgfx::createTexture2D(uint16_t(width), uint16_t(height), hasMips, 1,
-								 bgfx::TextureFormat::Enum::RGB8);
+	// static const KnightPos knightTour[8 * 4] = {
+	// 	{0, 0}, {1, 2}, {3, 3}, {4, 1}, {5, 3}, {7, 2}, {6, 0}, {5, 2},
+	// 	{7, 3}, {6, 1}, {4, 0}, {3, 2}, {2, 0}, {0, 1}, {1, 3}, {2, 1},
+	// 	{0, 2}, {1, 0}, {2, 2}, {0, 3}, {1, 1}, {3, 0}, {4, 2}, {5, 0},
+	// 	{7, 1}, {6, 3}, {5, 1}, {7, 0}, {6, 2}, {4, 3}, {3, 1}, {2, 3},
+	// };
+
+	// const bgfx::Memory *stippleTex = bgfx::alloc(8 * 4 * 3);
+	// stippleTex = bgfx::alloc(imageSize);
+	// bx::memSet(stippleTex->data, 0, stippleTex->size);
+
+	// for (uint8_t ii = 0; ii < width * height; ++ii) {
+	// 	// stippleTex->data[knightTour[ii].m_y * 8 + knightTour[ii].m_x] = ii * 4;
+	// 	stippleTex->data[ii * 3] = image[ii * 3];
+	// 	stippleTex->data[ii * 3 + 1] = image[ii * 3 + 1];
+	// 	stippleTex->data[ii * 3 + 2] = image[ii * 3 + 2];
+	// }
+
+	// *stippleTex->data = *image;
+
+	g_texture = bgfx::createTexture2D(
+		width, height, false, 1, bgfx::TextureFormat::RGB8,
+		// BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT, stippleTex);
+		BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, bgfx::makeRef(image, imageSize));
+
+	// g_texture = bgfx::createTexture2D(
+	// 	uint16_t(width), uint16_t(height), hasMips, nbChannel,
+	// 	//  bgfx::TextureFormat::Enum::RGB8, BGFX_TEXTURE_NONE |
+	// 	//  BGFX_SAMPLER_NONE, bgfx::makeRef(image, width * height * 3 *
+	// 	//  sizeof(uint32_t)));
+	// 	bgfx::TextureFormat::Enum::RGB8, BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE,
+	// 	bgfx::makeRef(image, imageSize * 3));
 	// ibh = bgfx::createIndexBuffer(
 	// bgfx::makeRef(triangle_list.data(), sizeof(uint16_t) *
 	// triangle_list.size()));
