@@ -12,7 +12,7 @@
 #include <bx/uint32_t.h>
 // #include "bgfx/vertexdecl.h"
 #define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+// #include "tiny_obj_loader.h"
 // #include "stb_image.h"
 // #include <stb_image.h>
 // #include "stb/stb_image.h"
@@ -28,6 +28,7 @@
 // #include <filesystem>
 #include <glm/glm.hpp>
 // #include <assert.h>
+#include "Mesh.h"
 #include <cassert>
 
 #define WIN_WIDTH 640
@@ -42,47 +43,15 @@ bgfx::ShaderHandle loadShader(const char *FILENAME);
 bgfx::TextureHandle loadTexture(const char *FILENAME);
 
 // ----------------- GLOBAL VARS
-GLFWwindow *window = nullptr;
-bgfx::VertexBufferHandle vbh;
-bgfx::IndexBufferHandle ibh;
+GLFWwindow *g_window = nullptr;
+// bgfx::VertexBufferHandle vbh;
+// bgfx::IndexBufferHandle ibh;
 // bx::FileReaderI * fileReader = nullptr;
-bgfx::ProgramHandle program;
+bgfx::ProgramHandle g_program;
 unsigned int counter = 0;
-bgfx::UniformHandle s_texColor;
-bgfx::TextureHandle m_texture;
-
-struct PosColorVertex {
-	float x;
-	float y;
-	float z;
-	// uint32_t abgr;
-	float nx;
-	float ny;
-	float nz;
-};
-
-// static PosColorVertex cubeVertices[] = {
-// 	{-1.0f, 1.0f, 1.0f, 0xff000000},   {1.0f, 1.0f, 1.0f, 0xff0000ff},
-// 	{-1.0f, -1.0f, 1.0f, 0xff00ff00},  {1.0f, -1.0f, 1.0f, 0xff00ffff},
-// 	{-1.0f, 1.0f, -1.0f, 0xffff0000},  {1.0f, 1.0f, -1.0f, 0xffff00ff},
-// 	{-1.0f, -1.0f, -1.0f, 0xffffff00}, {1.0f, -1.0f, -1.0f, 0xffffffff},
-// };
-
-static PosColorVertex cubeVertices[] = {
-	{-1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f},
-	{1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f},
-	{-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f},
-	{1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f},
-	{-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f},
-	{1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f},
-	{-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f},
-	{1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f},
-};
-
-static const uint16_t cubeTriList[] = {
-	0, 1, 2, 1, 3, 2, 4, 6, 5, 5, 6, 7, 0, 2, 4, 4, 2, 6,
-	1, 5, 3, 5, 7, 3, 0, 4, 1, 4, 5, 1, 2, 3, 6, 6, 3, 7,
-};
+bgfx::UniformHandle g_texColor;
+bgfx::TextureHandle g_texture;
+Mesh *g_mesh = nullptr;
 
 static const char *s_ptNames[]{
 	"Triangle List",
@@ -100,22 +69,6 @@ static const uint64_t s_ptState[]{
 };
 // BX_STATIC_ASSERT(BX_COUNTOF(s_ptState) == BX_COUNTOF(s_ptNames));
 
-// struct Vertex {
-// 	glm::vec3 position;
-// 	glm::vec3 normal;
-// 	// glm::vec2 uvTexture;
-// };
-
-struct Vertex {
-	float x;
-	float y;
-	float z;
-	float nx;
-	float ny;
-	float nz;
-	float tx;
-	float ty;
-};
 // #define WIN32_LEAN_AND_MEAN
 // #include <windows.h>
 // #include <Shlwapi.h>
@@ -157,8 +110,8 @@ int main(int argc, char const *argv[]) {
 	init();
 
 	// while (true)
-	while (!glfwWindowShouldClose(window)) {
-		processInput(window);
+	while (!glfwWindowShouldClose(g_window)) {
+		processInput(g_window);
 
 		update();
 		// bgfx::frame();
@@ -166,7 +119,7 @@ int main(int argc, char const *argv[]) {
 		counter++;
 		// std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
-		// glfwSwapBuffers(window);
+		// glfwSwapBuffers(g_window);
 		glfwPollEvents();
 		std::cout << "update " << counter << std::endl;
 	}
@@ -176,6 +129,73 @@ int main(int argc, char const *argv[]) {
 	// glfwTerminate();
 
 	return 0;
+}
+
+void init() {
+	glfwInit();
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	g_window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Hello, bgfx from glfw!",
+								NULL, NULL);
+	if (g_window == NULL) {
+		// std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		throw std::runtime_error("Failed to create GLFW window");
+		// exit(-1);
+	}
+	// glfwMakeContextCurrent(window); // question : what does this fonction ?
+	// glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	// bgfx::RenderFrame();
+	bgfx::renderFrame();
+
+	// bgfx::PlatformData pd;
+	// pd.nwh = glfwGetWin32Window(window);
+	// bgfx::setPlatformData(pd);
+
+	bgfx::Init bgfxInit = {};
+	// bgfxInit.type = bgfx::RendererType::OpenGL;
+	bgfxInit.platformData.nwh = glfwGetWin32Window(g_window);
+
+	bgfxInit.type =
+		bgfx::RendererType::Count; // Automatically choose a renderer
+	bgfxInit.resolution.width = WIN_WIDTH;
+	bgfxInit.resolution.height = WIN_HEIGHT;
+	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+	// bgfxInit.resolution.reset = BGFX_RESET_NONE; // question
+	// bgfx::init(bgfxInit);
+	if (!bgfx::init(bgfxInit)) {
+		throw std::runtime_error("Failed to initialize bgfx");
+		// exit(1);
+		// return 1;
+	}
+
+	// bgfx::setDebug(BGFX_DEBUG_TEXT);
+	// bgfx::setDebug(BGFX_DEBUG_WIREFRAME);
+
+	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f,
+					   0);
+	bgfx::setViewRect(0, 0, 0, WIN_WIDTH, WIN_HEIGHT);
+	bgfx::touch(0);
+
+	// glfwMakeContextCurrent(nullptr); // question : why we can do it ?
+
+	// std::string inputFile = "D:/proto-bgfx/Assets/Sponza/sponza.obj";
+	g_mesh = new Mesh("D:/proto-bgfx/Assets/Teapot/teapot.obj");
+
+	// ----------------- INIT SHADER
+	// fileReader = BX_NEW(allocator, fileReader);
+	bgfx::ShaderHandle vsh = loadShader("cubes.vert");
+	bgfx::ShaderHandle fsh = loadShader("cubes.frag");
+	// bgfx::ShaderHandle vsh = loadShader("mesh.vert");
+	// bgfx::ShaderHandle fsh = loadShader("mesh.frag");
+	g_program = bgfx::createProgram(vsh, fsh, true);
+
+	g_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
+
+	// g_texture = loadTexture("textures/checkerboard.png");
+	g_texture = loadTexture("Assets/Sponza/textures/background_ddn.tga");
+
+	// bgfx::ProgramHandle program;
+	// program = loadProgram("cubes.vert", "cubes.frag");
 }
 
 void update() {
@@ -226,202 +246,47 @@ void update() {
 
 	float mtx[16];
 	bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
-	bgfx::setTransform(mtx);
+	// bgfx::setTransform(mtx);
 
+	const uint64_t state = 0 | BGFX_STATE_WRITE_R | BGFX_STATE_WRITE_G |
+						   BGFX_STATE_WRITE_B | BGFX_STATE_WRITE_A |
+						   BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
+						   BGFX_STATE_CULL_CW | BGFX_STATE_MSAA | s_ptState[0];
+	// UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
+
+	// const uint64_t stateTransparent =
+	// 	0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A |
+	// 	BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA |
+	// 	BGFX_STATE_BLEND_ALPHA;
+
+	// const uint64_t stateOpaque = BGFX_STATE_DEFAULT;
+
+	// state = BGFX_STATE_DEFAULT;
 	// bgfx::submit(0, program);
-	bgfx::setVertexBuffer(0, vbh);
-	bgfx::setIndexBuffer(ibh);
+	// bgfx::setVertexBuffer(0, vbh);
+	// bgfx::setIndexBuffer(ibh);
+	// bgfx::setTransform(mtx);
+	// bgfx::setState(state);
+	g_mesh->submit(0, g_program, mtx, state);
+	// g_mesh->submit(0, g_program, mtx, stateTransparent);
+	// g_mesh->submit(0, g_program, mtx, stateOpaque);
 
-	uint64_t state = 0 | BGFX_STATE_WRITE_R | BGFX_STATE_WRITE_G |
-					 BGFX_STATE_WRITE_B | BGFX_STATE_WRITE_A |
-					 BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
-					 BGFX_STATE_CULL_CW | BGFX_STATE_MSAA | s_ptState[0];
-
-	bgfx::setState(state);
-
-	bgfx::submit(0, program);
+	// bgfx::submit(0, g_program);
 
 	bgfx::frame();
 }
-std::vector<Vertex> vertices;
-std::vector<uint16_t> triangle_list;
-
-void init() {
-	glfwInit();
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Hello, bgfx from glfw!",
-							  NULL, NULL);
-	if (window == NULL) {
-		// std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		throw std::runtime_error("Failed to create GLFW window");
-		// exit(-1);
-	}
-	// glfwMakeContextCurrent(window); // question : what does this fonction ?
-	// glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	// bgfx::RenderFrame();
-	bgfx::renderFrame();
-
-	// bgfx::PlatformData pd;
-	// pd.nwh = glfwGetWin32Window(window);
-	// bgfx::setPlatformData(pd);
-
-	bgfx::Init bgfxInit = {};
-	// bgfxInit.type = bgfx::RendererType::OpenGL;
-	bgfxInit.platformData.nwh = glfwGetWin32Window(window);
-
-	bgfxInit.type =
-		bgfx::RendererType::Count; // Automatically choose a renderer
-	bgfxInit.resolution.width = WIN_WIDTH;
-	bgfxInit.resolution.height = WIN_HEIGHT;
-	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-	// bgfxInit.resolution.reset = BGFX_RESET_NONE; // question
-	// bgfx::init(bgfxInit);
-	if (!bgfx::init(bgfxInit)) {
-		throw std::runtime_error("Failed to initialize bgfx");
-		// exit(1);
-		// return 1;
-	}
-
-	// bgfx::setDebug(BGFX_DEBUG_TEXT);
-	// bgfx::setDebug(BGFX_DEBUG_WIREFRAME);
-
-	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f,
-					   0);
-	bgfx::setViewRect(0, 0, 0, WIN_WIDTH, WIN_HEIGHT);
-	bgfx::touch(0);
-
-	// glfwMakeContextCurrent(nullptr); // question : why we can do it ?
-
-	// ------------- INIT GEOMETRY
-	// bgfx::VertexDecl pcvDecl; // question : out of date ?
-	bgfx::VertexLayout ms_layout;
-	ms_layout.begin()
-		.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-		.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-		.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-		// .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-		.end();
-
-	// bgfx::VertexBufferHandle vbh;
-
-	// std::string inputFile = "D:/proto-bgfx/Assets/Sponza/sponza.obj";
-	std::string inputFile = "D:/proto-bgfx/Assets/Teapot/teapot.obj";
-	tinyobj::attrib_t attrib;
-	std::vector<tinyobj::shape_t> shapes;
-	std::vector<tinyobj::material_t> materials;
-
-	std::string warn;
-	std::string err;
-
-	const bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,
-									  inputFile.c_str());
-
-	if (!warn.empty()) {
-		std::cout << warn << std::endl;
-	}
-
-	if (!err.empty()) {
-		std::cerr << err << std::endl;
-	}
-
-	if (!ret) {
-		throw std::runtime_error("");
-		// exit(1);
-	}
-
-	if (attrib.vertices.empty() || attrib.normals.empty() ||
-		attrib.texcoords.empty()) {
-		throw std::runtime_error("bad vertices");
-	}
-	// std::vector<float[8]> vertices;
-	// std::vector<Vertex> vertices;
-	vertices.clear();
-	// std::vector<uint16_t> triangle_list;
-
-	// attrib.vertices;
-	// Loop over shapes
-	for (size_t s = 0; s < shapes.size(); s++) {
-		// Loop over faces(polygon)
-		size_t index_offset = 0;
-		for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-			int fv = shapes[s].mesh.num_face_vertices[f];
-
-			// Loop over vertices in the face.
-			for (size_t v = 0; v < fv; v++) {
-				// access to vertex
-				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
-				tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
-				tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
-				tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
-				tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
-				tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
-				tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
-				tinyobj::real_t tx =
-					attrib.texcoords[2 * idx.texcoord_index + 0];
-				tinyobj::real_t ty =
-					attrib.texcoords[2 * idx.texcoord_index + 1];
-
-				// vertices.push_back({{vx, vy, vz}, {nx, ny, nz}}); // question
-				// : emplace_back ?
-				vertices.push_back({vx, vy, vz, nx, ny, nz, tx,
-									ty}); // question : emplace_back ?
-				// Optional: vertex colors
-				// tinyobj::real_t red = attrib.colors[3*idx.vertex_index+0];
-				// tinyobj::real_t green = attrib.colors[3*idx.vertex_index+1];
-				// tinyobj::real_t blue = attrib.colors[3*idx.vertex_index+2];
-				triangle_list.push_back(uint16_t(triangle_list.size()));
-			}
-			index_offset += fv;
-
-			// per-face material
-			shapes[s].mesh.material_ids[f];
-		}
-	}
-
-	// vbh = bgfx::createVertexBuffer(
-	// 	bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), ms_layout);
-	// ibh = bgfx::createIndexBuffer(
-	// 	bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
-	const uint16_t stride = ms_layout.getStride();
-
-	// const bgfx::Memory * mem = bgfx::alloc(vertices.size * stride);
-	// bx::memCopy(vertices, )
-	// vbh = bgfx::createVertexBuffer(mem, ms_layout);
-	assert(stride == sizeof(Vertex));
-
-	vbh = bgfx::createVertexBuffer(
-		bgfx::makeRef(vertices.data(), sizeof(Vertex) * vertices.size()),
-		ms_layout);
-	ibh = bgfx::createIndexBuffer(bgfx::makeRef(
-		triangle_list.data(), sizeof(uint16_t) * triangle_list.size()));
-
-	// ----------------- INIT SHADER
-	// fileReader = BX_NEW(allocator, fileReader);
-	bgfx::ShaderHandle vsh = loadShader("cubes.vert");
-	bgfx::ShaderHandle fsh = loadShader("cubes.frag");
-	// bgfx::ShaderHandle vsh = loadShader("mesh.vert");
-	// bgfx::ShaderHandle fsh = loadShader("mesh.frag");
-	program = bgfx::createProgram(vsh, fsh, true);
-
-	s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
-
-	// m_texture = loadTexture("textures/checkerboard.png");
-	m_texture = loadTexture("Assets/Sponza/textures/background_ddn.tga");
-
-	// bgfx::ProgramHandle program;
-	// program = loadProgram("cubes.vert", "cubes.frag");
-}
 
 void shutdown() {
-	glfwMakeContextCurrent(window);
-	bgfx::destroy(ibh);
-	bgfx::destroy(vbh);
-	bgfx::destroy(program);
+	// glfwMakeContextCurrent(g_window);
+	// bgfx::destroy(ibh);
+	// bgfx::destroy(vbh);
+	delete g_mesh;
+	g_mesh = nullptr;
+	bgfx::destroy(g_program);
 	bgfx::shutdown();
 
-	glfwMakeContextCurrent(nullptr);
-	glfwDestroyWindow(window);
+	// glfwMakeContextCurrent(nullptr);
+	glfwDestroyWindow(g_window);
 	// window = nullptr; // question : necessary ?
 	glfwTerminate();
 }
@@ -517,9 +382,10 @@ bgfx::TextureHandle loadTexture(const char *filename) {
 		stbi_load(filename, &width, &height, &comp, STBI_rgb);
 
 	if (image == nullptr) {
-		// throw(std::string("Failed to load texture : ") + std::string(filename));
-		// throw(std::string("Failed to load texture : "));
- 		throw std::runtime_error("Failed to load texture");
+		// throw(std::string("Failed to load texture : ") +
+		// std::string(filename)); throw(std::string("Failed to load texture :
+		// "));
+		throw std::runtime_error("Failed to load texture");
 	}
 
 	stbi_image_free(image);
