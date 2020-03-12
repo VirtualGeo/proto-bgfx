@@ -33,10 +33,14 @@
 #define WIN_WIDTH 640
 #define WIN_HEIGHT 480
 
-void init();
-void shutdown();
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+// void focus_callback(GLFWwindow *window, int focused);
+void init();
+void shutdown();
 void update();
 bgfx::ShaderHandle loadShader(const char *FILENAME);
 // bgfx::TextureHandle loadTexture(const char *FILENAME);
@@ -51,6 +55,7 @@ unsigned int counter = 0;
 // bgfx::UniformHandle g_texColor;
 // bgfx::TextureHandle g_texture;
 Mesh *g_mesh = nullptr;
+bool g_clicked = false;
 
 static const char *s_ptNames[]{
 	"Triangle List",
@@ -102,6 +107,15 @@ static const uint64_t s_ptState[]{
 // 	std::cout << "Working Dir = " << workingDir << "\n";
 // 	return 0;
 // }
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+bool firstMouse = true;
+float yaw = 0.0f;
+float pitch = 0.0f;
+float lastX = WIN_WIDTH / 2.0f;
+float lastY = WIN_HEIGHT / 2.0f;
+float fov = 60.0f;
 
 int main(int argc, char const *argv[]) {
 	std::cout << "hello bgfx !!!" << std::endl;
@@ -111,6 +125,10 @@ int main(int argc, char const *argv[]) {
 
 	// while (true)
 	while (!glfwWindowShouldClose(g_window)) {
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		processInput(g_window);
 
 		update();
@@ -119,9 +137,10 @@ int main(int argc, char const *argv[]) {
 		counter++;
 		// std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
-		// glfwSwapBuffers(g_window);
+		// glfwSwapBuffers(g_window); question : why not use ?
 		glfwPollEvents();
 		// std::cout << "update " << counter << std::endl;
+		// glfwSetMousePos(100, 100);
 	}
 
 	shutdown();
@@ -132,6 +151,7 @@ int main(int argc, char const *argv[]) {
 }
 
 void init() {
+	// --------------------- INIT GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	g_window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Hello, bgfx from glfw!",
@@ -144,7 +164,13 @@ void init() {
 		// exit(-1);
 	}
 	// glfwMakeContextCurrent(window); // question : what does this fonction ?
-	// glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(g_window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(g_window, mouse_callback);
+	glfwSetScrollCallback(g_window, scroll_callback);
+	glfwSetMouseButtonCallback(g_window, mouse_button_callback);
+	// glfwSetWindowFocusCallback(g_window, focus_callback);
+
+	// glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	// bgfx::RenderFrame();
 	bgfx::renderFrame();
 
@@ -165,8 +191,8 @@ void init() {
 	// bgfx::init(bgfxInit);
 	if (!bgfx::init(bgfxInit)) {
 		std::cout << "Failed to initialize bgfx" << std::endl;
-		throw std::runtime_error("Failed to initialize bgfx");
-		// exit(1);
+		// throw std::runtime_error("Failed to initialize bgfx");
+		exit(1);
 		// return 1;
 	}
 
@@ -181,10 +207,11 @@ void init() {
 	// glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
 	// g_mesh = new Mesh("D:/proto-bgfx/Assets/Sponza/sponza.obj");
-	// g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/sponza/sponza.obj");
-	g_mesh = new Mesh("Assets/McGuire/sponza/sponza.obj");
+	g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/sponza/sponza.obj");
+	// g_mesh = new Mesh("Assets/McGuire/sponza/sponza.obj");
 	// g_mesh = new Mesh("D:/proto-bgfx/Assets/Teapot/teapot.obj");
 	// g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/teapot/teapot.obj");
+	// g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/gallery/gallery.obj");
 
 	// ----------------- INIT SHADER
 	// fileReader = BX_NEW(allocator, fileReader);
@@ -194,7 +221,8 @@ void init() {
 	// bgfx::ShaderHandle fsh = loadShader("mesh.frag");
 	g_program = bgfx::createProgram(vsh, fsh, true);
 
-	// g_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
+	// g_texColor = bgfx::createUniform("s_texColor",
+	// bgfx::UniformType::Sampler);
 
 	// g_texture = loadTexture("textures/checkerboard.png");
 	// g_texture = loadTexture("Assets/Sponza/textures/background_ddn.tga");
@@ -207,6 +235,11 @@ void init() {
 	// program = loadProgram("cubes.vert", "cubes.frag");
 }
 
+bx::Vec3 cameraPos = {0.0f, 2.0f, 0.0f};
+bx::Vec3 cameraFront = {1.0f, 0.0f, 0.0f};
+bx::Vec3 cameraUp = {0.0f, 1.0f, 0.0f};
+// bool g_focused = false;
+
 void update() {
 	// Set view 0 default viewport.
 	bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
@@ -215,16 +248,16 @@ void update() {
 	// if no other draw calls are submitted to view 0.
 	bgfx::touch(0);
 
-
 	// ------------------------- RENDER SCENE
 	const bx::Vec3 at = {0.0f, 2.0f, 0.0f};
 	const bx::Vec3 eye = {0.0f, 2.0f, -2.0f};
 	// {
 	float view[16];
-	bx::mtxLookAt(view, eye, at);
+	// bx::mtxLookAt(view, eye, at);
+	bx::mtxLookAt(view, cameraPos, bx::add(cameraPos, cameraFront), cameraUp);
 
 	float proj[16];
-	bx::mtxProj(proj, 60.0f, float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f,
+	bx::mtxProj(proj, fov, float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f,
 				bgfx::getCaps()->homogeneousDepth);
 	// bgfx::setViewTransform(0, view, proj);
 	bgfx::setViewTransform(0, view, proj);
@@ -235,7 +268,12 @@ void update() {
 
 	float mtx[16];
 	// bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
-	bx::mtxRotateY(mtx, counter * 0.01f);
+	// if (g_focused) {
+		bx::mtxIdentity(mtx);
+	// } else {
+
+		// bx::mtxRotateY(mtx, counter * 0.01f);
+	// }
 	// bx::mtxScale(mtx, 0.1f);
 	// bgfx::setTransform(mtx);
 
@@ -288,15 +326,97 @@ void shutdown() {
 	// glfwMakeContextCurrent(g_window);
 }
 
+// ------------------------------------ GLFW FUNCTIONS
 void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		// if (g_focused) {
+		// }
 		glfwSetWindowShouldClose(window, true);
 	}
+
+	float cameraSpeed = 5.0 * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		cameraPos = bx::add(cameraPos, bx::mul(cameraFront, cameraSpeed));
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		cameraPos = bx::sub(cameraPos, bx::mul(cameraFront, cameraSpeed));
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		cameraPos = bx::sub(
+			cameraPos, bx::mul(bx::normalize(bx::cross(cameraFront, cameraUp)),
+							   cameraSpeed));
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		cameraPos = bx::add(
+			cameraPos, bx::mul(bx::normalize(bx::cross(cameraFront, cameraUp)),
+							   cameraSpeed));
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 	// glViewport(0, 0, width, height);
 }
+
+void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+	if (! g_clicked) {
+		return;
+	}
+	if (firstMouse) {
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	// float xoffset = xpos - lastX;
+	float xoffset = lastX - xpos;
+	float yoffset =
+		lastY - ypos; // reversed since y-coordinates go from bottom to top
+	lastX = xpos;
+	lastY = ypos;
+
+	float sensitivity = 0.5f; // change this value to your liking
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	// make sure that when pitch is out of bounds, screen doesn't get flipped
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	bx::Vec3 front;
+	front.x = cos(bx::toRad(yaw)) * cos(bx::toRad(pitch));
+	front.y = sin(bx::toRad(pitch));
+	front.z = sin(bx::toRad(yaw)) * cos(bx::toRad(pitch));
+	cameraFront = bx::normalize(front);
+}
+
+const float maxFov = 120.0f;
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+	xoffset *= 5;
+	yoffset *= 5;
+	if (fov >= 1.0f && fov <= maxFov)
+		fov -= yoffset;
+	if (fov <= 1.0f)
+		fov = 1.0f;
+	if (fov >= maxFov)
+		fov = maxFov;
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		g_clicked = true;
+		firstMouse = true;
+	}
+    else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		g_clicked = false;
+	}
+        // popup_menu();
+}
+// void focus_callback(GLFWwindow *window, int focused) {
+// 	g_focused = focused == GLFW_TRUE;
+
+// }
 
 bgfx::ShaderHandle loadShader(const char *FILENAME) {
 	const char *shaderPath = "???";

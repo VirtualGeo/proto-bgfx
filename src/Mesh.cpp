@@ -65,9 +65,9 @@ Mesh::Mesh(const char *filePath) {
 		const auto &mat = materials[i];
 		// texture_option_t
 		std::cout << "material[" << i << "] name='" << mat.name
-				  << "', diffuseName='" << materials[i].diffuse_texname << "'"
-				  << "', specularName='" << materials[i].specular_texname << "'"
-				  << "', bumpName='" << materials[i].bump_texname << "'"
+				  << "', diffuseName='" << materials[i].diffuse_texname
+				  << "', specularName='" << materials[i].specular_texname
+				  << "', bumpName='" << materials[i].bump_texname
 				  << "', normalName='" << materials[i].normal_texname << "'"
 				  << std::endl;
 	}
@@ -167,7 +167,31 @@ Mesh::Mesh(const char *filePath) {
 
 		// shapes[s].mesh.material_ids[f];
 
+		const int nbMat = shapes[s].mesh.material_ids.size();
+		if (nbMat == 0) {
+			std::cout << "none material for object" << std::endl;
+			exit(1);
+		}
+        //  else if (nbMat != 1) {
+		// 	std::cout << "multiple materials (" << nbMat
+		// 			  << ") for same object : ";
+		// 	for (int i = 0; i < nbMat; ++i) {
+		// 		const auto &material =
+		// 			materials[shapes[s].mesh.material_ids[i]];
+		// 		std::cout << material.name << ", ";
+		// 	}
+		// 	std::cout << std::endl;
+
+		// 	// exit(1);
+		// }
+
 		const auto &material = materials[shapes[s].mesh.material_ids[0]];
+
+		// tinyobj::material_t * material = nullptr;
+		// for (int i =0; i <shapes[s].mesh.material_ids.size(); ++i) {
+		//     if ()
+
+		// }
 
 		if (material.diffuse_texname != "") {
 			group.m_texture =
@@ -209,14 +233,21 @@ void Mesh::submit(bgfx::ViewId id, bgfx::ProgramHandle program,
 									itEnd = m_groups.end();
 		 it != itEnd; ++it) {
 		const Group &group = *it;
+        if (group.m_texture == nullptr) {
+            continue;
+        }
 
 		bgfx::setTransform(mtx);
 		bgfx::setState(state);
 
-		if (group.m_texture != nullptr) {
+		// if (group.m_texture != nullptr) {
 			bgfx::setTexture(0, group.m_texture->m_sampler,
 							 group.m_texture->m_texture);
-		}
+
+		// }
+        // else {
+        //     continue;
+        // }
 
 		bgfx::setIndexBuffer(group.m_ibh);
 		bgfx::setVertexBuffer(0, group.m_vbh);

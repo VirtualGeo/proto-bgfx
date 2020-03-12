@@ -10,7 +10,8 @@ Texture::Texture(const std::string &filename) {
 	int width;
 	int height;
 	int nbChannel;
-	m_image = stbi_load(filename.c_str(), &width, &height, &nbChannel, STBI_rgb);
+	m_image =
+		stbi_load(filename.c_str(), &width, &height, &nbChannel, STBI_rgb);
 	// stbi_load(filename, &width, &height, &comp, STBI_rgb);
 	size_t imageSize = width * height * nbChannel;
 
@@ -19,11 +20,12 @@ Texture::Texture(const std::string &filename) {
 		// std::string(filename)); throw(std::string("Failed to load texture
 		// :
 		// "));
-		std::cout << "Failed to load texture '" << filename.c_str() << "'" << std::endl;
-        exit(1);
+		std::cout << "Failed to load texture '" << filename.c_str() << "'"
+				  << std::endl;
+		exit(1);
 		// throw std::runtime_error("Failed to load texture");
 	}
-	assert(nbChannel == 3);
+	// assert(nbChannel == 3);
 	// stbi_image_free(image);
 	// image = nullptr;
 	// return bgfx::createTexture2D();
@@ -51,10 +53,24 @@ Texture::Texture(const std::string &filename) {
 	// imageSize = info.storageSize;
 	m_sampler = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
 
-	m_texture = bgfx::createTexture2D(
-		width, height, hasMips, 1, bgfx::TextureFormat::RGB8,
-		// BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT, stippleTex);
-		textureFlags | samplerFlags, bgfx::makeRef(m_image, imageSize));
+	if (nbChannel == 3) {
+		m_texture = bgfx::createTexture2D(
+			width, height, hasMips, 1, bgfx::TextureFormat::RGB8,
+			// BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT, stippleTex);
+			textureFlags | samplerFlags, bgfx::makeRef(m_image, imageSize));
+	} else if (nbChannel == 1) {
+		m_texture = bgfx::createTexture2D(
+			width, height, hasMips, 1, bgfx::TextureFormat::R8,
+			textureFlags | samplerFlags, bgfx::makeRef(m_image, imageSize));
+	} else if (nbChannel == 4) {
+		m_texture = bgfx::createTexture2D(
+			width, height, hasMips, 1, bgfx::TextureFormat::RGBA8,
+			textureFlags | samplerFlags, bgfx::makeRef(m_image, imageSize));
+	}
+    else {
+        std::cout << "unable to load texture with " << nbChannel << " channels" << std::endl;
+        exit(1);
+    }
 
 	// stbi_image_free(image);
 	// image = nullptr;
