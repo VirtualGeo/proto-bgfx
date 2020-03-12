@@ -6,6 +6,7 @@
 #include "tiny_obj_loader.h"
 #include <cassert>
 #include <iostream>
+#include "Texture.h"
 
 // struct Vertex {
 // 	glm::vec3 position;
@@ -56,10 +57,21 @@ struct Vertex {
 	float ty;
 };
 
+// struct Texture {
+//     // uint32_t m_flags;
+//     bgfx::UniformHandle m_sampler;
+//     bgfx::TextureHandle m_texture;
+//     // uint8_t m_stage;
+// };
+
 struct Group {
 
 	std::vector<Vertex> m_vertices;
 	std::vector<uint16_t> m_indices;
+
+
+    Texture * m_texture = nullptr;
+	// loadTexture("D:/proto-bgfx/Assets/Teapot/default.png");
 
 	bgfx::VertexBufferHandle m_vbh;
 	bgfx::IndexBufferHandle m_ibh;
@@ -86,6 +98,7 @@ struct Mesh {
 
 	bgfx::VertexLayout m_layout;
 	GroupArray m_groups;
+    // std::string m_path;
 	// bgfx::VertexBufferHandle m_vbh;
 	// bgfx::IndexBufferHandle m_ibh;
 };

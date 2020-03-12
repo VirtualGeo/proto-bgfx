@@ -17,7 +17,6 @@
 // #include <stb_image.h>
 // #include "stb/stb_image.h"
 // #define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
 // #include <stb/stb_image.h>
 
 #include <chrono>
@@ -40,7 +39,7 @@ void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void update();
 bgfx::ShaderHandle loadShader(const char *FILENAME);
-bgfx::TextureHandle loadTexture(const char *FILENAME);
+// bgfx::TextureHandle loadTexture(const char *FILENAME);
 
 // ----------------- GLOBAL VARS
 GLFWwindow *g_window = nullptr;
@@ -49,10 +48,9 @@ GLFWwindow *g_window = nullptr;
 // bx::FileReaderI * fileReader = nullptr;
 bgfx::ProgramHandle g_program;
 unsigned int counter = 0;
-bgfx::UniformHandle g_texColor;
-bgfx::TextureHandle g_texture;
+// bgfx::UniformHandle g_texColor;
+// bgfx::TextureHandle g_texture;
 Mesh *g_mesh = nullptr;
-unsigned char *image = nullptr;
 
 static const char *s_ptNames[]{
 	"Triangle List",
@@ -123,7 +121,7 @@ int main(int argc, char const *argv[]) {
 
 		// glfwSwapBuffers(g_window);
 		glfwPollEvents();
-		std::cout << "update " << counter << std::endl;
+		// std::cout << "update " << counter << std::endl;
 	}
 
 	shutdown();
@@ -183,7 +181,8 @@ void init() {
 	// glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
 	// g_mesh = new Mesh("D:/proto-bgfx/Assets/Sponza/sponza.obj");
-	g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/sponza/sponza.obj");
+	// g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/sponza/sponza.obj");
+	g_mesh = new Mesh("Assets/McGuire/sponza/sponza.obj");
 	// g_mesh = new Mesh("D:/proto-bgfx/Assets/Teapot/teapot.obj");
 	// g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/teapot/teapot.obj");
 
@@ -195,13 +194,14 @@ void init() {
 	// bgfx::ShaderHandle fsh = loadShader("mesh.frag");
 	g_program = bgfx::createProgram(vsh, fsh, true);
 
-	g_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
+	// g_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
 
 	// g_texture = loadTexture("textures/checkerboard.png");
 	// g_texture = loadTexture("Assets/Sponza/textures/background_ddn.tga");
 	// g_texture = loadTexture("Assets/McGuire/teapot/default.png");
 	// g_texture = loadTexture("D:/proto-bgfx/Assets/Teapot/default.png");
-	loadTexture("D:/proto-bgfx/Assets/Teapot/default.png");
+
+	// loadTexture("D:/proto-bgfx/Assets/Teapot/default.png");
 
 	// bgfx::ProgramHandle program;
 	// program = loadProgram("cubes.vert", "cubes.frag");
@@ -258,7 +258,7 @@ void update() {
 	// bgfx::setIndexBuffer(ibh);
 	// bgfx::setTransform(mtx);
 	// bgfx::setState(state);
-	bgfx::setTexture(0, g_texColor, g_texture);
+	// bgfx::setTexture(0, g_texColor, g_texture);
 	g_mesh->submit(0, g_program, mtx, state);
 	// g_mesh->submit(0, g_program, mtx, stateTransparent);
 	// g_mesh->submit(0, g_program, mtx, stateOpaque);
@@ -272,13 +272,13 @@ void shutdown() {
 	// bgfx::destroy(ibh);
 	// bgfx::destroy(vbh);
 
-	stbi_image_free(image);
+	// stbi_image_free(image);
 
 	delete g_mesh;
 	g_mesh = nullptr;
 	bgfx::destroy(g_program);
-	bgfx::destroy(g_texture);
-	bgfx::destroy(g_texColor);
+	// bgfx::destroy(g_texture);
+	// bgfx::destroy(g_texColor);
 	bgfx::shutdown();
 
 	// glfwMakeContextCurrent(nullptr);
@@ -373,42 +373,3 @@ bgfx::ShaderHandle loadShader(const char *FILENAME) {
 // unsigned char *image = nullptr;
 
 // const bgfx::Memory *stippleTex;
-
-bgfx::TextureHandle loadTexture(const char *filename) {
-
-	int width;
-	int height;
-	int nbChannel;
-	image = stbi_load(filename, &width, &height, &nbChannel, STBI_rgb);
-	// stbi_load(filename, &width, &height, &comp, STBI_rgb);
-	size_t imageSize = width * height * nbChannel;
-	assert(nbChannel == 3);
-
-	if (image == nullptr) {
-		// throw(std::string("Failed to load texture : ") +
-		// std::string(filename)); throw(std::string("Failed to load texture :
-		// "));
-		std::cout << "Failed to load texture" << std::endl;
-		throw std::runtime_error("Failed to load texture");
-	}
-	// stbi_image_free(image);
-	// image = nullptr;
-	// return bgfx::createTexture2D();
-	bool hasMips = false;
-	// const bgfx::Memory *texPtr = bgfx::alloc(imageSize);
-	// stippleTex = bgfx::alloc(imageSize);
-	// bx::memSet(stippleTex->data, 0, stippleTex->size);
-	// texPtr->data = (uint8_t*)std::move(image);
-
-	const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
-	const uint64_t samplerFlags =
-		0 | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT;
-
-	g_texture = bgfx::createTexture2D(
-		width, height, false, 1, bgfx::TextureFormat::RGB8,
-		// BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT, stippleTex);
-		textureFlags | samplerFlags, bgfx::makeRef(image, imageSize));
-
-	// stbi_image_free(image);
-	// image = nullptr;
-}
