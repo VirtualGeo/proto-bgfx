@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <thread>
 // #include <filesystem>
-#include <glm/glm.hpp>
+// #include <glm/glm.hpp>
 // #include <assert.h>
 #include "Mesh.h"
 #include <cassert>
@@ -52,6 +52,7 @@ unsigned int counter = 0;
 bgfx::UniformHandle g_texColor;
 bgfx::TextureHandle g_texture;
 Mesh *g_mesh = nullptr;
+unsigned char *image = nullptr;
 
 static const char *s_ptNames[]{
 	"Triangle List",
@@ -108,6 +109,7 @@ int main(int argc, char const *argv[]) {
 	std::cout << "hello bgfx !!!" << std::endl;
 
 	init();
+	std::cout << "init done." << std::endl;
 
 	// while (true)
 	while (!glfwWindowShouldClose(g_window)) {
@@ -180,8 +182,9 @@ void init() {
 
 	// glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
-	// std::string inputFile = "D:/proto-bgfx/Assets/Sponza/sponza.obj";
-	g_mesh = new Mesh("D:/proto-bgfx/Assets/Teapot/teapot.obj");
+	// g_mesh = new Mesh("D:/proto-bgfx/Assets/Sponza/sponza.obj");
+	g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/sponza/sponza.obj");
+	// g_mesh = new Mesh("D:/proto-bgfx/Assets/Teapot/teapot.obj");
 	// g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/teapot/teapot.obj");
 
 	// ----------------- INIT SHADER
@@ -205,37 +208,17 @@ void init() {
 }
 
 void update() {
+	// Set view 0 default viewport.
 	bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
+
+	// This dummy draw call is here to make sure that view 0 is cleared
+	// if no other draw calls are submitted to view 0.
 	bgfx::touch(0);
 
-	// bgfx::dbgTextClear();
-	// bgfx::dbgTextImage(bx::max<uint16_t>(uint16_t(WIN_WIDTH / 2 / 8), 20) -
-	// 20, 				   bx::max<uint16_t>(uint16_t(WIN_HEIGHT / 2 / 16), 6) -
-	// 6, 40, 12, s_logo, 160);
-
-	// bgfx::dbgTextPrintf(0, 1, 0x0f,
-	// 					"Color can be changed with ANSI "
-	// 					"\x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b["
-	// 					"14;me\x1b[0m code too.");
-
-	// bgfx::dbgTextPrintf(
-	// 	80, 1, 0x0f,
-	// 	"\x1b[;0m    \x1b[;1m    \x1b[; 2m    \x1b[; 3m    \x1b[; 4m    \x1b[; "
-	// 	"5m    \x1b[; 6m    \x1b[; 7m    \x1b[0m");
-	// bgfx::dbgTextPrintf(
-	// 	80, 2, 0x0f,
-	// 	"\x1b[;8m    \x1b[;9m    \x1b[;10m    \x1b[;11m    \x1b[;12m    "
-	// 	"\x1b[;13m    \x1b[;14m    \x1b[;15m    \x1b[0m");
-
-	// const bgfx::Stats *stats = bgfx::getStats();
-	// bgfx::dbgTextPrintf(
-	// 	0, 2, 0x0f,
-	// 	"Backbuffer %dW x %dH in pixels, debug text %dW x %dH in characters.",
-	// 	stats->width, stats->height, stats->textWidth, stats->textHeight);
 
 	// ------------------------- RENDER SCENE
-	const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
-	const bx::Vec3 eye = {0.0f, 0.0f, -2.0f};
+	const bx::Vec3 at = {0.0f, 2.0f, 0.0f};
+	const bx::Vec3 eye = {0.0f, 2.0f, -2.0f};
 	// {
 	float view[16];
 	bx::mtxLookAt(view, eye, at);
@@ -251,13 +234,15 @@ void update() {
 	// bgfx::touch(0);
 
 	float mtx[16];
-	bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
+	// bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
+	bx::mtxRotateY(mtx, counter * 0.01f);
+	// bx::mtxScale(mtx, 0.1f);
 	// bgfx::setTransform(mtx);
 
 	const uint64_t state = 0 | BGFX_STATE_WRITE_R | BGFX_STATE_WRITE_G |
 						   BGFX_STATE_WRITE_B | BGFX_STATE_WRITE_A |
 						   BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
-						   BGFX_STATE_CULL_CW | BGFX_STATE_MSAA | s_ptState[0];
+						   BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA | s_ptState[0];
 	// UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
 
 	// const uint64_t stateTransparent =
@@ -284,20 +269,23 @@ void update() {
 }
 
 void shutdown() {
-	// glfwMakeContextCurrent(nullptr);
-	glfwDestroyWindow(g_window);
-	// window = nullptr; // question : necessary ?
-	glfwTerminate();
-	// glfwMakeContextCurrent(g_window);
-
 	// bgfx::destroy(ibh);
 	// bgfx::destroy(vbh);
+
+	stbi_image_free(image);
+
 	delete g_mesh;
 	g_mesh = nullptr;
 	bgfx::destroy(g_program);
 	bgfx::destroy(g_texture);
 	bgfx::destroy(g_texColor);
 	bgfx::shutdown();
+
+	// glfwMakeContextCurrent(nullptr);
+	glfwDestroyWindow(g_window);
+	// window = nullptr; // question : necessary ?
+	glfwTerminate();
+	// glfwMakeContextCurrent(g_window);
 }
 
 void processInput(GLFWwindow *window) {
@@ -382,18 +370,17 @@ bgfx::ShaderHandle loadShader(const char *FILENAME) {
 	return bgfx::createShader(mem);
 }
 
-unsigned char *image = nullptr;
+// unsigned char *image = nullptr;
 
-const bgfx::Memory *stippleTex;
+// const bgfx::Memory *stippleTex;
 
 bgfx::TextureHandle loadTexture(const char *filename) {
 
 	int width;
 	int height;
 	int nbChannel;
-	// unsigned char *image =
-	// stbi_load(filename, &width, &height, &comp, STBI_rgb);
 	image = stbi_load(filename, &width, &height, &nbChannel, STBI_rgb);
+	// stbi_load(filename, &width, &height, &comp, STBI_rgb);
 	size_t imageSize = width * height * nbChannel;
 	assert(nbChannel == 3);
 
@@ -408,44 +395,20 @@ bgfx::TextureHandle loadTexture(const char *filename) {
 	// image = nullptr;
 	// return bgfx::createTexture2D();
 	bool hasMips = false;
-	// struct KnightPos {
-	// 	int32_t m_x;
-	// 	int32_t m_y;
-	// };
-
-	// static const KnightPos knightTour[8 * 4] = {
-	// 	{0, 0}, {1, 2}, {3, 3}, {4, 1}, {5, 3}, {7, 2}, {6, 0}, {5, 2},
-	// 	{7, 3}, {6, 1}, {4, 0}, {3, 2}, {2, 0}, {0, 1}, {1, 3}, {2, 1},
-	// 	{0, 2}, {1, 0}, {2, 2}, {0, 3}, {1, 1}, {3, 0}, {4, 2}, {5, 0},
-	// 	{7, 1}, {6, 3}, {5, 1}, {7, 0}, {6, 2}, {4, 3}, {3, 1}, {2, 3},
-	// };
-
-	// const bgfx::Memory *stippleTex = bgfx::alloc(8 * 4 * 3);
+	// const bgfx::Memory *texPtr = bgfx::alloc(imageSize);
 	// stippleTex = bgfx::alloc(imageSize);
 	// bx::memSet(stippleTex->data, 0, stippleTex->size);
+	// texPtr->data = (uint8_t*)std::move(image);
 
-	// for (uint8_t ii = 0; ii < width * height; ++ii) {
-	// 	// stippleTex->data[knightTour[ii].m_y * 8 + knightTour[ii].m_x] = ii * 4;
-	// 	stippleTex->data[ii * 3] = image[ii * 3];
-	// 	stippleTex->data[ii * 3 + 1] = image[ii * 3 + 1];
-	// 	stippleTex->data[ii * 3 + 2] = image[ii * 3 + 2];
-	// }
-
-	// *stippleTex->data = *image;
+	const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+	const uint64_t samplerFlags =
+		0 | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT;
 
 	g_texture = bgfx::createTexture2D(
 		width, height, false, 1, bgfx::TextureFormat::RGB8,
 		// BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT, stippleTex);
-		BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, bgfx::makeRef(image, imageSize));
+		textureFlags | samplerFlags, bgfx::makeRef(image, imageSize));
 
-	// g_texture = bgfx::createTexture2D(
-	// 	uint16_t(width), uint16_t(height), hasMips, nbChannel,
-	// 	//  bgfx::TextureFormat::Enum::RGB8, BGFX_TEXTURE_NONE |
-	// 	//  BGFX_SAMPLER_NONE, bgfx::makeRef(image, width * height * 3 *
-	// 	//  sizeof(uint32_t)));
-	// 	bgfx::TextureFormat::Enum::RGB8, BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE,
-	// 	bgfx::makeRef(image, imageSize * 3));
-	// ibh = bgfx::createIndexBuffer(
-	// bgfx::makeRef(triangle_list.data(), sizeof(uint16_t) *
-	// triangle_list.size()));
+	// stbi_image_free(image);
+	// image = nullptr;
 }

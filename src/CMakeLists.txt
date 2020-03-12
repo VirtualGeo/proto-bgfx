@@ -38,7 +38,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
     glfw
     tinyobjloader
-    glm
+    # glm
     stb
     # OpenGL::GL
 )

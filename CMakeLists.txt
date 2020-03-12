@@ -107,7 +107,7 @@ endmacro(COMPILE_SHADER)
 
 add_subdirectory(Modules/glfw)
 add_subdirectory(Modules/tinyobjloader)
-add_subdirectory(Modules/glm)
+# add_subdirectory(Modules/glm)
 
 # add_subdirectory(Modules/stb)
 add_library(stb STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/stb_image.cpp)
