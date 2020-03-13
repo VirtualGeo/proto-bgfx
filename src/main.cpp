@@ -37,7 +37,8 @@ void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void mouse_button_callback(GLFWwindow *window, int button, int action,
+						   int mods);
 // void focus_callback(GLFWwindow *window, int focused);
 void init();
 void shutdown();
@@ -122,16 +123,27 @@ int main(int argc, char const *argv[]) {
 
 	init();
 	std::cout << "init done." << std::endl;
+	bgfx::setDebug(BGFX_DEBUG_TEXT);
 
+	float sum = 0.0f;
 	// while (true)
+	float fps = 0.0f;
 	while (!glfwWindowShouldClose(g_window)) {
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		sum += deltaTime;
+		if (counter % 10 == 0) {
+			fps = 10.0f / sum;
+			// fps = 1.0f / deltaTime;
+			sum = 0.0f;
+		}
+		bgfx::dbgTextPrintf(0, 0, 0x08, "fps = %.1f", fps);
 
 		processInput(g_window);
 
 		update();
+
 		// bgfx::frame();
 
 		counter++;
@@ -179,11 +191,11 @@ void init() {
 	// bgfx::setPlatformData(pd);
 
 	bgfx::Init bgfxInit = {};
-	// bgfxInit.type = bgfx::RendererType::OpenGL;
 	bgfxInit.platformData.nwh = glfwGetWin32Window(g_window);
 
-	bgfxInit.type =
-		bgfx::RendererType::Count; // Automatically choose a renderer
+	bgfxInit.type = bgfx::RendererType::OpenGL;
+	// bgfxInit.type =
+		// bgfx::RendererType::Count; // Automatically choose a renderer
 	bgfxInit.resolution.width = WIN_WIDTH;
 	bgfxInit.resolution.height = WIN_HEIGHT;
 	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
@@ -207,11 +219,10 @@ void init() {
 	// glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
 	// g_mesh = new Mesh("D:/proto-bgfx/Assets/Sponza/sponza.obj");
-	g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/sponza/sponza.obj");
-	// g_mesh = new Mesh("Assets/McGuire/sponza/sponza.obj");
-	// g_mesh = new Mesh("D:/proto-bgfx/Assets/Teapot/teapot.obj");
-	// g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/teapot/teapot.obj");
-	// g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/gallery/gallery.obj");
+	// g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/bedroom/iscv2.obj");
+	g_mesh = new Mesh("Assets/McGuire/sponza/sponza.obj");
+	// g_mesh = new Mesh("Assets/McGuire/bmw/bmw.obj");
+	// g_mesh = new Mesh("Assets/Teapot/teapot.obj");
 
 	// ----------------- INIT SHADER
 	// fileReader = BX_NEW(allocator, fileReader);
@@ -269,18 +280,23 @@ void update() {
 	float mtx[16];
 	// bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
 	// if (g_focused) {
-		bx::mtxIdentity(mtx);
+	bx::mtxIdentity(mtx);
+	// bx::mtxScale(mtx, 0.01f);
 	// } else {
 
-		// bx::mtxRotateY(mtx, counter * 0.01f);
+	// bx::mtxRotateY(mtx, counter * 0.01f);
 	// }
 	// bx::mtxScale(mtx, 0.1f);
 	// bgfx::setTransform(mtx);
 
-	const uint64_t state = 0 | BGFX_STATE_WRITE_R | BGFX_STATE_WRITE_G |
-						   BGFX_STATE_WRITE_B | BGFX_STATE_WRITE_A |
-						   BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
-						   BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA | s_ptState[0];
+	// const uint64_t state = 0 | BGFX_STATE_WRITE_R | BGFX_STATE_WRITE_G |
+	// 					   BGFX_STATE_WRITE_B | BGFX_STATE_WRITE_A |
+	// 					   BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
+	// 					   BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA | s_ptState[0];
+
+	const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
+						   BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW |
+						   BGFX_STATE_BLEND_NORMAL;
 	// UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
 
 	// const uint64_t stateTransparent =
@@ -339,6 +355,12 @@ void processInput(GLFWwindow *window) {
 		cameraPos = bx::add(cameraPos, bx::mul(cameraFront, cameraSpeed));
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		cameraPos = bx::sub(cameraPos, bx::mul(cameraFront, cameraSpeed));
+
+	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
+		cameraPos = bx::add(cameraPos, bx::mul(cameraUp, cameraSpeed));
+	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
+		cameraPos = bx::sub(cameraPos, bx::mul(cameraUp, cameraSpeed));
+
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		cameraPos = bx::sub(
 			cameraPos, bx::mul(bx::normalize(bx::cross(cameraFront, cameraUp)),
@@ -354,7 +376,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-	if (! g_clicked) {
+	if (!g_clicked) {
 		return;
 	}
 	if (firstMouse) {
@@ -402,16 +424,15 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 		fov = maxFov;
 }
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+void mouse_button_callback(GLFWwindow *window, int button, int action,
+						   int mods) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		g_clicked = true;
 		firstMouse = true;
-	}
-    else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+	} else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
 		g_clicked = false;
 	}
-        // popup_menu();
+	// popup_menu();
 }
 // void focus_callback(GLFWwindow *window, int focused) {
 // 	g_focused = focused == GLFW_TRUE;

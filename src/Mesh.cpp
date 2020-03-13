@@ -35,8 +35,8 @@ Mesh::Mesh(const char *filePath) {
 	std::string warn;
 	std::string err;
 
-	const bool ret =
-		tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filePath);
+	const bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,
+									  filePath, directory.c_str());
 
 	if (!warn.empty()) {
 		std::cout << warn << std::endl;
@@ -52,10 +52,12 @@ Mesh::Mesh(const char *filePath) {
 		// exit(1);
 	}
 
+	const int nbMaterial = materials.size();
+
 	printf("# of vertices  = %d\n", (int)(attrib.vertices.size()) / 3);
 	printf("# of normals   = %d\n", (int)(attrib.normals.size()) / 3);
 	printf("# of texcoords = %d\n", (int)(attrib.texcoords.size()) / 2);
-	printf("# of materials = %d\n", (int)materials.size());
+	printf("# of materials = %d\n", nbMaterial);
 	printf("# of shapes    = %d\n", (int)shapes.size());
 
 	// Append `default` material
@@ -64,12 +66,12 @@ Mesh::Mesh(const char *filePath) {
 	for (size_t i = 0; i < materials.size(); i++) {
 		const auto &mat = materials[i];
 		// texture_option_t
-		std::cout << "material[" << i << "] name='" << mat.name
-				  << "', diffuseName='" << materials[i].diffuse_texname
-				  << "', specularName='" << materials[i].specular_texname
-				  << "', bumpName='" << materials[i].bump_texname
-				  << "', normalName='" << materials[i].normal_texname << "'"
-				  << std::endl;
+		std::cout << "material[" << i << "/" << nbMaterial << "] name='"
+				  << mat.name << "', diffuseName='"
+				  << materials[i].diffuse_texname << "', specularName='"
+				  << materials[i].specular_texname << "', bumpName='"
+				  << materials[i].bump_texname << "', normalName='"
+				  << materials[i].normal_texname << "'" << std::endl;
 	}
 
 	if (attrib.vertices.empty()) {
@@ -98,7 +100,8 @@ Mesh::Mesh(const char *filePath) {
 	// std::vector<Vertex> vertices;
 	// std::vector<uint16_t> triangle_list;
 	m_groups.clear();
-	m_groups.resize(shapes.size());
+	const int nbShape = shapes.size();
+	m_groups.resize(nbShape);
 
 	// m_vertices.clear();
 	// m_indices.clear();
@@ -108,35 +111,65 @@ Mesh::Mesh(const char *filePath) {
 	// attrib.vertices;
 	// Loop over shapes
 	for (size_t s = 0; s < shapes.size(); s++) {
+		auto &shape = shapes[s];
+		int nbVertice = 0;
+		const int nbFace = shape.mesh.num_face_vertices.size();
+		assert(nbFace > 0);
+		std::cout << "shape[" << s << "/" << nbShape << "] name='" << shape.name
+				  << "', nbFace=" << nbFace;
+		// shape.mesh.tags;
 		auto &group = m_groups[s];
 		auto &vertices = group.m_vertices;
 		// vertices.clear();
 		auto &indices = group.m_indices;
 
 		// assert(shapes.size() == 3);
+
 		// Loop over faces(polygon)
 		size_t index_offset = 0;
-		for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-			int fv = shapes[s].mesh.num_face_vertices[f];
+		for (size_t f = 0; f < nbFace; f++) {
+			int fv = shape.mesh.num_face_vertices[f];
+			assert(fv == 3);
+			nbVertice += fv;
 
 			// Loop over vertices in the face.
 			for (size_t v = 0; v < fv; v++) {
 				// access to vertex
 				// shapes[s].mesh.indices;
-				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+				assert(index_offset + v >= 0);
+				assert(index_offset + v < shape.mesh.indices.size());
+				tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
+				assert(3 * idx.vertex_index + 2 < attrib.vertices.size());
+				assert(idx.vertex_index >= 0);
 				tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
 				tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
 				tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
-				tinyobj::real_t nx = 0.5;
-				// attrib.normals[3 * idx.normal_index + 0];
-				tinyobj::real_t ny = 0.5;
-				// attrib.normals[3 * idx.normal_index + 1];
-				tinyobj::real_t nz = 0.5;
-				// attrib.normals[3 * idx.normal_index + 2];
-				tinyobj::real_t tx =
-					attrib.texcoords[2 * idx.texcoord_index + 0];
-				tinyobj::real_t ty =
-					attrib.texcoords[2 * idx.texcoord_index + 1];
+
+				tinyobj::real_t nx = 0.0;
+				tinyobj::real_t ny = 1.0;
+				tinyobj::real_t nz = 0.0;
+				if (idx.normal_index != -1) {
+					assert(3 * idx.normal_index + 2 < attrib.normals.size());
+					assert(idx.normal_index >= 0);
+
+					attrib.normals[3 * idx.normal_index + 0];
+					attrib.normals[3 * idx.normal_index + 1];
+					attrib.normals[3 * idx.normal_index + 2];
+				}
+				// if (2 * idx.texcoord_index + 1 >= attrib.texcoords.size()) {
+				// 	std::cout << "index=" << idx.texcoord_index << ", attrib="
+				// << attrib.texcoords.size() << std::endl; 	exit(1);
+				// }
+				tinyobj::real_t tx = 0.0f;
+				tinyobj::real_t ty = 0.0f;
+				if (idx.texcoord_index != -1) { // has texture coords
+					assert(2 * idx.texcoord_index + 1 <
+						   attrib.texcoords.size());
+					assert(idx.texcoord_index >= 0);
+
+					tx = attrib.texcoords[2 * idx.texcoord_index + 0];
+					ty = attrib.texcoords[2 * idx.texcoord_index + 1];
+				}
 
 				// vertices.push_back({{vx, vy, vz}, {nx, ny, nz}}); //
 				// question : emplace_back ?
@@ -157,6 +190,10 @@ Mesh::Mesh(const char *filePath) {
 			// per-face material
 			// shapes[s].mesh.material_ids[f];
 		}
+		assert(index_offset == nbVertice);
+
+		const float meanVerticePerPolygon = nbVertice / nbFace;
+		std::cout << ", nbVerticePerPolygon=" << meanVerticePerPolygon;
 
 		group.m_vbh = bgfx::createVertexBuffer(
 			bgfx::makeRef(vertices.data(), sizeof(Vertex) * vertices.size()),
@@ -167,12 +204,12 @@ Mesh::Mesh(const char *filePath) {
 
 		// shapes[s].mesh.material_ids[f];
 
-		const int nbMat = shapes[s].mesh.material_ids.size();
-		if (nbMat == 0) {
-			std::cout << "none material for object" << std::endl;
-			exit(1);
-		}
-        //  else if (nbMat != 1) {
+		// const int nbMat = shape.mesh.material_ids.size();
+		// if (nbMat == 0) {
+		// 	std::cout << "none material for object" << std::endl;
+		// 	exit(1);
+		// }
+		//  else if (nbMat != 1) {
 		// 	std::cout << "multiple materials (" << nbMat
 		// 			  << ") for same object : ";
 		// 	for (int i = 0; i < nbMat; ++i) {
@@ -185,21 +222,54 @@ Mesh::Mesh(const char *filePath) {
 		// 	// exit(1);
 		// }
 
-		const auto &material = materials[shapes[s].mesh.material_ids[0]];
+		// assert(!shape.mesh.material_ids.empty());
+		// assert(nbMaterial > shape.mesh.material_ids[0]);
+		if (shape.mesh.material_ids[0] == -1) { // no material
+			group.m_diffuse[0] = 0.0f;
+			group.m_diffuse[1] = 1.0f;
+			group.m_diffuse[2] = 0.0f;
+			group.m_diffuse[3] = 0.0f;
 
-		// tinyobj::material_t * material = nullptr;
-		// for (int i =0; i <shapes[s].mesh.material_ids.size(); ++i) {
-		//     if ()
+		} else { // has material
 
-		// }
+			const auto &material = materials[shape.mesh.material_ids[0]];
 
-		if (material.diffuse_texname != "") {
-			group.m_texture =
-				new Texture(directory + "/" + material.diffuse_texname);
+			// tinyobj::material_t * material = nullptr;
+			// for (int i =0; i <shapes[s].mesh.material_ids.size(); ++i) {
+			//     if ()
+
+			// }
+			std::cout << ", material='" << material.name << "'";
+			// float vec[3] = {0.0f, 1.0f, 2};
+			for (int i = 0; i < 3; ++i) {
+				group.m_diffuse[i] = material.diffuse[i];
+			}
+
+			if (material.diffuse_texname != "") {
+				group.m_texture =
+					new Texture(directory + "/" + material.diffuse_texname);
+				std::cout << " hasTexture";
+
+				// group.m_hasDiffuseTexture = true;
+				group.m_diffuse[3] = 1.0f;
+				// std::cout << "DIFFUSE : " << group.m_diffuse[3] << std::endl;
+			} else {
+				group.m_diffuse[3] = 0.0f;
+			}
 		}
+		// group.m_diffuse = {material.diffuse[0], material.diffuse[1],
+		// material.diffuse[2], material.diffuse[3]};
+		group.m_uDiffuse =
+			bgfx::createUniform("u_diffuse", bgfx::UniformType::Vec4);
+
+		// group.m_uHasDiffuseTexture =
+		// bgfx::createUniform("u_hasDiffuseTexture", bgfx::UniformType::Vec4);
+
+		std::cout << std::endl;
 		// group.m_texture = new
 		// Texture("D:/proto-bgfx/Assets/Teapot/default.png");
 	}
+	// std::cout << "load mesh done" << std::endl;
 
 	// m_numVertices = vertices.size();
 	// m_vertices = (uint8_t *)malloc(sizeof(Vertex) * m_numVertices);
@@ -233,26 +303,45 @@ void Mesh::submit(bgfx::ViewId id, bgfx::ProgramHandle program,
 									itEnd = m_groups.end();
 		 it != itEnd; ++it) {
 		const Group &group = *it;
-        if (group.m_texture == nullptr) {
-            continue;
-        }
+		// if (group.m_texture == nullptr) {
+		// bgfx::set
+		// continue;
+		// }
 
 		bgfx::setTransform(mtx);
 		bgfx::setState(state);
 
 		// if (group.m_texture != nullptr) {
+		bgfx::setUniform(group.m_uDiffuse, group.m_diffuse);
+
+		if (group.m_texture != nullptr) {
+			// uint32_t flags = UINT32_MAX;
+			// uint32_t flags = BGFX_TEXTURE_USE_DEFAULT;
+
+			// const uint64_t textureFlags =
+				// 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
+			// const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+			// const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
 			bgfx::setTexture(0, group.m_texture->m_sampler,
 							 group.m_texture->m_texture);
+							//  textureFlags | samplerFlags);
+
+			// bgfx::setUniform(group.m_uHasDiffuseTexture, (void*)true);
+		}
+		// else {
+		// bgfx::setTexture(0, group.m_texture->m_sampler, bgfx::Tex)
+		// }
 
 		// }
-        // else {
-        //     continue;
-        // }
+		// else {
+		//     continue;
+		// }
 
 		bgfx::setIndexBuffer(group.m_ibh);
 		bgfx::setVertexBuffer(0, group.m_vbh);
 		// bgfx::submit(id, program, 0, it != itEnd - 1);
 		bgfx::submit(id, program);
+		// std::cout << "submit" << std::endl;
 	}
 
 	// bgfx::setIndexBuffer(m_ibh);
@@ -274,6 +363,8 @@ Mesh::~Mesh() {
 		 it != itEnd; ++it) {
 		const Group &group = *it;
 		bgfx::destroy(group.m_vbh);
+
+		bgfx::destroy(group.m_uDiffuse);
 
 		if (bgfx::isValid(group.m_ibh)) {
 			bgfx::destroy(group.m_ibh);

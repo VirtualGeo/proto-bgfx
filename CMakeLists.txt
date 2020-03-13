@@ -71,6 +71,7 @@ macro(COMPILE_SHADER SHADER)
             elseif(${SHADER_TYPE} STREQUAL "compute")
                 set(PROFILE "cs_5_0")
             endif()
+            # set(PROFILE "glsl")
             set(OPTIMIZATION -O 3)
         else()
             set(PLATFORM "linux") # TODO
@@ -88,9 +89,9 @@ macro(COMPILE_SHADER SHADER)
                     --platform ${PLATFORM}
                     --type ${SHADER_TYPE}
                     --verbose
-                    --profile ${PROFILE}
+                    # --profile ${PROFILE}
                     -i ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src
-                    ${OPTIMIZATION}
+                    # ${OPTIMIZATION}
             MAIN_DEPENDENCY ${SHADER_SRC_DIR}/${SHADER}
             COMMENT "Compiling ${SHADER_TYPE} shader ${SHADER_NAME}"
         )

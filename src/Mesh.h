@@ -1,12 +1,20 @@
 
 #pragma ounce
 #include "bgfx/bgfx.h"
+// #include "bgfx/platform.h"
 #include <vector>
 // #include <tinyobj/>
 #include "tiny_obj_loader.h"
 #include <cassert>
 #include <iostream>
 #include "Texture.h"
+// #include <bx/bx.h>
+#include <bx/file.h>
+#include <bx/macros.h>
+#include <bx/uint32_t.h>
+
+// bgfx::UniformType::Vec4 f;
+// bx::Vec4;
 
 // struct Vertex {
 // 	glm::vec3 position;
@@ -72,6 +80,13 @@ struct Group {
 
     Texture * m_texture = nullptr;
 	// loadTexture("D:/proto-bgfx/Assets/Teapot/default.png");
+
+	bgfx::UniformHandle m_uDiffuse;
+	float m_diffuse[4];
+	// float m_diffuseColor[3];
+	// bool m_hasDiffuseTexture = false;
+	// bgfx::UniformHandle m_uHasDiffuseTexture;
+	// bx::Vec3 m_diffuse;
 
 	bgfx::VertexBufferHandle m_vbh;
 	bgfx::IndexBufferHandle m_ibh;

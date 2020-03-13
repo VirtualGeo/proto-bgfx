@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include <cassert>
 #include <iostream>
+#include <bx/readerwriter.h>
 
 // Texture::Texture(const char *filename) {
 Texture::Texture(const std::string &filename) {
@@ -35,14 +36,14 @@ Texture::Texture(const std::string &filename) {
 	// stippleTex = bgfx::alloc(imageSize);
 	// bx::memSet(stippleTex->data, 0, stippleTex->size);
 	// texPtr->data = (uint8_t*)std::move(image);
-	// BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
-
-	// const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE |
-	// BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
+	// const uint64_t textureFlags = 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
 	const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
-	// const uint64_t samplerFlags = BGFX_SAMPLER_NONE;
-	const uint64_t samplerFlags =
-		0 | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT;
+	// BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
+	// const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+	const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
+	// BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN
+	// const uint64_t samplerFlags =
+		// 0 | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT;
 
 	// bgfx::TextureInfo info;
 	// bgfx::calcTextureSize(info, width, height, 0, false, true, 0,
@@ -52,12 +53,23 @@ Texture::Texture(const std::string &filename) {
 	// assert(imageSize == info.storageSize);
 	// imageSize = info.storageSize;
 	m_sampler = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
+	// const bgfx::Memory * mem = bgfx::copy(m_image, imageSize * 8);
+	// const bgfx::Memory * mem = bgfx::alloc(imageSize);
+	// bx::memCopy(mem, image, imageSize);
+	// bgfx::copy(m_image, )
+	// bgfx::blit()
+
+	// bgfx::alloc()
+	// stbi_image_free(m_image);
+	// m_image = nullptr;
 
 	if (nbChannel == 3) {
 		m_texture = bgfx::createTexture2D(
 			width, height, hasMips, 1, bgfx::TextureFormat::RGB8,
 			// BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT, stippleTex);
 			textureFlags | samplerFlags, bgfx::makeRef(m_image, imageSize));
+			// textureFlags | samplerFlags, mem);
+
 	} else if (nbChannel == 1) {
 		m_texture = bgfx::createTexture2D(
 			width, height, hasMips, 1, bgfx::TextureFormat::R8,
