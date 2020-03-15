@@ -2,7 +2,7 @@
 # project(src VERSION 1.0 LANGUAGES CXX)
 
 foreach(SHADER ${IN_SHADERS})
-    compile_shader(${SHADER})
+        compile_shader(${SHADER})
 endforeach()
 
 # set(SOURCE main.cpp)
@@ -21,26 +21,53 @@ find_package(bgfx REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${BGFX_INCLUDE_DIRS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC __STDC_LIMIT_MACROS __STDC_FORMAT_MACROS __STDC_CONSTANT_MACROS)
 if (MSVC)
-    target_compile_options(${PROJECT_NAME} PUBLIC /Wall)
+        target_compile_options(${PROJECT_NAME} PUBLIC /Wall)
 endif()
 
+set(OTHER_LIBS "")
+if (UNIX)
+        find_package(X11 REQUIRED)
+        find_package(OpenGL REQUIRED)
 
-# find_package(OpenGL REQUIRED)
+        set(OTHER_LIBS ${OTHER_LIBS} ${X11_LIBRARIES} ${OPENGL_LIBRARIES})
+        target_link_libraries(${PROJECT_NAME} PUBLIC
+                ${X11_LIBRARIES}
+                ${OPENGL_LIBRARIES}
+                $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
+                $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
+                $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
+                $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
+                $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
+                $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
+                $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
+                $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
+                glfw
+                tinyobjloader
+                # glm
+                stb
+                )
+        #else()
+endif()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC 
-    $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
-    $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
-    $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
-    $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
-    $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
-    $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
-    $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
-    $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
-    glfw
-    tinyobjloader
-    # glm
-    stb
-    # OpenGL::GL
-)
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        #                ${X11_LIBRARIES}
+        #                ${OPENGL_LIBRARIES}
+        $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
+        $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
+        $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
+        $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
+        $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
+        $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
+        $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
+        $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
+        glfw
+        tinyobjloader
+        # glm
+        stb
+        #        OpenGL::GL
+        #        ${X11_LIBRARIES}
+
+        )
 
 
+#endif()

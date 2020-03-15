@@ -5,104 +5,105 @@ include(FindPackageHandleStandardArgs)
 #         /usr
 #         /usr/local
 #     ${BX_ROOT}
-    
+
 #     PATH_SUFFIXES
 #     include
 # )
-    
+
 
 find_path(BGFX_INCLUDE_DIR bgfx/bgfx.h
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-    
-    PATH_SUFFIXES
-    include
-)
-    
+        PATHS
+        /usr
+        /usr/local
+        ${BGFX_ROOT}
 
-set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIR}; ${BGFX_INCLUDE_DIR}/compat/msvc)
+        PATH_SUFFIXES
+        include
+        )
 
-    # message(FATAL_ERROR "ERROR: ${BGFX_INCLUDE_DIR}")
-    
+
+#set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIR}; ${BGFX_INCLUDE_DIR}/compat/msvc)
+set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIR})
+
+# message(FATAL_ERROR "ERROR: ${BGFX_INCLUDE_DIR}")
+
 
 
 find_library(BGFX_LIBRARY_DEBUG NAMES bgfxd
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
+        PATHS
+        /usr
+        /usr/local
+        ${BGFX_ROOT}
 
-    PATH_SUFFIXES
-    lib
-)
+        PATH_SUFFIXES
+        lib
+        )
 find_library(BGFX_LIBRARY_RELEASE NAMES bgfx
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
+        PATHS
+        /usr
+        /usr/local
+        ${BGFX_ROOT}
 
-    PATH_SUFFIXES
-    lib
-)
+        PATH_SUFFIXES
+        lib
+        )
 
 find_library(BIMG_LIBRARY_DEBUG NAMES bimgd
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
+        PATHS
+        /usr
+        /usr/local
+        ${BGFX_ROOT}
 
-    PATH_SUFFIXES
-    lib
-)
+        PATH_SUFFIXES
+        lib
+        )
 find_library(BIMG_LIBRARY_RELEASE NAMES bimg
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
+        PATHS
+        /usr
+        /usr/local
+        ${BGFX_ROOT}
 
-    PATH_SUFFIXES
-    lib
-)
+        PATH_SUFFIXES
+        lib
+        )
 
 find_library(BX_LIBRARY_DEBUG NAMES bxd
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
+        PATHS
+        /usr
+        /usr/local
+        ${BGFX_ROOT}
 
-    PATH_SUFFIXES
-    lib
-)
+        PATH_SUFFIXES
+        lib
+        )
 find_library(BX_LIBRARY_RELEASE NAMES bx
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
+        PATHS
+        /usr
+        /usr/local
+        ${BGFX_ROOT}
 
-    PATH_SUFFIXES
-    lib
-)
+        PATH_SUFFIXES
+        lib
+        )
 
 find_library(ASTCCODEC_LIBRARY_DEBUG NAMES astc-codecd
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
+        PATHS
+        /usr
+        /usr/local
+        ${BGFX_ROOT}
 
-    PATH_SUFFIXES
-    lib
-)
+        PATH_SUFFIXES
+        lib
+        )
 find_library(ASTCCODEC_LIBRARY_RELEASE NAMES astc-codec
-     PATHS 
-     /usr
-     /usr/local
-     ${BGFX_ROOT}
+        PATHS
+        /usr
+        /usr/local
+        ${BGFX_ROOT}
 
-    PATH_SUFFIXES
-    lib
-)
+        PATH_SUFFIXES
+        lib
+        )
 
 
 
@@ -116,5 +117,5 @@ mark_as_advanced(BGFX_FOUND BGFX_INCLUDE_DIR BGFX_LIBRARY_RELEASE)
 
 # message(FATAL_ERROR "toto: ${BGFX_FOUND}")
 if (NOT BGFX_FOUND) 
-    message(FATAL_ERROR "could not find bgfx, make sure you have set BGFX_ROOT")
-    endif()
+        message(FATAL_ERROR "could not find bgfx, make sure you have set BGFX_ROOT")
+endif()

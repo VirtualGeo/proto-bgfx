@@ -3,10 +3,14 @@ project(proto-bgfx VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -O0 -g -Wfatal-errors")
+
+if (UNIX)
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -O0 -g -Wfatal-errors")
+endif()
 
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(BGFX_ROOT /home/gauthier/tmp/bgfx.cmake/bgfx-install)
 
 # find_package(glfw3 3.3 REQUIRED)
 # ------------------------------ GLFW
@@ -83,7 +87,8 @@ macro(COMPILE_SHADER SHADER)
         add_custom_command(
             OUTPUT ${SHADER_DIR}/bin/${BIN_SHADER_NAME}
             COMMAND
-                D:/bgfx.cmake/bgfx-install/bin/shaderc
+#                D:/bgfx.cmake/bgfx-install/bin/shaderc
+                ${BGFX_ROOT}/bin/shaderc
                     -f ${SHADER_SRC_DIR}/${SHADER}
                     -o ${SHADER_DIR}/bin/${BIN_SHADER_NAME}
                     --platform ${PLATFORM}
