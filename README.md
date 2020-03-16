@@ -37,8 +37,6 @@ $ cmake --build . --target install --config Debug
 $ cmake --build . --target install --config Release
 ```
 
---
-
 ## How to include bgfx, bx, bimg library into proto-bgfx project
 You must set the cmake variable BGFX_ROOT as the path of bgfx-install on your system
 
