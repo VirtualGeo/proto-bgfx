@@ -5,8 +5,6 @@
 * glfw (submodule)
 * tinyobjloader (submodule)
 
----
-
 ## Building (command line instruction)
 ```bash
 $ git submodule init
@@ -16,6 +14,8 @@ $ cd build
 $ cmake ..
 $ make
 ```
+
+---
 
 ## How to install bgfx, bx, bimg libraries
 ```bash
@@ -36,6 +36,8 @@ set_target_properties( astc-codec PROPERTIES DEBUG_POSTFIX d)
 $ cmake --build . --target install --config Debug
 $ cmake --build . --target install --config Release
 ```
+
+--
 
 ## How to include bgfx, bx, bimg library into proto-bgfx project
 You must set the cmake variable BGFX_ROOT as the path of bgfx-install on your system
