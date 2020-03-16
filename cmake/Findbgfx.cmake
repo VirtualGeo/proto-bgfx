@@ -22,8 +22,12 @@ find_path(BGFX_INCLUDE_DIR bgfx/bgfx.h
         )
 
 
-#set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIR}; ${BGFX_INCLUDE_DIR}/compat/msvc)
-set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIR})
+if (UNIX)
+        set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIR})
+elseif(MSVC)
+        set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIR}; ${BGFX_INCLUDE_DIR}/compat/msvc)
+endif()
+
 
 # message(FATAL_ERROR "ERROR: ${BGFX_INCLUDE_DIR}")
 

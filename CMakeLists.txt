@@ -9,8 +9,9 @@ if (UNIX)
 endif()
 
 
+# message("BGFX_ROOT = " ${BGFX_ROOT})
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(BGFX_ROOT /home/gauthier/tmp/bgfx.cmake/bgfx-install)
+# set(BGFX_ROOT /home/gauthier/tmp/bgfx.cmake/bgfx-install)
 
 # find_package(glfw3 3.3 REQUIRED)
 # ------------------------------ GLFW
@@ -75,7 +76,7 @@ macro(COMPILE_SHADER SHADER)
             elseif(${SHADER_TYPE} STREQUAL "compute")
                 set(PROFILE "cs_5_0")
             endif()
-            # set(PROFILE "glsl")
+            set(PROFILE "glsl")
             set(OPTIMIZATION -O 3)
         else()
             set(PLATFORM "linux") # TODO
@@ -87,7 +88,7 @@ macro(COMPILE_SHADER SHADER)
         add_custom_command(
             OUTPUT ${SHADER_DIR}/bin/${BIN_SHADER_NAME}
             COMMAND
-#                D:/bgfx.cmake/bgfx-install/bin/shaderc
+            #    D:/bgfx.cmake/bgfx-install/bin/shaderc
                 ${BGFX_ROOT}/bin/shaderc
                     -f ${SHADER_SRC_DIR}/${SHADER}
                     -o ${SHADER_DIR}/bin/${BIN_SHADER_NAME}

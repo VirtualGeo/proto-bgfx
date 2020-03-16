@@ -24,7 +24,7 @@ if (MSVC)
         target_compile_options(${PROJECT_NAME} PUBLIC /Wall)
 endif()
 
-set(OTHER_LIBS "")
+# set(OTHER_LIBS "")
 if (UNIX)
         find_package(X11 REQUIRED)
         find_package(OpenGL REQUIRED)
@@ -64,6 +64,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         tinyobjloader
         # glm
         stb
+        # bgfx
         #        OpenGL::GL
         #        ${X11_LIBRARIES}
 
