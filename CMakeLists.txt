@@ -8,6 +8,18 @@ if (UNIX)
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -O0 -g -Wfatal-errors")
 endif()
 
+set(RENDERER_OpenGL 1)
+# set(RENDERER_DirectX 1)
+
+if (RENDERER_OpenGL)
+    add_definitions(-DRENDERER_OpenGL)
+    # add_definitions(-DRENDERER_DirectX 0)
+elseif(RENDERER_DirectX)
+#     add_definitions(-DRENDERER_OpenGL 0)
+    add_definitions(-DRENDERER_DirectX)
+else()
+    add_definitions(-DRENDERER_Auto)
+endif()
 
 # message("BGFX_ROOT = " ${BGFX_ROOT})
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -68,43 +80,57 @@ macro(COMPILE_SHADER SHADER)
     get_shader_infos(${SHADER} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)
     if(OK)
         if(WIN32)
+            # message("WIN32")
             set(PLATFORM "windows")
-            if(${SHADER_TYPE} STREQUAL "vertex")
-                set(PROFILE "vs_5_0")
-            elseif(${SHADER_TYPE} STREQUAL "fragment")
-                set(PROFILE "ps_5_0")
-            elseif(${SHADER_TYPE} STREQUAL "compute")
-                set(PROFILE "cs_5_0")
+            if(RENDERER_DirectX)
+                if(${SHADER_TYPE} STREQUAL "vertex")
+                    set(PROFILE "vs_5_0")
+                elseif(${SHADER_TYPE} STREQUAL "fragment")
+                    set(PROFILE "ps_5_0")
+                elseif(${SHADER_TYPE} STREQUAL "compute")
+                    set(PROFILE "cs_5_0")
+                endif()
+                # set(PROFILE "")
+                set(OPTIMIZATION "-O 3 --Werror")
+                # set(OPTIMIZATION "")
+                set(SHADER_BIN_REP "dx11")
+
+            elseif(RENDERER_OpenGL)
+                set(PROFILE "")
+                set(OPTIMIZATION "")
+                set(SHADER_BIN_REP "glsl")
+
+
             endif()
-            set(PROFILE "glsl")
-            set(OPTIMIZATION -O 3)
+
         else()
             set(PLATFORM "linux") # TODO
-            set(PROFILE "glsl")
+            # set(PROFILE "glsl")
+            set(PROFILE "")
             set(OPTIMIZATION "")
+            set(SHADER_BIN_REP "glsl")
         endif(WIN32)
 
 
         add_custom_command(
-            OUTPUT ${SHADER_DIR}/bin/${BIN_SHADER_NAME}
+            OUTPUT ${SHADER_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME}
             COMMAND
-            #    D:/bgfx.cmake/bgfx-install/bin/shaderc
                 ${BGFX_ROOT}/bin/shaderc
                     -f ${SHADER_SRC_DIR}/${SHADER}
-                    -o ${SHADER_DIR}/bin/${BIN_SHADER_NAME}
+                    -o ${SHADER_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME}
                     --platform ${PLATFORM}
                     --type ${SHADER_TYPE}
                     --verbose
-                    # --profile ${PROFILE}
+                    --profile ${PROFILE}
                     -i ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src
-                    # ${OPTIMIZATION}
+                    ${OPTIMIZATION}
             MAIN_DEPENDENCY ${SHADER_SRC_DIR}/${SHADER}
             COMMENT "Compiling ${SHADER_TYPE} shader ${SHADER_NAME}"
         )
-        message(${SHADER_SRC_DIR}/${SHADER})
+        message(${SHADER_SRC_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME})
         # add_custom_target(src DEPENDS ${SHADER_DIR}/bin/${BIN_SHADER_NAME})
 
-        list(APPEND OUT_SHADERS ${SHADER_DIR}/bin/${BIN_SHADER_NAME})
+        list(APPEND OUT_SHADERS ${SHADER_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME})
     endif()
 endmacro(COMPILE_SHADER)
 

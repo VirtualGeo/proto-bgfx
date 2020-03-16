@@ -17,6 +17,7 @@ uniform vec4 u_diffuse;
 
 void main()
 {
+
 	//gl_FragColor = v_color0;
 
 	vec3 normal = normalize(v_normal);

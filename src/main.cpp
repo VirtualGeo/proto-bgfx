@@ -207,9 +207,20 @@ void init() {
 	bgfxInit.platformData.nwh = glfwGetWin32Window(g_window);
 #endif
 
+	// std::cout << RENDERER_TYPE << std::endl;
+#ifdef RENDERER_OpenGL
 	bgfxInit.type = bgfx::RendererType::OpenGL;
-	// bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a
+	std::cout << "RendererType OpenGL" << std::endl;
+#endif
+#ifdef RENDERER_DirectX
+	bgfxInit.type = bgfx::RendererType::Direct3D12;
+	std::cout << "RendererType DirectX" << std::endl;
+#endif
+#ifdef RENDERER_Auto
+	bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a
 	// renderer
+	std::cout << "RendererType auto" << std::endl;
+#endif
 	bgfxInit.resolution.width = WIN_WIDTH;
 	bgfxInit.resolution.height = WIN_HEIGHT;
 	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
@@ -221,6 +232,7 @@ void init() {
 		exit(1);
 		// return 1;
 	}
+
 
 	// bgfx::setDebug(BGFX_DEBUG_TEXT);
 	// bgfx::setDebug(BGFX_DEBUG_WIREFRAME);
@@ -460,32 +472,32 @@ void mouse_button_callback(GLFWwindow *window, int button, int action,
 bgfx::ShaderHandle loadShader(const char *FILENAME) {
 	const char *shaderPath = "???";
 
-	// switch (bgfx::getRendererType()) {
-	// case bgfx::RendererType::Noop:
-	// case bgfx::RendererType::Direct3D9:
-	// 	shaderPath = "shaders/bin/dx9/";
-	// 	break;
-	// case bgfx::RendererType::Direct3D11:
-	// case bgfx::RendererType::Direct3D12:
-	// 	shaderPath = "shaders/bin/dx11/";
-	// 	break;
-	// case bgfx::RendererType::Gnm:
-	// 	shaderPath = "shaders/bin/pssl/";
-	// 	break;
-	// case bgfx::RendererType::Metal:
-	// 	shaderPath = "shaders/bin/metal/";
-	// 	break;
-	// case bgfx::RendererType::OpenGL:
-	// 	shaderPath = "shaders/bin/glsl/";
-	// 	break;
-	// case bgfx::RendererType::OpenGLES:
-	// 	shaderPath = "shaders/bin/essl/";
-	// 	break;
-	// case bgfx::RendererType::Vulkan:
-	// 	shaderPath = "shaders/bin/spirv/";
-	// 	break;
-	// }
-	shaderPath = "shaders/bin/";
+	switch (bgfx::getRendererType()) {
+	case bgfx::RendererType::Noop:
+	case bgfx::RendererType::Direct3D9:
+		shaderPath = "shaders/bin/dx9/";
+		break;
+	case bgfx::RendererType::Direct3D11:
+	case bgfx::RendererType::Direct3D12:
+		shaderPath = "shaders/bin/dx11/";
+		break;
+	case bgfx::RendererType::Gnm:
+		shaderPath = "shaders/bin/pssl/";
+		break;
+	case bgfx::RendererType::Metal:
+		shaderPath = "shaders/bin/metal/";
+		break;
+	case bgfx::RendererType::OpenGL:
+		shaderPath = "shaders/bin/glsl/";
+		break;
+	case bgfx::RendererType::OpenGLES:
+		shaderPath = "shaders/bin/essl/";
+		break;
+	case bgfx::RendererType::Vulkan:
+		shaderPath = "shaders/bin/spirv/";
+		break;
+	}
+	// shaderPath = "shaders/bin/";
 	// shaderPath = "/home/gauthier/tmp2/proto-bgfx/shaders/bin/";
 
 	size_t shaderLen = strlen(shaderPath);
