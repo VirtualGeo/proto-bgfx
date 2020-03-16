@@ -7,6 +7,3 @@
 [submodule "Assets/Sponza"]
 	path = Assets/Sponza
 	url = https://github.com/jimmiebergmann/Sponza.git
-[submodule "Modules/glm"]
-	path = Modules/glm
-	url = https://github.com/g-truc/glm.git
