@@ -44,6 +44,6 @@ You must set the cmake variable BGFX_ROOT as the path of bgfx-install on your sy
 in .vscode/settings.json of proto-bgfx project add these lines
 ```json
 "cmake.configureSettings": {
-        "BGFX_ROOT": "D:/bgfx.cmake/bgfx-install",
+        "BGFX_ROOT": "D:/<PATH_IN_YOUR_SYSTEM>/bgfx-install",
 },
 ```
