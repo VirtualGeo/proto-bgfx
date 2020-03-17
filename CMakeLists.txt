@@ -5,18 +5,23 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (UNIX)
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -O0 -g -Wfatal-errors")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -Wextra -O0 -g -Wfatal-errors")
 endif()
 
-set(RENDERER_OpenGL 1)
+#set(RENDERER_OpenGL 1)
 # set(RENDERER_DirectX 1)
+
+#message("CMAKE_SOURCE_DIR = " ${CMAKE_SOURCE_DIR})
+#set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
+add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
+
 
 if (RENDERER_OpenGL)
     add_definitions(-DRENDERER_OpenGL)
     # add_definitions(-DRENDERER_DirectX 0)
-elseif(RENDERER_DirectX)
-#     add_definitions(-DRENDERER_OpenGL 0)
-    add_definitions(-DRENDERER_DirectX)
+    #elseif(RENDERER_DirectX)
+    #     add_definitions(-DRENDERER_OpenGL 0)
+    #    add_definitions(-DRENDERER_DirectX)
 else()
     add_definitions(-DRENDERER_Auto)
 endif()
@@ -35,7 +40,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 # -------------------------------- SHADERS
 set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
-            # MAIN_DEPENDENCY ${SHADER_DIR}/src/${SHADER}
+# MAIN_DEPENDENCY ${SHADER_DIR}/src/${SHADER}
 set(SHADER_SRC_DIR ${SHADER_DIR}/src)
 # set(SHADERS test.vert.sc)
 
@@ -66,13 +71,13 @@ endfunction(GET_SHADER_INFOS)
 
 # file(GLOB_RECURSE IN_SHADERS *.sc)
 set(IN_SHADERS
-    cubes.vert.sc 
+    cubes.vert.sc
     cubes.frag.sc
     # blinnphong_vert.sc
     # blinnphong_frag.sc
     # mesh_vert.sc
     # mesh_frag.sc
-)
+    )
 
 set(OUT_SHADERS )
 
@@ -82,7 +87,13 @@ macro(COMPILE_SHADER SHADER)
         if(WIN32)
             # message("WIN32")
             set(PLATFORM "windows")
-            if(RENDERER_DirectX)
+            if(RENDERER_OpenGL)
+                set(PROFILE "")
+                set(OPTIMIZATION "")
+                set(SHADER_BIN_REP "glsl")
+
+            else()
+                #            if(RENDERER_DirectX)
                 if(${SHADER_TYPE} STREQUAL "vertex")
                     set(PROFILE "vs_5_0")
                 elseif(${SHADER_TYPE} STREQUAL "fragment")
@@ -95,10 +106,6 @@ macro(COMPILE_SHADER SHADER)
                 # set(OPTIMIZATION "")
                 set(SHADER_BIN_REP "dx11")
 
-            elseif(RENDERER_OpenGL)
-                set(PROFILE "")
-                set(OPTIMIZATION "")
-                set(SHADER_BIN_REP "glsl")
 
 
             endif()
@@ -115,18 +122,18 @@ macro(COMPILE_SHADER SHADER)
         add_custom_command(
             OUTPUT ${SHADER_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME}
             COMMAND
-                ${BGFX_ROOT}/bin/shaderc
-                    -f ${SHADER_SRC_DIR}/${SHADER}
-                    -o ${SHADER_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME}
-                    --platform ${PLATFORM}
-                    --type ${SHADER_TYPE}
-                    --verbose
-                    --profile ${PROFILE}
-                    -i ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src
-                    ${OPTIMIZATION}
+            ${BGFX_ROOT}/bin/shaderc
+            -f ${SHADER_SRC_DIR}/${SHADER}
+            -o ${SHADER_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME}
+            --platform ${PLATFORM}
+            --type ${SHADER_TYPE}
+            --verbose
+            --profile ${PROFILE}
+            -i ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src
+            ${OPTIMIZATION}
             MAIN_DEPENDENCY ${SHADER_SRC_DIR}/${SHADER}
             COMMENT "Compiling ${SHADER_TYPE} shader ${SHADER_NAME}"
-        )
+            )
         message(${SHADER_SRC_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME})
         # add_custom_target(src DEPENDS ${SHADER_DIR}/bin/${BIN_SHADER_NAME})
 
