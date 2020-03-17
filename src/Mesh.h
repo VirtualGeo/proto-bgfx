@@ -6,6 +6,7 @@
 // #include "bgfx/platform.h"
 #include <vector>
 // #include <tinyobj/>
+//#define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 #include <cassert>
 #include <iostream>
