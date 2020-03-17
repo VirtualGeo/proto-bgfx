@@ -82,40 +82,43 @@ static const uint64_t s_ptState[]{
 };
 // BX_STATIC_ASSERT(BX_COUNTOF(s_ptState) == BX_COUNTOF(s_ptNames));
 
-// #define WIN32_LEAN_AND_MEAN
-// #include <windows.h>
-// #include <Shlwapi.h>
-// #pragma comment(lib, "shlwapi.lib")
 
-// #include <iostream>
-// #include <string>
-// #include <cstring>
-// // using namespace std;
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <Shlwapi.h>
+#pragma comment(lib, "shlwapi.lib")
 
-// inline std::string GetExeDir()
-// {
-//     char path[MAX_PATH] = "";
-//     GetModuleFileNameA(NULL, path, MAX_PATH);
-//     PathRemoveFileSpecA(path);
-//     PathAddBackslashA(path);
-//     return path;
-// }
+#include <iostream>
+#include <string>
+#include <cstring>
+// using namespace std;
 
-// std::string GetWorkingDir()
-// {
-//     char path[MAX_PATH] = "";
-//     GetCurrentDirectoryA(MAX_PATH, path);
-//     PathAddBackslashA(path);
-//     return path;
-// }
+inline std::string GetExeDir()
+{
+    char path[MAX_PATH] = "";
+    GetModuleFileNameA(NULL, path, MAX_PATH);
+    PathRemoveFileSpecA(path);
+    PathAddBackslashA(path);
+    return path;
+}
 
-// int main() {
-// 	std::string exeDir     = GetExeDir();
-// 	std::string workingDir = GetWorkingDir();
-// 	std::cout << "Exe Dir     = " << exeDir     << "\n";
-// 	std::cout << "Working Dir = " << workingDir << "\n";
-// 	return 0;
-// }
+std::string GetWorkingDir()
+{
+    char path[MAX_PATH] = "";
+    GetCurrentDirectoryA(MAX_PATH, path);
+    PathAddBackslashA(path);
+    return path;
+}
+
+int main() {
+	std::string exeDir     = GetExeDir();
+	std::string workingDir = GetWorkingDir();
+	std::cout << "Exe Dir     = " << exeDir     << "\n";
+	std::cout << "Working Dir = " << workingDir << "\n";
+	return 0;
+}
+
+
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
@@ -126,49 +129,49 @@ float lastX = WIN_WIDTH / 2.0f;
 float lastY = WIN_HEIGHT / 2.0f;
 float fov = 60.0f;
 
-int main(int argc, char const *argv[]) {
-	std::cout << "hello bgfx !!!" << std::endl;
+// int main(int argc, char const *argv[]) {
+// 	std::cout << "hello bgfx !!!" << std::endl;
 
-	init();
-	std::cout << "init done." << std::endl;
-	bgfx::setDebug(BGFX_DEBUG_TEXT);
+// 	init();
+// 	std::cout << "init done." << std::endl;
+// 	bgfx::setDebug(BGFX_DEBUG_TEXT);
 
-	float sum = 0.0f;
-	// while (true)
-	float fps = 0.0f;
-	while (!glfwWindowShouldClose(g_window)) {
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-		sum += deltaTime;
-		if (counter % 10 == 0) {
-			fps = 10.0f / sum;
-			// fps = 1.0f / deltaTime;
-			sum = 0.0f;
-		}
-		bgfx::dbgTextPrintf(0, 0, 0x08, "fps = %.1f", fps);
+// 	float sum = 0.0f;
+// 	// while (true)
+// 	float fps = 0.0f;
+// 	while (!glfwWindowShouldClose(g_window)) {
+// 		float currentFrame = glfwGetTime();
+// 		deltaTime = currentFrame - lastFrame;
+// 		lastFrame = currentFrame;
+// 		sum += deltaTime;
+// 		if (counter % 10 == 0) {
+// 			fps = 10.0f / sum;
+// 			// fps = 1.0f / deltaTime;
+// 			sum = 0.0f;
+// 		}
+// 		bgfx::dbgTextPrintf(0, 0, 0x08, "fps = %.1f", fps);
 
-		processInput(g_window);
+// 		processInput(g_window);
 
-		update();
+// 		update();
 
-		// bgfx::frame();
+// 		// bgfx::frame();
 
-		counter++;
-		// std::this_thread::sleep_for(std::chrono::milliseconds(16));
+// 		counter++;
+// 		// std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
-		// glfwSwapBuffers(g_window); question : why not use ?
-		glfwPollEvents();
-		// std::cout << "update " << counter << std::endl;
-		// glfwSetMousePos(100, 100);
-	}
+// 		// glfwSwapBuffers(g_window); question : why not use ?
+// 		glfwPollEvents();
+// 		// std::cout << "update " << counter << std::endl;
+// 		// glfwSetMousePos(100, 100);
+// 	}
 
-	shutdown();
-	// bgfx::shutdown(); // question : after or before glfwTerminate ?
-	// glfwTerminate();
+// 	shutdown();
+// 	// bgfx::shutdown(); // question : after or before glfwTerminate ?
+// 	// glfwTerminate();
 
-	return 0;
-}
+// 	return 0;
+// }
 
 void init() {
 	// --------------------- INIT GLFW
