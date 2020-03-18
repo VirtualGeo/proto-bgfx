@@ -1,10 +1,6 @@
-
-
-// #include "bgfx/bgfx.h"
 #include "bgfx/platform.h"
 #include <bgfx/bgfx.h>
 #include <bx/bx.h>
-// #include "bx/file.h"
 #include <bx/file.h>
 #include <bx/macros.h>
 #include <bx/uint32_t.h>
@@ -18,28 +14,15 @@
 //#include "GLFW/glfw4native.h"
 #include <GLFW/glfw3native.h>
 
-//#include "logo.h"
-// #include "bgfx/vertexdecl.h"
-#define TINYOBJLOADER_IMPLEMENTATION
-// #include "tiny_obj_loader.h"
-// #include "stb_image.h"
-// #include <stb_image.h>
-// #include "stb/stb_image.h"
-// #define STB_IMAGE_IMPLEMENTATION
-// #include <stb/stb_image.h>
-
-//#include <chrono>
-//#include <direct.h>
-//#include <iostream>
-//#include <stdio.h>
-
-#include <thread>
+//#include <thread>
 // #include <filesystem>
 // #include <glm/glm.hpp>
 // #include <assert.h>
-#include "Mesh.h"
+//#include "Mesh.h"
+#include "Scene.h"
 #include <cassert>
 #include <fstream>
+#include <iostream>
 
 #define WIN_WIDTH 640
 #define WIN_HEIGHT 480
@@ -54,72 +37,17 @@ void mouse_button_callback(GLFWwindow* window, int button, int action,
 void init();
 void shutdown();
 void update();
+
 bgfx::ShaderHandle loadShader(const char* FILENAME);
-//bgfx::ShaderHandle loadShader(const std::string& FILENAME);
-// bgfx::TextureHandle loadTexture(const char *FILENAME);
+void updateCameraFront();
 
 // ----------------- GLOBAL VARS
 GLFWwindow* g_window = nullptr;
-// bgfx::VertexBufferHandle vbh;
-// bgfx::IndexBufferHandle ibh;
-// bx::FileReaderI * fileReader = nullptr;
 bgfx::ProgramHandle g_program;
 unsigned int counter = 0;
-// bgfx::UniformHandle g_texColor;
-// bgfx::TextureHandle g_texture;
-Mesh* g_mesh = nullptr;
+//Mesh* g_mesh = nullptr;
+Scene g_scene;
 bool g_clicked = false;
-
-static const char* s_ptNames[] {
-    "Triangle List",
-    // "Triangle Strip",
-    // "Lines",
-    // "Line Strip",
-    // "Points",
-};
-
-static const uint64_t s_ptState[] {
-    UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
-    // BGFX_STATE_PT_LINES,
-    // BGFX_STATE_PT_LINESTRIP,
-    // BGFX_STATE_PT_POINTS,
-};
-// BX_STATIC_ASSERT(BX_COUNTOF(s_ptState) == BX_COUNTOF(s_ptNames));
-
-//#define WIN32_LEAN_AND_MEAN
-//#include <windows.h>
-//#include <Shlwapi.h>
-//#pragma comment(lib, "shlwapi.lib")
-
-//#include <iostream>
-//#include <string>
-//#include <cstring>
-//// using namespace std;
-
-//inline std::string GetExeDir()
-//{
-//    char path[MAX_PATH] = "";
-//    GetModuleFileNameA(NULL, path, MAX_PATH);
-//    PathRemoveFileSpecA(path);
-//    PathAddBackslashA(path);
-//    return path;
-//}
-
-//std::string GetWorkingDir()
-//{
-//    char path[MAX_PATH] = "";
-//    GetCurrentDirectoryA(MAX_PATH, path);
-//    PathAddBackslashA(path);
-//    return path;
-//}
-
-//int main() {
-//	std::string exeDir     = GetExeDir();
-//	std::string workingDir = GetWorkingDir();
-//	std::cout << "Exe Dir     = " << exeDir     << "\n";
-//	std::cout << "Working Dir = " << workingDir << "\n";
-//	return 0;
-//}
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -130,9 +58,14 @@ float pitch = 0.0f;
 float lastX = WIN_WIDTH / 2.0f;
 float lastY = WIN_HEIGHT / 2.0f;
 float fov = 60.0f;
+bx::Vec3 cameraPos = { 0.0f, 2.0f, 0.0f };
+bx::Vec3 cameraFront;
+bx::Vec3 cameraUp = { 0.0f, 1.0f, 0.0f };
+const float maxFov = 120.0f;
 
 int main(int argc, char const* argv[])
 {
+    updateCameraFront(); // with current yaw and pitch
     std::cout << "hello bgfx !!!" << std::endl;
 
     //    std::cout << PROJECT_DIR << std::endl;
@@ -256,9 +189,11 @@ void init()
 
     // g_mesh = new Mesh("D:/proto-bgfx/Assets/Sponza/sponza.obj");
     // g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/bedroom/iscv2.obj");
-//    g_mesh = new Mesh("Assets/McGuire/sponza/sponza-blend.obj");
-    g_mesh = new Mesh("Assets/Sponza/sponza.obj");
-//    g_mesh = new Mesh("Assets/McGuire/sponzaBlender/sponza.obj");
+    //    g_mesh = new Mesh("Assets/McGuire/sponza/sponza-blend.obj");
+//    g_mesh = new Mesh("Assets/Sponza/sponza.obj");
+    g_scene.addModel("Assets/Sponza/sponza.obj");
+
+    //    g_mesh = new Mesh("Assets/McGuire/sponzaBlender/sponza.obj");
     //    g_mesh = new
     //    Mesh("/home/gauthier/tmp2/proto-bgfx/Assets/McGuire/sponza/sponza.obj");
     // g_mesh = new Mesh("Assets/McGuire/bmw/bmw.obj");
@@ -288,9 +223,6 @@ void init()
     // program = loadProgram("cubes.vert", "cubes.frag");
 }
 
-bx::Vec3 cameraPos = { 0.0f, 2.0f, 0.0f };
-bx::Vec3 cameraFront = { 1.0f, 0.0f, 0.0f };
-bx::Vec3 cameraUp = { 0.0f, 1.0f, 0.0f };
 // bool g_focused = false;
 
 void update()
@@ -337,6 +269,7 @@ void update()
     // 					   BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
     // 					   BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA | s_ptState[0];
 
+//    const uint64_t state = 0 | BGFX_STATE_PT_TRISTRIP | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
     const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
     // UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
 
@@ -354,7 +287,8 @@ void update()
     // bgfx::setTransform(mtx);
     // bgfx::setState(state);
     // bgfx::setTexture(0, g_texColor, g_texture);
-    g_mesh->submit(0, g_program, mtx, state);
+//    g_mesh->submit(0, g_program, mtx, state);
+    g_scene.submit(0, g_program, mtx, state);
     // g_mesh->submit(0, g_program, mtx, stateTransparent);
     // g_mesh->submit(0, g_program, mtx, stateOpaque);
 
@@ -370,8 +304,8 @@ void shutdown()
 
     // stbi_image_free(image);
 
-    delete g_mesh;
-    g_mesh = nullptr;
+//    delete g_mesh;
+//    g_mesh = nullptr;
     bgfx::destroy(g_program);
     // bgfx::destroy(g_texture);
     // bgfx::destroy(g_texColor);
@@ -417,6 +351,16 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // glViewport(0, 0, width, height);
 }
 
+void updateCameraFront()
+{
+
+    bx::Vec3 front;
+    front.x = bx::cos(bx::toRad(yaw)) * bx::cos(bx::toRad(pitch));
+    front.y = bx::sin(bx::toRad(pitch));
+    front.z = bx::sin(bx::toRad(yaw)) * bx::cos(bx::toRad(pitch));
+    cameraFront = bx::normalize(front);
+}
+
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     if (!g_clicked) {
@@ -446,15 +390,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
         pitch = 89.0f;
     if (pitch < -89.0f)
         pitch = -89.0f;
-
-    bx::Vec3 front;
-    front.x = cos(bx::toRad(yaw)) * cos(bx::toRad(pitch));
-    front.y = sin(bx::toRad(pitch));
-    front.z = sin(bx::toRad(yaw)) * cos(bx::toRad(pitch));
-    cameraFront = bx::normalize(front);
+    //    bx::Vec3 front;
+    //    front.x = bx::cos(bx::toRad(yaw)) * bx::cos(bx::toRad(pitch));
+    //    front.y = bx::sin(bx::toRad(pitch));
+    //    front.z = bx::sin(bx::toRad(yaw)) * bx::cos(bx::toRad(pitch));
+    //    cameraFront = bx::normalize(front);
+    updateCameraFront();
 }
 
-const float maxFov = 120.0f;
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     xoffset *= 5;
@@ -478,13 +421,13 @@ void mouse_button_callback(GLFWwindow* window, int button, int action,
     }
     // popup_menu();
 }
+
 // void focus_callback(GLFWwindow *window, int focused) {
 // 	g_focused = focused == GLFW_TRUE;
-
 // }
 
 //bgfx::ShaderHandle loadShader(const std::string& FILENAME)
-bgfx::ShaderHandle loadShader(const char * filename)
+bgfx::ShaderHandle loadShader(const char* filename)
 {
     //    const char* shaderPath = "???";
     std::string shaderPath;
@@ -537,9 +480,9 @@ bgfx::ShaderHandle loadShader(const char * filename)
 
     // FILE *file = fopen("shaders/bin/cubes.vert.bin", "rb");
     //    FILE* file = fopen(filePath, "rb");
-//    std::fstream file;
+    //    std::fstream file;
     std::ifstream file(filePath, std::ios::binary);
-//    file.open(filePath, std::ios::in | std::ios::binary);
+    //    file.open(filePath, std::ios::in | std::ios::binary);
 
     //    if (file == NULL) {
     if (!file.is_open()) {
@@ -551,31 +494,27 @@ bgfx::ShaderHandle loadShader(const char * filename)
 
         exit(-1);
     }
-//    fseek(file, 0, SEEK_END);
-//    file.seekg(0, std::ios::seekdir::_S_end);
-//    long fileSize = ftell(file);
-//    long fileSize = file.tellg();
+    //    fseek(file, 0, SEEK_END);
+    //    file.seekg(0, std::ios::seekdir::_S_end);
+    //    long fileSize = ftell(file);
+    //    long fileSize = file.tellg();
     long begin = file.tellg();
     file.seekg(0, std::ios::end);
     long end = file.tellg();
-    long fileSize = end -begin;
-//    fseek(file, 0, SEEK_SET);
-//    file.seekg(0)
+    long fileSize = end - begin;
+    //    fseek(file, 0, SEEK_SET);
+    //    file.seekg(0)
 
     file.seekg(0, std::ios::beg);
 
     const bgfx::Memory* mem = bgfx::alloc(fileSize + 1);
-//    fread(mem->data, 1, fileSize, file);
+    //    fread(mem->data, 1, fileSize, file);
     file.read((char*)mem->data, fileSize);
     mem->data[mem->size - 1] = '\0';
-//    fclose(file);
+    //    fclose(file);
     file.close();
 
-//    free(filePath);
+    //    free(filePath);
 
     return bgfx::createShader(mem);
 }
-
-// unsigned char *image = nullptr;
-
-// const bgfx::Memory *stippleTex;
