@@ -1,13 +1,16 @@
 
-#pragma ounce
+//#pragma ounce
+#ifndef __MESH_H
+#define __MESH_H
 // #include "bgfx/bgfx.h"
 
 #include <bgfx/bgfx.h>
 // #include "bgfx/platform.h"
 #include <vector>
 // #include <tinyobj/>
-//#define TINYOBJLOADER_IMPLEMENTATION
+//#define TINYOBJLOADER_IMPLEMENTATION // question : why not possible to include tiny_obj_loader here ?
 #include "tiny_obj_loader.h"
+
 #include <cassert>
 #include <iostream>
 #include "Texture.h"
@@ -97,7 +100,9 @@ struct Group {
 };
 typedef std::vector<Group> GroupArray;
 
-struct Mesh {
+class Mesh {
+
+public:
 
 	// Mesh(const char *filePath);
 	Mesh(const char *filePath);
@@ -114,9 +119,12 @@ struct Mesh {
 	// std::vector<Vertex> m_vertices;
 	// std::vector<uint16_t> m_indices;
 
+private:
 	bgfx::VertexLayout m_layout;
 	GroupArray m_groups;
     // std::string m_path;
 	// bgfx::VertexBufferHandle m_vbh;
 	// bgfx::IndexBufferHandle m_ibh;
 };
+
+#endif // __MESH_H
