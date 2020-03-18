@@ -4,6 +4,3 @@
 [submodule "Modules/tinyobjloader"]
 	path = Modules/tinyobjloader
 	url = https://github.com/tinyobjloader/tinyobjloader.git
-[submodule "Assets/Sponza"]
-	path = Assets/Sponza
-	url = https://github.com/jimmiebergmann/Sponza.git
