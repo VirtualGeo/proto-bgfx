@@ -428,19 +428,19 @@ Mesh::Mesh(const char *filePath) {
 
 			if (material.diffuse_texname != "") {
 //    std::string directory = std::string(path).substr(0, path.find_last_of('/'));
-                std::string str = material.diffuse_texname;
-                std::string filename = str.substr(0, str.find_last_of('.'));
-                std::string extension = str.substr(str.find_last_of('.') + 1);
+//                std::string str = material.diffuse_texname;
+//                std::string filename = str.substr(0, str.find_last_of('.'));
+//                std::string extension = str.substr(str.find_last_of('.') + 1);
 //                std::string fileName = material.diffuse_texname.substr()
-                std::for_each(filename.begin(), filename.end(), [](char & c) {
-                    c = std::tolower(c);
-                });
+//                std::for_each(filename.begin(), filename.end(), [](char & c) {
+//                    c = std::tolower(c);
+//                });
 //                std::for_each(extension.begin(), extension.end(), [](char & c) {
 //                    c = std::tolower(c);
 //                });
                 group.m_texture =
-//                    new Texture(directory + "/" + material.diffuse_texname);
-                    new Texture(directory + "/" + filename + "." + extension);
+                    new Texture(directory + "/" + material.diffuse_texname);
+//                    new Texture(directory + "/" + filename + "." + extension);
                 std::cout << " hasTexture";
 
 				// group.m_hasDiffuseTexture = true;

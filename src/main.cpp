@@ -256,8 +256,8 @@ void init()
 
     // g_mesh = new Mesh("D:/proto-bgfx/Assets/Sponza/sponza.obj");
     // g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/bedroom/iscv2.obj");
-//    g_mesh = new Mesh("Assets/McGuire/sponza/sponza.obj");
-    g_mesh = new Mesh("Assets/Sponza2/sponza.obj");
+//    g_mesh = new Mesh("Assets/McGuire/sponza/sponza-blend.obj");
+    g_mesh = new Mesh("Assets/Sponza/sponza.obj");
 //    g_mesh = new Mesh("Assets/McGuire/sponzaBlender/sponza.obj");
     //    g_mesh = new
     //    Mesh("/home/gauthier/tmp2/proto-bgfx/Assets/McGuire/sponza/sponza.obj");
