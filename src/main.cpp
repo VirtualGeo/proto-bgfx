@@ -23,6 +23,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+//#include "Vertex.h"
 
 #define WIN_WIDTH 640
 #define WIN_HEIGHT 480
@@ -66,13 +67,13 @@ const float maxFov = 120.0f;
 int main(int argc, char const* argv[])
 {
     updateCameraFront(); // with current yaw and pitch
-    std::cout << "hello bgfx !!!" << std::endl;
+    std::cout << "[main] hello bgfx !!!" << std::endl;
 
     //    std::cout << PROJECT_DIR << std::endl;
     //    return 0;
 
     init();
-    std::cout << "init done." << std::endl;
+    std::cout << "[main] init done." << std::endl;
     bgfx::setDebug(BGFX_DEBUG_TEXT);
 
     float sum = 0.0f;
@@ -114,6 +115,7 @@ int main(int argc, char const* argv[])
 
 void init()
 {
+
     // --------------------- INIT GLFW
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -122,7 +124,7 @@ void init()
     if (g_window == NULL) {
         // std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
-        std::cout << "Failed to create GLFW window" << std::endl;
+        std::cout << "[main] Failed to create GLFW window" << std::endl;
         throw std::runtime_error("Failed to create GLFW window");
         // exit(-1);
     }
@@ -163,7 +165,7 @@ void init()
 #ifdef RENDERER_Auto
     bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a
     // renderer
-    std::cout << "RendererType auto" << std::endl;
+    std::cout << "[main] RendererType auto" << std::endl;
 #endif
     bgfxInit.resolution.width = WIN_WIDTH;
     bgfxInit.resolution.height = WIN_HEIGHT;
@@ -171,7 +173,7 @@ void init()
     // bgfxInit.resolution.reset = BGFX_RESET_NONE; // question
     // bgfx::init(bgfxInit);
     if (!bgfx::init(bgfxInit)) {
-        std::cout << "Failed to initialize bgfx" << std::endl;
+        std::cout << "[main] Failed to initialize bgfx" << std::endl;
         // throw std::runtime_error("Failed to initialize bgfx");
         exit(1);
         // return 1;
@@ -180,17 +182,24 @@ void init()
     // bgfx::setDebug(BGFX_DEBUG_TEXT);
     // bgfx::setDebug(BGFX_DEBUG_WIREFRAME);
 
-    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f,
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FFFFFF, 1.0f,
         0);
     bgfx::setViewRect(0, 0, 0, WIN_WIDTH, WIN_HEIGHT);
     bgfx::touch(0);
 
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
+    //    Vertex::init(); //init layout
+//    m_layout.begin()
+//        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+//        .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+//        .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+//        // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+//        .end();
 
     // g_mesh = new Mesh("D:/proto-bgfx/Assets/Sponza/sponza.obj");
     // g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/bedroom/iscv2.obj");
     //    g_mesh = new Mesh("Assets/McGuire/sponza/sponza-blend.obj");
-//    g_mesh = new Mesh("Assets/Sponza/sponza.obj");
+    //    g_mesh = new Mesh("Assets/Sponza/sponza.obj");
     g_scene.addModel("Assets/Sponza/sponza.obj");
 
     //    g_mesh = new Mesh("Assets/McGuire/sponzaBlender/sponza.obj");
@@ -269,7 +278,7 @@ void update()
     // 					   BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
     // 					   BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA | s_ptState[0];
 
-//    const uint64_t state = 0 | BGFX_STATE_PT_TRISTRIP | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
+    //    const uint64_t state = 0 | BGFX_STATE_PT_TRISTRIP | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
     const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
     // UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
 
@@ -287,7 +296,7 @@ void update()
     // bgfx::setTransform(mtx);
     // bgfx::setState(state);
     // bgfx::setTexture(0, g_texColor, g_texture);
-//    g_mesh->submit(0, g_program, mtx, state);
+    //    g_mesh->submit(0, g_program, mtx, state);
     g_scene.submit(0, g_program, mtx, state);
     // g_mesh->submit(0, g_program, mtx, stateTransparent);
     // g_mesh->submit(0, g_program, mtx, stateOpaque);
@@ -304,8 +313,9 @@ void shutdown()
 
     // stbi_image_free(image);
 
-//    delete g_mesh;
-//    g_mesh = nullptr;
+    g_scene.clear();
+    //    delete g_mesh;
+    //    g_mesh = nullptr;
     bgfx::destroy(g_program);
     // bgfx::destroy(g_texture);
     // bgfx::destroy(g_texColor);
@@ -315,6 +325,7 @@ void shutdown()
     glfwDestroyWindow(g_window);
     // window = nullptr; // question : necessary ?
     glfwTerminate();
+    std::cout << "[main] shutdown done" << std::endl;
     // glfwMakeContextCurrent(g_window);
 }
 
@@ -487,7 +498,7 @@ bgfx::ShaderHandle loadShader(const char* filename)
     //    if (file == NULL) {
     if (!file.is_open()) {
         // perror(std::string("Failed to load ")+  std::string(FILENAME));
-        std::cout << "Failed to load '" << filePath << "' '" << filename << "'"
+        std::cout << "[main] Failed to load '" << filePath << "' '" << filename << "'"
                   << std::endl;
 
         // throw std::runtime_error("Failed to load " + std::string(FILENAME));

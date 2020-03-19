@@ -8,14 +8,13 @@ if (UNIX)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -Wextra -O0 -g -Wfatal-errors")
 endif()
 
-#set(RENDERER_OpenGL 1)
-# set(RENDERER_DirectX 1)
 
 #message("CMAKE_SOURCE_DIR = " ${CMAKE_SOURCE_DIR})
 #set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
 add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
 
-
+#set(RENDERER_OpenGL 1)
+# set(RENDERER_DirectX 1)
 if (RENDERER_OpenGL)
     add_definitions(-DRENDERER_OpenGL)
     # add_definitions(-DRENDERER_DirectX 0)
@@ -80,6 +79,7 @@ set(IN_SHADERS
     )
 
 set(OUT_SHADERS )
+set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
 
 macro(COMPILE_SHADER SHADER)
     get_shader_infos(${SHADER} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)

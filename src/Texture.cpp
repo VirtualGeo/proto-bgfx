@@ -6,31 +6,39 @@
 #include "System.h"
 
 // Texture::Texture(const char *filename) {
-Texture::Texture(const std::string& diffuseTexName, const std::string& baseDir)
+Texture::Texture(const std::string& texName, const std::string& baseDir)
 {
     //                    GLuint texture_id;
-//    uint texture_id;
+    m_name = texName;
+    m_baseDir = baseDir;
+
+    const std::string absoluteTexName = baseDir + texName;
+
+    //    uint texture_id;
     int w, h;
     int comp;
 
-    std::string texture_filename = diffuseTexName;
-    if (!FileExists(texture_filename)) {
-        // Append base dir.
-        texture_filename = baseDir + diffuseTexName;
-        if (!FileExists(texture_filename)) {
-            std::cerr << "    [Texture] Unable to find file: " << diffuseTexName
-                      << std::endl;
-            exit(1);
-        }
-    }
+    assert(!FileExists(texName));
 
-    unsigned char* image = stbi_load(texture_filename.c_str(), &w, &h, &comp, STBI_default);
-    if (!image) {
-        std::cerr << "    [Texture] Unable to load texture: " << texture_filename
+    //    std::string texture_filename = diffuseTexName;
+    //    if (!FileExists(texture_filename)) {
+    // Append base dir.
+    //        texture_filename = baseDir + diffuseTexName;
+    if (!FileExists(absoluteTexName)) {
+        std::cerr << "    [Texture] Unable to find file: " << absoluteTexName
                   << std::endl;
         exit(1);
     }
-    std::cout << "    [Texture] Loaded texture: '" << texture_filename << "', w = " << w
+    //    }
+
+//    unsigned char* image = stbi_load(absoluteTexName.c_str(), &w, &h, &comp, STBI_default);
+    m_image = stbi_load(absoluteTexName.c_str(), &w, &h, &comp, STBI_default);
+    if (!m_image) {
+        std::cerr << "    [Texture] Unable to load texture: " << absoluteTexName
+                  << std::endl;
+        exit(1);
+    }
+    std::cout << "    [Texture] Loaded texture: '" << absoluteTexName << "', w = " << w
               << ", h = " << h << ", comp = " << comp << std::endl;
 
     const size_t imageSize = w * h * comp;
@@ -137,8 +145,51 @@ Texture::Texture(const std::string& diffuseTexName, const std::string& baseDir)
 
 Texture::~Texture()
 {
-    stbi_image_free(m_image);
-    m_image = nullptr;
+//    std::cout << "\033[31m";
+//    std::cout << "[Texture] " << this << " delete texture '" << m_name << "' " << m_image << ", textureHandle=" << m_textureHandle.idx << std::endl;
+//    std::cout << "\033[0m";
+
+//    assert(m_image);
+    if (m_image != nullptr) {
+        stbi_image_free(m_image);
+        m_image = nullptr;
+
+        bgfx::destroy(m_textureHandle);
+//        std::cout << "bgfx destroy " << std::endl;
+    }
+//    else {
+//        std::cout << "bgfx bad destroy " << std::endl;
+//    }
     //	bgfx::destroy(m_sampler);
-    bgfx::destroy(m_textureHandle);
+    //    bgfx::isValid(m_textureHandle)
+//    assert(bgfx::isValid(m_textureHandle));
+//    bgfx::destroy(m_textureHandle);
+    //    std::cout << "[Texture] " << m_name << " deleted" << std::endl;
+
+    std::cout << "\033[31m";
+    std::cout << "[Texture] " << this << " '" << m_name << "' deleted" << std::endl;
+    std::cout << "\033[0m";
+}
+
+const bgfx::TextureHandle& Texture::textureHandle() const
+{
+    return m_textureHandle;
+}
+
+std::string Texture::name() const
+{
+    return m_name;
+}
+
+Texture::Texture(Texture&& texture)
+    : m_image(texture.m_image)
+    , m_textureHandle(std::move(texture.m_textureHandle))
+    , m_name(std::move(texture.m_name))
+    , m_baseDir(std::move(texture.m_baseDir))
+{
+    texture.m_image = nullptr;
+//    texture.m_textureHandle.
+    std::cout << "\033[34m";
+    std::cout << "[Texture] " << this << " '" << m_name << "' right moving from " << &texture << std::endl;
+    std::cout << "\033[0m";
 }

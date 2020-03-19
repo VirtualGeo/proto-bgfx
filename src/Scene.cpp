@@ -6,15 +6,18 @@
 #include <stb/stb_image.h>
 
 #include "System.h"
+//#include <cassert>
 
 Scene::Scene()
 {
+    //    Vertex::init();
     m_layout.begin()
         .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
         .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
         .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
         // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
         .end();
+
 }
 
 void Scene::addModel(const char* filename)
@@ -68,71 +71,104 @@ void Scene::addModel(const char* filename)
     printf("[Scene] # of shapes    = %d\n", (int)shapes.size());
 
     // Append `default` material
-//    materials.push_back(tinyobj::material_t());
+    materials.push_back(tinyobj::material_t());
 
-//    for (size_t i = 0; i < materials.size(); i++) {
-//        printf("material[%d].diffuse_texname = %s\n", int(i),
-//            materials[i].diffuse_texname.c_str());
-//    }
+    //    for (size_t i = 0; i < materials.size(); i++) {
+    //        printf("material[%d].diffuse_texname = %s\n", int(i),
+    //            materials[i].diffuse_texname.c_str());
+    //    }
 
     // Load diffuse textures
     //    {
-//    for (const tinyobj::material_t& material : materials) {
+    //    for (const tinyobj::material_t& material : materials) {
+    m_materials.reserve(materials.size());
+    m_textures.reserve(materials.size());
 
     for (size_t i = 0; i < materials.size(); i++) {
-        const tinyobj::material_t & material = materials[i];
+        const tinyobj::material_t& material = materials[i];
 
         std::cout << "[Scene] Load material[" << i << "] " << material.name << std::endl;
-//        printf("material[%d].difname = %s\n", int(i),
-//            material.name.c_str());
-        m_materials.push_back(Material(material, m_textures, base_dir));
+        //        printf("material[%d].difname = %s\n", int(i),
+        //            material.name.c_str());
+        //        m_materials.push_back(Material(material, m_textures, base_dir));
+        m_materials.emplace_back(material, m_textures, base_dir);
     }
+    //    for (const auto & texture : m_textures) {
+    ////        const auto texture = pair.second;
+    //        assert(bgfx::isValid(texture.textureHandle()));
+    //    }
     assert(materials.size() == m_materials.size());
 
-    for (const tinyobj::shape_t & shape : shapes) {
-        m_objects.push_back(Object(shape));
+    m_objects.reserve(shapes.size());
+    for (size_t i = 0; i < shapes.size(); ++i) {
+        const tinyobj::shape_t& shape = shapes[i];
+        //        m_objects.push_back(Object(shape, attrib, materials, i));
+        m_objects.emplace_back(shape, attrib, materials, i, m_layout);
     }
-    //        for (size_t m = 0; m < materials.size(); m++) {
-    //            tinyobj::material_t* mp = &materials[m];
-    //    }
-    //    }
+
+    m_uDiffuse = bgfx::createUniform("u_diffuseColor", bgfx::UniformType::Vec4);
 }
 
 void Scene::submit(bgfx::ViewId id, bgfx::ProgramHandle program, const float* mtx, uint64_t state)
 {
-    //    for (const Object & object : m_objects) {
+        for (const Object & object : m_objects) {
+//    const uint nbObjects = m_objects.size();
+//            bgfx::setTransform(mtx);
+//            bgfx::setState(state);
+//        for (int i =0; i <nbObjects; ++i) {
+//            const Object & object = m_objects[i];
 
-    //		bgfx::setTransform(mtx);
-    //		bgfx::setState(state);
+            const Material & material = m_materials[object.iMaterial()];
 
-    //		bgfx::setUniform(group.m_uDiffuse, group.m_diffuse);
+            bgfx::setTransform(mtx);
+            bgfx::setState(state);
 
-    //		if (group.m_texture != nullptr) {
-    //			// uint32_t flags = UINT32_MAX;
-    //			// uint32_t flags = BGFX_TEXTURE_USE_DEFAULT;
 
-    //			// const uint64_t textureFlags =
-    //				// 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
-    //			// const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
-    //			// const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
-    //			bgfx::setTexture(0, group.m_texture->m_sampler,
-    //							 group.m_texture->m_texture);
-    //							//  textureFlags | samplerFlags);
+            bgfx::setUniform(m_uDiffuse, material.diffuse());
 
-    //			// bgfx::setUniform(group.m_uHasDiffuseTexture, (void*)true);
-    //		}
-    //		// else {
-    //		// bgfx::setTexture(0, group.m_texture->m_sampler, bgfx::Tex)
-    //		// }
+//    		if (group.m_texture != nullptr) {
+//    			// uint32_t flags = UINT32_MAX;
+//    			// uint32_t flags = BGFX_TEXTURE_USE_DEFAULT;
 
-    //		// }
-    //		// else {
-    //		//     continue;
-    //		// }
+//    			// const uint64_t textureFlags =
+//    				// 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
+//    			// const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+//    			// const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
+//    			bgfx::setTexture(0, group.m_texture->m_sampler,
+//    							 group.m_texture->m_texture);
+//    							//  textureFlags | samplerFlags);
 
-    //		bgfx::setIndexBuffer(group.m_ibh);
-    //		bgfx::setVertexBuffer(0, group.m_vbh);
-    //		// bgfx::submit(id, program, 0, it != itEnd - 1);
-    //		bgfx::submit(id, program);
+//    			// bgfx::setUniform(group.m_uHasDiffuseTexture, (void*)true);
+//    		}
+
+            // else {
+            // bgfx::setTexture(0, group.m_texture->m_sampler, bgfx::Tex)
+            // }
+
+            // }
+            // else {
+            //     continue;
+            // }
+
+//    		bgfx::setIndexBuffer(group.m_ibh);
+
+            bgfx::setVertexBuffer(0, object.vbh());
+
+//             bgfx::submit(id, program, 0, i != nbObjects - 1);
+            bgfx::submit(id, program);
+        }
+}
+
+void Scene::clear()
+{
+    //    bgfx::destroy(m_layout);
+    //    m_objects.clear();
+    //    m_materials.clear();
+    //    for (const auto & texture : m_textures) {
+    ////        const auto & texture = pair.second;
+    //        assert(bgfx::isValid(texture.textureHandle()));
     //    }
+    m_textures.clear(); // bgfx::TextureHandle
+    m_objects.clear(); // bgfx::VertexBufferHandle
+    //    m_materials.clear();
 }
