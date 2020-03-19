@@ -16,6 +16,7 @@ public:
 //    void draw()
     void submit(bgfx::ViewId id, bgfx::ProgramHandle program, const float *mtx,
                 uint64_t state);
+    void clear(); // clear scene (bgfx::destroy(handle)) before bgfx::shutdown() from main shutdown()
 
 private:
     bgfx::VertexLayout m_layout;
@@ -25,6 +26,8 @@ private:
     Materials m_materials;
 //    std::vector<Texture> m_textures;
     Textures m_textures;
+
+    bgfx::UniformHandle m_uDiffuse;
 
 
 };

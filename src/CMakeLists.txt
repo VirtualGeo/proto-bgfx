@@ -13,7 +13,8 @@ file(GLOB_RECURSE SOURCE *.cpp *.h)
 #     list(APPEND IN_SHADERS_FULL_PATH ${SHADER_SRC_DIR}/${IN_SHADER} ${OUT_SHADERS})
 # endforeach()
 
-add_executable(${PROJECT_NAME} ${SOURCE} ${OUT_SHADERS})
+#set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
+add_executable(${PROJECT_NAME} ${SOURCE} ${OUT_SHADERS} ${VARYING_DEF_SHADER})
 
 # set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
