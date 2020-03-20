@@ -34,9 +34,9 @@ void main()
     }
     else {
         color = vec4(u_diffuseColor.xyz, 1.0);
-
     }
 
-	gl_FragColor = color;
+//    color = vec4(u_diffuseColor.xyz, 1.0);
+    gl_FragColor = color;
 	
 }

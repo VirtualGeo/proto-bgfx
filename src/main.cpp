@@ -206,8 +206,9 @@ void init()
     // g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/bedroom/iscv2.obj");
     //    g_mesh = new Mesh("Assets/McGuire/sponza/sponza-blend.obj");
     //    g_mesh = new Mesh("Assets/Sponza/sponza.obj");
-//    g_scene.addModel("Assets/Sponza/sponza.obj");
-    g_scene.addModel("Assets/McGuire/San_Miguel/san-miguel-blend.obj");
+
+    g_scene.addModel("Assets/Sponza/sponza.obj");
+//    g_scene.addModel("Assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
     g_nbVertices = g_scene.nbVertices();
     g_nbTriangles = g_scene.nbTriangles();
