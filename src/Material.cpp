@@ -15,17 +15,22 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
     for (size_t i = 0; i < 3; i++) {
         m_diffuse[i] = material.diffuse[i];
     }
-//    std::cout << m_diffuse[0] << m_diffuse[1] << m_diffuse[2] << std::endl;
-//    m_diffuse[0] = 0.0f;
-//    m_diffuse[1] = 1.0f;
-//    m_diffuse[2] = 1.0f;
+    //    std::cout << m_diffuse[0] << m_diffuse[1] << m_diffuse[2] << std::endl;
+    //    m_diffuse[0] = 0.0f;
+    //    m_diffuse[1] = 1.0f;
+    //    m_diffuse[2] = 1.0f;
 
     const std::string& diffuseTexName = material.diffuse_texname;
 
     if (diffuseTexName.length() > 0) {
         // Only load the texture if it is not already loaded
-        for (const Texture& texture : textures) {
+        //        for (const Texture& texture : textures) {
+        for (int i = 0; i < textures.size(); ++i) {
+            const Texture& texture = textures[i];
+
             if (texture.name() == diffuseTexName) {
+                m_iTexDiffuse = i;
+                std::cout << "        [Texture] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
                 return;
             }
         }
@@ -58,7 +63,7 @@ Material::Material(Material&& material)
     std::cout << "\033[0m";
 }
 
-const float *Material::diffuse() const
+const float* Material::diffuse() const
 {
     return m_diffuse;
 }
