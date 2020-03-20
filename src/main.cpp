@@ -68,6 +68,9 @@ uint g_nbVertices;
 uint g_nbTriangles;
 uint g_nbObjects;
 float g_texturesSize;
+int g_parsingTime;
+int g_loadingMaterialsTime;
+int g_loadingObjectsTime;
 
 int main(int argc, char const* argv[])
 {
@@ -208,12 +211,18 @@ void init()
     //    g_mesh = new Mesh("Assets/Sponza/sponza.obj");
 
     g_scene.addModel("Assets/Sponza/sponza.obj");
+
+//    g_scene.addModel("Assets/McGuire/Darbovic_Sponza/sponza.obj");
+//    g_scene.addModel("Assets/McGuire/Crytek_Sponza/sponza.obj");
 //    g_scene.addModel("Assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
     g_nbVertices = g_scene.nbVertices();
     g_nbTriangles = g_scene.nbTriangles();
     g_nbObjects = g_scene.nbObjects();
     g_texturesSize = g_scene.texturesSize() / 1000000.0f;
+    g_parsingTime = g_scene.parsingTime();
+    g_loadingMaterialsTime = g_scene.loadingMaterialsTime();
+    g_loadingObjectsTime = g_scene.loadingObjectsTime();
 
     //    g_mesh = new Mesh("Assets/McGuire/sponzaBlender/sponza.obj");
     //    g_mesh = new
@@ -257,6 +266,9 @@ void update()
     bgfx::touch(0);
 
     bgfx::dbgTextPrintf(0, 0, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.1f | Objects:%d | Textures:%.1f MiB", g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_texturesSize);
+    bgfx::dbgTextPrintf(0, 1, 0x0F, "\x1b[6mParsing time = %d ms\x1b[0m", g_parsingTime);
+    bgfx::dbgTextPrintf(0, 2, 0x0F, "\x1b[6mLoading materials time = %d ms\x1b[0m", g_loadingMaterialsTime);
+    bgfx::dbgTextPrintf(0, 3, 0x0F, "\x1b[6mLoading objects time = %d ms\x1b[0m", g_loadingObjectsTime);
 
     // ------------------------- RENDER SCENE
     const bx::Vec3 at = { 0.0f, 2.0f, 0.0f };

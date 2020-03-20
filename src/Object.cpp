@@ -129,7 +129,10 @@ void computeSmoothingNormals(const tinyobj::attrib_t& attrib, const tinyobj::sha
 } // computeSmoothingNormals
 } // namespace
 
-Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib, const std::vector<tinyobj::material_t>& materials, const size_t iShape, const bgfx::VertexLayout& layout)
+Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
+    const std::vector<tinyobj::material_t>& materials, const size_t iShape,
+    const bgfx::VertexLayout& layout)
+
 //Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t & attrib)
 {
     //    assert(bgfx::isValid(m_vbh));
@@ -150,18 +153,48 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib, c
         computeSmoothingNormals(attrib, shape, smoothVertexNormals);
     }
 
+    // OpenGL viewer does not support texturing with per-face material.
+//    assert(!shape.mesh.material_ids.empty());
+    m_iMaterial = shape.mesh.material_ids[0];
+//    assert(0 <= m_iMaterial && m_iMaterial < static_cast<int>(materials.size()));
+
+//    std::cout << "m_iMaterial = " << m_iMaterial << " ";
+
+    std::cout << "Object " << shape.name << ", ";
+    const tinyobj::mesh_t & mesh = shape.mesh;
+    std::cout << "nbIndices:" << mesh.indices.size() << ", ";
+//    for (int i =0; i <mesh.indices.size(); ++i) {
+//    }
+    std::cout << "nbMaterials:" << mesh.material_ids.size() << ", ";
+    std::cout << "nbFaces:" << mesh.num_face_vertices.size() << ", ";
+    std::cout << "nbGroups:" << mesh.smoothing_group_ids.size();
+    std::cout << std::endl;
+
+
     // for each triangles
     for (size_t f = 0; f < shape.mesh.indices.size() / 3; f++) {
         tinyobj::index_t idx0 = shape.mesh.indices[3 * f + 0];
         tinyobj::index_t idx1 = shape.mesh.indices[3 * f + 1];
         tinyobj::index_t idx2 = shape.mesh.indices[3 * f + 2];
 
-        int current_material_id = shape.mesh.material_ids[f];
+        assert(idx0.normal_index == idx0.vertex_index);
+        assert(idx0.vertex_index == idx0.texcoord_index);
+        //        shape.mesh.num_face_vertices
 
-        if ((current_material_id < 0) || (current_material_id >= static_cast<int>(materials.size()))) {
-            // Invaid material ID. Use default material.
-            current_material_id = materials.size() - 1; // Default material is added to the last item in `materials`.
-        }
+        int current_material_id = shape.mesh.material_ids[f];
+//        std::cout << current_material_id << " ";
+//        if (current_material_id != m_iMaterial) {
+////            std::cout << std::endl;
+//            std::cout << "multiple texture for " << m_name << std::endl;
+//        }
+//        assert(current_material_id == m_iMaterial);
+
+
+//            assert(0 <= current_material_id && current_material_id < static_cast<int>(materials.size()));
+        //        if ((current_material_id < 0) || (current_material_id >= static_cast<int>(materials.size()))) {
+        //            // Invaid material ID. Use default material.
+        //            current_material_id = materials.size() - 1; // Default material is added to the last item in `materials`.
+        //        }
         // if (current_material_id >= materials.size()) {
         //    std::cerr << "Invalid material index: " << current_material_id <<
         //    std::endl;
@@ -315,18 +348,19 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib, c
         }
     }
 
+//    std::cout << std::endl;
     //    o.vb_id = 0;
     //    o.numTriangles = 0;
 
-    // OpenGL viewer does not support texturing with per-face material.
-    if (shape.mesh.material_ids.size() > 0 && shape.mesh.material_ids.size() > iShape) {
-        m_iMaterial = shape.mesh.material_ids[0];
-        //        o.material_id = shape.mesh.material_ids[0]; // use the material ID
-        // of the first face.
-    } else {
-        m_iMaterial = materials.size() - 1;
-        //        o.material_id = materials.size() - 1; // = ID for default material.
-    }
+    //    if (shape.mesh.material_ids.size() > 0 && shape.mesh.material_ids.size() > iShape) {
+    //        m_iMaterial = shape.mesh.material_ids[0];
+    //        //        o.material_id = shape.mesh.material_ids[0]; // use the material ID
+    //        // of the first face.
+    ////        m_iMaterial = materials.size() - 1;
+    //    } else {
+    //        m_iMaterial = materials.size() - 1;
+    //        //        o.material_id = materials.size() - 1; // = ID for default material.
+    //    }
     //    printf("[Object] shape[%d] material_id %d\n", int(iShape), int(m_iMaterial));
 
     if (m_vertices.size() > 0) {
@@ -352,7 +386,6 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib, c
         m_vbh = bgfx::createVertexBuffer(
             bgfx::makeRef(m_vertices.data(), sizeof(Vertex) * m_vertices.size()),
             layout);
-
 
         //        printf("[Object] shape[%d] # of triangles = %d\n", static_cast<int>(iShape),
         //            m_nbTriangles);
@@ -396,7 +429,7 @@ Object::~Object()
     std::cout << "\033[0m";
 }
 
-const bgfx::VertexBufferHandle & Object::vbh() const
+const bgfx::VertexBufferHandle& Object::vbh() const
 {
     return m_vbh;
 }

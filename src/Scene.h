@@ -22,6 +22,13 @@ public:
     size_t nbObjects() const;
     size_t texturesSize() const;
 
+    int parsingTime() const;
+    void setParsingTime(int parsingTime);
+
+    int loadingMaterialsTime() const;
+
+    int loadingObjectsTime() const;
+
 private:
     bgfx::VertexLayout m_layout;
     std::vector<Object> m_objects;

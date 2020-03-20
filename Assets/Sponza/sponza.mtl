@@ -12,7 +12,7 @@ d 0.000000
 illum 9
 
 newmtl Material__25
-Ns 1.000002
+Ns 5.000001
 Ka 1.000000 1.000000 1.000000
 Kd 1.000000 1.000000 1.000000
 Ks 0.000000 0.000000 0.000000
@@ -20,7 +20,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 1
-map_Bump textures/lion_bump.png
 map_Kd textures/lion.jpg
 
 newmtl Material__298
@@ -32,7 +31,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 1
-map_Bump textures/background_bump.png
 map_Kd textures/background.jpg
 
 newmtl Material__47
@@ -67,7 +65,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Bump textures/sponza_arch_bump.png
 map_Kd textures/sponza_arch_diff.jpg
 map_Ks textures/sponza_arch_spec.jpg
 
@@ -80,7 +77,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Bump textures/spnza_bricks_a_bump.png
 map_Kd textures/spnza_bricks_a_diff.jpg
 map_Ks textures/spnza_bricks_a_spec.jpg
 
@@ -117,7 +113,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Bump textures/sponza_column_a_bump.png
 map_Kd textures/sponza_column_a_diff.jpg
 map_Ks textures/sponza_column_a_spec.jpg
 
@@ -130,7 +125,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Bump textures/sponza_column_b_bump.png
 map_Kd textures/sponza_column_b_diff.jpg
 map_Ks textures/sponza_column_b_spec.jpg
 
@@ -143,7 +137,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Bump textures/sponza_column_c_bump.png
 map_Kd textures/sponza_column_c_diff.jpg
 map_Ks textures/sponza_column_c_spec.jpg
 
@@ -261,7 +254,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 9
-map_Bump textures/sponza_thorn_bump.png
 map_Kd textures/sponza_thorn_diff.jpg
 map_Ks textures/sponza_thorn_spec.jpg
 map_d textures/sponza_thorn_mask.jpg
@@ -276,8 +268,6 @@ Ni 1.000000
 d 0.000000
 illum 9
 map_Kd textures/sponza_thorn_diff.jpg
-map_Ks textures/sponza_thorn_spec.jpg
-map_d textures/sponza_thorn_mask.jpg
 
 newmtl roof
 Ns 5.000001
@@ -299,7 +289,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 1
-map_Bump textures/vase_bump.png
 map_Kd textures/vase_dif.jpg
 
 newmtl vase_hanging
@@ -322,6 +311,5 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Bump textures/vase_round_bump.png
 map_Kd textures/vase_round.jpg
 map_Ks textures/vase_round_spec.jpg

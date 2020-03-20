@@ -23,6 +23,7 @@ Scene::Scene()
 void Scene::addModel(const char* filename)
 {
     std::string absoluteFilename(std::string(PROJECT_DIR) + filename);
+//    std::string absoluteFilename(filename);
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -62,7 +63,7 @@ void Scene::addModel(const char* filename)
         //        return;
     }
 
-    printf("[Scene] Parsing time: %d [ms]\n", (int)tm.msec());
+//    printf("[Scene] Parsing time: %d [ms]\n", (int)tm.msec());
     m_parsingTime = tm.msec();
 
     printf("[Scene] # of vertices  = %d\n", (int)(attrib.vertices.size()) / 3);
@@ -72,7 +73,7 @@ void Scene::addModel(const char* filename)
     printf("[Scene] # of shapes    = %d\n", (int)shapes.size());
 
     // Append `default` material
-    materials.push_back(tinyobj::material_t());
+//    materials.push_back(tinyobj::material_t());
 
     //    for (size_t i = 0; i < materials.size(); i++) {
     //        printf("material[%d].diffuse_texname = %s\n", int(i),
@@ -237,4 +238,24 @@ size_t Scene::texturesSize() const
     }
 
     return texturesSize;
+}
+
+int Scene::parsingTime() const
+{
+    return m_parsingTime;
+}
+
+void Scene::setParsingTime(int parsingTime)
+{
+    m_parsingTime = parsingTime;
+}
+
+int Scene::loadingMaterialsTime() const
+{
+    return m_loadingMaterialsTime;
+}
+
+int Scene::loadingObjectsTime() const
+{
+    return m_loadingObjectsTime;
 }
