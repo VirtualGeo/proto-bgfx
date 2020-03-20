@@ -17,6 +17,8 @@ public:
 
     const float * diffuse() const;
 
+    int iTexDiffuse() const;
+
 private:
     std::string m_name;
 //    std::vector<uint> m_iTextures[Texture::size];

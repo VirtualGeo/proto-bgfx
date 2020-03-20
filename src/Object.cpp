@@ -405,3 +405,13 @@ size_t Object::iMaterial() const
 {
     return m_iMaterial;
 }
+
+size_t Object::nbVertices() const
+{
+    return m_vertices.size();
+}
+
+uint Object::nbTriangles() const
+{
+    return m_nbTriangles;
+}

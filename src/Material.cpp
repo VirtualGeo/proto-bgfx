@@ -62,3 +62,8 @@ const float *Material::diffuse() const
 {
     return m_diffuse;
 }
+
+int Material::iTexDiffuse() const
+{
+    return m_iTexDiffuse;
+}

@@ -23,12 +23,16 @@ public:
 //    Texture(Texture &&) noexcept = default;
     Texture(Texture &&);
 
+    size_t textureSize() const;
+
 private:
     unsigned char* m_image = nullptr;
     //	bgfx::UniformHandle m_sampler;
     bgfx::TextureHandle m_textureHandle;
     std::string m_name;
     std::string m_baseDir;
+
+    size_t m_textureSize; // bytes
 };
 
 using Textures = std::vector<Texture>;

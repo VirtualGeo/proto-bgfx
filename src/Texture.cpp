@@ -42,6 +42,8 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
               << ", h = " << h << ", comp = " << comp << std::endl;
 
     const size_t imageSize = w * h * comp;
+    m_textureSize = imageSize; // bytes
+//    m_textureSize = imageSize * 8;
     const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
     const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
     bool hasMips = false;
@@ -192,4 +194,9 @@ Texture::Texture(Texture&& texture)
     std::cout << "\033[34m";
     std::cout << "[Texture] " << this << " '" << m_name << "' right moving from " << &texture << std::endl;
     std::cout << "\033[0m";
+}
+
+size_t Texture::textureSize() const
+{
+    return m_textureSize;
 }

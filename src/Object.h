@@ -49,6 +49,9 @@ public:
     const bgfx::VertexBufferHandle & vbh() const;
 
     size_t iMaterial() const;
+    size_t nbVertices() const;
+
+    uint nbTriangles() const;
 
 private:
     bgfx::VertexBufferHandle m_vbh;

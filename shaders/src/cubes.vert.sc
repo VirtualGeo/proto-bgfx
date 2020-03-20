@@ -20,5 +20,5 @@ void main()
 	//vec3 normal = a_normal.xyz*2.0 - 1.0;
 //    vec3 normal = a_normal;
 //    v_normal = mul(u_modelView, vec4(normal, 0.0) ).xyz;
-//    v_texcoord0 = a_texcoord0;
+    v_texcoord0 = a_texcoord0;
 }

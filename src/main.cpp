@@ -25,8 +25,8 @@
 #include <iostream>
 //#include "Vertex.h"
 
-#define WIN_WIDTH 640
-#define WIN_HEIGHT 480
+#define WIN_WIDTH 800
+#define WIN_HEIGHT 600
 
 void processInput(GLFWwindow* window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -63,6 +63,11 @@ bx::Vec3 cameraPos = { 0.0f, 2.0f, 0.0f };
 bx::Vec3 cameraFront;
 bx::Vec3 cameraUp = { 0.0f, 1.0f, 0.0f };
 const float maxFov = 120.0f;
+float g_fps;
+uint g_nbVertices;
+uint g_nbTriangles;
+uint g_nbObjects;
+float g_texturesSize;
 
 int main(int argc, char const* argv[])
 {
@@ -78,18 +83,19 @@ int main(int argc, char const* argv[])
 
     float sum = 0.0f;
     // while (true)
-    float fps = 0.0f;
+    //    float fps = 0.0f;
+    g_fps = 0.0f;
     while (!glfwWindowShouldClose(g_window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         sum += deltaTime;
         if (counter % 10 == 0) {
-            fps = 10.0f / sum;
+            g_fps = 10.0f / sum;
             // fps = 1.0f / deltaTime;
             sum = 0.0f;
         }
-        bgfx::dbgTextPrintf(0, 0, 0x08, "fps = %.1f", fps);
+        //        bgfx::dbgTextPrintf(0, 0, 0x08, "fps = %.1f", g_fps);
 
         processInput(g_window);
 
@@ -189,18 +195,24 @@ void init()
 
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
     //    Vertex::init(); //init layout
-//    m_layout.begin()
-//        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-//        .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-//        .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-//        // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-//        .end();
+    //    m_layout.begin()
+    //        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+    //        .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+    //        .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+    //        // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+    //        .end();
 
     // g_mesh = new Mesh("D:/proto-bgfx/Assets/Sponza/sponza.obj");
     // g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/bedroom/iscv2.obj");
     //    g_mesh = new Mesh("Assets/McGuire/sponza/sponza-blend.obj");
     //    g_mesh = new Mesh("Assets/Sponza/sponza.obj");
-    g_scene.addModel("Assets/Sponza/sponza.obj");
+//    g_scene.addModel("Assets/Sponza/sponza.obj");
+    g_scene.addModel("Assets/McGuire/San_Miguel/san-miguel-blend.obj");
+
+    g_nbVertices = g_scene.nbVertices();
+    g_nbTriangles = g_scene.nbTriangles();
+    g_nbObjects = g_scene.nbObjects();
+    g_texturesSize = g_scene.texturesSize() / 1000000.0f;
 
     //    g_mesh = new Mesh("Assets/McGuire/sponzaBlender/sponza.obj");
     //    g_mesh = new
@@ -242,6 +254,8 @@ void update()
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
     bgfx::touch(0);
+
+    bgfx::dbgTextPrintf(0, 0, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.1f | Objects:%d | Textures:%.1f MiB", g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_texturesSize);
 
     // ------------------------- RENDER SCENE
     const bx::Vec3 at = { 0.0f, 2.0f, 0.0f };
