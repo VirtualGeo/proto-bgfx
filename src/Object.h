@@ -6,6 +6,9 @@
 #include <tiny_obj_loader.h>
 //#include <memory>
 #include "Vertex.h"
+#include "Mesh.h"
+#include "Material.h"
+#include "Program.h"
 
 //namespace  { // question : why without build failed ?
 
@@ -46,20 +49,28 @@ public:
     Object(Object && object);
     ~Object();
 
-    const bgfx::VertexBufferHandle & vbh() const;
+//    void draw() const;
+//    void draw(bgfx::ViewId id, bgfx::ProgramHandle program, const float *mtx,
+//                uint64_t state) const;
+    void draw(const bgfx::ViewId id, const Program & program, const float *mtx,
+                const uint64_t state, const Materials & materials, const Textures & textures) const;
 
-    size_t iMaterial() const;
+    const bgfx::VertexBufferHandle & vbh() const;
+//    bgfx::IndexBufferHandle ibh() const;
+
+//    size_t iMaterial() const;
     size_t nbVertices() const;
 
     uint nbTriangles() const;
+
 
 private:
     bgfx::VertexBufferHandle m_vbh;
 //    std::unique_ptr<bgfx::VertexBufferHandle> m_vbh;
     std::vector<Vertex> m_vertices;
+    std::vector<Mesh> m_meshes;
 
     uint m_nbTriangles;
-    size_t m_iMaterial;
 
     float m_bmin[3];
     float m_bmax[3];

@@ -24,6 +24,7 @@
 #include <fstream>
 #include <iostream>
 //#include "Vertex.h"
+#include "Program.h"
 
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
@@ -44,7 +45,8 @@ void updateCameraFront();
 
 // ----------------- GLOBAL VARS
 GLFWwindow* g_window = nullptr;
-bgfx::ProgramHandle g_program;
+//bgfx::ProgramHandle g_program;
+Program g_program;
 unsigned int counter = 0;
 //Mesh* g_mesh = nullptr;
 Scene g_scene;
@@ -208,9 +210,10 @@ void init()
 
     g_scene.addModel("Assets/Sponza/sponza.obj");
 
-//    g_scene.addModel("Assets/McGuire/Darbovic_Sponza/sponza.obj");
-//    g_scene.addModel("Assets/McGuire/Crytek_Sponza/sponza.obj");
+//    g_scene.addModel("Assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
+//    g_scene.addModel("Assets/McGuire/Crytek_Sponza/sponza-blend.obj");
 //    g_scene.addModel("Assets/McGuire/San_Miguel/san-miguel-blend.obj");
+
 
     g_nbVertices = g_scene.nbVertices();
     g_nbTriangles = g_scene.nbTriangles();
@@ -230,11 +233,12 @@ void init()
 
     // ----------------- INIT SHADER
     // fileReader = BX_NEW(allocator, fileReader);
-    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
-    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
+//    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
+//    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
     // bgfx::ShaderHandle vsh = loadShader("mesh.vert");
     // bgfx::ShaderHandle fsh = loadShader("mesh.frag");
-    g_program = bgfx::createProgram(vsh, fsh, true);
+//    g_program = bgfx::createProgram(vsh, fsh, true);
+    g_program.init("cubes");
 
     // g_texColor = bgfx::createUniform("s_texColor",
     // bgfx::UniformType::Sampler);
@@ -301,7 +305,7 @@ void update()
     // 					   BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
     // 					   BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA | s_ptState[0];
 
-    //    const uint64_t state = 0 | BGFX_STATE_PT_TRISTRIP | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
+//        const uint64_t state = 0 | BGFX_STATE_PT_TRISTRIP | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
     const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
     // UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
 
@@ -320,7 +324,7 @@ void update()
     // bgfx::setState(state);
     // bgfx::setTexture(0, g_texColor, g_texture);
     //    g_mesh->submit(0, g_program, mtx, state);
-    g_scene.submit(0, g_program, mtx, state);
+    g_scene.draw(0, g_program, mtx, state);
     // g_mesh->submit(0, g_program, mtx, stateTransparent);
     // g_mesh->submit(0, g_program, mtx, stateOpaque);
 
@@ -339,7 +343,7 @@ void shutdown()
     g_scene.clear();
     //    delete g_mesh;
     //    g_mesh = nullptr;
-    bgfx::destroy(g_program);
+//    bgfx::destroy(g_program);
     // bgfx::destroy(g_texture);
     // bgfx::destroy(g_texColor);
     bgfx::shutdown();
@@ -459,96 +463,3 @@ void mouse_button_callback(GLFWwindow* window, int button, int action,
 // void focus_callback(GLFWwindow *window, int focused) {
 // 	g_focused = focused == GLFW_TRUE;
 // }
-
-//bgfx::ShaderHandle loadShader(const std::string& FILENAME)
-bgfx::ShaderHandle loadShader(const char* filename)
-{
-    //    const char* shaderPath = "???";
-    std::string shaderPath;
-
-    switch (bgfx::getRendererType()) {
-    case bgfx::RendererType::Noop:
-    case bgfx::RendererType::Direct3D9:
-        shaderPath = "shaders/bin/dx9/";
-        break;
-    case bgfx::RendererType::Direct3D11:
-    case bgfx::RendererType::Direct3D12:
-        shaderPath = "shaders/bin/dx11/";
-        break;
-    case bgfx::RendererType::Gnm:
-        shaderPath = "shaders/bin/pssl/";
-        break;
-    case bgfx::RendererType::Metal:
-        shaderPath = "shaders/bin/metal/";
-        break;
-    case bgfx::RendererType::OpenGL:
-        shaderPath = "shaders/bin/glsl/";
-        break;
-    case bgfx::RendererType::OpenGLES:
-        shaderPath = "shaders/bin/essl/";
-        break;
-    case bgfx::RendererType::Vulkan:
-        shaderPath = "shaders/bin/spirv/";
-        break;
-    }
-    // shaderPath = "shaders/bin/";
-    // shaderPath = "/home/gauthier/tmp2/proto-bgfx/shaders/bin/";
-
-    //    size_t shaderLen = strlen(shaderPath);
-    //    size_t fileLen = strlen(FILENAME);
-    //    char* filePath = (char*)malloc(shaderLen + fileLen + 5);
-    std::string filePath = PROJECT_DIR + shaderPath + filename + ".bin";
-    //    memcpy(filePath, shaderPath, shaderLen);
-    //    memcpy(&filePath[shaderLen], FILENAME, fileLen);
-    //    memcpy(&filePath[shaderLen + fileLen], ".bin\0", 5);
-
-    // std::cout << "current path : " << std::filesystem::current_path() <<
-    // std::endl; char buff[80]; GetCurrentDirectory(buff, 80);
-
-    // FILE *file = fopen(FILENAME, "rb");
-    // FILE *file = fopen(filePath, "rb");
-    // bx::FileReaderI * fileReader = nullptr;
-    // bx::AllocatorI * allocator = nullptr;
-    // allocator = & bx::DefaultAllocator;
-    // fileReader = BX_NEW(allocator, FileReader);
-
-    // FILE *file = fopen("shaders/bin/cubes.vert.bin", "rb");
-    //    FILE* file = fopen(filePath, "rb");
-    //    std::fstream file;
-    std::ifstream file(filePath, std::ios::binary);
-    //    file.open(filePath, std::ios::in | std::ios::binary);
-
-    //    if (file == NULL) {
-    if (!file.is_open()) {
-        // perror(std::string("Failed to load ")+  std::string(FILENAME));
-        std::cout << "[main] Failed to load '" << filePath << "' '" << filename << "'"
-                  << std::endl;
-
-        // throw std::runtime_error("Failed to load " + std::string(FILENAME));
-
-        exit(-1);
-    }
-    //    fseek(file, 0, SEEK_END);
-    //    file.seekg(0, std::ios::seekdir::_S_end);
-    //    long fileSize = ftell(file);
-    //    long fileSize = file.tellg();
-    long begin = file.tellg();
-    file.seekg(0, std::ios::end);
-    long end = file.tellg();
-    long fileSize = end - begin;
-    //    fseek(file, 0, SEEK_SET);
-    //    file.seekg(0)
-
-    file.seekg(0, std::ios::beg);
-
-    const bgfx::Memory* mem = bgfx::alloc(fileSize + 1);
-    //    fread(mem->data, 1, fileSize, file);
-    file.read((char*)mem->data, fileSize);
-    mem->data[mem->size - 1] = '\0';
-    //    fclose(file);
-    file.close();
-
-    //    free(filePath);
-
-    return bgfx::createShader(mem);
-}

@@ -23,6 +23,7 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
     const std::string& diffuseTexName = material.diffuse_texname;
 
     if (diffuseTexName.length() > 0) {
+        m_diffuse[3] = 1.0f;
         // Only load the texture if it is not already loaded
         //        for (const Texture& texture : textures) {
         for (int i = 0; i < textures.size(); ++i) {
@@ -45,6 +46,9 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
         textures.emplace_back(diffuseTexName, baseDir);
         //        }
     }
+    else {
+        m_diffuse[3] = 0.0f;
+    }
 }
 
 Material::~Material()
@@ -65,6 +69,11 @@ Material::Material(Material&& material)
 
 const float* Material::diffuse() const
 {
+//    float ret[4];
+//    for (int i =0; i <3; ++i) {
+//        ret[i] = i;
+//    }
+//    ret[3] = (m_iTexDiffuse >= 0) ?(1.0) :(0.0);
     return m_diffuse;
 }
 

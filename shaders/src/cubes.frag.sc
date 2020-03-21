@@ -8,13 +8,12 @@ $input v_normal, v_texcoord0
 //#include <common.sh>
 #include <bgfx_shader.sh>
 
-SAMPLER2D(s_texColor, 0);
+SAMPLER2D(s_diffuse, 0);
+uniform vec4 u_diffuse;
+#define u_diffuseColor u_diffuse.xyz
+#define u_hasDiffuseTexture u_diffuse.w
+//uniform vec4 u_hasDiffuseTexture;
 
-uniform vec4 u_diffuseColor;
-uniform vec4 u_hasDiffuseTexture;
-
-//#define u_diffuseColor u_diffuse.xyz
-//#define u_hasDiffuseTexture u_diffuse.w
 
 void main()
 {
@@ -28,12 +27,12 @@ void main()
 
 	// vec4 color = vec4(v_texcoord0.x, v_texcoord0.y, 1.0, 1.0);
     vec4 color;
-    if (u_hasDiffuseTexture.x > 0.5) {
-        color = texture2D(s_texColor, v_texcoord0);
+    if (u_hasDiffuseTexture > 0.5) {
+        color = texture2D(s_diffuse, v_texcoord0);
 
     }
     else {
-        color = vec4(u_diffuseColor.xyz, 1.0);
+        color = vec4(u_diffuseColor, 1.0);
     }
 
 //    color = vec4(u_diffuseColor.xyz, 1.0);

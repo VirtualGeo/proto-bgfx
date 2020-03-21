@@ -24,7 +24,7 @@ private:
 //    std::vector<uint> m_iTextures[Texture::size];
     int m_iTexDiffuse = -1;
 
-    float m_diffuse[3];
+    float m_diffuse[4];
 
 };
 
