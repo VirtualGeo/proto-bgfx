@@ -205,10 +205,6 @@ void init()
     //        // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
     //        .end();
 
-    // g_mesh = new Mesh("D:/proto-bgfx/Assets/Sponza/sponza.obj");
-    // g_mesh = new Mesh("D:/proto-bgfx/Assets/McGuire/bedroom/iscv2.obj");
-    //    g_mesh = new Mesh("Assets/McGuire/sponza/sponza-blend.obj");
-    //    g_mesh = new Mesh("Assets/Sponza/sponza.obj");
 
     g_scene.addModel("Assets/Sponza/sponza.obj");
 

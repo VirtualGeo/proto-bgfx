@@ -177,8 +177,8 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
         tinyobj::index_t idx1 = shape.mesh.indices[3 * f + 1];
         tinyobj::index_t idx2 = shape.mesh.indices[3 * f + 2];
 
-        assert(idx0.normal_index == idx0.vertex_index);
-        assert(idx0.vertex_index == idx0.texcoord_index);
+//        assert(idx0.normal_index == idx0.vertex_index);
+//        assert(idx0.vertex_index == idx0.texcoord_index);
         //        shape.mesh.num_face_vertices
 
         int current_material_id = shape.mesh.material_ids[f];
