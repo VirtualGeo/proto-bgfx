@@ -7,6 +7,7 @@
 #include <tiny_obj_loader.h>
 #include "Material.h"
 #include "Texture.h"
+#include "Program.h"
 
 class Scene
 {
@@ -14,8 +15,8 @@ public:
     Scene();
     void addModel(const char * filename);
 //    void draw()
-    void submit(bgfx::ViewId id, bgfx::ProgramHandle program, const float *mtx,
-                uint64_t state);
+    void draw(const bgfx::ViewId id, const Program & program, const float *mtx,
+                const uint64_t state) const;
     void clear(); // clear scene (bgfx::destroy(handle)) before bgfx::shutdown() from main shutdown()
     size_t nbVertices() const;
     size_t nbTriangles() const;
@@ -38,9 +39,9 @@ private:
 //    std::vector<Texture> m_textures;
     Textures m_textures;
 
-    bgfx::UniformHandle m_uDiffuse;
-    bgfx::UniformHandle m_samplerDiffuse;
-    bgfx::UniformHandle m_uHasDiffuseTexture;
+//    bgfx::UniformHandle m_uDiffuse;
+//    bgfx::UniformHandle m_samplerDiffuse;
+//    bgfx::UniformHandle m_uHasDiffuseTexture;
 
 
 
