@@ -14,6 +14,8 @@ class Texture {
 public:
     Texture(const std::string& texName, const std::string& baseDir);
     ~Texture();
+//    Texture(std::ifstream & file);
+    void save(std::ofstream & file);
 
     const bgfx::TextureHandle & textureHandle() const;
 

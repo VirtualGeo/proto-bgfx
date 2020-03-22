@@ -1,6 +1,7 @@
 #include "Mesh.h"
 
 #include <cassert>
+#include "FileSystem.h"
 
 Mesh::Mesh(int iMaterial)
     : m_iMaterial(iMaterial)
@@ -29,6 +30,21 @@ Mesh::Mesh(Mesh&& mesh)
     std::cout << "\033[34m";
     std::cout << "[Mesh] " << this << " right moving from " << &mesh << std::endl;
     std::cout << "\033[0m";
+}
+
+Mesh::Mesh(std::ifstream &file)
+{
+    FileSystem::read(m_iMaterial, file);
+    FileSystem::read(m_indices, file);
+
+    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(uint16_t) * m_indices.size()));
+}
+
+void Mesh::save(std::ofstream &file)
+{
+    FileSystem::write(m_iMaterial, file);
+    FileSystem::write(m_indices, file);
+
 }
 
 //Mesh &Mesh::operator=(Mesh &&mesh)

@@ -11,6 +11,8 @@
 class Mesh {
 public:
     Mesh(int iMaterial);
+    Mesh(std::ifstream & file);
+    void save(std::ofstream & file);
     ~Mesh();
 
     Mesh(const Mesh & mesh) = delete;

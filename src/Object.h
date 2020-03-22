@@ -44,6 +44,9 @@ class Object
 {
 public:
     Object(const tinyobj::shape_t & shape, const tinyobj::attrib_t & attrib, const std::vector<tinyobj::material_t> & materials, const size_t iShape, const bgfx::VertexLayout & layout);
+//    Object(std::ifstream & file);
+    Object(std::ifstream &file, const size_t iShape, const bgfx::VertexLayout &layout);
+    void save(std::ofstream & file);
 
     Object(const Object &) = delete; // copy constructor
     Object(Object && object);
