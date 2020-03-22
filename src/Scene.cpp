@@ -141,7 +141,7 @@ void Scene::draw(const bgfx::ViewId id, const Program &program, const float *mtx
 
 void Scene::clear()
 {
-    //    bgfx::destroy(m_layout);
+//        bgfx::destroy(m_layout);
     //    m_objects.clear();
     //    m_materials.clear();
     //    for (const auto & texture : m_textures) {

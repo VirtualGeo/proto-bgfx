@@ -7,8 +7,11 @@ class Program
 {
 public:
     Program();
+    ~Program();
 
     void init(const char * shaderName);
+
+    void clear();
 
 //    bgfx::ProgramHandle program() const;
 

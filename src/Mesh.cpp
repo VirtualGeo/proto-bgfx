@@ -7,15 +7,43 @@ Mesh::Mesh(int iMaterial)
 {
 }
 
-void Mesh::draw(const bgfx::ViewId id, const Program &program, const float* mtx, const uint64_t state, const Materials &materials, const Textures &textures, const bgfx::VertexBufferHandle &vbh) const
+Mesh::~Mesh()
+{
+    if (m_last) {
+        bgfx::destroy(m_ibh);
+    }
+
+    std::cout << "\033[31m";
+    std::cout << "[Mesh] " << this << " deleted" << std::endl;
+    std::cout << "\033[0m";
+}
+
+Mesh::Mesh(Mesh&& mesh)
+    : m_iMaterial(mesh.m_iMaterial)
+    , m_indices(std::move(m_indices))
+    , m_ibh(std::move(m_ibh))
+{
+    //    m_last = true;
+    mesh.m_last = false;
+
+    std::cout << "\033[34m";
+    std::cout << "[Mesh] " << this << " right moving from " << &mesh << std::endl;
+    std::cout << "\033[0m";
+}
+
+//Mesh &Mesh::operator=(Mesh &&mesh)
+//{
+
+//}
+
+void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx, const uint64_t state, const Materials& materials, const Textures& textures, const bgfx::VertexBufferHandle& vbh) const
 {
     bgfx::setTransform(mtx);
     bgfx::setState(state);
 
-//    const int iMaterial = m_iMaterial;
+    //    const int iMaterial = m_iMaterial;
     assert(0 <= m_iMaterial && m_iMaterial < materials.size());
     const Material& material = materials[m_iMaterial];
-
 
     bgfx::setUniform(program.m_uDiffuse, material.diffuse());
 
@@ -38,8 +66,8 @@ void Mesh::draw(const bgfx::ViewId id, const Program &program, const float* mtx,
         //  textureFlags | samplerFlags);
 
         //                 bgfx::setUniform(m_uHasDiffuseTexture, (void*)true);
-//        float temp[1] = { 1.0 };
-//        bgfx::setUniform(m_uHasDiffuseTexture, temp);
+        //        float temp[1] = { 1.0 };
+        //        bgfx::setUniform(m_uHasDiffuseTexture, temp);
         //                 bgfx::setUniform(m_uHasDiffuseTexture);
     }
 
@@ -55,7 +83,7 @@ void Mesh::draw(const bgfx::ViewId id, const Program &program, const float* mtx,
     //    		bgfx::setIndexBuffer(group.m_ibh);
 
     bgfx::setIndexBuffer(m_ibh);
-//    bgfx::setVertexBuffer(0, vbh);
+    //    bgfx::setVertexBuffer(0, vbh);
     bgfx::submit(id, program.m_handle);
 }
 

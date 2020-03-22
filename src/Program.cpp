@@ -9,6 +9,14 @@ Program::Program()
 
 }
 
+Program::~Program()
+{
+//    bgfx::destroy(m_handle);
+//    bgfx::destroy(m_uDiffuse);
+//    bgfx::destroy(m_sDiffuse);
+
+}
+
 void Program::init(const char *shaderName)
 {
 
@@ -20,7 +28,15 @@ void Program::init(const char *shaderName)
 
     m_uDiffuse = bgfx::createUniform("u_diffuse", bgfx::UniformType::Vec4);
     m_sDiffuse = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
-//    m_uHasDiffuseTexture = bgfx::createUniform("u_hasDiffuseTexture", bgfx::UniformType::Vec4);
+    //    m_uHasDiffuseTexture = bgfx::createUniform("u_hasDiffuseTexture", bgfx::UniformType::Vec4);
+}
+
+void Program::clear()
+{
+    bgfx::destroy(m_handle);
+    bgfx::destroy(m_uDiffuse);
+    bgfx::destroy(m_sDiffuse);
+
 }
 
 //bgfx::ProgramHandle Program::program() const
