@@ -4,6 +4,7 @@
 //Material::Material()
 //{
 
+#include "FileSystem.h"
 //}
 #include "System.h"
 
@@ -56,6 +57,20 @@ Material::~Material()
     std::cout << "\033[31m";
     std::cout << "[Material] '" << m_name << "' deleted " << this << std::endl;
     std::cout << "\033[0m";
+}
+
+Material::Material(std::ifstream &file)
+{
+    FileSystem::read(m_name, file);
+    FileSystem::read(m_iTexDiffuse, file);
+    FileSystem::read(m_diffuse, 4, file);
+}
+
+void Material::save(std::ofstream &file)
+{
+    FileSystem::write(m_name, file);
+    FileSystem::write(m_iTexDiffuse, file);
+    FileSystem::write(m_diffuse, 4, file);
 }
 
 Material::Material(Material&& material)

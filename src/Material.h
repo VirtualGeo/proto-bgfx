@@ -10,6 +10,8 @@ class Material
 public:
     Material(const tinyobj::material_t & tinyobjMaterial, Textures & textures, const std::string & baseDir);
     ~Material();
+    Material(std::ifstream & file);
+    void save(std::ofstream & file);
 
     Material(const Material &) = delete;
 //    Material(Material &&) noexcept = default;

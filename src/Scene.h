@@ -30,6 +30,9 @@ public:
 
     int loadingObjectsTime() const;
 
+    void load(std::ifstream & file);
+    void save(std::ofstream & file);
+
 private:
     bgfx::VertexLayout m_layout;
     std::vector<Object> m_objects;

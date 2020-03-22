@@ -73,6 +73,7 @@ float g_texturesSize;
 int g_parsingTime;
 int g_loadingMaterialsTime;
 int g_loadingObjectsTime;
+int g_totalLoadingTime;
 
 int main(int argc, char const* argv[])
 {
@@ -222,6 +223,7 @@ void init()
     g_parsingTime = g_scene.parsingTime();
     g_loadingMaterialsTime = g_scene.loadingMaterialsTime();
     g_loadingObjectsTime = g_scene.loadingObjectsTime();
+    g_totalLoadingTime = g_parsingTime + g_loadingMaterialsTime + g_loadingObjectsTime;
 
     //    g_mesh = new Mesh("Assets/McGuire/sponzaBlender/sponza.obj");
     //    g_mesh = new
@@ -266,9 +268,14 @@ void update()
     bgfx::touch(0);
 
     bgfx::dbgTextPrintf(0, 0, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.1f | Objects:%d | Textures:%.1f MiB", g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_texturesSize);
-    bgfx::dbgTextPrintf(0, 1, 0x0F, "\x1b[6mParsing time = %d ms\x1b[0m", g_parsingTime);
-    bgfx::dbgTextPrintf(0, 2, 0x0F, "\x1b[6mLoading materials time = %d ms\x1b[0m", g_loadingMaterialsTime);
-    bgfx::dbgTextPrintf(0, 3, 0x0F, "\x1b[6mLoading objects time = %d ms\x1b[0m", g_loadingObjectsTime);
+    bgfx::dbgTextPrintf(0, 1, 0x0F, "Parsing time = %d ms", g_parsingTime);
+    bgfx::dbgTextPrintf(0, 2, 0x0F, "Loading materials time = %d ms", g_loadingMaterialsTime);
+    bgfx::dbgTextPrintf(0, 3, 0x0F, "Loading objects time = %d ms", g_loadingObjectsTime);
+    bgfx::dbgTextPrintf(0, 4, 0x0F, "Total loading time = %d ms", g_totalLoadingTime);
+//    bgfx::dbgTextPrintf(0, 1, 0x0F, "\x1b[6mParsing time = %d ms\x1b[0m", g_parsingTime);
+//    bgfx::dbgTextPrintf(0, 2, 0x0F, "\x1b[6mLoading materials time = %d ms\x1b[0m", g_loadingMaterialsTime);
+//    bgfx::dbgTextPrintf(0, 3, 0x0F, "\x1b[6mLoading objects time = %d ms\x1b[0m", g_loadingObjectsTime);
+//    bgfx::dbgTextPrintf(0, 4, 0x0F, "\x1b[6mTotal loading time = %d ms\x1b[0m", g_totalLoadingTime);
 
     // ------------------------- RENDER SCENE
     const bx::Vec3 at = { 0.0f, 2.0f, 0.0f };

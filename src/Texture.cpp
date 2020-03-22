@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "System.h"
+#include "FileSystem.h"
 
 // Texture::Texture(const char *filename) {
 Texture::Texture(const std::string& texName, const std::string& baseDir)
@@ -171,6 +172,21 @@ Texture::~Texture()
     std::cout << "\033[31m";
     std::cout << "[Texture] " << this << " '" << m_name << "' deleted" << std::endl;
     std::cout << "\033[0m";
+}
+
+//Texture::Texture(std::ifstream &file)
+//{
+////    FileSystem::read(m_name, file);
+////    FileSystem::read(m_baseDir, file);
+////    Texture::Texture(m_name, m_baseDir);
+
+//}
+
+void Texture::save(std::ofstream &file)
+{
+    FileSystem::write(m_name, file);
+    FileSystem::write(m_baseDir, file);
+
 }
 
 const bgfx::TextureHandle& Texture::textureHandle() const
