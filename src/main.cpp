@@ -341,6 +341,8 @@ void shutdown()
     // stbi_image_free(image);
 
     g_scene.clear();
+    g_program.clear();
+
     //    delete g_mesh;
     //    g_mesh = nullptr;
 //    bgfx::destroy(g_program);
