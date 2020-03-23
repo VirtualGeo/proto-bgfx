@@ -28,9 +28,9 @@ public:
     static void read(int & val, std::ifstream & file) {
         file.read(reinterpret_cast<char*>(&val), sizeof(int));
     }
-    static void read(uint & val, std::ifstream & file) {
-        file.read(reinterpret_cast<char*>(&val), sizeof(int));
-    }
+    // static void read(uint & val, std::ifstream & file) {
+    //     file.read(reinterpret_cast<char*>(&val), sizeof(int));
+    // }
     static void read(float * val, size_t len, std::ifstream & file) {
         file.read(reinterpret_cast<char*>(val), len * sizeof(float));
     }
@@ -39,7 +39,7 @@ public:
     static void read(std::vector<T>& val, std::ifstream& file)
     {
         assert(val.empty());
-        uint size;
+        size_t size;
         read(size, file);
         val.resize(size);
         auto * tab = val.data();
@@ -49,7 +49,7 @@ public:
     static void read(std::string& val, std::ifstream& file)
     {
         assert(val.empty());
-        uint size;
+        size_t size;
         read(size, file);
         val.resize(size);
         file.read(const_cast<char*>(val.data()), size * sizeof(char));
@@ -65,9 +65,9 @@ public:
     static void write(int  val, std::ofstream & file) {
         file.write(reinterpret_cast<const char*>(&val), sizeof(int));
     }
-    static void write(uint  val, std::ofstream & file) {
-        file.write(reinterpret_cast<const char*>(&val), sizeof(int));
-    }
+    // static void write(uint  val, std::ofstream & file) {
+    //     file.write(reinterpret_cast<const char*>(&val), sizeof(int));
+    // }
     static void write(float * val, size_t len, std::ofstream & file) {
         file.write(reinterpret_cast<const char*>(val), len * sizeof(float));
     }
@@ -75,7 +75,7 @@ public:
     template <class T>
     static void write(const std::vector<T>& val, std::ofstream& file)
     {
-        uint size = val.size();
+        size_t size = val.size();
         write(size, file);
 
         auto * tab = val.data();
@@ -84,7 +84,7 @@ public:
 
     static void write(const std::string& val, std::ofstream& file)
     {
-        uint size = val.size();
+        size_t size = val.size();
         write(size, file);
 //        val.resize(size);
         file.write(const_cast<const char*>(val.data()), size * sizeof(char));

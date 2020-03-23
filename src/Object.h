@@ -64,7 +64,7 @@ public:
 //    size_t iMaterial() const;
     size_t nbVertices() const;
 
-    uint nbTriangles() const;
+    size_t nbTriangles() const;
 
 
 private:
@@ -73,7 +73,7 @@ private:
     std::vector<Vertex> m_vertices;
     std::vector<Mesh> m_meshes;
 
-    uint m_nbTriangles;
+    size_t m_nbTriangles;
 
     float m_bmin[3];
     float m_bmax[3];

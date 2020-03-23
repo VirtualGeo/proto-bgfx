@@ -5,6 +5,7 @@
 
 #include "System.h"
 #include "FileSystem.h"
+#include <string>
 
 // Texture::Texture(const char *filename) {
 Texture::Texture(const std::string& texName, const std::string& baseDir)
