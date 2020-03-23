@@ -10,6 +10,7 @@
 //#include "Vertex.h"
 //#include "Mesh.h"
 #include "FileSystem.h"
+#include <algorithm>
 
 static void CalcNormal(float N[3], float v0[3], float v1[3], float v2[3])
 {
@@ -532,7 +533,7 @@ Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayou
     size_t size;
     FileSystem::read(size, file);
     m_meshes.reserve(size);
-    for (uint i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
 //        m_meshes.push_back(file);
         m_meshes.emplace_back(file);
     }
@@ -556,7 +557,7 @@ void Object::save(std::ofstream &file)
     size_t size = m_meshes.size();
     FileSystem::write(size, file);
 //    m_meshes.reserve(size);
-    for (uint i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
 //        m_meshes.push_back(file);
         m_meshes[i].save(file);
     }
@@ -573,7 +574,7 @@ Object::Object(Object&& object)
     //      m_bmax(object.m_bmax),
     m_name(std::move(object.m_name))
 {
-    for (uint i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
         m_bmin[i] = object.m_bmin[i];
         m_bmax[i] = object.m_bmax[i];
     }
@@ -623,7 +624,7 @@ size_t Object::nbVertices() const
     return m_vertices.size();
 }
 
-uint Object::nbTriangles() const
+size_t Object::nbTriangles() const
 {
     return m_nbTriangles;
 }

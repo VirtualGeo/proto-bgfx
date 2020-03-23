@@ -242,7 +242,7 @@ void Scene::load(std::ifstream& file)
     size_t size;
     FileSystem::read(size, file);
     m_materials.reserve(size);
-    for (uint i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
         //            m_materials.emplace_back(file, &m_textures);
         //        m_materials.push_back(file);
         m_materials.emplace_back(file);
@@ -250,7 +250,7 @@ void Scene::load(std::ifstream& file)
 
     FileSystem::read(size, file);
     m_textures.reserve(size);
-    for (uint i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
         std::string texName;
         std::string baseDir;
         FileSystem::read(texName, file);
@@ -285,7 +285,7 @@ void Scene::save(std::ofstream& file)
     size = m_materials.size();
     FileSystem::write(size, file);
     //    m_materials.reserve(size);
-    for (uint i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
         //            m_materials.emplace_back(file, &m_textures);
         //        m_materials.push_back(file);
         m_materials[i].save(file);
@@ -294,7 +294,7 @@ void Scene::save(std::ofstream& file)
     size = m_textures.size();
     FileSystem::write(size, file);
     //    m_textures.reserve(size);
-    for (uint i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
         //        m_textures.push_back(file);
         //        m_textures.save(file);
         m_textures[i].save(file);
@@ -303,7 +303,7 @@ void Scene::save(std::ofstream& file)
     size = m_objects.size();
     FileSystem::write(size, file);
     //    m_objects.reserve(size);
-    for (uint i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
         //        m_objects.push_back(file);
         //        m_objects.save(file);
         m_objects[i].save(file);

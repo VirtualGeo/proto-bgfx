@@ -41,7 +41,7 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
 
         //            textures.insert(std::make_pair(diffuseTexName, Texture(diffuseTexName, baseDir)));
         //            textures.insert(std::make_pair(diffuseTexName, {diffuseTexName, baseDir}));
-        m_iTexDiffuse = textures.size();
+        m_iTexDiffuse = static_cast<int>(textures.size());
         //        textures.push_back(Texture(diffuseTexName, baseDir));
         //        textures.emplace_back(Texture(diffuseTexName, baseDir));
         textures.emplace_back(diffuseTexName, baseDir);

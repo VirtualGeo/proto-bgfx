@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <string>
+
 bgfx::ShaderHandle loadShader(const char* filename);
 
 Program::Program()
