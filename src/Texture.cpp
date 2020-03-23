@@ -3,8 +3,8 @@
 #include <cassert>
 #include <iostream>
 
-#include "System.h"
 #include "FileSystem.h"
+#include "System.h"
 #include <string>
 
 // Texture::Texture(const char *filename) {
@@ -33,7 +33,7 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
     }
     //    }
 
-//    unsigned char* image = stbi_load(absoluteTexName.c_str(), &w, &h, &comp, STBI_default);
+    //    unsigned char* image = stbi_load(absoluteTexName.c_str(), &w, &h, &comp, STBI_default);
     m_image = stbi_load(absoluteTexName.c_str(), &w, &h, &comp, STBI_default);
     if (!m_image) {
         std::cerr << "    [Texture] Unable to load texture: " << absoluteTexName
@@ -45,15 +45,28 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
 
     const size_t imageSize = w * h * comp;
     m_textureSize = imageSize; // bytes
-//    m_textureSize = imageSize * 8;
+    //    m_textureSize = imageSize * 8;
     const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+    //    const uint64_t textureFlags = 0 | BGFX_TEXTURE_RT_MSAA_X8;
+    //     const uint64_t textureFlags = 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
+    // BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
+    // const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+    // BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN
     const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
+    //     const uint64_t samplerFlags =
+    //     0 | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT;
+
     bool hasMips = false;
+    //    const bgfx::Memory * mem = bgfx::makeRef(m_image, imageSize);
     //                    glGenTextures(1, &texture_id);
     //                    glBindTexture(GL_TEXTURE_2D, texture_id);
     //                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     //                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    if (comp == 3) {
+    if (comp == 1) {
+        m_textureHandle = bgfx::createTexture2D(
+            w, h, hasMips, 1, bgfx::TextureFormat::R8,
+            textureFlags | samplerFlags, bgfx::makeRef(m_image, imageSize));
+    } else if (comp == 3) {
         //                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB,
         //                            GL_UNSIGNED_BYTE, image);
         m_textureHandle = bgfx::createTexture2D(
@@ -73,7 +86,7 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
     }
     //                    glBindTexture(GL_TEXTURE_2D, 0);
 
-    //    stbi_image_free(image);
+    //        stbi_image_free(m_image);
 
     //	const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
     //	const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
@@ -149,25 +162,25 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
 
 Texture::~Texture()
 {
-//    std::cout << "\033[31m";
-//    std::cout << "[Texture] " << this << " delete texture '" << m_name << "' " << m_image << ", textureHandle=" << m_textureHandle.idx << std::endl;
-//    std::cout << "\033[0m";
+    //    std::cout << "\033[31m";
+    //    std::cout << "[Texture] " << this << " delete texture '" << m_name << "' " << m_image << ", textureHandle=" << m_textureHandle.idx << std::endl;
+    //    std::cout << "\033[0m";
 
-//    assert(m_image);
+    //    assert(m_image);
     if (m_image != nullptr) {
         stbi_image_free(m_image);
         m_image = nullptr;
 
         bgfx::destroy(m_textureHandle);
-//        std::cout << "bgfx destroy " << std::endl;
+        //        std::cout << "bgfx destroy " << std::endl;
     }
-//    else {
-//        std::cout << "bgfx bad destroy " << std::endl;
-//    }
+    //    else {
+    //        std::cout << "bgfx bad destroy " << std::endl;
+    //    }
     //	bgfx::destroy(m_sampler);
     //    bgfx::isValid(m_textureHandle)
-//    assert(bgfx::isValid(m_textureHandle));
-//    bgfx::destroy(m_textureHandle);
+    //    assert(bgfx::isValid(m_textureHandle));
+    //    bgfx::destroy(m_textureHandle);
     //    std::cout << "[Texture] " << m_name << " deleted" << std::endl;
 
     std::cout << "\033[31m";
@@ -183,11 +196,10 @@ Texture::~Texture()
 
 //}
 
-void Texture::save(std::ofstream &file)
+void Texture::save(std::ofstream& file)
 {
     FileSystem::write(m_name, file);
     FileSystem::write(m_baseDir, file);
-
 }
 
 const bgfx::TextureHandle& Texture::textureHandle() const
@@ -207,7 +219,7 @@ Texture::Texture(Texture&& texture)
     , m_baseDir(std::move(texture.m_baseDir))
 {
     texture.m_image = nullptr;
-//    texture.m_textureHandle.
+    //    texture.m_textureHandle.
     std::cout << "\033[34m";
     std::cout << "[Texture] " << this << " '" << m_name << "' right moving from " << &texture << std::endl;
     std::cout << "\033[0m";

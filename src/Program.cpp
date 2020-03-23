@@ -4,7 +4,8 @@
 
 #include <string>
 
-bgfx::ShaderHandle loadShader(const char* filename);
+//bgfx::ShaderHandle loadShader(const char* filename);
+bgfx::ShaderHandle loadShader(const std::string & filename);
 
 Program::Program()
 {
@@ -22,15 +23,20 @@ Program::~Program()
 void Program::init(const char *shaderName)
 {
 
-    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
-    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
+//    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
+    bgfx::ShaderHandle vsh = loadShader(std::string(shaderName) + ".vert");
+//    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
+    bgfx::ShaderHandle fsh = loadShader(std::string(shaderName) + ".frag");
     // bgfx::ShaderHandle vsh = loadShader("mesh.vert");
     // bgfx::ShaderHandle fsh = loadShader("mesh.frag");
     m_handle = bgfx::createProgram(vsh, fsh, true);
 
     m_uDiffuse = bgfx::createUniform("u_diffuse", bgfx::UniformType::Vec4);
     m_sDiffuse = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
+
+    m_sOpacity = bgfx::createUniform("s_opacity", bgfx::UniformType::Sampler);
     //    m_uHasDiffuseTexture = bgfx::createUniform("u_hasDiffuseTexture", bgfx::UniformType::Vec4);
+    m_uTexturesEnable = bgfx::createUniform("u_texturesEnable", bgfx::UniformType::Vec4);
 }
 
 void Program::clear()
@@ -39,6 +45,8 @@ void Program::clear()
     bgfx::destroy(m_uDiffuse);
     bgfx::destroy(m_sDiffuse);
 
+    bgfx::destroy(m_sOpacity);
+    bgfx::destroy(m_uTexturesEnable);
 }
 
 //bgfx::ProgramHandle Program::program() const
@@ -47,8 +55,8 @@ void Program::clear()
 //}
 
 
-//bgfx::ShaderHandle loadShader(const std::string& FILENAME)
-bgfx::ShaderHandle loadShader(const char* filename)
+bgfx::ShaderHandle loadShader(const std::string& filename)
+//bgfx::ShaderHandle loadShader(const char* filename)
 {
     //    const char* shaderPath = "???";
     std::string shaderPath;

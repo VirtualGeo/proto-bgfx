@@ -6,4 +6,4 @@ build/
 CMakeLists.txt.user
 Assets/McGuire/San_Miguel/
 
-*.bin
+Assets/**/*.bin

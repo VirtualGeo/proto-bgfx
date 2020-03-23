@@ -23,6 +23,9 @@ public:
     bgfx::UniformHandle m_uDiffuse;
     bgfx::UniformHandle m_sDiffuse;
 
+    bgfx::UniformHandle m_sOpacity;
+    bgfx::UniformHandle m_uTexturesEnable;
+
 };
 
 #endif // PROGRAM_H

@@ -14,6 +14,9 @@ uniform vec4 u_diffuse;
 #define u_hasDiffuseTexture u_diffuse.w
 //uniform vec4 u_hasDiffuseTexture;
 
+SAMPLER2D(s_opacity, 1);
+uniform vec4 u_texturesEnable;
+#define u_hasOpacityTexture u_texturesEnable.x
 
 void main()
 {
@@ -26,9 +29,21 @@ void main()
 //    return;
 
 	// vec4 color = vec4(v_texcoord0.x, v_texcoord0.y, 1.0, 1.0);
+
+
+
     vec4 color;
     if (u_hasDiffuseTexture > 0.5) {
         color = texture2D(s_diffuse, v_texcoord0);
+
+//        if (color.w < 0.1) {
+//            discard;
+//        }
+        if (u_hasOpacityTexture > 0.5) {
+            if (texture2D(s_opacity, v_texcoord0).x < 0.5) {
+                discard;
+            }
+        }
 
     }
     else {

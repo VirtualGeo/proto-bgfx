@@ -12,12 +12,16 @@ add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
 
 #set(RENDERER_OpenGL 1)
 # set(RENDERER_DirectX 1)
+#set(RENDERER_Vulkan 1)
+
 if (RENDERER_OpenGL)
     add_definitions(-DRENDERER_OpenGL)
     # add_definitions(-DRENDERER_DirectX 0)
     #elseif(RENDERER_DirectX)
     #     add_definitions(-DRENDERER_OpenGL 0)
     #    add_definitions(-DRENDERER_DirectX)
+elseif(RENDERER_Vulkan)
+    add_definitions(-DRENDERER_Vulkan)
 else()
     add_definitions(-DRENDERER_Auto)
 endif()
@@ -81,13 +85,20 @@ set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
 macro(COMPILE_SHADER SHADER)
     get_shader_infos(${SHADER} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)
     if(OK)
+        # ----------------------- WINDOWS
         if(WIN32)
-            # message("WIN32")
+             message("WIN32")
             set(PLATFORM "windows")
             if(RENDERER_OpenGL)
                 set(PROFILE "")
                 set(OPTIMIZATION "")
                 set(SHADER_BIN_REP "glsl")
+
+            elseif(RENDERER_Vulkan)
+                set(PROFILE "spirv")
+                set(OPTIMIZATION "")
+                set(SHADER_BIN_REP "spirv")
+
 
             else()
                 #            if(RENDERER_DirectX)
@@ -103,17 +114,41 @@ macro(COMPILE_SHADER SHADER)
                 # set(OPTIMIZATION "")
                 set(SHADER_BIN_REP "dx11")
 
-
-
             endif()
 
+        # ------------------------- LINUX
         else()
+            message("LINUX")
             set(PLATFORM "linux") # TODO
-            # set(PROFILE "glsl")
-            set(PROFILE "")
-            set(OPTIMIZATION "")
-            set(SHADER_BIN_REP "glsl")
-        endif(WIN32)
+            if(RENDERER_Vulkan)
+                message("Vulkan")
+                set(PROFILE "spirv")
+                set(OPTIMIZATION "")
+                set(SHADER_BIN_REP "spirv")
+            else()
+                message("OpenGL")
+                # set(PROFILE "glsl")
+                set(PROFILE "")
+                set(OPTIMIZATION "")
+                set(SHADER_BIN_REP "glsl")
+            endif()
+        endif()
+
+        message("
+            OUTPUT ${SHADER_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME}
+            COMMAND
+            ${BGFX_ROOT}/bin/shaderc
+            -f ${SHADER_SRC_DIR}/${SHADER}
+            -o ${SHADER_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME}
+            --platform ${PLATFORM}
+            --type ${SHADER_TYPE}
+            --verbose
+            --profile ${PROFILE}
+            -i ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src
+            ${OPTIMIZATION}
+            MAIN_DEPENDENCY ${SHADER_SRC_DIR}/${SHADER}
+            COMMENT \"Compiling ${SHADER_TYPE} shader ${SHADER_NAME}\"
+            ")
 
 
         add_custom_command(
