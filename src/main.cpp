@@ -170,6 +170,10 @@ void init()
     std::cout << "RendererType OpenGL" << std::endl;
 #endif
 
+#ifdef RENDERER_Vulkan
+    bgfxInit.type = bgfx::RendererType::Vulkan;
+    std::cout << "RendererType Vulkan" << std::endl;
+#endif
 //#ifdef RENDERER_DirectX
 //    bgfxInit.type = bgfx::RendererType::Direct3D12;
 //    std::cout << "RendererType DirectX" << std::endl;

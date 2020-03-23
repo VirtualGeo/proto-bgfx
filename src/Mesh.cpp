@@ -68,7 +68,7 @@ void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
     if (iTexDiffuse >= 0) {
 
         assert(iTexDiffuse < textures.size());
-        const Texture& texture = textures[material.iTexDiffuse()];
+        const Texture& texture = textures[iTexDiffuse];
         //                }
         // uint32_t flags = UINT32_MAX;
         // uint32_t flags = BGFX_TEXTURE_USE_DEFAULT;
@@ -85,6 +85,16 @@ void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
         //        float temp[1] = { 1.0 };
         //        bgfx::setUniform(m_uHasDiffuseTexture, temp);
         //                 bgfx::setUniform(m_uHasDiffuseTexture);
+    }
+
+
+    bgfx::setUniform(program.m_uTexturesEnable, material.texturesEnable());
+    const int iTexOpacity = material.iTexOpacity();
+    if (iTexOpacity >= 0) {
+        assert(iTexOpacity < textures.size());
+        const Texture & texture = textures[iTexOpacity];
+
+        bgfx::setTexture(1, program.m_sOpacity, texture.textureHandle());
     }
 
     // else {

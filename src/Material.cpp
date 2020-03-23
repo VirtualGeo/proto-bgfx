@@ -8,8 +8,25 @@
 //}
 #include "System.h"
 
+bool hasLoaded(const std::string& texName, const Textures& textures, int& iTex)
+{
+
+    for (int i = 0; i < textures.size(); ++i) {
+        const Texture& texture = textures[i];
+
+        if (texture.name() == texName) {
+            iTex = i;
+            return true;
+        }
+    }
+    return false;
+}
+
 Material::Material(const tinyobj::material_t& material, Textures& textures, const std::string& baseDir)
 {
+    //    for (int i =0; i <4; ++i) {
+    //        m_activeTextures[i] = 0.0f;
+    //    }
     m_name = material.name;
 
     //        float diffuse[3];
@@ -27,28 +44,33 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
         m_diffuse[3] = 1.0f;
         // Only load the texture if it is not already loaded
         //        for (const Texture& texture : textures) {
-        for (int i = 0; i < textures.size(); ++i) {
-            const Texture& texture = textures[i];
-
-            if (texture.name() == diffuseTexName) {
-                m_iTexDiffuse = i;
-                std::cout << "        [Texture] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
-                return;
-            }
+        int i;
+        if (hasLoaded(diffuseTexName, textures, i)) {
+            m_iTexDiffuse = i;
+            std::cout << "        [Texture] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
+            //            return;
+        } else {
+            m_iTexDiffuse = static_cast<int>(textures.size());
+            textures.emplace_back(diffuseTexName, baseDir);
         }
-        //        if (textures.find(diffuseTexName) == textures.end()) {
-        //            textures.insert(std::make_pair(material->diffuse_texname, texture_id));
-
-        //            textures.insert(std::make_pair(diffuseTexName, Texture(diffuseTexName, baseDir)));
-        //            textures.insert(std::make_pair(diffuseTexName, {diffuseTexName, baseDir}));
-        m_iTexDiffuse = static_cast<int>(textures.size());
-        //        textures.push_back(Texture(diffuseTexName, baseDir));
-        //        textures.emplace_back(Texture(diffuseTexName, baseDir));
-        textures.emplace_back(diffuseTexName, baseDir);
-        //        }
     }
-    else {
-        m_diffuse[3] = 0.0f;
+    //    } else {
+    //        m_diffuse[3] = 0.0f;
+    //    }
+
+    const std::string& opacityTexName = material.alpha_texname;
+    if (opacityTexName.length() > 0) {
+        m_texturesEnable[0] = 1.0f;
+
+        int i;
+        if (hasLoaded(opacityTexName, textures, i)) {
+            m_iTexOpacity = i;
+            std::cout << "        [Texture] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
+        }
+        else {
+            m_iTexOpacity = static_cast<int>(textures.size());
+            textures.emplace_back(opacityTexName, baseDir);
+        }
     }
 }
 
@@ -59,18 +81,24 @@ Material::~Material()
     std::cout << "\033[0m";
 }
 
-Material::Material(std::ifstream &file)
+Material::Material(std::ifstream& file)
 {
     FileSystem::read(m_name, file);
     FileSystem::read(m_iTexDiffuse, file);
     FileSystem::read(m_diffuse, 4, file);
+
+    FileSystem::read(m_texturesEnable, 4, file);
+    FileSystem::read(m_iTexOpacity, file);
 }
 
-void Material::save(std::ofstream &file)
+void Material::save(std::ofstream& file)
 {
     FileSystem::write(m_name, file);
     FileSystem::write(m_iTexDiffuse, file);
     FileSystem::write(m_diffuse, 4, file);
+
+    FileSystem::write(m_texturesEnable, 4, file);
+    FileSystem::write(m_iTexOpacity, file);
 }
 
 Material::Material(Material&& material)
@@ -84,15 +112,25 @@ Material::Material(Material&& material)
 
 const float* Material::diffuse() const
 {
-//    float ret[4];
-//    for (int i =0; i <3; ++i) {
-//        ret[i] = i;
-//    }
-//    ret[3] = (m_iTexDiffuse >= 0) ?(1.0) :(0.0);
+    //    float ret[4];
+    //    for (int i =0; i <3; ++i) {
+    //        ret[i] = i;
+    //    }
+    //    ret[3] = (m_iTexDiffuse >= 0) ?(1.0) :(0.0);
     return m_diffuse;
+}
+
+const float *Material::texturesEnable() const
+{
+    return m_texturesEnable;
 }
 
 int Material::iTexDiffuse() const
 {
     return m_iTexDiffuse;
+}
+
+int Material::iTexOpacity() const
+{
+    return m_iTexOpacity;
 }

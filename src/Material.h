@@ -18,15 +18,21 @@ public:
     Material(Material &&);
 
     const float * diffuse() const;
+    const float * texturesEnable() const;
 
     int iTexDiffuse() const;
+
+    int iTexOpacity() const;
 
 private:
     std::string m_name;
 //    std::vector<uint> m_iTextures[Texture::size];
     int m_iTexDiffuse = -1;
 
-    float m_diffuse[4];
+    float m_diffuse[4] = {0.0f};
+
+    float m_texturesEnable[4] = {0.0f};
+    int m_iTexOpacity = -1;
 
 };
 
