@@ -17,7 +17,7 @@ add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
     add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 #endif()
 
-set(RENDERER_OpenGL 1)
+# set(RENDERER_OpenGL 1)
 # set(RENDERER_DirectX 1)
 # set(RENDERER_Vulkan 1)
 
