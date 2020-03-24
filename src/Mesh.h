@@ -8,6 +8,9 @@
 #include "Material.h"
 #include "Program.h"
 
+//using indice_type = uint16_t;
+using indice_type = unsigned short;
+
 class Mesh {
 public:
     Mesh(int iMaterial);
@@ -32,7 +35,7 @@ public:
 
 //private:
     size_t m_iMaterial;
-    std::vector<uint16_t> m_indices;
+    std::vector<indice_type> m_indices;
     bgfx::IndexBufferHandle m_ibh;
 
 private:

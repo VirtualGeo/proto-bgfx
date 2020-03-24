@@ -13,7 +13,8 @@ class Scene
 {
 public:
     Scene();
-    void addModel(const char * filename);
+//    void addModel(const char * filename);
+    void addModel(const std::string &filename);
 //    void draw()
     void draw(const bgfx::ViewId id, const Program & program, const float *mtx,
                 const uint64_t state) const;

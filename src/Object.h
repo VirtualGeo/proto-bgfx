@@ -65,6 +65,7 @@ public:
     size_t nbVertices() const;
 
     size_t nbTriangles() const;
+    size_t nbMeshes() const;
 
 
 private:

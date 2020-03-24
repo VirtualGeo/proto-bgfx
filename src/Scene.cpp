@@ -20,15 +20,16 @@ Scene::Scene()
         .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
         // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
         .end();
-
 }
 
-void Scene::addModel(const char* filename)
+//void Scene::addModel(const char* filename)
+void Scene::addModel(const std::string & filename)
 {
-    std::string absoluteFilename(std::string(PROJECT_DIR) + filename);
-    //    std::string absoluteFilename(filename);
+    //    std::string absoluteFilename(std::string(PROJECT_DIR) + filename);
+    std::string absoluteFilename(filename);
     std::string bin = absoluteFilename.substr(0, absoluteFilename.find_last_of('.')) + ".bin";
     //    std::cout << "bin : " << bin << std::endl;
+#ifdef AUTO_GENERATE_BIN_MODEL
     if (FileExists(bin)) {
         std::ifstream file;
         file.open(bin, std::ios::binary | std::ios::in);
@@ -41,6 +42,7 @@ void Scene::addModel(const char* filename)
 
         return;
     }
+#endif
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -66,9 +68,11 @@ void Scene::addModel(const char* filename)
         base_dir.c_str());
     if (!warn.empty()) {
         std::cout << "[Scene] WARN: " << warn << std::endl;
+        exit(1);
     }
     if (!err.empty()) {
         std::cerr << "[Scene] " << err << std::endl;
+        exit(1);
     }
 
     tm.end();
@@ -106,10 +110,11 @@ void Scene::addModel(const char* filename)
     //    timerutil tm;
     tm.start();
 
-    for (size_t i = 0; i < materials.size(); i++) {
+    const size_t nbMaterials = materials.size();
+    for (size_t i = 0; i < nbMaterials; i++) {
         const tinyobj::material_t& material = materials[i];
 
-        std::cout << "[Scene] Load material[" << i << "] " << material.name << std::endl;
+        std::cout << "[Scene] Load material[" << i << "/" << nbMaterials << "] " << material.name << std::endl;
         //        printf("material[%d].difname = %s\n", int(i),
         //            material.name.c_str());
         //        m_materials.push_back(Material(material, m_textures, base_dir));
@@ -126,11 +131,18 @@ void Scene::addModel(const char* filename)
 
     tm.start();
 
+//    size_t nbIndices =0;
+    size_t nbMeshes = 0;
     m_objects.reserve(shapes.size());
     for (size_t i = 0; i < shapes.size(); ++i) {
         const tinyobj::shape_t& shape = shapes[i];
         //        m_objects.push_back(Object(shape, attrib, materials, i));
         m_objects.emplace_back(shape, attrib, materials, i, m_layout);
+//        nbIndices += m_objects[i].nbTriangles() * 3;
+        nbMeshes += m_objects[i].nbMeshes();
+//        std::cout << "[Scene] nbIndices:" << nbIndices << std::endl;
+        std::cout << "[Scene] nbMeshes:" << nbMeshes << std::endl;
+        bgfx::frame();
     }
 
     tm.end();
@@ -140,6 +152,7 @@ void Scene::addModel(const char* filename)
     std::cout << "[Scene] Loading materials time: " << m_loadingMaterialsTime << " [ms]" << std::endl;
     std::cout << "[Scene] Loading objects time: " << m_loadingObjectsTime << " [ms]" << std::endl;
 
+#ifdef AUTO_GENERATE_BIN_MODEL
     //    save(file);
     std::ofstream file;
     file.open(bin, std::ios::binary | std::ios::out);
@@ -149,6 +162,7 @@ void Scene::addModel(const char* filename)
     }
     save(file);
     file.close();
+#endif
 }
 
 void Scene::draw(const bgfx::ViewId id, const Program& program, const float* mtx, const uint64_t state) const
@@ -270,15 +284,16 @@ void Scene::load(std::ifstream& file)
     for (size_t i = 0; i < size; ++i) {
         //        m_objects.push_back(Object(file, i, m_layout));
         m_objects.emplace_back(file, i, m_layout);
+        bgfx::frame();
     }
 
     tm.end();
     m_loadingObjectsTime = tm.msec();
 
     m_parsingTime = 0;
-//    FileSystem::read(m_parsingTime, file);
-//    FileSystem::read(m_loadingMaterialsTime, file);
-//    FileSystem::read(m_loadingObjectsTime, file);
+    //    FileSystem::read(m_parsingTime, file);
+    //    FileSystem::read(m_loadingMaterialsTime, file);
+    //    FileSystem::read(m_loadingObjectsTime, file);
 }
 
 void Scene::save(std::ofstream& file)
@@ -311,7 +326,7 @@ void Scene::save(std::ofstream& file)
         m_objects[i].save(file);
     }
 
-//    FileSystem::write(m_parsingTime, file);
-//    FileSystem::write(m_loadingMaterialsTime, file);
-//    FileSystem::write(m_loadingObjectsTime, file);
+    //    FileSystem::write(m_parsingTime, file);
+    //    FileSystem::write(m_loadingMaterialsTime, file);
+    //    FileSystem::write(m_loadingObjectsTime, file);
 }
