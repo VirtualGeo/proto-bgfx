@@ -29,6 +29,9 @@
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
 
+//#define WIN_WIDTH 1920
+//#define WIN_HEIGHT 1080
+
 void processInput(GLFWwindow* window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -186,7 +189,7 @@ void init()
     bgfxInit.resolution.width = WIN_WIDTH;
     bgfxInit.resolution.height = WIN_HEIGHT;
     bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-    // bgfxInit.resolution.reset = BGFX_RESET_NONE; // question
+//     bgfxInit.resolution.reset = BGFX_RESET_NONE; // question
     // bgfx::init(bgfxInit);
     if (!bgfx::init(bgfxInit)) {
         std::cout << "[main] Failed to initialize bgfx" << std::endl;
@@ -213,11 +216,13 @@ void init()
     //        .end();
 
 
-    g_scene.addModel("Assets/Sponza/sponza.obj");
+//    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/Sponza/sponza.obj");
 
-//    g_scene.addModel("Assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
-//    g_scene.addModel("Assets/McGuire/Crytek_Sponza/sponza-blend.obj");
-//    g_scene.addModel("Assets/McGuire/San_Miguel/san-miguel-blend.obj");
+//    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
+//    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/Crytek_Sponza/sponza-blend.obj");
+//    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/San_Miguel/san-miguel-blend.obj");
+//    g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
+    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
 
 
     g_nbVertices = g_scene.nbVertices();

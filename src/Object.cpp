@@ -485,7 +485,8 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
             Mesh& mmesh = m_meshes[i];
             assert(mmesh.m_indices.size() % 3 == 0);
 
-            mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(uint16_t) * mmesh.m_indices.size()));
+//            mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(indice_type) * mmesh.m_indices.size()), BGFX_BUFFER_INDEX32);
+            mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(indice_type) * mmesh.m_indices.size()));
             m_nbTriangles += mmesh.m_indices.size() / 3;
             std::cout << "    [Mesh] " << i << " nbIndices=" << mmesh.m_indices.size();
             //            for (int j =0; j <std::min(mesh.m_indices.size(), ulong(10)); ++i) {
@@ -627,6 +628,11 @@ size_t Object::nbVertices() const
 size_t Object::nbTriangles() const
 {
     return m_nbTriangles;
+}
+
+size_t Object::nbMeshes() const
+{
+    return m_meshes.size();
 }
 
 //bgfx::IndexBufferHandle Object::ibh() const

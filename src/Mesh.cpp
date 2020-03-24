@@ -37,7 +37,9 @@ Mesh::Mesh(std::ifstream &file)
     FileSystem::read(m_iMaterial, file);
     FileSystem::read(m_indices, file);
 
-    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(uint16_t) * m_indices.size()));
+//    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(uint16_t) * m_indices.size()));
+    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(indice_type) * m_indices.size()));
+//    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(indice_type) * m_indices.size()), BGFX_BUFFER_INDEX32);
 }
 
 void Mesh::save(std::ofstream &file)
@@ -79,6 +81,7 @@ void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
         // const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
         bgfx::setTexture(0, program.m_sDiffuse,
             texture.textureHandle());
+
         //  textureFlags | samplerFlags);
 
         //                 bgfx::setUniform(m_uHasDiffuseTexture, (void*)true);
