@@ -26,6 +26,7 @@ public:
     Texture(Texture &&);
 
     size_t textureSize() const;
+    friend std::ostream & operator<<(std::ostream & os, const Texture & texture);
 
 private:
     unsigned char* m_image = nullptr;
@@ -34,6 +35,9 @@ private:
     std::string m_name;
     std::string m_baseDir;
 
+    int m_width;
+    int m_height;
+    int m_nbChannel;
     size_t m_textureSize; // bytes
 };
 

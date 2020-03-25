@@ -32,6 +32,7 @@ public:
                 const uint64_t state, const Materials & materials, const Textures & textures, const bgfx::VertexBufferHandle & vbh) const;
 
 //    std::vector<uint16_t> indices() const;
+    friend std::ostream & operator<<(std::ostream & os, const Mesh & mesh);
 
 //private:
     size_t m_iMaterial;

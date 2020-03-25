@@ -17,8 +17,8 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
     const std::string absoluteTexName = baseDir + texName;
 
     //    uint texture_id;
-    int w, h;
-    int comp;
+//    int w, h;
+//    int comp;
 
     assert(!FileExists(texName));
 
@@ -34,17 +34,18 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
     //    }
 
     //    unsigned char* image = stbi_load(absoluteTexName.c_str(), &w, &h, &comp, STBI_default);
-    m_image = stbi_load(absoluteTexName.c_str(), &w, &h, &comp, STBI_default);
+    m_image = stbi_load(absoluteTexName.c_str(), &m_width, &m_height, &m_nbChannel, STBI_default);
     if (!m_image) {
         std::cerr << "    [Texture] Unable to load texture: " << absoluteTexName
                   << std::endl;
         exit(1);
     }
-    std::cout << "    [Texture] Loaded texture: '" << absoluteTexName << "', w = " << w
-              << ", h = " << h << ", comp = " << comp << std::endl;
+//    std::cout << "    [Texture] Loaded texture: '" << absoluteTexName << "', w = " << w
+//              << ", h = " << h << ", comp = " << comp << std::endl;
 
-    const size_t imageSize = w * h * comp;
-    m_textureSize = imageSize; // bytes
+//    const size_t imageSize = w * h * comp;
+//    m_textureSize = imageSize; // bytes
+    m_textureSize = m_width * m_height * m_nbChannel;
     //    m_textureSize = imageSize * 8;
     const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
     //    const uint64_t textureFlags = 0 | BGFX_TEXTURE_RT_MSAA_X8;
@@ -62,26 +63,26 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
     //                    glBindTexture(GL_TEXTURE_2D, texture_id);
     //                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     //                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    if (comp == 1) {
+    if (m_nbChannel == 1) {
         m_textureHandle = bgfx::createTexture2D(
-            w, h, hasMips, 1, bgfx::TextureFormat::R8,
-            textureFlags | samplerFlags, bgfx::makeRef(m_image, imageSize));
-    } else if (comp == 3) {
+            m_width, m_height, hasMips, 1, bgfx::TextureFormat::R8,
+            textureFlags | samplerFlags, bgfx::makeRef(m_image, m_textureSize));
+    } else if (m_nbChannel == 3) {
         //                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB,
         //                            GL_UNSIGNED_BYTE, image);
         m_textureHandle = bgfx::createTexture2D(
-            w, h, hasMips, 1, bgfx::TextureFormat::RGB8,
+            m_width, m_height, hasMips, 1, bgfx::TextureFormat::RGB8,
             // BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT, stippleTex);
-            textureFlags | samplerFlags, bgfx::makeRef(m_image, imageSize));
+            textureFlags | samplerFlags, bgfx::makeRef(m_image, m_textureSize));
         // textureFlags | samplerFlags, mem);
-    } else if (comp == 4) {
+    } else if (m_nbChannel == 4) {
         m_textureHandle = bgfx::createTexture2D(
-            w, h, hasMips, 1, bgfx::TextureFormat::RGBA8,
-            textureFlags | samplerFlags, bgfx::makeRef(m_image, imageSize));
+            m_width, m_height, hasMips, 1, bgfx::TextureFormat::RGBA8,
+            textureFlags | samplerFlags, bgfx::makeRef(m_image, m_textureSize));
         //                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
         //                            GL_UNSIGNED_BYTE, image);
     } else {
-        std::cout << "    [Texture] unable to load texture with " << comp << " channels" << std::endl;
+        std::cout << "    [Texture] unable to load texture with " << m_nbChannel << " channels" << std::endl;
         assert(0); // TODO
     }
     //                    glBindTexture(GL_TEXTURE_2D, 0);
@@ -200,6 +201,8 @@ void Texture::save(std::ofstream& file)
 {
     FileSystem::write(m_name, file);
     FileSystem::write(m_baseDir, file);
+
+//    FileSystem::write()
 }
 
 const bgfx::TextureHandle& Texture::textureHandle() const
@@ -217,6 +220,10 @@ Texture::Texture(Texture&& texture)
     , m_textureHandle(std::move(texture.m_textureHandle))
     , m_name(std::move(texture.m_name))
     , m_baseDir(std::move(texture.m_baseDir))
+    , m_width(texture.m_width)
+    , m_height(texture.m_height)
+    , m_nbChannel(texture.m_nbChannel)
+    , m_textureSize(texture.m_textureSize)
 {
     texture.m_image = nullptr;
     //    texture.m_textureHandle.
@@ -228,4 +235,9 @@ Texture::Texture(Texture&& texture)
 size_t Texture::textureSize() const
 {
     return m_textureSize;
+}
+
+std::ostream &operator<<(std::ostream &os, const Texture &texture)
+{
+    return os << "'" << texture.m_name << "', width=" << texture.m_width << ", height=" << texture.m_height << ", nbChannel=" << texture.m_nbChannel;
 }

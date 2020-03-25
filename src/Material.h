@@ -24,6 +24,9 @@ public:
 
     int iTexOpacity() const;
 
+    std::string name() const;
+    friend std::ostream & operator <<(std::ostream & os, const Material & material);
+
 private:
     std::string m_name;
 //    std::vector<uint> m_iTextures[Texture::size];

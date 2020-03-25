@@ -36,6 +36,7 @@ void main()
     if (u_hasDiffuseTexture > 0.5) {
         color = texture2D(s_diffuse, v_texcoord0);
 
+
 //        if (color.w < 0.1) {
 //            discard;
 //        }
