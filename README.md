@@ -31,10 +31,10 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/bgfx-install)
 ### Add line in cmake/3rdparty/astc-codec.cmake
 set_target_properties( astc-codec PROPERTIES DEBUG_POSTFIX d)
 
-### Run these commands to generate all the bgfx-install library in the root of bgfx.cmake repository
+### Run these commands to generate all the bgfx-install library in the bgfx.cmake repository
 ```bash
-$ cmake --build . --target install --config Debug
-$ cmake --build . --target install --config Release
+$ cmake --build <BGFX_CMAKE_BUILD_DEBUG_DIR> --target install --config Debug
+$ cmake --build <BGFX_CMAKE_BUILD_RELEASE_DIR> --target install --config Release
 ```
 
 ## How to include bgfx, bx, bimg library into proto-bgfx project
