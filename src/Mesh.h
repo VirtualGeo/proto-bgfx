@@ -14,18 +14,16 @@ using indice_type = unsigned short;
 class Mesh {
 public:
     Mesh(int iMaterial);
-    Mesh(std::ifstream & file);
-    void save(std::ofstream & file);
-    ~Mesh();
-
     Mesh(const Mesh & mesh) = delete;
 //    Mesh(Mesh && mesh) noexcept = default;
     Mesh(Mesh && mesh);
 //    Mesh & operator =(Mesh && mesh) = delete ;
 //    Mesh & operator=(Mesh & mesh) = delete ;
-
-
 //    Mesh & operator=(Mesh && mesh);
+    ~Mesh();
+    Mesh(std::ifstream & file);
+    void save(std::ofstream & file) const;
+
 
 
     void draw(const bgfx::ViewId id, const Program & program, const float *mtx,

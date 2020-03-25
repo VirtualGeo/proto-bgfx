@@ -1,11 +1,7 @@
 #include "Material.h"
 
 #include <cassert>
-//Material::Material()
-//{
-
 #include "FileSystem.h"
-//}
 #include "System.h"
 
 bool hasLoaded(const std::string& texName, const Textures& textures, int& iTex)
@@ -47,7 +43,9 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
         int i;
         if (hasLoaded(diffuseTexName, textures, i)) {
             m_iTexDiffuse = i;
+#ifdef DEBUG
             std::cout << "        [Texture] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
+#endif
             //            return;
         } else {
             m_iTexDiffuse = static_cast<int>(textures.size());
@@ -65,7 +63,9 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
         int i;
         if (hasLoaded(opacityTexName, textures, i)) {
             m_iTexOpacity = i;
+#ifdef DEBUG
             std::cout << "        [Texture] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
+#endif
         }
         else {
             m_iTexOpacity = static_cast<int>(textures.size());
@@ -74,11 +74,24 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
     }
 }
 
+Material::Material(Material&& material)
+    : m_name(std::move(material.m_name))
+    , m_iTexDiffuse(material.m_iTexDiffuse)
+{
+#ifdef DEBUG
+    std::cout << "\033[34m";
+    std::cout << "[Material] " << this << " '" << m_name << "' right moving from " << &material << std::endl;
+    std::cout << "\033[0m";
+#endif
+}
+
 Material::~Material()
 {
+#ifdef DEBUG
     std::cout << "\033[31m";
     std::cout << "[Material] '" << m_name << "' deleted " << this << std::endl;
     std::cout << "\033[0m";
+#endif
 }
 
 Material::Material(std::ifstream& file)
@@ -91,7 +104,7 @@ Material::Material(std::ifstream& file)
     FileSystem::read(m_iTexOpacity, file);
 }
 
-void Material::save(std::ofstream& file)
+void Material::save(std::ofstream& file) const
 {
     FileSystem::write(m_name, file);
     FileSystem::write(m_iTexDiffuse, file);
@@ -101,15 +114,13 @@ void Material::save(std::ofstream& file)
     FileSystem::write(m_iTexOpacity, file);
 }
 
-Material::Material(Material&& material)
-    : m_name(std::move(material.m_name))
-    , m_iTexDiffuse(material.m_iTexDiffuse)
+
+std::ostream &operator <<(std::ostream &os, const Material &material)
 {
-    std::cout << "\033[34m";
-    std::cout << "[Material] " << this << " '" << m_name << "' right moving from " << &material << std::endl;
-    std::cout << "\033[0m";
+    return os << "'" << material.m_name << "'";
 }
 
+// -------------------------- GETTERS
 const float* Material::diffuse() const
 {
     //    float ret[4];
@@ -138,9 +149,4 @@ int Material::iTexOpacity() const
 std::string Material::name() const
 {
     return m_name;
-}
-
-std::ostream &operator <<(std::ostream &os, const Material &material)
-{
-    return os << "'" << material.m_name << "'";
 }

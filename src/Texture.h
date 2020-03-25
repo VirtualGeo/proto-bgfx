@@ -13,20 +13,15 @@ class Texture {
 
 public:
     Texture(const std::string& texName, const std::string& baseDir);
-    Texture(Texture &&);
-//    Texture(Texture &&) noexcept = default;
-    Texture(const Texture &) = delete; // delete copy constructor
+    Texture(Texture&&);
+    //    Texture(Texture &&) noexcept = default;
+    Texture(const Texture&) = delete; // delete copy constructor
     ~Texture();
 
-//    Texture(std::ifstream & file);
-    void save(std::ofstream & file);
+    //    Texture(std::ifstream & file);
+    void save(std::ofstream& file) const;
 
-    // -------------------- getters
-    const bgfx::TextureHandle & textureHandle() const;
-    std::string name() const;
-    size_t textureSize() const;
-
-    friend std::ostream & operator<<(std::ostream & os, const Texture & texture);
+    friend std::ostream& operator<<(std::ostream& os, const Texture& texture);
 
 private:
     unsigned char* m_image = nullptr;
@@ -39,6 +34,11 @@ private:
     int m_height;
     int m_nbChannel;
     size_t m_textureSize; // bytes
+
+public: // ---------------------------------------------- getters
+    const bgfx::TextureHandle& textureHandle() const;
+    std::string name() const;
+    size_t textureSize() const;
 };
 
 using Textures = std::vector<Texture>;

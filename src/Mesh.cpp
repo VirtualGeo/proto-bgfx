@@ -8,16 +8,6 @@ Mesh::Mesh(int iMaterial)
 {
 }
 
-Mesh::~Mesh()
-{
-    if (m_last) {
-        bgfx::destroy(m_ibh);
-    }
-
-    std::cout << "\033[31m";
-    std::cout << "[Mesh] " << this << " deleted" << std::endl;
-    std::cout << "\033[0m";
-}
 
 Mesh::Mesh(Mesh&& mesh)
     : m_iMaterial(mesh.m_iMaterial)
@@ -27,9 +17,24 @@ Mesh::Mesh(Mesh&& mesh)
     //    m_last = true;
     mesh.m_last = false;
 
+#ifdef DEBUG
     std::cout << "\033[34m";
     std::cout << "[Mesh] " << this << " right moving from " << &mesh << std::endl;
     std::cout << "\033[0m";
+#endif
+}
+
+Mesh::~Mesh()
+{
+    if (m_last) {
+        bgfx::destroy(m_ibh);
+    }
+
+#ifdef DEBUG
+    std::cout << "\033[31m";
+    std::cout << "[Mesh] " << this << " deleted" << std::endl;
+    std::cout << "\033[0m";
+#endif
 }
 
 Mesh::Mesh(std::ifstream& file)
@@ -42,7 +47,7 @@ Mesh::Mesh(std::ifstream& file)
     //    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(indice_type) * m_indices.size()), BGFX_BUFFER_INDEX32);
 }
 
-void Mesh::save(std::ofstream& file)
+void Mesh::save(std::ofstream& file) const
 {
     FileSystem::write(m_iMaterial, file);
     FileSystem::write(m_indices, file);

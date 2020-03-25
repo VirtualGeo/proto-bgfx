@@ -488,16 +488,9 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
             //            mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(indice_type) * mmesh.m_indices.size()), BGFX_BUFFER_INDEX32);
             mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(indice_type) * mmesh.m_indices.size()));
             m_nbTriangles += mmesh.m_indices.size() / 3;
-            std::cout << "    [Mesh] " << i << " nbIndices=" << mmesh.m_indices.size();
-            //            for (int j =0; j <std::min(mesh.m_indices.size(), ulong(10)); ++i) {
-            ////            for (int j =0; j <10; ++i) {
-            //                std::cout << mesh.m_indices[j] << " ";
-            //            }
-            //            if (! mesh.tags.empty()) {
-            //            std::cout << "tags name:" << mesh.tags[0].name ;
-            //            }
-
-            std::cout << std::endl;
+#ifdef DEBUG
+            std::cout << "    [Mesh] " << i << " nbIndices=" << mmesh.m_indices.size() << std::endl;
+#endif
         }
 
         //    std::vector<float> buffer; // pos(3float), normal(3float), color(3float)
@@ -521,6 +514,44 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
 
     //    BX_CHECK(bgfx::isValid(m_vbh), "vbh not valid on object constructor"); // not worked !!!
     //    bgfx::crev
+}
+
+Object::Object(Object&& object)
+    : m_vbh(std::move(object.m_vbh))
+    , m_nbTriangles(object.m_nbTriangles)
+    //    , m_iMaterial(object.m_iMaterial)
+    , m_meshes(std::move(object.m_meshes))
+    ,
+    //      m_bmin(object.m_bmin),
+    //      m_bmax(object.m_bmax),
+    m_name(std::move(object.m_name))
+{
+    for (int i = 0; i < 3; ++i) {
+        m_bmin[i] = object.m_bmin[i];
+        m_bmax[i] = object.m_bmax[i];
+    }
+    object.m_name = "";
+
+#ifdef DEBUG
+    std::cout << "\033[34m";
+    std::cout << "[Object] " << this << " '" << m_name << "' right moving from " << &object << std::endl;
+    std::cout << "\033[0m";
+#endif
+}
+
+Object::~Object()
+{
+    //    assert(m_name.empty());
+    if (!m_name.empty()) {
+        //        assert(bgfx::isValid(m_vbh));
+        bgfx::destroy(m_vbh);
+    }
+
+#ifdef DEBUG
+    std::cout << "\033[31m";
+    std::cout << "[Object] '" << m_name << "' deleted " << this << std::endl;
+    std::cout << "\033[0m";
+#endif
 }
 
 Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayout& layout)
@@ -549,7 +580,7 @@ Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayou
     //    std::cout << "[Object] " << iShape << ", shape '" << m_name << "', nbMeshes=" << m_meshes.size() << ", nbTriangles=" << m_nbTriangles << std::endl;
 }
 
-void Object::save(std::ofstream& file)
+void Object::save(std::ofstream& file) const
 {
     FileSystem::write(m_vertices, file);
     FileSystem::write(m_nbTriangles, file);
@@ -566,40 +597,6 @@ void Object::save(std::ofstream& file)
     }
 }
 
-Object::Object(Object&& object)
-    : m_vbh(std::move(object.m_vbh))
-    , m_nbTriangles(object.m_nbTriangles)
-    //    , m_iMaterial(object.m_iMaterial)
-    , m_meshes(std::move(object.m_meshes))
-    ,
-    //      m_bmin(object.m_bmin),
-    //      m_bmax(object.m_bmax),
-    m_name(std::move(object.m_name))
-{
-    for (int i = 0; i < 3; ++i) {
-        m_bmin[i] = object.m_bmin[i];
-        m_bmax[i] = object.m_bmax[i];
-    }
-    object.m_name = "";
-
-    std::cout << "\033[34m";
-    std::cout << "[Object] " << this << " '" << m_name << "' right moving from " << &object << std::endl;
-    std::cout << "\033[0m";
-}
-
-Object::~Object()
-{
-    //    assert(m_name.empty());
-    if (!m_name.empty()) {
-        //        assert(bgfx::isValid(m_vbh));
-        bgfx::destroy(m_vbh);
-    }
-
-    std::cout << "\033[31m";
-    std::cout << "[Object] '" << m_name << "' deleted " << this << std::endl;
-    std::cout << "\033[0m";
-}
-
 void Object::draw(const bgfx::ViewId id, const Program& program, const float* mtx, const uint64_t state, const Materials& materials, const Textures& textures) const
 {
     for (const Mesh& mesh : m_meshes) {
@@ -611,6 +608,8 @@ void Object::draw(const bgfx::ViewId id, const Program& program, const float* mt
     }
 }
 
+
+// --------------------------------- GETTERS
 const bgfx::VertexBufferHandle& Object::vbh() const
 {
     return m_vbh;

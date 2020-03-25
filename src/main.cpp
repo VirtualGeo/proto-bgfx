@@ -86,13 +86,17 @@ size_t g_nbIndexBuffer;
 int main(int argc, char const* argv[])
 {
     updateCameraFront(); // with current g_yaw and g_pitch
+#ifdef DEBUG
     std::cout << "[main] hello bgfx !!!" << std::endl;
+#endif
 
     //    std::cout << PROJECT_DIR << std::endl;
     //    return 0;
 
     init();
+#ifdef DEBUG
     std::cout << "[main] init done." << std::endl;
+#endif
     bgfx::setDebug(BGFX_DEBUG_TEXT);
 
     //    float sum = 0.0f;
@@ -182,25 +186,30 @@ void init()
     // std::cout << RENDERER_TYPE << std::endl;
 #ifdef RENDERER_OpenGL
     bgfxInit.type = bgfx::RendererType::OpenGL;
-    std::cout << "RendererType OpenGL" << std::endl;
+//    std::cout << "RendererType OpenGL" << std::endl;
 #endif
-
+#ifdef RENDERER_OpenGLES
+    bgfxInit.type = bgfx::RendererType::OpenGLES;
+#endif
 #ifdef RENDERER_Vulkan
     bgfxInit.type = bgfx::RendererType::Vulkan;
-    std::cout << "RendererType Vulkan" << std::endl;
+//    std::cout << "RendererType Vulkan" << std::endl;
 #endif
-#ifdef RENDERER_DirectX
+#ifdef RENDERER_Direct3D12
     bgfxInit.type = bgfx::RendererType::Direct3D12;
-    std::cout << "RendererType DirectX" << std::endl;
+//    std::cout << "RendererType Direct3D12" << std::endl;
+#endif
+#ifdef RENDERER_Metal
+    bgfxInit.type = bgfx::RendererType::Metal;
 #endif
 #ifdef RENDERER_Auto
     bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
-    std::cout << "[main] RendererType auto" << std::endl;
+//    std::cout << "[main] RendererType auto" << std::endl;
 #endif
     bgfxInit.resolution.width = WIN_WIDTH;
     bgfxInit.resolution.height = WIN_HEIGHT;
-//    bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-        bgfxInit.resolution.reset = BGFX_RESET_NONE;
+    bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+    //        bgfxInit.resolution.reset = BGFX_RESET_NONE;
     bgfxInit.vendorId = BGFX_PCI_ID_NONE;
     // bgfxInit.vendorId = BGFX_PCI_ID_INTEL;
     //    bgfxInit.vendorId = BGFX_PCI_ID_NVIDIA;
@@ -223,13 +232,13 @@ void init()
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-//    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/Sponza/sponza.obj");
+    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/Sponza/sponza.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/Crytek_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
     //    g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
-        g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+    //        g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\Cougar.obj");
 
     g_nbVertices = g_scene.nbVertices();
@@ -263,11 +272,11 @@ void init()
     case bgfx::RendererType::Metal:
         g_renderer = "Metal";
         break;
-    case bgfx::RendererType::OpenGL:
-        g_renderer = "OpenGL";
-        break;
     case bgfx::RendererType::OpenGLES:
         g_renderer = "OpenGLES";
+        break;
+    case bgfx::RendererType::OpenGL:
+        g_renderer = "OpenGL";
         break;
     case bgfx::RendererType::Vulkan:
         g_renderer = "Vulkan";
@@ -393,7 +402,9 @@ void shutdown()
     glfwDestroyWindow(g_window);
     // window = nullptr; // question : necessary ?
     glfwTerminate();
+#ifdef DEBUG
     std::cout << "[main] shutdown done" << std::endl;
+#endif
 }
 
 // ------------------------------------ GLFW FUNCTIONS

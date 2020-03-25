@@ -174,9 +174,11 @@ Texture::Texture(Texture&& texture)
 {
     texture.m_image = nullptr;
     //    texture.m_textureHandle.
+#ifdef DEBUG
     std::cout << "\033[34m";
     std::cout << "[Texture] " << this << " '" << m_name << "' right moving from " << &texture << std::endl;
     std::cout << "\033[0m";
+#endif
 }
 
 Texture::~Texture()
@@ -202,9 +204,11 @@ Texture::~Texture()
     //    bgfx::destroy(m_textureHandle);
     //    std::cout << "[Texture] " << m_name << " deleted" << std::endl;
 
+#ifdef DEBUG
     std::cout << "\033[31m";
     std::cout << "[Texture] " << this << " '" << m_name << "' deleted" << std::endl;
     std::cout << "\033[0m";
+#endif
 }
 
 //Texture::Texture(std::ifstream &file)
@@ -215,12 +219,18 @@ Texture::~Texture()
 
 //}
 
-void Texture::save(std::ofstream& file)
+void Texture::save(std::ofstream& file) const
 {
     FileSystem::write(m_name, file);
     FileSystem::write(m_baseDir, file);
 
 //    FileSystem::write()
+}
+
+
+std::ostream &operator<<(std::ostream &os, const Texture &texture)
+{
+    return os << "'" << texture.m_name << "', width=" << texture.m_width << ", height=" << texture.m_height << ", nbChannel=" << texture.m_nbChannel;
 }
 
 // ----------------------------------------- GETTERS
@@ -238,9 +248,4 @@ std::string Texture::name() const
 size_t Texture::textureSize() const
 {
     return m_textureSize;
-}
-
-std::ostream &operator<<(std::ostream &os, const Texture &texture)
-{
-    return os << "'" << texture.m_name << "', width=" << texture.m_width << ", height=" << texture.m_height << ", nbChannel=" << texture.m_nbChannel;
 }

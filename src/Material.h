@@ -9,22 +9,15 @@ class Material
 {
 public:
     Material(const tinyobj::material_t & tinyobjMaterial, Textures & textures, const std::string & baseDir);
-    ~Material();
-    Material(std::ifstream & file);
-    void save(std::ofstream & file);
-
-    Material(const Material &) = delete;
+    Material(const Material & file) = delete;
 //    Material(Material &&) noexcept = default;
-    Material(Material &&);
+    Material(Material && material);
+    ~Material();
 
-    const float * diffuse() const;
-    const float * texturesEnable() const;
+    Material(std::ifstream & file);
+    void save(std::ofstream & file) const;
 
-    int iTexDiffuse() const;
 
-    int iTexOpacity() const;
-
-    std::string name() const;
     friend std::ostream & operator <<(std::ostream & os, const Material & material);
 
 private:
@@ -36,6 +29,14 @@ private:
 
     float m_texturesEnable[4] = {0.0f};
     int m_iTexOpacity = -1;
+
+public: // ------------------------- getters
+    const float * diffuse() const;
+    const float * texturesEnable() const;
+    int iTexDiffuse() const;
+    int iTexOpacity() const;
+    std::string name() const;
+
 
 };
 
