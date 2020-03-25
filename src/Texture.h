@@ -13,19 +13,19 @@ class Texture {
 
 public:
     Texture(const std::string& texName, const std::string& baseDir);
+    Texture(Texture &&);
+//    Texture(Texture &&) noexcept = default;
+    Texture(const Texture &) = delete; // delete copy constructor
     ~Texture();
+
 //    Texture(std::ifstream & file);
     void save(std::ofstream & file);
 
+    // -------------------- getters
     const bgfx::TextureHandle & textureHandle() const;
-
     std::string name() const;
-
-    Texture(const Texture &) = delete; // delete copy constructor
-//    Texture(Texture &&) noexcept = default;
-    Texture(Texture &&);
-
     size_t textureSize() const;
+
     friend std::ostream & operator<<(std::ostream & os, const Texture & texture);
 
 private:

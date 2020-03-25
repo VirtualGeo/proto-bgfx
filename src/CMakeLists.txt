@@ -2,7 +2,7 @@
 # project(src VERSION 1.0 LANGUAGES CXX)
 
 foreach(SHADER ${IN_SHADERS})
-        compile_shader(${SHADER})
+    compile_shader(${SHADER})
 endforeach()
 
 # set(SOURCE main.cpp)
@@ -17,6 +17,7 @@ file(GLOB_RECURSE SOURCE *.cpp *.h)
 add_executable(${PROJECT_NAME} ${SOURCE} ${OUT_SHADERS} ${VARYING_DEF_SHADER})
 
 # set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+#message("BGFX_LIBRARY_RELEASE" ${BGFX_LIBRARY_RELEASE})
 
 find_package(bgfx REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${BGFX_INCLUDE_DIRS})
@@ -25,60 +26,45 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC __STDC_LIMIT_MACROS __STDC_FOR
 # if (UNIX)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -Wextra -O0 -g -Wfatal-errors")
-#    target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wpedantic -Werror -DDEBUG -O0 -g -Wfatal-errors)
+    #    target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wpedantic -Werror -DDEBUG -O0 -g -Wfatal-errors)
     target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wpedantic -Wextra -DDEBUG -O0 -g -Wfatal-errors)
-# endif()
-# elseif (MSVC)
+    # endif()
+    # elseif (MSVC)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-        # target_compile_options(${PROJECT_NAME} PUBLIC /Wall)
-        target_compile_options(${PROJECT_NAME} PUBLIC /W4 /WX)
+    # target_compile_options(${PROJECT_NAME} PUBLIC /Wall)
+    target_compile_options(${PROJECT_NAME} PUBLIC /W4 /WX)
 endif()
 
-# set(OTHER_LIBS "")
+set(SYSTEM_DEPEND_LIBS "")
 if (UNIX)
-        find_package(X11 REQUIRED)
-        find_package(OpenGL REQUIRED)
 
-        set(OTHER_LIBS ${OTHER_LIBS} ${X11_LIBRARIES} ${OPENGL_LIBRARIES})
-        target_link_libraries(${PROJECT_NAME} PUBLIC
-                ${X11_LIBRARIES}
-                ${OPENGL_LIBRARIES}
-                $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
-                $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
-                $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
-                $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
-                $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
-                $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
-                $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
-                $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
-                glfw
-                tinyobjloader
-                # glm
-                stb
-                )
-        #else()
+    find_package(X11 REQUIRED)
+    #        set(OpenGL_GL_PREFERENCE "GLVND")
+    set(OpenGL_GL_PREFERENCE "LEGACY")
+    find_package(OpenGL REQUIRED)
+
+    set(SYSTEM_DEPEND_LIBS ${SYSTEM_DEPEND_LIBS} ${X11_LIBRARIES} ${OPENGL_LIBRARIES})
+    #else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-        #                ${X11_LIBRARIES}
-        #                ${OPENGL_LIBRARIES}
-        $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
-        $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
-        $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
-        $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
-        $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
-        $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
-        $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
-        $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
-        glfw
-        tinyobjloader
-        # glm
-        stb
-        # bgfx
-        #        OpenGL::GL
-        #        ${X11_LIBRARIES}
+    ${SYSTEM_DEPEND_LIBS}
+    #    ${X11_LIBRARIES}
+    #    ${OPENGL_LIBRARIES}
+    $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
+    $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
+    $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
+    $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
+    $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}> # BX not before BIMG
+    $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
+    $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
+    $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
+    glfw
+    tinyobjloader
+    stb
+    )
 
-        )
+#        OpenGL::GL
+#        ${X11_LIBRARIES}
+#    )
 
-
-#endif()

@@ -4,15 +4,13 @@ project(proto-bgfx VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
 #option(AUTO_GENERATE_BIN_MODEL "Generate bin file of model for fast loading" ON)
-
-
 
 #message("CMAKE_SOURCE_DIR = " ${CMAKE_SOURCE_DIR})
 #set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
 add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
 
+# ------------------------ USER CONFIGURATIONS ----------------------
 #if (AUTO_GENERATE_BIN_MODEL)
     add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 #endif()
@@ -20,6 +18,7 @@ add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
 # set(RENDERER_OpenGL 1)
 # set(RENDERER_DirectX 1)
 # set(RENDERER_Vulkan 1)
+# -------------------------------------------------------------------
 
 if (RENDERER_OpenGL)
     add_definitions(-DRENDERER_OpenGL)
@@ -61,6 +60,7 @@ set(IN_SHADERS
     )
 
 include (${CMAKE_MODULE_PATH}/Shader.cmake)
+#include(${CMAKE_MODULE_PATH}/Findbgfx.cmake)
 # file(GLOB shaders shaders/src/*.sc)
 
 # -------------------------------- EXTERNAL LIBS

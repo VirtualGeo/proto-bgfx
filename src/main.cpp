@@ -42,7 +42,7 @@ void init();
 void shutdown();
 void update();
 
-bgfx::ShaderHandle loadShader(const char* FILENAME);
+//bgfx::ShaderHandle loadShader(const char* FILENAME);
 void updateCameraFront();
 
 // ----------------- GLOBAL VARS
@@ -109,10 +109,10 @@ int main(int argc, char const* argv[])
         lastTime = currentTime;
         sum += g_deltaTime;
 
-        if (g_counter % 10 == 0) {
+        if (g_counter % 20 == 0) {
             //		    g_lastFrame = currentFrame;
 
-            g_fps = 10.0f / sum;
+            g_fps = 20.0f / sum;
             // fps = 1.0f / g_deltaTime;
             sum = 0.0f;
         }
@@ -199,8 +199,8 @@ void init()
 #endif
     bgfxInit.resolution.width = WIN_WIDTH;
     bgfxInit.resolution.height = WIN_HEIGHT;
-    bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-    //    bgfxInit.resolution.reset = BGFX_RESET_NONE;
+//    bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+        bgfxInit.resolution.reset = BGFX_RESET_NONE;
     bgfxInit.vendorId = BGFX_PCI_ID_NONE;
     // bgfxInit.vendorId = BGFX_PCI_ID_INTEL;
     //    bgfxInit.vendorId = BGFX_PCI_ID_NVIDIA;
@@ -222,14 +222,14 @@ void init()
 
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
-    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/Sponza/sponza.obj");
-
+    // ------------------------------- LOADING MODEL
+//    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/Sponza/sponza.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/Crytek_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
     //    g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
-    //    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+        g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\Cougar.obj");
 
     g_nbVertices = g_scene.nbVertices();
