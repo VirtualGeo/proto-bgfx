@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
-#include <cassert>
 #include "FileSystem.h"
+#include <cassert>
 
 Mesh::Mesh(int iMaterial)
     : m_iMaterial(iMaterial)
@@ -32,21 +32,20 @@ Mesh::Mesh(Mesh&& mesh)
     std::cout << "\033[0m";
 }
 
-Mesh::Mesh(std::ifstream &file)
+Mesh::Mesh(std::ifstream& file)
 {
     FileSystem::read(m_iMaterial, file);
     FileSystem::read(m_indices, file);
 
-//    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(uint16_t) * m_indices.size()));
+    //    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(uint16_t) * m_indices.size()));
     m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(indice_type) * m_indices.size()));
-//    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(indice_type) * m_indices.size()), BGFX_BUFFER_INDEX32);
+    //    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(indice_type) * m_indices.size()), BGFX_BUFFER_INDEX32);
 }
 
-void Mesh::save(std::ofstream &file)
+void Mesh::save(std::ofstream& file)
 {
     FileSystem::write(m_iMaterial, file);
     FileSystem::write(m_indices, file);
-
 }
 
 //Mesh &Mesh::operator=(Mesh &&mesh)
@@ -90,12 +89,11 @@ void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
         //                 bgfx::setUniform(m_uHasDiffuseTexture);
     }
 
-
     bgfx::setUniform(program.m_uTexturesEnable, material.texturesEnable());
     const int iTexOpacity = material.iTexOpacity();
     if (iTexOpacity >= 0) {
         assert(iTexOpacity < textures.size());
-        const Texture & texture = textures[iTexOpacity];
+        const Texture& texture = textures[iTexOpacity];
 
         bgfx::setTexture(1, program.m_sOpacity, texture.textureHandle());
     }
@@ -114,6 +112,13 @@ void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
     bgfx::setIndexBuffer(m_ibh);
     //    bgfx::setVertexBuffer(0, vbh);
     bgfx::submit(id, program.m_handle);
+}
+
+std::ostream& operator<<(std::ostream& os, const Mesh& mesh)
+{
+    //        const Mesh & mesh = m_meshes.back();
+    //        std::cout << "    [Object] Load mesh[" << i << "/" << size << "] nbIndices=" << mesh.m_indices.size() << ", iMaterial=" << mesh.m_iMaterial  << std::endl;
+    return os << "nbIndices=" << mesh.m_indices.size() << ", iMaterial=" << mesh.m_iMaterial;
 }
 
 //Mesh::Mesh(const char *filePath) {

@@ -23,6 +23,9 @@ public:
     size_t nbTriangles() const;
     size_t nbObjects() const;
     size_t texturesSize() const;
+    size_t nbVertexBuffer() const;
+    size_t nbIndexBuffer() const;
+    size_t nbTextures() const;
 
     int parsingTime() const;
     void setParsingTime(int parsingTime);

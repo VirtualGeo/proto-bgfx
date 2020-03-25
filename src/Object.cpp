@@ -485,7 +485,7 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
             Mesh& mmesh = m_meshes[i];
             assert(mmesh.m_indices.size() % 3 == 0);
 
-//            mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(indice_type) * mmesh.m_indices.size()), BGFX_BUFFER_INDEX32);
+            //            mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(indice_type) * mmesh.m_indices.size()), BGFX_BUFFER_INDEX32);
             mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(indice_type) * mmesh.m_indices.size()));
             m_nbTriangles += mmesh.m_indices.size() / 3;
             std::cout << "    [Mesh] " << i << " nbIndices=" << mmesh.m_indices.size();
@@ -516,14 +516,14 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
 
         //        printf("[Object] shape[%d] # of triangles = %d\n", static_cast<int>(iShape),
         //            m_nbTriangles);
-        std::cout << "[Object] " << iShape << ", shape '" << m_name << "', nbMeshes=" << m_meshes.size() << ", nbTriangles=" << m_nbTriangles << std::endl;
+        //        std::cout << "[Object] " << iShape << ", shape '" << m_name << "', nbMeshes=" << m_meshes.size() << ", nbTriangles=" << m_nbTriangles << std::endl;
     }
 
     //    BX_CHECK(bgfx::isValid(m_vbh), "vbh not valid on object constructor"); // not worked !!!
     //    bgfx::crev
 }
 
-Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayout & layout)
+Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayout& layout)
 {
     FileSystem::read(m_vertices, file);
     FileSystem::read(m_nbTriangles, file);
@@ -535,8 +535,10 @@ Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayou
     FileSystem::read(size, file);
     m_meshes.reserve(size);
     for (size_t i = 0; i < size; ++i) {
-//        m_meshes.push_back(file);
+        //        m_meshes.push_back(file);
         m_meshes.emplace_back(file);
+        //        const Mesh & mesh = m_meshes.back();
+        //        std::cout << "    [Object] Load mesh[" << i << "/" << size << "] nbIndices=" << mesh.m_indices.size() << ", iMaterial=" << mesh.m_iMaterial  << std::endl;
     }
     m_vbh = bgfx::createVertexBuffer(
         bgfx::makeRef(m_vertices.data(), sizeof(Vertex) * m_vertices.size()),
@@ -544,10 +546,10 @@ Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayou
 
     //        printf("[Object] shape[%d] # of triangles = %d\n", static_cast<int>(iShape),
     //            m_nbTriangles);
-    std::cout << "[Object] " << iShape << ", shape '" << m_name << "', nbMeshes=" << m_meshes.size() << ", nbTriangles=" << m_nbTriangles << std::endl;
+    //    std::cout << "[Object] " << iShape << ", shape '" << m_name << "', nbMeshes=" << m_meshes.size() << ", nbTriangles=" << m_nbTriangles << std::endl;
 }
 
-void Object::save(std::ofstream &file)
+void Object::save(std::ofstream& file)
 {
     FileSystem::write(m_vertices, file);
     FileSystem::write(m_nbTriangles, file);
@@ -557,12 +559,11 @@ void Object::save(std::ofstream &file)
 
     size_t size = m_meshes.size();
     FileSystem::write(size, file);
-//    m_meshes.reserve(size);
+    //    m_meshes.reserve(size);
     for (int i = 0; i < size; ++i) {
-//        m_meshes.push_back(file);
+        //        m_meshes.push_back(file);
         m_meshes[i].save(file);
     }
-
 }
 
 Object::Object(Object&& object)
@@ -633,6 +634,27 @@ size_t Object::nbTriangles() const
 size_t Object::nbMeshes() const
 {
     return m_meshes.size();
+}
+
+std::string Object::name() const
+{
+    return m_name;
+}
+
+std::ostream& operator<<(std::ostream& os, const Object& object)
+{
+    os << "'" << object.m_name << "', nbMeshes=" << object.m_meshes.size() << ", nbTriangles=" << object.m_nbTriangles << std::endl;
+    //    for (const Mesh& mesh : object.m_meshes) {
+    int size = object.m_meshes.size();
+    for (int i = 0; i < size; ++i) {
+        const Mesh& mesh = object.m_meshes[i];
+        os << "    [Object] Load mesh[" << i << "/" << size << "] : " << mesh;
+//        os << mesh;
+        if (i != size - 1) {
+            os << std::endl;
+        }
+    }
+    return os;
 }
 
 //bgfx::IndexBufferHandle Object::ibh() const

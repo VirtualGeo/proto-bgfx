@@ -134,3 +134,13 @@ int Material::iTexOpacity() const
 {
     return m_iTexOpacity;
 }
+
+std::string Material::name() const
+{
+    return m_name;
+}
+
+std::ostream &operator <<(std::ostream &os, const Material &material)
+{
+    return os << "'" << material.m_name << "'";
+}

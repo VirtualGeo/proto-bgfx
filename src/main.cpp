@@ -72,6 +72,7 @@ size_t g_nbVertices;
 size_t g_nbTriangles;
 size_t g_nbObjects;
 float g_texturesSize;
+size_t g_nbTextures;
 int g_parsingTime;
 int g_loadingMaterialsTime;
 int g_loadingObjectsTime;
@@ -79,6 +80,8 @@ int g_totalLoadingTime;
 std::string g_renderer;
 std::string g_vendorID;
 int g_debugHMargin;
+size_t g_nbVertexBuffer;
+size_t g_nbIndexBuffer;
 
 int main(int argc, char const* argv[])
 {
@@ -99,6 +102,8 @@ int main(int argc, char const* argv[])
     float sum = 0.0f;
     auto lastTime = glfwGetTime();
     while (!glfwWindowShouldClose(g_window)) {
+        bgfx::dbgTextClear();
+
         const auto currentTime = glfwGetTime();
         g_deltaTime = currentTime - lastTime; // need deltaTime at each frame by processInput()
         lastTime = currentTime;
@@ -231,10 +236,13 @@ void init()
     g_nbTriangles = g_scene.nbTriangles();
     g_nbObjects = g_scene.nbObjects();
     g_texturesSize = g_scene.texturesSize() / 1000000.0f;
+    g_nbTextures = g_scene.nbTextures();
     g_parsingTime = g_scene.parsingTime();
     g_loadingMaterialsTime = g_scene.loadingMaterialsTime();
     g_loadingObjectsTime = g_scene.loadingObjectsTime();
     g_totalLoadingTime = g_parsingTime + g_loadingMaterialsTime + g_loadingObjectsTime;
+    g_nbVertexBuffer = g_scene.nbVertexBuffer();
+    g_nbIndexBuffer = g_scene.nbIndexBuffer();
 
     const bgfx::Caps* caps = bgfx::getCaps();
     //    switch (bgfx::getRendererType()) {
@@ -310,14 +318,17 @@ void update()
 
     //        int margin = 2;
     //   const int margin = (g_renderer == "OpenGL") ? (0) : (2);
-    bgfx::dbgTextPrintf(0, g_debugHMargin + 0, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.1f | Objects:%d | Textures:%.1f MiB",
-        g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_texturesSize);
-    bgfx::dbgTextPrintf(0, g_debugHMargin + 1, 0x0F, "Current renderer = %s", g_renderer.c_str());
-    bgfx::dbgTextPrintf(0, g_debugHMargin + 2, 0x0F, "Graphic Vendor ID = %s", g_vendorID.c_str());
-    bgfx::dbgTextPrintf(0, g_debugHMargin + 3, 0x0F, "Parsing time = %d ms", g_parsingTime);
-    bgfx::dbgTextPrintf(0, g_debugHMargin + 4, 0x0F, "Loading materials time = %d ms", g_loadingMaterialsTime);
-    bgfx::dbgTextPrintf(0, g_debugHMargin + 5, 0x0F, "Loading objects time = %d ms", g_loadingObjectsTime);
-    bgfx::dbgTextPrintf(0, g_debugHMargin + 6, 0x0F, "Total loading time = %d ms", g_totalLoadingTime);
+    int line = g_debugHMargin - 1;
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.2f | Objects:%d | Textures:%d (%.1f MiB)",
+        g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_nbTextures, g_texturesSize);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Vertex buffer:%d | Index buffer:%d | Index buffer/Vertex buffer:%.2f",
+        g_nbVertexBuffer, g_nbIndexBuffer, (float)g_nbIndexBuffer / g_nbVertexBuffer);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Current renderer = %s", g_renderer.c_str());
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Graphic Vendor ID = %s", g_vendorID.c_str());
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Parsing time = %d ms", g_parsingTime);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Loading materials time = %d ms", g_loadingMaterialsTime);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Loading objects time = %d ms", g_loadingObjectsTime);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Total loading time = %d ms", g_totalLoadingTime);
 
     // ------------------------- RENDER SCENE
     const bx::Vec3 at = { 0.0f, 2.0f, 0.0f };

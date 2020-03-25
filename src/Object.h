@@ -66,7 +66,8 @@ public:
 
     size_t nbTriangles() const;
     size_t nbMeshes() const;
-
+    std::string name() const;
+    friend std::ostream & operator <<(std::ostream & os, const Object & object);
 
 private:
     bgfx::VertexBufferHandle m_vbh;
