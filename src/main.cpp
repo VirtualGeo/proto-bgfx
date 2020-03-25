@@ -26,49 +26,48 @@
 //#include "Vertex.h"
 #include "Program.h"
 
-// #define WIN_WIDTH 800
-// #define WIN_HEIGHT 600
+#define WIN_WIDTH 800
+#define WIN_HEIGHT 600
+//#define WIN_WIDTH 1920
+//#define WIN_HEIGHT 1080
 
-#define WIN_WIDTH 1920
-#define WIN_HEIGHT 1080
-
-void processInput(GLFWwindow *window);
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-void mouse_button_callback(GLFWwindow *window, int button, int action,
-						   int mods);
+void processInput(GLFWwindow* window);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void mouse_button_callback(GLFWwindow* window, int button, int action,
+    int mods);
 // void focus_callback(GLFWwindow *window, int focused);
 void init();
 void shutdown();
 void update();
 
-bgfx::ShaderHandle loadShader(const char *FILENAME);
+bgfx::ShaderHandle loadShader(const char* FILENAME);
 void updateCameraFront();
 
 // ----------------- GLOBAL VARS
-GLFWwindow *g_window = nullptr;
+GLFWwindow* g_window = nullptr;
 // bgfx::ProgramHandle g_program;
 Program g_program;
-unsigned int counter = 0;
+unsigned int g_counter = 0;
 // Mesh* g_mesh = nullptr;
 Scene g_scene;
 bool g_clicked = false;
 
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+float g_deltaTime = 0.0f;
+//float g_lastFrame = 0.0f;
 
-bool firstMouse = true;
-float yaw = 0.0f;
-float pitch = 0.0f;
-float lastX = WIN_WIDTH / 2.0f;
-float lastY = WIN_HEIGHT / 2.0f;
-float fov = 60.0f;
-bx::Vec3 cameraPos = {0.0f, 2.0f, 0.0f};
-bx::Vec3 cameraFront;
-bx::Vec3 cameraUp = {0.0f, 1.0f, 0.0f};
-const float maxFov = 120.0f;
-float g_fps;
+bool g_firstMouse = true;
+float g_yaw = 0.0f;
+float g_pitch = 0.0f;
+float g_lastX = WIN_WIDTH / 2.0f;
+float g_lastY = WIN_HEIGHT / 2.0f;
+float g_fov = 60.0f;
+bx::Vec3 g_cameraPos = { 0.0f, 2.0f, 0.0f };
+bx::Vec3 g_cameraFront;
+bx::Vec3 g_cameraUp = { 0.0f, 1.0f, 0.0f };
+const float g_maxFov = 120.0f;
+float g_fps = 0.0f;
 size_t g_nbVertices;
 size_t g_nbTriangles;
 size_t g_nbObjects;
@@ -79,476 +78,415 @@ int g_loadingObjectsTime;
 int g_totalLoadingTime;
 std::string g_renderer;
 std::string g_vendorID;
+int g_debugHMargin;
 
-int main(int argc, char const *argv[]) {
-	updateCameraFront(); // with current yaw and pitch
-	std::cout << "[main] hello bgfx !!!" << std::endl;
+int main(int argc, char const* argv[])
+{
+    updateCameraFront(); // with current g_yaw and g_pitch
+    std::cout << "[main] hello bgfx !!!" << std::endl;
 
-	//    std::cout << PROJECT_DIR << std::endl;
-	//    return 0;
+    //    std::cout << PROJECT_DIR << std::endl;
+    //    return 0;
 
-	init();
-	std::cout << "[main] init done." << std::endl;
-	bgfx::setDebug(BGFX_DEBUG_TEXT);
+    init();
+    std::cout << "[main] init done." << std::endl;
+    bgfx::setDebug(BGFX_DEBUG_TEXT);
 
-	float sum = 0.0f;
-	// while (true)
-	//    float fps = 0.0f;
-	g_fps = 0.0f;
-	while (!glfwWindowShouldClose(g_window)) {
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-		sum += deltaTime;
-		if (counter % 10 == 0) {
-			g_fps = 10.0f / sum;
-			// fps = 1.0f / deltaTime;
-			sum = 0.0f;
-		}
-		//        bgfx::dbgTextPrintf(0, 0, 0x08, "fps = %.1f", g_fps);
+    //    float sum = 0.0f;
+    // while (true)
+    //    float fps = 0.0f;
+    //    g_fps = 0.0f;
+    float sum = 0.0f;
+    auto lastTime = glfwGetTime();
+    while (!glfwWindowShouldClose(g_window)) {
+        const auto currentTime = glfwGetTime();
+        g_deltaTime = currentTime - lastTime; // need deltaTime at each frame by processInput()
+        lastTime = currentTime;
+        sum += g_deltaTime;
 
-		processInput(g_window);
+        if (g_counter % 10 == 0) {
+            //		    g_lastFrame = currentFrame;
 
-		update();
+            g_fps = 10.0f / sum;
+            // fps = 1.0f / g_deltaTime;
+            sum = 0.0f;
+        }
+        //        bgfx::dbgTextPrintf(0, 0, 0x08, "fps = %.1f", g_fps);
 
-		// bgfx::frame();
+        processInput(g_window);
 
-		counter++;
-		// std::this_thread::sleep_for(std::chrono::milliseconds(16));
+        update();
 
-		// glfwSwapBuffers(g_window); question : why not use ?
-		glfwPollEvents();
-		// std::cout << "update " << counter << std::endl;
-		// glfwSetMousePos(100, 100);
-	}
+        // bgfx::frame();
 
-	shutdown();
-	// bgfx::shutdown(); // question : after or before glfwTerminate ?
-	// glfwTerminate();
+        g_counter++;
+        // std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
-	return 0;
+        // glfwSwapBuffers(g_window); question : why not use ?
+        glfwPollEvents();
+        // std::cout << "update " << g_counter << std::endl;
+        // glfwSetMousePos(100, 100);
+    }
+
+    shutdown();
+    // bgfx::shutdown(); // question : after or before glfwTerminate ?
+    // glfwTerminate();
+
+    return 0;
 }
 
-void init() {
+void init()
+{
 
-	// --------------------- INIT GLFW
-	glfwInit();
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	g_window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Hello, bgfx from glfw!",
-								NULL, NULL);
-	if (g_window == NULL) {
-		// std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		std::cout << "[main] Failed to create GLFW window" << std::endl;
-		throw std::runtime_error("Failed to create GLFW window");
-		// exit(-1);
-	}
-	// glfwMakeContextCurrent(window); // question : what does this fonction ?
-	glfwSetFramebufferSizeCallback(g_window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(g_window, mouse_callback);
-	glfwSetScrollCallback(g_window, scroll_callback);
-	glfwSetMouseButtonCallback(g_window, mouse_button_callback);
-	// glfwSetWindowFocusCallback(g_window, focus_callback);
+    // --------------------- INIT GLFW
+    glfwInit();
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    g_window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Hello, bgfx from glfw!",
+        NULL, NULL);
+    if (g_window == NULL) {
+        // std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        std::cout << "[main] Failed to create GLFW window" << std::endl;
+        throw std::runtime_error("Failed to create GLFW window");
+        // exit(-1);
+    }
+    // glfwMakeContextCurrent(window); // question : what does this fonction ?
+    glfwSetFramebufferSizeCallback(g_window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(g_window, mouse_callback);
+    glfwSetScrollCallback(g_window, scroll_callback);
+    glfwSetMouseButtonCallback(g_window, mouse_button_callback);
+    // glfwSetWindowFocusCallback(g_window, focus_callback);
 
-	// glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	// bgfx::RenderFrame();
-	bgfx::renderFrame();
+    // glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // bgfx::RenderFrame();
+    bgfx::renderFrame();
 
-	// bgfx::PlatformData pd;
-	// pd.nwh = glfwGetWin32Window(window);
-	// bgfx::setPlatformData(pd);
+    // bgfx::PlatformData pd;
+    // pd.nwh = glfwGetWin32Window(window);
+    // bgfx::setPlatformData(pd);
 
-	bgfx::Init bgfxInit = {};
+    bgfx::Init bgfxInit = {};
 //	bgfxInit.platformData.nwh = glfwGetWin32Window(g_window);
 #if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-	bgfxInit.platformData.ndt = glfwGetX11Display();
-	bgfxInit.platformData.nwh = (void *)(uintptr_t)glfwGetX11Window(g_window);
+    bgfxInit.platformData.ndt = glfwGetX11Display();
+    bgfxInit.platformData.nwh = (void*)(uintptr_t)glfwGetX11Window(g_window);
 #elif BX_PLATFORM_WINDOWS
-	bgfxInit.platformData.nwh = glfwGetWin32Window(g_window);
+    bgfxInit.platformData.nwh = glfwGetWin32Window(g_window);
 #endif
 
-	// std::cout << RENDERER_TYPE << std::endl;
+    // std::cout << RENDERER_TYPE << std::endl;
 #ifdef RENDERER_OpenGL
-	bgfxInit.type = bgfx::RendererType::OpenGL;
-	std::cout << "RendererType OpenGL" << std::endl;
+    bgfxInit.type = bgfx::RendererType::OpenGL;
+    std::cout << "RendererType OpenGL" << std::endl;
 #endif
 
 #ifdef RENDERER_Vulkan
-	bgfxInit.type = bgfx::RendererType::Vulkan;
-	std::cout << "RendererType Vulkan" << std::endl;
+    bgfxInit.type = bgfx::RendererType::Vulkan;
+    std::cout << "RendererType Vulkan" << std::endl;
 #endif
 #ifdef RENDERER_DirectX
-	bgfxInit.type = bgfx::RendererType::Direct3D12;
-	std::cout << "RendererType DirectX" << std::endl;
+    bgfxInit.type = bgfx::RendererType::Direct3D12;
+    std::cout << "RendererType DirectX" << std::endl;
 #endif
 #ifdef RENDERER_Auto
-	bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a
-	// renderer
-	std::cout << "[main] RendererType auto" << std::endl;
+    bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
+    std::cout << "[main] RendererType auto" << std::endl;
 #endif
-	bgfxInit.resolution.width = WIN_WIDTH;
-	bgfxInit.resolution.height = WIN_HEIGHT;
-	// bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-	bgfxInit.resolution.reset = BGFX_RESET_NONE; // question
-	// bgfxInit.vendorId = BGFX_PCI_ID_NONE;
-	// bgfxInit.vendorId = BGFX_PCI_ID_INTEL;
-	bgfxInit.vendorId = BGFX_PCI_ID_NVIDIA;
-	// bgfx::init(bgfxInit);
-	if (!bgfx::init(bgfxInit)) {
-		std::cout << "[main] Failed to initialize bgfx" << std::endl;
-		// throw std::runtime_error("Failed to initialize bgfx");
-		exit(1);
-		// return 1;
-	}
+    bgfxInit.resolution.width = WIN_WIDTH;
+    bgfxInit.resolution.height = WIN_HEIGHT;
+    bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+    //    bgfxInit.resolution.reset = BGFX_RESET_NONE;
+    bgfxInit.vendorId = BGFX_PCI_ID_NONE;
+    // bgfxInit.vendorId = BGFX_PCI_ID_INTEL;
+    //    bgfxInit.vendorId = BGFX_PCI_ID_NVIDIA;
+    // bgfx::init(bgfxInit);
+    if (!bgfx::init(bgfxInit)) {
+        std::cout << "[main] Failed to initialize bgfx" << std::endl;
+        // throw std::runtime_error("Failed to initialize bgfx");
+        exit(1);
+        // return 1;
+    }
 
-	// bgfx::setDebug(BGFX_DEBUG_TEXT);
-	// bgfx::setDebug(BGFX_DEBUG_WIREFRAME);
+    // bgfx::setDebug(BGFX_DEBUG_TEXT);
+    // bgfx::setDebug(BGFX_DEBUG_WIREFRAME);
 
-	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f,
-					   0);
-	bgfx::setViewRect(0, 0, 0, WIN_WIDTH, WIN_HEIGHT);
-	bgfx::touch(0);
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f,
+        0);
+    bgfx::setViewRect(0, 0, 0, WIN_WIDTH, WIN_HEIGHT);
+    bgfx::touch(0);
 
-	// glfwMakeContextCurrent(nullptr); // question : why we can do it ?
-	//    Vertex::init(); //init layout
-	//    m_layout.begin()
-	//        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-	//        .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-	//        .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-	//        // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-	//        .end();
+    // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
-	//    g_scene.addModel(std::string(PROJECT_DIR) +
-	//    "Assets/Sponza/sponza.obj");
+    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/Sponza/sponza.obj");
 
-	//    g_scene.addModel(std::string(PROJECT_DIR) +
-	//    "Assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
-	//    g_scene.addModel(std::string(PROJECT_DIR) +
-	//    "Assets/McGuire/Crytek_Sponza/sponza-blend.obj");
-	//    g_scene.addModel(std::string(PROJECT_DIR) +
-	//    "Assets/McGuire/San_Miguel/san-miguel-blend.obj");
-	//    g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
-	// g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
-	g_scene.addModel(
-		"C:\\Users\\gauthier.bouyjou\\Downloads\\export\\Cougar.obj");
-	// "C:\Users\gauthier.bouyjou\Downloads\export\cougar.obj"
+    //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
+    //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/Crytek_Sponza/sponza-blend.obj");
+    //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
-	g_nbVertices = g_scene.nbVertices();
-	g_nbTriangles = g_scene.nbTriangles();
-	g_nbObjects = g_scene.nbObjects();
-	g_texturesSize = g_scene.texturesSize() / 1000000.0f;
-	g_parsingTime = g_scene.parsingTime();
-	g_loadingMaterialsTime = g_scene.loadingMaterialsTime();
-	g_loadingObjectsTime = g_scene.loadingObjectsTime();
-	g_totalLoadingTime =
-		g_parsingTime + g_loadingMaterialsTime + g_loadingObjectsTime;
+    //    g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
+    //    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+    //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\Cougar.obj");
 
-	switch (bgfx::getRendererType()) {
-	case bgfx::RendererType::Noop:
-	case bgfx::RendererType::Direct3D9:
-		g_renderer = "DirectX9";
-		break;
-	case bgfx::RendererType::Direct3D11:
-		g_renderer = "DirectX11";
-		break;
-	case bgfx::RendererType::Direct3D12:
-		g_renderer = "DirectX12";
-		break;
-	// case bgfx::RendererType::Gnm:
-	// shaderPath = "shaders/bin/pssl/";
-	// break;
-	case bgfx::RendererType::Metal:
-		g_renderer = "Metal";
-		break;
-	case bgfx::RendererType::OpenGL:
-		g_renderer = "OpenGL";
-		break;
-	case bgfx::RendererType::OpenGLES:
-		g_renderer = "OpenGLES";
-		break;
-	case bgfx::RendererType::Vulkan:
-		g_renderer = "Vulkan";
-		break;
-	}
+    g_nbVertices = g_scene.nbVertices();
+    g_nbTriangles = g_scene.nbTriangles();
+    g_nbObjects = g_scene.nbObjects();
+    g_texturesSize = g_scene.texturesSize() / 1000000.0f;
+    g_parsingTime = g_scene.parsingTime();
+    g_loadingMaterialsTime = g_scene.loadingMaterialsTime();
+    g_loadingObjectsTime = g_scene.loadingObjectsTime();
+    g_totalLoadingTime = g_parsingTime + g_loadingMaterialsTime + g_loadingObjectsTime;
+
+    const bgfx::Caps* caps = bgfx::getCaps();
+    //    switch (bgfx::getRendererType()) {
+    switch (caps->rendererType) {
+    case bgfx::RendererType::Noop:
+    case bgfx::RendererType::Direct3D9:
+        g_renderer = "DirectX9";
+        break;
+    case bgfx::RendererType::Direct3D11:
+        g_renderer = "DirectX11";
+        break;
+    case bgfx::RendererType::Direct3D12:
+        g_renderer = "DirectX12";
+        break;
+    // case bgfx::RendererType::Gnm:
+    // shaderPath = "shaders/bin/pssl/";
+    // break;
+    case bgfx::RendererType::Metal:
+        g_renderer = "Metal";
+        break;
+    case bgfx::RendererType::OpenGL:
+        g_renderer = "OpenGL";
+        break;
+    case bgfx::RendererType::OpenGLES:
+        g_renderer = "OpenGLES";
+        break;
+    case bgfx::RendererType::Vulkan:
+        g_renderer = "Vulkan";
+        break;
+    }
+    g_debugHMargin = (g_renderer == "OpenGL") ? (0) : (2);
 
     // bgfx::getCaps().vendorId;
 
-    const bgfx::Caps * caps = bgfx::getCaps();
-	switch (caps->vendorId) {
-	case BGFX_PCI_ID_AMD:
-		g_vendorID = "AMD";
-		break;
-	case BGFX_PCI_ID_INTEL:
-		g_vendorID = "INTEL";
-		break;
-	case BGFX_PCI_ID_NVIDIA:
-		g_vendorID = "NVIDIA";
-		break;
+    switch (caps->vendorId) {
+    case BGFX_PCI_ID_AMD:
+        g_vendorID = "AMD";
+        break;
+    case BGFX_PCI_ID_INTEL:
+        g_vendorID = "INTEL";
+        break;
+    case BGFX_PCI_ID_NVIDIA:
+        g_vendorID = "NVIDIA";
+        break;
 
-	default:
+    default:
         std::cout << "unknown vendor graphic id" << std::endl;
         exit(1);
-		break;
-	}
+        break;
+    }
 
-	//    g_mesh = new Mesh("Assets/McGuire/sponzaBlender/sponza.obj");
-	//    g_mesh = new
-	//    Mesh("/home/gauthier/tmp2/proto-bgfx/Assets/McGuire/sponza/sponza.obj");
-	// g_mesh = new Mesh("Assets/McGuire/bmw/bmw.obj");
-	// g_mesh = new Mesh("Assets/Teapot/teapot.obj");
-	//  g_mesh = new
-	//  Mesh("/home/gauthier/tmp2/proto-bgfx/Assets/Teapot/teapot.obj");
+    // ----------------- INIT SHADERS AND PROGRAM
+    //    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
+    //    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
+    //    g_program = bgfx::createProgram(vsh, fsh, true);
+    g_program.init("cubes");
 
-	// ----------------- INIT SHADER
-	// fileReader = BX_NEW(allocator, fileReader);
-	//    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
-	//    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
-	// bgfx::ShaderHandle vsh = loadShader("mesh.vert");
-	// bgfx::ShaderHandle fsh = loadShader("mesh.frag");
-	//    g_program = bgfx::createProgram(vsh, fsh, true);
-	g_program.init("cubes");
+    // g_texColor = bgfx::createUniform("s_texColor",
+    // bgfx::UniformType::Sampler);
 
-	// g_texColor = bgfx::createUniform("s_texColor",
-	// bgfx::UniformType::Sampler);
-
-	// g_texture = loadTexture("textures/checkerboard.png");
-	// g_texture = loadTexture("Assets/Sponza/textures/background_ddn.tga");
-	// g_texture = loadTexture("Assets/McGuire/teapot/default.png");
-	// g_texture = loadTexture("D:/proto-bgfx/Assets/Teapot/default.png");
-
-	// loadTexture("D:/proto-bgfx/Assets/Teapot/default.png");
-
-	// bgfx::ProgramHandle program;
-	// program = loadProgram("cubes.vert", "cubes.frag");
+    // bgfx::ProgramHandle program;
+    // program = loadProgram("cubes.vert", "cubes.frag");
 }
 
-// bool g_focused = false;
+void update()
+{
+    // Set view 0 default viewport.
+    bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
 
-void update() {
-	// Set view 0 default viewport.
-	bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
+    // This dummy draw call is here to make sure that view 0 is cleared
+    // if no other draw calls are submitted to view 0.
+    bgfx::touch(0);
 
-	// This dummy draw call is here to make sure that view 0 is cleared
-	// if no other draw calls are submitted to view 0.
-	bgfx::touch(0);
+    //        int margin = 2;
+    //   const int margin = (g_renderer == "OpenGL") ? (0) : (2);
+    bgfx::dbgTextPrintf(0, g_debugHMargin + 0, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.1f | Objects:%d | Textures:%.1f MiB",
+        g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_texturesSize);
+    bgfx::dbgTextPrintf(0, g_debugHMargin + 1, 0x0F, "Current renderer = %s", g_renderer.c_str());
+    bgfx::dbgTextPrintf(0, g_debugHMargin + 2, 0x0F, "Graphic Vendor ID = %s", g_vendorID.c_str());
+    bgfx::dbgTextPrintf(0, g_debugHMargin + 3, 0x0F, "Parsing time = %d ms", g_parsingTime);
+    bgfx::dbgTextPrintf(0, g_debugHMargin + 4, 0x0F, "Loading materials time = %d ms", g_loadingMaterialsTime);
+    bgfx::dbgTextPrintf(0, g_debugHMargin + 5, 0x0F, "Loading objects time = %d ms", g_loadingObjectsTime);
+    bgfx::dbgTextPrintf(0, g_debugHMargin + 6, 0x0F, "Total loading time = %d ms", g_totalLoadingTime);
 
-	int margin = 2;
-	bgfx::dbgTextPrintf(0, margin + 0, 0x0F,
-						"Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.1f | "
-						"Objects:%d | Textures:%.1f MiB",
-						g_fps, g_nbVertices, g_nbTriangles,
-						(float)g_nbVertices / g_nbTriangles, g_nbObjects,
-						g_texturesSize);
-	bgfx::dbgTextPrintf(0, margin + 1, 0x0F, "Current renderer = %s",
-						g_renderer.c_str());
-	bgfx::dbgTextPrintf(0, margin + 2, 0x0F, "Graphic Vendor ID = %s",
-						g_vendorID.c_str());
-	bgfx::dbgTextPrintf(0, margin + 3, 0x0F, "Parsing time = %d ms",
-						g_parsingTime);
-	bgfx::dbgTextPrintf(0, margin + 4, 0x0F, "Loading materials time = %d ms",
-						g_loadingMaterialsTime);
-	bgfx::dbgTextPrintf(0, margin + 5, 0x0F, "Loading objects time = %d ms",
-						g_loadingObjectsTime);
-	bgfx::dbgTextPrintf(0, margin + 6, 0x0F, "Total loading time = %d ms",
-						g_totalLoadingTime);
-	//    bgfx::dbgTextPrintf(0, 1, 0x0F, "\x1b[6mParsing time = %d ms\x1b[0m",
-	//    g_parsingTime); bgfx::dbgTextPrintf(0, 2, 0x0F, "\x1b[6mLoading
-	//    materials time = %d ms\x1b[0m", g_loadingMaterialsTime);
-	//    bgfx::dbgTextPrintf(0, 3, 0x0F, "\x1b[6mLoading objects time = %d
-	//    ms\x1b[0m", g_loadingObjectsTime); bgfx::dbgTextPrintf(0, 4, 0x0F,
-	//    "\x1b[6mTotal loading time = %d ms\x1b[0m", g_totalLoadingTime);
+    // ------------------------- RENDER SCENE
+    const bx::Vec3 at = { 0.0f, 2.0f, 0.0f };
+    const bx::Vec3 eye = { 0.0f, 2.0f, -2.0f };
+    // {
+    float view[16];
+    // bx::mtxLookAt(view, eye, at);
+    bx::mtxLookAt(view, g_cameraPos, bx::add(g_cameraPos, g_cameraFront), g_cameraUp);
 
-	// ------------------------- RENDER SCENE
-	const bx::Vec3 at = {0.0f, 2.0f, 0.0f};
-	const bx::Vec3 eye = {0.0f, 2.0f, -2.0f};
-	// {
-	float view[16];
-	// bx::mtxLookAt(view, eye, at);
-	bx::mtxLookAt(view, cameraPos, bx::add(cameraPos, cameraFront), cameraUp);
+    float proj[16];
+    bx::mtxProj(proj, g_fov, float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f,
+        bgfx::getCaps()->homogeneousDepth);
 
-	float proj[16];
-	bx::mtxProj(proj, fov, float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f,
-				bgfx::getCaps()->homogeneousDepth);
-	// bgfx::setViewTransform(0, view, proj);
-	bgfx::setViewTransform(0, view, proj);
+    bgfx::setViewTransform(0, view, proj);
 
-	// }
-	// bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
-	// bgfx::touch(0);
+    float mtx[16];
+    // bx::mtxRotateXY(mtx, g_counter * 0.01f, g_counter * 0.01f);
+    // if (g_focused) {
+    bx::mtxIdentity(mtx);
+    // bx::mtxScale(mtx, 0.01f);
+    // } else {
 
-	float mtx[16];
-	// bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
-	// if (g_focused) {
-	bx::mtxIdentity(mtx);
-	// bx::mtxScale(mtx, 0.01f);
-	// } else {
+    // bx::mtxRotateY(mtx, g_counter * 0.01f);
+    // }
+    // bx::mtxScale(mtx, 0.1f);
+    // bgfx::setTransform(mtx);
 
-	// bx::mtxRotateY(mtx, counter * 0.01f);
-	// }
-	// bx::mtxScale(mtx, 0.1f);
-	// bgfx::setTransform(mtx);
+    // const uint64_t state = 0 | BGFX_STATE_WRITE_R | BGFX_STATE_WRITE_G |
+    // 					   BGFX_STATE_WRITE_B | BGFX_STATE_WRITE_A |
+    // 					   BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
+    // 					   BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA | s_ptState[0];
 
-	// const uint64_t state = 0 | BGFX_STATE_WRITE_R | BGFX_STATE_WRITE_G |
-	// 					   BGFX_STATE_WRITE_B | BGFX_STATE_WRITE_A |
-	// 					   BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
-	// 					   BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA | s_ptState[0];
+    //        const uint64_t state = 0 | BGFX_STATE_PT_TRISTRIP |
+    //        BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
+    //        BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW |
+    //        BGFX_STATE_BLEND_NORMAL;
+    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
+    // UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
 
-	//        const uint64_t state = 0 | BGFX_STATE_PT_TRISTRIP |
-	//        BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
-	//        BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW |
-	//        BGFX_STATE_BLEND_NORMAL;
-	const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A |
-						   BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS |
-						   BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
-	// UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
+    // const uint64_t stateTransparent =
+    // 	0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A |
+    // 	BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA |
+    // 	BGFX_STATE_BLEND_ALPHA;
 
-	// const uint64_t stateTransparent =
-	// 	0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A |
-	// 	BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA |
-	// 	BGFX_STATE_BLEND_ALPHA;
+    // const uint64_t stateOpaque = BGFX_STATE_DEFAULT;
 
-	// const uint64_t stateOpaque = BGFX_STATE_DEFAULT;
+    g_scene.draw(0, g_program, mtx, state);
 
-	// state = BGFX_STATE_DEFAULT;
-	// bgfx::submit(0, program);
-	// bgfx::setVertexBuffer(0, vbh);
-	// bgfx::setIndexBuffer(ibh);
-	// bgfx::setTransform(mtx);
-	// bgfx::setState(state);
-	// bgfx::setTexture(0, g_texColor, g_texture);
-	//    g_mesh->submit(0, g_program, mtx, state);
-	g_scene.draw(0, g_program, mtx, state);
-	// g_mesh->submit(0, g_program, mtx, stateTransparent);
-	// g_mesh->submit(0, g_program, mtx, stateOpaque);
-
-	// bgfx::submit(0, g_program);
-
-	bgfx::frame();
+    bgfx::frame();
 }
 
-void shutdown() {
-	// bgfx::destroy(ibh);
-	// bgfx::destroy(vbh);
+void shutdown()
+{
 
-	// stbi_image_free(image);
+    g_scene.clear();
+    g_program.clear();
 
-	g_scene.clear();
-	g_program.clear();
+    bgfx::shutdown();
 
-	//    delete g_mesh;
-	//    g_mesh = nullptr;
-	//    bgfx::destroy(g_program);
-	// bgfx::destroy(g_texture);
-	// bgfx::destroy(g_texColor);
-	bgfx::shutdown();
-
-	// glfwMakeContextCurrent(nullptr);
-	glfwDestroyWindow(g_window);
-	// window = nullptr; // question : necessary ?
-	glfwTerminate();
-	std::cout << "[main] shutdown done" << std::endl;
-	// glfwMakeContextCurrent(g_window);
+    // glfwMakeContextCurrent(nullptr);
+    // glfwMakeContextCurrent(g_window);
+    glfwDestroyWindow(g_window);
+    // window = nullptr; // question : necessary ?
+    glfwTerminate();
+    std::cout << "[main] shutdown done" << std::endl;
 }
 
 // ------------------------------------ GLFW FUNCTIONS
-void processInput(GLFWwindow *window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-		// if (g_focused) {
-		// }
-		glfwSetWindowShouldClose(window, true);
-	}
+void processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        // if (g_focused) {
+        // }
+        glfwSetWindowShouldClose(window, true);
+    }
 
-	float cameraSpeed = 5.0 * deltaTime;
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		cameraPos = bx::add(cameraPos, bx::mul(cameraFront, cameraSpeed));
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		cameraPos = bx::sub(cameraPos, bx::mul(cameraFront, cameraSpeed));
+    float cameraSpeed = 5.0 * g_deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        g_cameraPos = bx::add(g_cameraPos, bx::mul(g_cameraFront, cameraSpeed));
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        g_cameraPos = bx::sub(g_cameraPos, bx::mul(g_cameraFront, cameraSpeed));
 
-	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
-		cameraPos = bx::add(cameraPos, bx::mul(cameraUp, cameraSpeed));
-	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
-		cameraPos = bx::sub(cameraPos, bx::mul(cameraUp, cameraSpeed));
+    if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
+        g_cameraPos = bx::add(g_cameraPos, bx::mul(g_cameraUp, cameraSpeed));
+    if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
+        g_cameraPos = bx::sub(g_cameraPos, bx::mul(g_cameraUp, cameraSpeed));
 
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		cameraPos = bx::sub(
-			cameraPos, bx::mul(bx::normalize(bx::cross(cameraFront, cameraUp)),
-							   cameraSpeed));
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		cameraPos = bx::add(
-			cameraPos, bx::mul(bx::normalize(bx::cross(cameraFront, cameraUp)),
-							   cameraSpeed));
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        g_cameraPos = bx::sub(
+            g_cameraPos, bx::mul(bx::normalize(bx::cross(g_cameraFront, g_cameraUp)), cameraSpeed));
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        g_cameraPos = bx::add(
+            g_cameraPos, bx::mul(bx::normalize(bx::cross(g_cameraFront, g_cameraUp)), cameraSpeed));
 }
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-	// glViewport(0, 0, width, height);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // glViewport(0, 0, width, height);
 }
 
-void updateCameraFront() {
+void updateCameraFront()
+{
 
-	bx::Vec3 front;
-	front.x = bx::cos(bx::toRad(yaw)) * bx::cos(bx::toRad(pitch));
-	front.y = bx::sin(bx::toRad(pitch));
-	front.z = bx::sin(bx::toRad(yaw)) * bx::cos(bx::toRad(pitch));
-	cameraFront = bx::normalize(front);
+    bx::Vec3 front;
+    front.x = bx::cos(bx::toRad(g_yaw)) * bx::cos(bx::toRad(g_pitch));
+    front.y = bx::sin(bx::toRad(g_pitch));
+    front.z = bx::sin(bx::toRad(g_yaw)) * bx::cos(bx::toRad(g_pitch));
+    g_cameraFront = bx::normalize(front);
 }
 
-void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-	if (!g_clicked) {
-		return;
-	}
-	if (firstMouse) {
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (!g_clicked) {
+        return;
+    }
+    if (g_firstMouse) {
+        g_lastX = xpos;
+        g_lastY = ypos;
+        g_firstMouse = false;
+    }
 
-	// float xoffset = xpos - lastX;
-	float xoffset = lastX - xpos;
-	float yoffset =
-		lastY - ypos; // reversed since y-coordinates go from bottom to top
-	lastX = xpos;
-	lastY = ypos;
+    // float xoffset = xpos - g_lastX;
+    float xoffset = g_lastX - xpos;
+    float yoffset = g_lastY - ypos; // reversed since y-coordinates go from bottom to top
+    g_lastX = xpos;
+    g_lastY = ypos;
 
-	float sensitivity = 0.5f; // change this value to your liking
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
+    float sensitivity = 0.5f; // change this value to your liking
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
 
-	yaw += xoffset;
-	pitch += yoffset;
+    g_yaw += xoffset;
+    g_pitch += yoffset;
 
-	// make sure that when pitch is out of bounds, screen doesn't get flipped
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-	//    bx::Vec3 front;
-	//    front.x = bx::cos(bx::toRad(yaw)) * bx::cos(bx::toRad(pitch));
-	//    front.y = bx::sin(bx::toRad(pitch));
-	//    front.z = bx::sin(bx::toRad(yaw)) * bx::cos(bx::toRad(pitch));
-	//    cameraFront = bx::normalize(front);
-	updateCameraFront();
+    // make sure that when g_pitch is out of bounds, screen doesn't get flipped
+    if (g_pitch > 89.0f)
+        g_pitch = 89.0f;
+    if (g_pitch < -89.0f)
+        g_pitch = -89.0f;
+    //    bx::Vec3 front;
+    //    front.x = bx::cos(bx::toRad(g_yaw)) * bx::cos(bx::toRad(g_pitch));
+    //    front.y = bx::sin(bx::toRad(g_pitch));
+    //    front.z = bx::sin(bx::toRad(g_yaw)) * bx::cos(bx::toRad(g_pitch));
+    //    g_cameraFront = bx::normalize(front);
+    updateCameraFront();
 }
 
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-	xoffset *= 5;
-	yoffset *= 5;
-	if (fov >= 1.0f && fov <= maxFov)
-		fov -= yoffset;
-	if (fov <= 1.0f)
-		fov = 1.0f;
-	if (fov >= maxFov)
-		fov = maxFov;
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    xoffset *= 5;
+    yoffset *= 5;
+    if (g_fov >= 1.0f && g_fov <= g_maxFov)
+        g_fov -= yoffset;
+    if (g_fov <= 1.0f)
+        g_fov = 1.0f;
+    if (g_fov >= g_maxFov)
+        g_fov = g_maxFov;
 }
 
-void mouse_button_callback(GLFWwindow *window, int button, int action,
-						   int mods) {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		g_clicked = true;
-		firstMouse = true;
-	} else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-		g_clicked = false;
-	}
-	// popup_menu();
+void mouse_button_callback(GLFWwindow* window, int button, int action,
+    int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        g_clicked = true;
+        g_firstMouse = true;
+    } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+        g_clicked = false;
+    }
+    // popup_menu();
 }
 
 // void focus_callback(GLFWwindow *window, int focused) {
