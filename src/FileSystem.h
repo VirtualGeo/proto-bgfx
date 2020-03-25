@@ -68,7 +68,7 @@ public:
     // static void write(uint  val, std::ofstream & file) {
     //     file.write(reinterpret_cast<const char*>(&val), sizeof(int));
     // }
-    static void write(float * val, size_t len, std::ofstream & file) {
+    static void write(const float * val, size_t len, std::ofstream & file) {
         file.write(reinterpret_cast<const char*>(val), len * sizeof(float));
     }
 
