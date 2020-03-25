@@ -317,7 +317,7 @@ void Scene::load(std::ifstream& file)
         m_objects.emplace_back(file, i, m_layout);
         const Object& object = m_objects.back();
         std::cout << "[Scene] Load object[" << i << "/" << size << "] : " << object << std::endl;
-        //        bgfx::frame();
+                bgfx::frame();
     }
 
     tm.end();

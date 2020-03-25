@@ -48,12 +48,13 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
     m_textureSize = m_width * m_height * m_nbChannel;
     //    m_textureSize = imageSize * 8;
     const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
-    //    const uint64_t textureFlags = 0 | BGFX_TEXTURE_RT_MSAA_X8;
-    //     const uint64_t textureFlags = 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
+//        const uint64_t textureFlags = 0 | BGFX_TEXTURE_RT_MSAA_X8;
+//         const uint64_t textureFlags = 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
     // BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
-    // const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+//     const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
     // BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN
     const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
+//    const uint64_t samplerFlags = 0 | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
     //     const uint64_t samplerFlags =
     //     0 | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT;
 
@@ -161,6 +162,23 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
     // }
 }
 
+Texture::Texture(Texture&& texture)
+    : m_image(texture.m_image)
+    , m_textureHandle(std::move(texture.m_textureHandle))
+    , m_name(std::move(texture.m_name))
+    , m_baseDir(std::move(texture.m_baseDir))
+    , m_width(texture.m_width)
+    , m_height(texture.m_height)
+    , m_nbChannel(texture.m_nbChannel)
+    , m_textureSize(texture.m_textureSize)
+{
+    texture.m_image = nullptr;
+    //    texture.m_textureHandle.
+    std::cout << "\033[34m";
+    std::cout << "[Texture] " << this << " '" << m_name << "' right moving from " << &texture << std::endl;
+    std::cout << "\033[0m";
+}
+
 Texture::~Texture()
 {
     //    std::cout << "\033[31m";
@@ -205,6 +223,7 @@ void Texture::save(std::ofstream& file)
 //    FileSystem::write()
 }
 
+// ----------------------------------------- GETTERS
 const bgfx::TextureHandle& Texture::textureHandle() const
 {
     return m_textureHandle;
@@ -215,22 +234,6 @@ std::string Texture::name() const
     return m_name;
 }
 
-Texture::Texture(Texture&& texture)
-    : m_image(texture.m_image)
-    , m_textureHandle(std::move(texture.m_textureHandle))
-    , m_name(std::move(texture.m_name))
-    , m_baseDir(std::move(texture.m_baseDir))
-    , m_width(texture.m_width)
-    , m_height(texture.m_height)
-    , m_nbChannel(texture.m_nbChannel)
-    , m_textureSize(texture.m_textureSize)
-{
-    texture.m_image = nullptr;
-    //    texture.m_textureHandle.
-    std::cout << "\033[34m";
-    std::cout << "[Texture] " << this << " '" << m_name << "' right moving from " << &texture << std::endl;
-    std::cout << "\033[0m";
-}
 
 size_t Texture::textureSize() const
 {
