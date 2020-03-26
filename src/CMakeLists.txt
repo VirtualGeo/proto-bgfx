@@ -24,9 +24,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${BGFX_INCLUDE_DIRS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC __STDC_LIMIT_MACROS __STDC_FORMAT_MACROS __STDC_CONSTANT_MACROS)
 
 # if (UNIX)
-#message(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}) # -g
-#message(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE}) # -03 -DNDEBUG
+# message(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}) # -g
+# message(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE}) # -03 -DNDEBUG
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # default debug flags : -g
+    #default release flags : -03 -DNDEBUG
      set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -Wextra -O0 -Wfatal-errors")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
     #    target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wpedantic -Werror -DDEBUG -O0 -g -Wfatal-errors)
@@ -34,8 +36,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # endif()
     # elseif (MSVC)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    # default debug flags : /MDd /Zi /Ob0 /Od /RTC1
+    # default release flags : /MD /O2 /Ob2 /DNDEBUG
+    #  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX")
     # target_compile_options(${PROJECT_NAME} PUBLIC /Wall)
-#    target_compile_options(${PROJECT_NAME} PUBLIC /W4 /WX)
+   target_compile_options(${PROJECT_NAME} PUBLIC /W4 /WX)
 endif()
 #target_compile_options(${PROJECT_NAME} PRIVATE
 #    "$<$<CONFIG:Debug>:${CMAKE_CXX_FLAGS_DEBUG}>"

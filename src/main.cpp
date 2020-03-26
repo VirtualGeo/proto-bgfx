@@ -209,7 +209,7 @@ void init()
     bgfxInit.resolution.width = WIN_WIDTH;
     bgfxInit.resolution.height = WIN_HEIGHT;
     bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-    //        bgfxInit.resolution.reset = BGFX_RESET_NONE;
+        //    bgfxInit.resolution.reset = BGFX_RESET_NONE;
     bgfxInit.vendorId = BGFX_PCI_ID_NONE;
     // bgfxInit.vendorId = BGFX_PCI_ID_INTEL;
     //    bgfxInit.vendorId = BGFX_PCI_ID_NVIDIA;
