@@ -1,5 +1,5 @@
-#ifndef FILESYSTEM_H
-#define FILESYSTEM_H
+#ifndef FILE_IO_H
+#define FILE_IO_H
 
 //#include <iostream>
 #include <fstream>
@@ -7,7 +7,7 @@
 
 #include <cassert>
 
-class FileSystem
+class FileIO
 {
 public:
 //    FileSystem();
@@ -103,4 +103,4 @@ public:
 //    }
 };
 
-#endif // FILESYSTEM_H
+#endif // FILE_IO_H

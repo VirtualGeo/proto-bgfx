@@ -217,7 +217,7 @@ void Scene::load(std::ifstream& file)
     tm.start();
 
     size_t size;
-    FileSystem::read(size, file);
+    FileIO::read(size, file);
     m_materials.reserve(size);
     for (int i = 0; i < size; ++i) {
         //            m_materials.emplace_back(file, &m_textures);
@@ -228,13 +228,13 @@ void Scene::load(std::ifstream& file)
 #endif
     }
 
-    FileSystem::read(size, file);
+    FileIO::read(size, file);
     m_textures.reserve(size);
     for (int i = 0; i < size; ++i) {
         //        std::string texName;
         //        std::string baseDir;
-        //        FileSystem::read(texName, file);
-        //        FileSystem::read(baseDir, file);
+        //        FileIO::read(texName, file);
+        //        FileIO::read(baseDir, file);
         //        m_textures.push_back(file);
         //        m_textures.emplace_back(texName, baseDir);
         m_textures.emplace_back(file);
@@ -248,7 +248,7 @@ void Scene::load(std::ifstream& file)
     m_loadingMaterialsTime = tm.msec();
     tm.start();
 
-    FileSystem::read(size, file);
+    FileIO::read(size, file);
     m_objects.reserve(size);
     //    bgfx::frame();
     for (size_t i = 0; i < size; ++i) {
@@ -266,16 +266,16 @@ void Scene::load(std::ifstream& file)
     m_loadingObjectsTime = tm.msec();
 
     m_parsingTime = 0;
-    //    FileSystem::read(m_parsingTime, file);
-    //    FileSystem::read(m_loadingMaterialsTime, file);
-    //    FileSystem::read(m_loadingObjectsTime, file);
+    //    FileIO::read(m_parsingTime, file);
+    //    FileIO::read(m_loadingMaterialsTime, file);
+    //    FileIO::read(m_loadingObjectsTime, file);
 }
 
 void Scene::save(std::ofstream& file) const
 {
     size_t size;
     size = m_materials.size();
-    FileSystem::write(size, file);
+    FileIO::write(size, file);
     //    m_materials.reserve(size);
     for (int i = 0; i < size; ++i) {
         //            m_materials.emplace_back(file, &m_textures);
@@ -284,7 +284,7 @@ void Scene::save(std::ofstream& file) const
     }
 
     size = m_textures.size();
-    FileSystem::write(size, file);
+    FileIO::write(size, file);
     //    m_textures.reserve(size);
     for (int i = 0; i < size; ++i) {
         //        m_textures.push_back(file);
@@ -293,7 +293,7 @@ void Scene::save(std::ofstream& file) const
     }
 
     size = m_objects.size();
-    FileSystem::write(size, file);
+    FileIO::write(size, file);
     //    m_objects.reserve(size);
     for (int i = 0; i < size; ++i) {
         //        m_objects.push_back(file);
@@ -301,9 +301,9 @@ void Scene::save(std::ofstream& file) const
         m_objects[i].save(file);
     }
 
-    //    FileSystem::write(m_parsingTime, file);
-    //    FileSystem::write(m_loadingMaterialsTime, file);
-    //    FileSystem::write(m_loadingObjectsTime, file);
+    //    FileIO::write(m_parsingTime, file);
+    //    FileIO::write(m_loadingMaterialsTime, file);
+    //    FileIO::write(m_loadingObjectsTime, file);
 }
 
 // ------------------------ GETTERS

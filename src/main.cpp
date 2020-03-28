@@ -183,6 +183,9 @@ void init()
 #elif BX_PLATFORM_WINDOWS
     bgfxInit.platformData.nwh = glfwGetWin32Window(g_window);
 #endif
+    bgfxInit.platformData.context = NULL;
+    bgfxInit.platformData.backBuffer = NULL;
+    bgfxInit.platformData.backBufferDS = NULL;
 
     // std::cout << RENDERER_TYPE << std::endl;
 #ifdef RENDERER_OpenGL
@@ -233,13 +236,13 @@ void init()
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+        g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Crytek_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
     //    g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
-    //        g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+//    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\Cougar.obj");
 
     g_nbVertices = g_scene.nbVertices();
@@ -378,11 +381,11 @@ void update()
     //        BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW |
     //        BGFX_STATE_BLEND_NORMAL;
     const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
-            | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
-            | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
-//    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z
-//            | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL
-//            | BGFX_STATE_MSAA;
+        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
+        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
+    //    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z
+    //            | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL
+    //            | BGFX_STATE_MSAA;
     // UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
 
     // const uint64_t stateTransparent =
