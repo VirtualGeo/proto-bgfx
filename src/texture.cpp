@@ -1,13 +1,13 @@
-#include "Texture.h"
+#include "texture.h"
 #include <bx/readerwriter.h>
 #include <cassert>
 #include <iostream>
 
-#include "FileSystem.h"
-#include "System.h"
+#include "fileIO.h"
+#include "system.h"
 #include <string>
 
-#include "bgfx_utils.h"
+//#include "bgfx_utils.h"
 #include <cstring>
 
 //#include <bimg/decode.h>

@@ -5,10 +5,10 @@
 #include <bgfx/bgfx.h>
 #include <tiny_obj_loader.h>
 //#include <memory>
-#include "Material.h"
-#include "Mesh.h"
-#include "Program.h"
-#include "Vertex.h"
+#include "material.h"
+#include "mesh.h"
+#include "program.h"
+#include "vertex.h"
 
 class Object {
 public:

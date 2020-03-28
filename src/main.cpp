@@ -19,12 +19,12 @@
 // #include <glm/glm.hpp>
 // #include <assert.h>
 //#include "Mesh.h"
-#include "Scene.h"
+#include "scene.h"
 #include <cassert>
 #include <fstream>
 #include <iostream>
 //#include "Vertex.h"
-#include "Program.h"
+#include "program.h"
 
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
@@ -233,10 +233,10 @@ void init()
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/Sponza/sponza.obj");
-    //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
-    //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/Crytek_Sponza/sponza-blend.obj");
-    //    g_scene.addModel(std::string(PROJECT_DIR) + "Assets/McGuire/San_Miguel/san-miguel-blend.obj");
+    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+    //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
+    //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Crytek_Sponza/sponza-blend.obj");
+    //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
     //    g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
     //        g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");

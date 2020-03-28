@@ -11,6 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
 
 # ------------------------ USER CONFIGURATIONS ----------------------
+#set(BGFX_ROOT <PATH_IN_YOUR_SYSTEM>/bgfx-install) // YOU MUST SET BGFX_ROOT TO COMPILE <----- WARNING
+
 #if (AUTO_GENERATE_BIN_MODEL)
     add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 #endif()
