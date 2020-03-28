@@ -3,6 +3,12 @@
 #include <cassert>
 #include "FileSystem.h"
 #include "System.h"
+//#include <iostream>
+//#include <stdio.h>
+//#include <string>
+//#include <iostream>
+//#include <cstdint>
+#include <cstring>
 
 bool hasLoaded(const std::string& texName, const Textures& textures, int& iTex)
 {
@@ -26,9 +32,12 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
     m_name = material.name;
 
     //        float diffuse[3];
-    for (size_t i = 0; i < 3; i++) {
-        m_diffuse[i] = material.diffuse[i];
-    }
+//    for (size_t i = 0; i < 3; i++) {
+//        m_diffuse[i] = material.diffuse[i];
+//    }
+    memcpy(m_diffuse, material.diffuse, 3 * sizeof(float));
+//    m_diffuse = material.diffuse;
+//    std::memcpy();
     //    std::cout << m_diffuse[0] << m_diffuse[1] << m_diffuse[2] << std::endl;
     //    m_diffuse[0] = 0.0f;
     //    m_diffuse[1] = 1.0f;
@@ -44,10 +53,12 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
         if (hasLoaded(diffuseTexName, textures, i)) {
             m_iTexDiffuse = i;
 #ifdef DEBUG
-            std::cout << "        [Texture] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
+            std::cout << "        [Material] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
 #endif
             //            return;
         } else {
+//            std::cout << "        [Material] Load texture: '" << diffuseTexName << "' " << std::endl;
+//    std::cout << "'" << m_name << "', width=" << m_width << ", height=" << m_height << ", nbChannel=" << m_nChannels << ", textureSize=" << m_textureSize << ", bitPerPixel=" << m_nChannels << std::endl;
             m_iTexDiffuse = static_cast<int>(textures.size());
             textures.emplace_back(diffuseTexName, baseDir);
         }
@@ -64,7 +75,7 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
         if (hasLoaded(opacityTexName, textures, i)) {
             m_iTexOpacity = i;
 #ifdef DEBUG
-            std::cout << "        [Texture] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
+            std::cout << "        [Material] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
 #endif
         }
         else {

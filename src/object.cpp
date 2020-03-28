@@ -52,9 +52,9 @@ struct vec3 {
 
 void normalizeVector(vec3& v)
 {
-    float len2 = v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2];
+    const float len2 = v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2];
     if (len2 > 0.0f) {
-        float len = bx::sqrt(len2);
+        const float len = bx::sqrt(len2);
 
         v.v[0] /= len;
         v.v[1] /= len;
@@ -489,7 +489,7 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
             mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(indice_type) * mmesh.m_indices.size()));
             m_nbTriangles += mmesh.m_indices.size() / 3;
 #ifdef DEBUG
-            std::cout << "    [Mesh] " << i << " nbIndices=" << mmesh.m_indices.size() << std::endl;
+            std::cout << "        [Mesh] " << i << " nbIndices=" << mmesh.m_indices.size() << std::endl;
 #endif
         }
 

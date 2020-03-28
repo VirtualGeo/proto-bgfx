@@ -82,6 +82,7 @@ void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
         // const uint64_t textureFlags =
         // 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
         // const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+//        const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MAG_ANISOTROPIC | BGFX_SAMPLER_MIN_ANISOTROPIC;
         // const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
         bgfx::setTexture(0, program.m_sDiffuse,
             texture.textureHandle());

@@ -6,8 +6,10 @@
 #include "bgfx/bgfx.h"
 #include <iostream>
 #include <map>
-#include <stb/stb_image.h>
+//#include <stb/stb_image.h>
 #include <vector>
+
+#include <bimg/bimg.h>
 
 class Texture {
 
@@ -18,13 +20,14 @@ public:
     Texture(const Texture&) = delete; // delete copy constructor
     ~Texture();
 
-    //    Texture(std::ifstream & file);
+    Texture(std::ifstream& file);
     void save(std::ofstream& file) const;
+
+    void createTextureHandle();
 
     friend std::ostream& operator<<(std::ostream& os, const Texture& texture);
 
 private:
-    unsigned char* m_image = nullptr;
     //	bgfx::UniformHandle m_sampler;
     bgfx::TextureHandle m_textureHandle;
     std::string m_name;
@@ -32,8 +35,16 @@ private:
 
     int m_width;
     int m_height;
-    int m_nbChannel;
+    int m_nChannels;
+
     size_t m_textureSize; // bytes
+    uint8_t* m_image = nullptr;
+    int m_nMips;
+
+    //    bgfx::TextureInfo m_texInfo;
+    //    bimg::Orientation::Enum m_orientation;
+
+        bool m_last = true;
 
 public: // ---------------------------------------------- getters
     const bgfx::TextureHandle& textureHandle() const;
