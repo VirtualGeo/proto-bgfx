@@ -105,6 +105,7 @@ int main(int argc, char const* argv[])
     //    g_fps = 0.0f;
     float sum = 0.0f;
     auto lastTime = glfwGetTime();
+    const int epoch = 50;
     while (!glfwWindowShouldClose(g_window)) {
         bgfx::dbgTextClear();
 
@@ -113,10 +114,10 @@ int main(int argc, char const* argv[])
         lastTime = currentTime;
         sum += g_deltaTime;
 
-        if (g_counter % 20 == 0) {
+        if (g_counter % epoch == 0) {
             //		    g_lastFrame = currentFrame;
 
-            g_fps = 20.0f / sum;
+            g_fps = epoch / sum; // sum is float
             // fps = 1.0f / g_deltaTime;
             sum = 0.0f;
         }
@@ -209,7 +210,7 @@ void init()
     bgfxInit.resolution.width = WIN_WIDTH;
     bgfxInit.resolution.height = WIN_HEIGHT;
     bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-        //    bgfxInit.resolution.reset = BGFX_RESET_NONE;
+    //            bgfxInit.resolution.reset = BGFX_RESET_NONE;
     bgfxInit.vendorId = BGFX_PCI_ID_NONE;
     // bgfxInit.vendorId = BGFX_PCI_ID_INTEL;
     //    bgfxInit.vendorId = BGFX_PCI_ID_NVIDIA;
@@ -254,6 +255,7 @@ void init()
     g_nbIndexBuffer = g_scene.nbIndexBuffer();
 
     const bgfx::Caps* caps = bgfx::getCaps();
+    assert(caps->supported & BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN);
     //    switch (bgfx::getRendererType()) {
     switch (caps->rendererType) {
     case bgfx::RendererType::Noop:
@@ -327,7 +329,8 @@ void update()
 
     //        int margin = 2;
     //   const int margin = (g_renderer == "OpenGL") ? (0) : (2);
-    int line = g_debugHMargin - 1;
+    //    int line = g_debugHMargin - 1;
+    int line = -1;
     bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.2f | Objects:%d | Textures:%d (%.1f MiB)",
         g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_nbTextures, g_texturesSize);
     bgfx::dbgTextPrintf(0, ++line, 0x0F, "Vertex buffer:%d | Index buffer:%d | Index buffer/Vertex buffer:%.2f",
@@ -374,7 +377,12 @@ void update()
     //        BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
     //        BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW |
     //        BGFX_STATE_BLEND_NORMAL;
-    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
+    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
+            | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
+            | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
+//    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z
+//            | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL
+//            | BGFX_STATE_MSAA;
     // UINT64_C(0), BGFX_STATE_PT_TRISTRIP,
 
     // const uint64_t stateTransparent =
@@ -392,8 +400,8 @@ void update()
 void shutdown()
 {
 
-    g_scene.clear();
-    g_program.clear();
+    g_scene.clear(); // clear bgfx handles (texture, vertexBuffer, indexBuffer) before shutdown bgfx
+    g_program.clear(); // clear uniform handles
 
     bgfx::shutdown();
 

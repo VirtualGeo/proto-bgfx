@@ -66,17 +66,18 @@ set(IN_SHADERS
     # mesh_frag.sc
     )
 
-include (${CMAKE_MODULE_PATH}/Shader.cmake)
+include (${CMAKE_MODULE_PATH}/shader.cmake)
 #include(${CMAKE_MODULE_PATH}/Findbgfx.cmake)
 # file(GLOB shaders shaders/src/*.sc)
 
 # -------------------------------- EXTERNAL LIBS
-add_subdirectory(Modules/glfw)
-add_subdirectory(Modules/tinyobjloader)
+set(EXTERNAL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external)
+add_subdirectory(modules/glfw)
+add_subdirectory(modules/tinyobjloader)
 # add_subdirectory(Modules/glm)
 
 # add_subdirectory(Modules/stb)
-add_library(stb STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/stb_image.cpp)
-target_include_directories(stb SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/)
+#add_library(stb STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/stb.cpp)
+#target_include_directories(stb SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/)
 
 add_subdirectory(src)

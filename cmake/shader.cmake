@@ -28,6 +28,7 @@ endfunction(GET_SHADER_INFOS)
 
 set(OUT_SHADERS )
 set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
+set(BGFX_SHADER ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src/bgfx_shader.sh)
 
 macro(COMPILE_SHADER SHADER)
     get_shader_infos(${SHADER} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)

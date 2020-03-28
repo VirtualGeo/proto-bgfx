@@ -3,7 +3,6 @@
 #include "TimerUtil.h"
 #include <cassert>
 #include <iostream>
-#include <stb/stb_image.h>
 
 #include "System.h"
 //#include <cassert>
@@ -169,14 +168,16 @@ void Scene::addModel(const std::string& filename)
 
 #ifdef AUTO_GENERATE_BIN_MODEL
     //    save(file);
-    std::ofstream file;
-    file.open(bin, std::ios::binary | std::ios::out);
-    if (!file.is_open()) {
-        std::cerr << "cannot open file" << std::endl;
-        exit(1);
+    if (!FileExists(bin)) {
+        std::ofstream file;
+        file.open(bin, std::ios::binary | std::ios::out);
+        if (!file.is_open()) {
+            std::cerr << "cannot open file" << std::endl;
+            exit(1);
+        }
+        save(file);
+        file.close();
     }
-    save(file);
-    file.close();
 #endif
 }
 
@@ -230,12 +231,13 @@ void Scene::load(std::ifstream& file)
     FileSystem::read(size, file);
     m_textures.reserve(size);
     for (int i = 0; i < size; ++i) {
-        std::string texName;
-        std::string baseDir;
-        FileSystem::read(texName, file);
-        FileSystem::read(baseDir, file);
+        //        std::string texName;
+        //        std::string baseDir;
+        //        FileSystem::read(texName, file);
+        //        FileSystem::read(baseDir, file);
         //        m_textures.push_back(file);
-        m_textures.emplace_back(texName, baseDir);
+        //        m_textures.emplace_back(texName, baseDir);
+        m_textures.emplace_back(file);
 #ifdef DEBUG
         const Texture& texture = m_textures.back();
         std::cout << "[Scene] Load texture[" << i << "/" << size << "] : " << texture << std::endl;

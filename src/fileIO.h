@@ -34,6 +34,9 @@ public:
     static void read(float * val, size_t len, std::ifstream & file) {
         file.read(reinterpret_cast<char*>(val), len * sizeof(float));
     }
+    static void read(uint8_t * val, size_t len, std::ifstream & file) {
+        file.read(reinterpret_cast<char*>(val), len * sizeof(uint8_t));
+    }
 
     template <class T>
     static void read(std::vector<T>& val, std::ifstream& file)
@@ -70,6 +73,9 @@ public:
     // }
     static void write(const float * val, size_t len, std::ofstream & file) {
         file.write(reinterpret_cast<const char*>(val), len * sizeof(float));
+    }
+    static void write(const uint8_t * val, size_t len, std::ofstream & file) {
+        file.write(reinterpret_cast<const char*>(val), len * sizeof(uint8_t));
     }
 
     template <class T>
