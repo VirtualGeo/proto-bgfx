@@ -1,4 +1,4 @@
-#include "Vertex.h"
+#include "vertex.h"
 
 //bgfx::VertexLayout Vertex::m_layout;
 //bgfx::VertexLayout Vertex::m_layout;

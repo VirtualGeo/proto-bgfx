@@ -1,4 +1,4 @@
-#include "Object.h"
+#include "object.h"
 
 #include <map>
 
@@ -9,7 +9,7 @@
 #include <limits>
 //#include "Vertex.h"
 //#include "Mesh.h"
-#include "FileSystem.h"
+#include "fileIO.h"
 #include <algorithm>
 
 static void CalcNormal(float N[3], float v0[3], float v1[3], float v2[3])

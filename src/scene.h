@@ -2,12 +2,12 @@
 #define SCENE_H
 
 #include <bgfx/bgfx.h>
-#include "Object.h"
+#include "object.h"
 #include <vector>
 #include <tiny_obj_loader.h>
-#include "Material.h"
-#include "Texture.h"
-#include "Program.h"
+#include "material.h"
+#include "texture.h"
+#include "program.h"
 
 class Scene
 {

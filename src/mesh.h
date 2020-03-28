@@ -7,8 +7,8 @@
 
 #include <vector>
 
-#include "Material.h"
-#include "Program.h"
+#include "material.h"
+#include "program.h"
 
 // using indice_type = uint16_t;
 using indice_type = unsigned short;

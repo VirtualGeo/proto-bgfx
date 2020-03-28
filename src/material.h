@@ -2,7 +2,7 @@
 #define MATERIAL_H
 
 #include <tiny_obj_loader.h>
-#include "Texture.h"
+#include "texture.h"
 #include <vector>
 
 class Material

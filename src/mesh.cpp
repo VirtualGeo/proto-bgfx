@@ -1,6 +1,6 @@
-#include "Mesh.h"
+#include "mesh.h"
 
-#include "FileSystem.h"
+#include "fileIO.h"
 #include <cassert>
 
 Mesh::Mesh(int iMaterial)

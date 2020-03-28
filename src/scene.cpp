@@ -1,12 +1,12 @@
-#include "Scene.h"
+#include "scene.h"
 
-#include "TimerUtil.h"
+#include "timerUtil.h"
 #include <cassert>
 #include <iostream>
 
-#include "System.h"
+#include "system.h"
 //#include <cassert>
-#include "FileSystem.h"
+#include "fileIO.h"
 #include <fstream>
 //#include <bimg/bimg.h>
 

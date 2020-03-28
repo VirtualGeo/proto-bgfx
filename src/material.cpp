@@ -1,8 +1,8 @@
-#include "Material.h"
+#include "material.h"
 
 #include <cassert>
-#include "FileSystem.h"
-#include "System.h"
+#include "fileIO.h"
+#include "system.h"
 //#include <iostream>
 //#include <stdio.h>
 //#include <string>
