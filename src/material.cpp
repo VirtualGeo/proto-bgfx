@@ -44,6 +44,7 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
     //    m_diffuse[2] = 1.0f;
 
     const std::string& diffuseTexName = material.diffuse_texname;
+//    material.diffuse_texopt.;
 
     if (diffuseTexName.length() > 0) {
         m_diffuse[3] = 1.0f;
@@ -98,31 +99,31 @@ Material::Material(Material&& material)
 
 Material::~Material()
 {
-#ifdef DEBUG
-    std::cout << "\033[31m";
-    std::cout << "[Material] '" << m_name << "' deleted " << this << std::endl;
-    std::cout << "\033[0m";
-#endif
+//#ifdef DEBUG
+//    std::cout << "\033[31m";
+//    std::cout << "[Material] '" << m_name << "' deleted " << this << std::endl;
+//    std::cout << "\033[0m";
+//#endif
 }
 
 Material::Material(std::ifstream& file)
 {
-    FileSystem::read(m_name, file);
-    FileSystem::read(m_iTexDiffuse, file);
-    FileSystem::read(m_diffuse, 4, file);
+    FileIO::read(m_name, file);
+    FileIO::read(m_iTexDiffuse, file);
+    FileIO::read(m_diffuse, 4, file);
 
-    FileSystem::read(m_texturesEnable, 4, file);
-    FileSystem::read(m_iTexOpacity, file);
+    FileIO::read(m_texturesEnable, 4, file);
+    FileIO::read(m_iTexOpacity, file);
 }
 
 void Material::save(std::ofstream& file) const
 {
-    FileSystem::write(m_name, file);
-    FileSystem::write(m_iTexDiffuse, file);
-    FileSystem::write(m_diffuse, 4, file);
+    FileIO::write(m_name, file);
+    FileIO::write(m_iTexDiffuse, file);
+    FileIO::write(m_diffuse, 4, file);
 
-    FileSystem::write(m_texturesEnable, 4, file);
-    FileSystem::write(m_iTexOpacity, file);
+    FileIO::write(m_texturesEnable, 4, file);
+    FileIO::write(m_iTexOpacity, file);
 }
 
 

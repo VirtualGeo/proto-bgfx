@@ -309,12 +309,19 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
                 assert(attrib.texcoords.size() > size_t(2 * idx1.texcoord_index + 1));
                 assert(attrib.texcoords.size() > size_t(2 * idx2.texcoord_index + 1));
 
-                // Flip Y coord.
+                // Flip X coord.
                 tc[0][0] = attrib.texcoords[2 * idx0.texcoord_index];
-                tc[0][1] = 1.0f - attrib.texcoords[2 * idx0.texcoord_index + 1];
                 tc[1][0] = attrib.texcoords[2 * idx1.texcoord_index];
-                tc[1][1] = 1.0f - attrib.texcoords[2 * idx1.texcoord_index + 1];
                 tc[2][0] = attrib.texcoords[2 * idx2.texcoord_index];
+//                tc[0][0] = 1.0f - attrib.texcoords[2 * idx0.texcoord_index];
+//                tc[1][0] = 1.0f - attrib.texcoords[2 * idx1.texcoord_index];
+//                tc[2][0] = 1.0f - attrib.texcoords[2 * idx2.texcoord_index];
+                // Flip Y coord.
+//                tc[0][1] = attrib.texcoords[2 * idx0.texcoord_index + 1];
+//                tc[1][1] = attrib.texcoords[2 * idx1.texcoord_index + 1];
+//                tc[2][1] = attrib.texcoords[2 * idx2.texcoord_index + 1];
+                tc[0][1] = 1.0f - attrib.texcoords[2 * idx0.texcoord_index + 1];
+                tc[1][1] = 1.0f - attrib.texcoords[2 * idx1.texcoord_index + 1];
                 tc[2][1] = 1.0f - attrib.texcoords[2 * idx2.texcoord_index + 1];
             }
         } else {
@@ -547,23 +554,23 @@ Object::~Object()
         bgfx::destroy(m_vbh);
     }
 
-#ifdef DEBUG
-    std::cout << "\033[31m";
-    std::cout << "[Object] '" << m_name << "' deleted " << this << std::endl;
-    std::cout << "\033[0m";
-#endif
+//#ifdef DEBUG
+//    std::cout << "\033[31m";
+//    std::cout << "[Object] '" << m_name << "' deleted " << this << std::endl;
+//    std::cout << "\033[0m";
+//#endif
 }
 
 Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayout& layout)
 {
-    FileSystem::read(m_vertices, file);
-    FileSystem::read(m_nbTriangles, file);
-    FileSystem::read(m_bmin, 3, file);
-    FileSystem::read(m_bmax, 3, file);
-    FileSystem::read(m_name, file);
+    FileIO::read(m_vertices, file);
+    FileIO::read(m_nbTriangles, file);
+    FileIO::read(m_bmin, 3, file);
+    FileIO::read(m_bmax, 3, file);
+    FileIO::read(m_name, file);
 
     size_t size;
-    FileSystem::read(size, file);
+    FileIO::read(size, file);
     m_meshes.reserve(size);
     for (size_t i = 0; i < size; ++i) {
         //        m_meshes.push_back(file);
@@ -582,14 +589,14 @@ Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayou
 
 void Object::save(std::ofstream& file) const
 {
-    FileSystem::write(m_vertices, file);
-    FileSystem::write(m_nbTriangles, file);
-    FileSystem::write(m_bmin, 3, file);
-    FileSystem::write(m_bmax, 3, file);
-    FileSystem::write(m_name, file);
+    FileIO::write(m_vertices, file);
+    FileIO::write(m_nbTriangles, file);
+    FileIO::write(m_bmin, 3, file);
+    FileIO::write(m_bmax, 3, file);
+    FileIO::write(m_name, file);
 
     size_t size = m_meshes.size();
-    FileSystem::write(size, file);
+    FileIO::write(size, file);
     //    m_meshes.reserve(size);
     for (int i = 0; i < size; ++i) {
         //        m_meshes.push_back(file);

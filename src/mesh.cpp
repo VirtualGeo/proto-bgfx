@@ -30,17 +30,17 @@ Mesh::~Mesh()
         bgfx::destroy(m_ibh);
     }
 
-#ifdef DEBUG
-    std::cout << "\033[31m";
-    std::cout << "[Mesh] " << this << " deleted" << std::endl;
-    std::cout << "\033[0m";
-#endif
+//#ifdef DEBUG
+//    std::cout << "\033[31m";
+//    std::cout << "[Mesh] " << this << " deleted" << std::endl;
+//    std::cout << "\033[0m";
+//#endif
 }
 
 Mesh::Mesh(std::ifstream& file)
 {
-    FileSystem::read(m_iMaterial, file);
-    FileSystem::read(m_indices, file);
+    FileIO::read(m_iMaterial, file);
+    FileIO::read(m_indices, file);
 
     //    m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(uint16_t) * m_indices.size()));
     m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(m_indices.data(), sizeof(indice_type) * m_indices.size()));
@@ -49,8 +49,8 @@ Mesh::Mesh(std::ifstream& file)
 
 void Mesh::save(std::ofstream& file) const
 {
-    FileSystem::write(m_iMaterial, file);
-    FileSystem::write(m_indices, file);
+    FileIO::write(m_iMaterial, file);
+    FileIO::write(m_indices, file);
 }
 
 //Mesh &Mesh::operator=(Mesh &&mesh)

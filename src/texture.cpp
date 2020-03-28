@@ -49,6 +49,7 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
 
     //    unsigned char* image = stbi_load(absoluteTexName.c_str(), &w, &h, &comp, STBI_default);
     uint8_t* data = nullptr;
+    //    stbi_set_flip_vertically_on_load(1);
     data = stbi_load(absoluteTexName.c_str(), &m_width, &m_height, &m_nChannels, STBI_default);
     if (!data) {
         std::cerr << "    [Texture] Unable to load texture: " << absoluteTexName
@@ -65,42 +66,45 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
     //    bool hasMips = false;
     //    bgfx::calcTextureSize(m_texInfo, m_width, m_height, 1, false, true, 1, texFormat);
 
-    //    std::cout << "'" << m_name << "', width=" << m_width << ", height=" << m_height << ", nbChannel=" << m_nChannels << ", textureSize=" << m_textureSize << ", bitPerPixel=" << m_nChannels << std::endl;
+    //            const int numMips = 1 + bx::floor(bx::log2(bx::max(m_width, m_height)));
+    m_nMips = bx::floor(bx::log2(bx::max(m_width, m_height)));
 
-    //        const int numMips = 1 + (int)bx::floor(bx::log2(bx::max(m_width, m_height)));
-    m_nMips = 1 + int(bx::log2(bx::max(m_width, m_height)));
-
-    int textureSize = 0;
     int width = m_width;
     int height = m_height;
+    int textureSize = width * height;
     //    const int lenMax = static_cast<int>(bx::pow(2.0f, 2.0f * numMips + 1.0f)) * m_nChannels;
-    //    uint8_t mipMaps[lenMax];
-    //    int offset = 0;
-    //    int numMips = -1;
+    //    int nMips = 0;
+    //    while (width > 1 || height > 1) {
+    //        width = bx::max(1, width >> 1);
+    //        height = bx::max(1, height >> 1);
+
+    //    }
     for (int i = 0; i < m_nMips; ++i) {
-        //        while (width != 1 || height != 1) {
+        //    while (width != 1 || height != 1) {
         //        const int a = bx::pow(2, i);
         //        const int mipSize = width * height * m_nChannels;
         //        textureSize += a * a;
-        textureSize += width * height;
 
         //        memset(&mipMaps, i, mipSize);
         //        memcpy(&mipMaps[offset], data, width * height * m_nChannels * sizeof (unsigned char));
         //        offset += width * height * m_nChannels;
 
-        width = bx::ceil(width / 2.0f);
-        height = bx::ceil(height / 2.0f);
-        //        width >>= 1;
-        //        height >>= 1;
-        //        ++numMips;
+        //        width = bx::ceil(width / 2.0f);
+        //        height = bx::ceil(height / 2.0f);
+        width = bx::max(1, width >> 1);
+        height = bx::max(1, height >> 1);
+        textureSize += width * height;
+        //        ++nMips;
     }
-    //    assert(numMips == 1 + int(bx::log2(bx::max(m_width, m_height))));
-    assert(width == 1 && height == 1);
+    //    m_nMips = nMips;
+    //    ++textureSize; // avoid max(1, width / 2) with width = 1 -> width / 2 = 0 for 1x1 mipmap
+    //    assert(nMips == bx::floor(bx::log2(bx::max(m_width, m_height))));
+    //    assert(width == 1 && height == 1);
     m_textureSize = textureSize * m_nChannels;
     //    assert(lenMax > m_textureSize);
 
     m_image = (uint8_t*)malloc(m_textureSize);
-    //    memset(m_image, 0xFF, m_textureSize);
+    //        memset(m_image, 0xFF, m_textureSize);
     memcpy(m_image, data, (m_width * m_height * m_nChannels));
     stbi_image_free(data);
     data = nullptr;
@@ -111,15 +115,15 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
     for (int i = 1; i < m_nMips; ++i) {
         const int previousMipSize = width * height * m_nChannels;
         //        if (i % 2 == 0) {
-        const int futureWidth = bx::ceil(width / 2.0f);
-        const int futureHeight = bx::ceil(height / 2.0f);
+        const int futureWidth = bx::max(1, width >> 1);
+        const int futureHeight = bx::max(1, height >> 1);
         //            memset(&m_image[offset], 0xFF, mipSize);
         //        } else {
         //            memset(&m_image[offset], 0x00, mipSize);
         //        }
         //        bimg::imageRgba8Downsample2x2(&m_image[offset], width, height, 1, )
         //        const int bsup = offset + previousMipSize + futureWidth * futureHeight * m_nChannels;
-        assert(offset + previousMipSize + futureWidth * futureHeight * m_nChannels <= m_textureSize);
+        assert(offset + previousMipSize + futureWidth * futureHeight * m_nChannels < m_textureSize);
         stbir_resize_uint8(&m_image[offset], width, height, 0, &m_image[offset + previousMipSize], futureWidth, futureHeight, 0, m_nChannels);
 
         offset += previousMipSize;
@@ -128,11 +132,12 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
         width = futureWidth;
         height = futureHeight;
     }
-    assert(width == 1 && height == 1);
+    //    assert(width == 1 && height == 1);
     //    std::cout << sizeof (uint8_t) << std::endl;
     //    memcpy(m_image, mipMaps, m_textureSize * sizeof(uint8_t));
     //    m_image = std::move(mipMaps);
     //    free(data);
+    //    std::cout << "'" << m_name << "', width=" << m_width << ", height=" << m_height << ", nbChannel=" << m_nChannels << ", textureSize=" << m_textureSize << std::endl;
     createTextureHandle();
 //    free(m_image); // not possible because scene.save() need image data to save bin model
 //    m_image = nullptr;
@@ -195,27 +200,27 @@ Texture::~Texture()
     //    bgfx::destroy(m_textureHandle);
     //    std::cout << "[Texture] " << m_name << " deleted" << std::endl;
 
-#ifdef DEBUG
-    std::cout << "\033[31m";
-    std::cout << "[Texture] " << this << " '" << m_name << "' deleted" << std::endl;
-    std::cout << "\033[0m";
-#endif
+    //#ifdef DEBUG
+    //    std::cout << "\033[31m";
+    //    std::cout << "[Texture] " << this << " '" << m_name << "' deleted" << std::endl;
+    //    std::cout << "\033[0m";
+    //#endif
 }
 
 Texture::Texture(std::ifstream& file)
 {
-    FileSystem::read(m_name, file);
-    FileSystem::read(m_baseDir, file);
+    FileIO::read(m_name, file);
+    FileIO::read(m_baseDir, file);
     //    Texture::Texture(m_name, m_baseDir);
     //    const bool hasMips = true;
-    FileSystem::read(m_width, file);
-    FileSystem::read(m_height, file);
-    FileSystem::read(m_nChannels, file);
+    FileIO::read(m_width, file);
+    FileIO::read(m_height, file);
+    FileIO::read(m_nChannels, file);
 
-    FileSystem::read(m_textureSize, file);
+    FileIO::read(m_textureSize, file);
     m_image = (uint8_t*)malloc(m_textureSize);
-    FileSystem::read(m_image, m_textureSize, file);
-    FileSystem::read(m_nMips, file);
+    FileIO::read(m_image, m_textureSize, file);
+    FileIO::read(m_nMips, file);
 
     createTextureHandle();
     free(m_image);
@@ -224,18 +229,18 @@ Texture::Texture(std::ifstream& file)
 
 void Texture::save(std::ofstream& file) const
 {
-    FileSystem::write(m_name, file);
-    FileSystem::write(m_baseDir, file);
+    FileIO::write(m_name, file);
+    FileIO::write(m_baseDir, file);
 
-    FileSystem::write(m_width, file);
-    FileSystem::write(m_height, file);
-    FileSystem::write(m_nChannels, file);
+    FileIO::write(m_width, file);
+    FileIO::write(m_height, file);
+    FileIO::write(m_nChannels, file);
 
-    FileSystem::write(m_textureSize, file);
+    FileIO::write(m_textureSize, file);
     assert(m_image != nullptr);
-    FileSystem::write(m_image, m_textureSize, file);
-    FileSystem::write(m_nMips, file);
-    //    FileSystem::write()
+    FileIO::write(m_image, m_textureSize, file);
+    FileIO::write(m_nMips, file);
+    //    FileIO::write()
 }
 
 void Texture::createTextureHandle()
@@ -266,6 +271,7 @@ void Texture::createTextureHandle()
     //                    glBindTexture(GL_TEXTURE_2D, texture_id);
     //                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     //                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //    const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
     const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
     //            const uint64_t textureFlags = 0 | BGFX_TEXTURE_RT_MSAA_X8;
     //                 const uint64_t textureFlags = 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
@@ -274,6 +280,7 @@ void Texture::createTextureHandle()
     // BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
     //         const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
     // BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN
+    //    const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
     const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
     //            const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MIN_ANISOTROPIC | BGFX_SAMPLER_MAG_ANISOTROPIC;
     //    / m_fun->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
