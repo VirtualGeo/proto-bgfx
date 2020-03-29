@@ -1,5 +1,5 @@
 # Blender MTL File: 'None'
-# Material Count: 27
+# Material Count: 26
 
 newmtl Material.001
 Ns 50.000007
@@ -34,16 +34,6 @@ d 1.000000
 illum 1
 map_Bump textures/background_bump.png
 map_Kd textures/background.jpg
-
-newmtl Material__47
-Ns 5.000001
-Ka 1.000000 1.000000 1.000000
-Kd 0.470400 0.470400 0.470400
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
-illum 1
 
 newmtl Material__57
 Ns 5.000001

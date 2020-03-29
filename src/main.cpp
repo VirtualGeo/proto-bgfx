@@ -26,8 +26,8 @@
 //#include "Vertex.h"
 #include "program.h"
 
-#define WIN_WIDTH 800
-#define WIN_HEIGHT 600
+//#define WIN_WIDTH 800
+//#define WIN_HEIGHT 600
 //#define WIN_WIDTH 1920
 //#define WIN_HEIGHT 1080
 
@@ -37,19 +37,25 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_button_callback(GLFWwindow* window, int button, int action,
     int mods);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void error_callback(int error, const char* description);
 // void focus_callback(GLFWwindow *window, int focused);
 void init();
 void shutdown();
 void update();
+uint32_t getResetFlags();
+void resetWindow();
 
 //bgfx::ShaderHandle loadShader(const char* FILENAME);
 void updateCameraFront();
 
 // ----------------- GLOBAL VARS
+int g_width = 800;
+int g_height = 600;
 GLFWwindow* g_window = nullptr;
 // bgfx::ProgramHandle g_program;
 Program g_program;
-unsigned int g_counter = 0;
+size_t g_counter = 1; // avoid g_fps = epoch / sum; with sum = 0
 // Mesh* g_mesh = nullptr;
 Scene g_scene;
 bool g_clicked = false;
@@ -60,8 +66,8 @@ float g_deltaTime = 0.0f;
 bool g_firstMouse = true;
 float g_yaw = 0.0f;
 float g_pitch = 0.0f;
-float g_lastX = WIN_WIDTH / 2.0f;
-float g_lastY = WIN_HEIGHT / 2.0f;
+float g_lastX = g_width / 2.0f;
+float g_lastY = g_height / 2.0f;
 float g_fov = 60.0f;
 bx::Vec3 g_cameraPos = { 0.0f, 2.0f, 0.0f };
 bx::Vec3 g_cameraFront;
@@ -79,13 +85,18 @@ int g_loadingObjectsTime;
 int g_totalLoadingTime;
 std::string g_renderer;
 std::string g_vendorID;
-int g_debugHMargin;
+//int g_debugHMargin;
 size_t g_nbVertexBuffer;
 size_t g_nbIndexBuffer;
+bool g_showStats = false;
+bool g_vsyncEnable = true;
+int g_mssaLevel = 0;
 
 int main(int argc, char const* argv[])
 {
-    updateCameraFront(); // with current g_yaw and g_pitch
+    glfwSetErrorCallback(error_callback);
+
+    updateCameraFront(); // with initial g_yaw and g_pitch
 #ifdef DEBUG
     std::cout << "[main] hello bgfx !!!" << std::endl;
 #endif
@@ -107,7 +118,6 @@ int main(int argc, char const* argv[])
     auto lastTime = glfwGetTime();
     const int epoch = 50;
     while (!glfwWindowShouldClose(g_window)) {
-        bgfx::dbgTextClear();
 
         const auto currentTime = glfwGetTime();
         g_deltaTime = currentTime - lastTime; // need deltaTime at each frame by processInput()
@@ -120,6 +130,8 @@ int main(int argc, char const* argv[])
             g_fps = epoch / sum; // sum is float
             // fps = 1.0f / g_deltaTime;
             sum = 0.0f;
+            //			bgfx::dbgTextClear();
+            //            printDebugMessage();
         }
         //        bgfx::dbgTextPrintf(0, 0, 0x08, "fps = %.1f", g_fps);
 
@@ -151,7 +163,7 @@ void init()
     // --------------------- INIT GLFW
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    g_window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Hello, bgfx from glfw!",
+    g_window = glfwCreateWindow(g_width, g_height, "Hello, bgfx from glfw!",
         NULL, NULL);
     if (g_window == NULL) {
         // std::cout << "Failed to create GLFW window" << std::endl;
@@ -165,10 +177,14 @@ void init()
     glfwSetCursorPosCallback(g_window, mouse_callback);
     glfwSetScrollCallback(g_window, scroll_callback);
     glfwSetMouseButtonCallback(g_window, mouse_button_callback);
+    glfwSetKeyCallback(g_window, key_callback);
     // glfwSetWindowFocusCallback(g_window, focus_callback);
 
     // glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // bgfx::RenderFrame();
+
+    // Call bgfx::renderFrame before bgfx::init to signal to bgfx not to create a render thread.
+    // Most graphics APIs must be used on the same thread that created the window.
     bgfx::renderFrame();
 
     // bgfx::PlatformData pd;
@@ -180,6 +196,8 @@ void init()
 #if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
     bgfxInit.platformData.ndt = glfwGetX11Display();
     bgfxInit.platformData.nwh = (void*)(uintptr_t)glfwGetX11Window(g_window);
+#elif BX_PLATFORM_OSX
+    bgfxInit.platformData.nwh = glfwGetCocoaWindow(g_window);
 #elif BX_PLATFORM_WINDOWS
     bgfxInit.platformData.nwh = glfwGetWin32Window(g_window);
 #endif
@@ -210,10 +228,13 @@ void init()
     bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
 //    std::cout << "[main] RendererType auto" << std::endl;
 #endif
-    bgfxInit.resolution.width = WIN_WIDTH;
-    bgfxInit.resolution.height = WIN_HEIGHT;
-    bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-    //            bgfxInit.resolution.reset = BGFX_RESET_NONE;
+    glfwGetWindowSize(g_window, &g_width, &g_height);
+    bgfxInit.resolution.width = g_width;
+    bgfxInit.resolution.height = g_height;
+    //    bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+    //    bgfxInit.resolution.reset = BGFX_RESET_NONE;
+    //    bgfxInit.resolution.reset = g_vsyncEnable ? BGFX_RESET_VSYNC : BGFX_RESET_NONE;
+    bgfxInit.resolution.reset = getResetFlags();
     bgfxInit.vendorId = BGFX_PCI_ID_NONE;
     // bgfxInit.vendorId = BGFX_PCI_ID_INTEL;
     //    bgfxInit.vendorId = BGFX_PCI_ID_NVIDIA;
@@ -230,19 +251,19 @@ void init()
 
     bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f,
         0);
-    bgfx::setViewRect(0, 0, 0, WIN_WIDTH, WIN_HEIGHT);
+    //    bgfx::setViewRect(0, 0, 0, g_width, g_height);
     bgfx::touch(0);
 
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-        g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Crytek_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
     //    g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
-//    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+    //    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\Cougar.obj");
 
     g_nbVertices = g_scene.nbVertices();
@@ -256,38 +277,40 @@ void init()
     g_totalLoadingTime = g_parsingTime + g_loadingMaterialsTime + g_loadingObjectsTime;
     g_nbVertexBuffer = g_scene.nbVertexBuffer();
     g_nbIndexBuffer = g_scene.nbIndexBuffer();
+    //    printDebugMessage();
 
     const bgfx::Caps* caps = bgfx::getCaps();
     assert(caps->supported & BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN);
     //    switch (bgfx::getRendererType()) {
-    switch (caps->rendererType) {
-    case bgfx::RendererType::Noop:
-    case bgfx::RendererType::Direct3D9:
-        g_renderer = "DirectX9";
-        break;
-    case bgfx::RendererType::Direct3D11:
-        g_renderer = "DirectX11";
-        break;
-    case bgfx::RendererType::Direct3D12:
-        g_renderer = "DirectX12";
-        break;
-    // case bgfx::RendererType::Gnm:
-    // shaderPath = "shaders/bin/pssl/";
-    // break;
-    case bgfx::RendererType::Metal:
-        g_renderer = "Metal";
-        break;
-    case bgfx::RendererType::OpenGLES:
-        g_renderer = "OpenGLES";
-        break;
-    case bgfx::RendererType::OpenGL:
-        g_renderer = "OpenGL";
-        break;
-    case bgfx::RendererType::Vulkan:
-        g_renderer = "Vulkan";
-        break;
-    }
-    g_debugHMargin = (g_renderer == "OpenGL") ? (0) : (2);
+    g_renderer = bgfx::getRendererName(caps->rendererType);
+//    switch (caps->rendererType) {
+//    case bgfx::RendererType::Noop:
+//    case bgfx::RendererType::Direct3D9:
+//        g_renderer = "DirectX9";
+//        break;
+//    case bgfx::RendererType::Direct3D11:
+//        g_renderer = "DirectX11";
+//        break;
+//    case bgfx::RendererType::Direct3D12:
+//        g_renderer = "DirectX12";
+//        break;
+//    // case bgfx::RendererType::Gnm:
+//    // shaderPath = "shaders/bin/pssl/";
+//    // break;
+//    case bgfx::RendererType::Metal:
+//        g_renderer = "Metal";
+//        break;
+//    case bgfx::RendererType::OpenGLES:
+//        g_renderer = "OpenGLES";
+//        break;
+//    case bgfx::RendererType::OpenGL:
+//        g_renderer = "OpenGL";
+//        break;
+//    case bgfx::RendererType::Vulkan:
+//        g_renderer = "Vulkan";
+//        break;
+//    }
+    //    g_debugHMargin = (g_renderer == "OpenGL") ? (0) : (2);
 
     // bgfx::getCaps().vendorId;
 
@@ -321,29 +344,51 @@ void init()
     // program = loadProgram("cubes.vert", "cubes.frag");
 }
 
+void printDebugMessage()
+{
+    //        int margin = 2;
+    //   const int margin = (g_renderer == "OpenGL") ? (0) : (2);
+//    tvm.printf(0, pos++, 0x8f, "       Vendor: %s ", m_vendor);
+//    tvm.printf(0, pos++, 0x8f, "     Renderer: %s ", m_renderer);
+//    tvm.printf(0, pos++, 0x8f, "      Version: %s ", m_version);
+//    tvm.printf(0, pos++, 0x8f, " GLSL version: %s ", m_glslVersion);
+
+    //    int line = g_debugHMargin - 1;
+    if (g_showStats) {
+        bgfx::setDebug(BGFX_DEBUG_STATS);
+    } else {
+        bgfx::dbgTextClear();
+        bgfx::setDebug(BGFX_DEBUG_TEXT);
+        const bgfx::Stats* stats = bgfx::getStats();
+        int line = -1;
+        bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats F2:Vsync F3:Msaa F4: F5: F6: F7:");
+//        bgfx::dbgTextPrintf(0, ++line, 0x0F, " %s / " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ", bgfx::getRendererName(bgfx::getRendererType());
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.2f | Objects:%d | Textures:%d (%.1f MiB)",
+            g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_nbTextures, g_texturesSize);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Vertex buffer:%d | Index buffer:%d | Index buffer/Vertex buffer:%.2f",
+            g_nbVertexBuffer, g_nbIndexBuffer, (float)g_nbIndexBuffer / g_nbVertexBuffer);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ");
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Renderer: %s", g_renderer.c_str());
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Graphic Vendor: %s Corporation", g_vendorID.c_str());
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Backbuffer %dx%d in pixels", stats->width, stats->height);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Parsing time: %d ms", g_parsingTime);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Loading materials time: %d ms", g_loadingMaterialsTime);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Loading objects time: %d ms", g_loadingObjectsTime);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Total loading time: %d ms", g_totalLoadingTime);
+    }
+}
+
 void update()
 {
     // Set view 0 default viewport.
-    bgfx::setViewRect(0, 0, 0, uint16_t(WIN_WIDTH), uint16_t(WIN_HEIGHT));
+    bgfx::setViewRect(0, 0, 0, uint16_t(g_width), uint16_t(g_height));
 
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
     bgfx::touch(0);
 
-    //        int margin = 2;
-    //   const int margin = (g_renderer == "OpenGL") ? (0) : (2);
-    //    int line = g_debugHMargin - 1;
-    int line = -1;
-    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.2f | Objects:%d | Textures:%d (%.1f MiB)",
-        g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_nbTextures, g_texturesSize);
-    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Vertex buffer:%d | Index buffer:%d | Index buffer/Vertex buffer:%.2f",
-        g_nbVertexBuffer, g_nbIndexBuffer, (float)g_nbIndexBuffer / g_nbVertexBuffer);
-    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Current renderer = %s", g_renderer.c_str());
-    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Graphic Vendor ID = %s", g_vendorID.c_str());
-    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Parsing time = %d ms", g_parsingTime);
-    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Loading materials time = %d ms", g_loadingMaterialsTime);
-    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Loading objects time = %d ms", g_loadingObjectsTime);
-    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Total loading time = %d ms", g_totalLoadingTime);
+    printDebugMessage();
+    //    bgfx::dbgTextPrintf(0, 0, 0x0F, "Fps:%.1f", g_fps);
 
     // ------------------------- RENDER SCENE
     const bx::Vec3 at = { 0.0f, 2.0f, 0.0f };
@@ -354,7 +399,7 @@ void update()
     bx::mtxLookAt(view, g_cameraPos, bx::add(g_cameraPos, g_cameraFront), g_cameraUp);
 
     float proj[16];
-    bx::mtxProj(proj, g_fov, float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f,
+    bx::mtxProj(proj, g_fov, float(g_width) / float(g_height), 0.1f, 100.0f,
         bgfx::getCaps()->homogeneousDepth);
 
     bgfx::setViewTransform(0, view, proj);
@@ -380,6 +425,7 @@ void update()
     //        BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
     //        BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW |
     //        BGFX_STATE_BLEND_NORMAL;
+    //    const uint64_t state = 0 | BGFX_STATE_DEFAULT;
     const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
         | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
         | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
@@ -397,6 +443,7 @@ void update()
 
     g_scene.draw(0, g_program, mtx, state);
 
+    // Advance to next frame. Process submitted rendering primitives.
     bgfx::frame();
 }
 
@@ -418,7 +465,42 @@ void shutdown()
 #endif
 }
 
+uint32_t getResetFlags()
+{
+    uint32_t flags = 0 | BGFX_RESET_NONE;
+    if (g_vsyncEnable) {
+        flags |= BGFX_RESET_VSYNC;
+    }
+
+    switch (g_mssaLevel) {
+    case 1:
+        flags |= BGFX_RESET_MSAA_X2;
+        break;
+    case 2:
+        flags |= BGFX_RESET_MSAA_X4;
+        break;
+    case 3:
+        flags |= BGFX_RESET_MSAA_X8;
+        break;
+    case 4:
+        flags |= BGFX_RESET_MSAA_X16; // question : why msaa_16 only differ
+        break;
+
+    }
+    return flags;
+}
+
+void resetWindow()
+{
+    bgfx::reset(g_width, g_height, getResetFlags());
+    bgfx::setViewRect(0, 0, 0, bgfx::BackbufferRatio::Equal);
+}
 // ------------------------------------ GLFW FUNCTIONS
+void error_callback(int error, const char* description)
+{
+    std::cout << "GLFW Error " << error << ": " << description << std::endl;
+    exit(1);
+}
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -427,7 +509,7 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
     }
 
-    float cameraSpeed = 5.0 * g_deltaTime;
+    float cameraSpeed = 3.0 * g_deltaTime;
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         g_cameraPos = bx::add(g_cameraPos, bx::mul(g_cameraFront, cameraSpeed));
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
@@ -448,17 +530,28 @@ void processInput(GLFWwindow* window)
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+    g_width = width;
+    g_height = height;
+
+    resetWindow();
+    //    bgfx::reset(g_width, g_height, g_vsyncEnable ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+    //    std::cout << "size_callback" << std::endl;
     // glViewport(0, 0, width, height);
 }
 
-void updateCameraFront()
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-
-    bx::Vec3 front;
-    front.x = bx::cos(bx::toRad(g_yaw)) * bx::cos(bx::toRad(g_pitch));
-    front.y = bx::sin(bx::toRad(g_pitch));
-    front.z = bx::sin(bx::toRad(g_yaw)) * bx::cos(bx::toRad(g_pitch));
-    g_cameraFront = bx::normalize(front);
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
+        g_showStats = !g_showStats;
+    }
+    if (key == GLFW_KEY_F2 && action == GLFW_PRESS) {
+        g_vsyncEnable = !g_vsyncEnable;
+        resetWindow();
+    }
+    if (key == GLFW_KEY_F3 && action == GLFW_PRESS) {
+        g_mssaLevel = ++ g_mssaLevel % 5;
+        resetWindow();
+    }
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -522,6 +615,16 @@ void mouse_button_callback(GLFWwindow* window, int button, int action,
     // popup_menu();
 }
 
+// --------------------------------- CAMERA FUNCTIONS
+void updateCameraFront()
+{
+
+    bx::Vec3 front;
+    front.x = bx::cos(bx::toRad(g_yaw)) * bx::cos(bx::toRad(g_pitch));
+    front.y = bx::sin(bx::toRad(g_pitch));
+    front.z = bx::sin(bx::toRad(g_yaw)) * bx::cos(bx::toRad(g_pitch));
+    g_cameraFront = bx::normalize(front);
+}
 // void focus_callback(GLFWwindow *window, int focused) {
 // 	g_focused = focused == GLFW_TRUE;
 // }
