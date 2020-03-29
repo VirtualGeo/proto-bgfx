@@ -36,6 +36,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # endif()
     # elseif (MSVC)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+# elseif (MSVC)
     # default debug flags : /MDd /Zi /Ob0 /Od /RTC1
     # default release flags : /MD /O2 /Ob2 /DNDEBUG
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX")

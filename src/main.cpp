@@ -55,7 +55,8 @@ int g_height = 600;
 GLFWwindow* g_window = nullptr;
 // bgfx::ProgramHandle g_program;
 Program g_program;
-size_t g_counter = 1; // avoid g_fps = epoch / sum; with sum = 0
+size_t g_counter = 0; // avoid g_fps = epoch / sum; with sum = 0
+int g_epoch = 10;
 // Mesh* g_mesh = nullptr;
 Scene g_scene;
 bool g_clicked = false;
@@ -117,7 +118,7 @@ int main(int argc, char const* argv[])
     //    g_fps = 0.0f;
     float sum = 0.0f;
     auto lastTime = glfwGetTime();
-    const int epoch = 50;
+    // int epoch = 10;
     while (!glfwWindowShouldClose(g_window)) {
 
         const auto currentTime = glfwGetTime();
@@ -125,12 +126,14 @@ int main(int argc, char const* argv[])
         lastTime = currentTime;
         sum += g_deltaTime;
 
-        if (g_counter % epoch == 0) {
+        if (g_counter >= g_epoch) {
             //		    g_lastFrame = currentFrame;
 
-            g_fps = epoch / sum; // sum is float
+            g_epoch = (g_fps = g_epoch / sum) / 2; // sum is float
             // fps = 1.0f / g_deltaTime;
             sum = 0.0f;
+            g_counter = 0;
+            // g_epoch = g_fps;
             //			bgfx::dbgTextClear();
             //            printDebugMessage();
         }
@@ -142,7 +145,7 @@ int main(int argc, char const* argv[])
 
         // bgfx::frame();
 
-        g_counter++;
+        ++g_counter;
         // std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
         // glfwSwapBuffers(g_window); question : why not use ?
@@ -266,7 +269,7 @@ void init()
 
     //        g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
 //    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
-    //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\Cougar.obj");
+    //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
 
     g_nbVertices = g_scene.nbVertices();
     g_nbTriangles = g_scene.nbTriangles();
@@ -550,6 +553,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     if (key == GLFW_KEY_F2 && action == GLFW_PRESS) {
         g_vsyncEnable = !g_vsyncEnable;
+        g_epoch = 10;
         resetWindow();
     }
     if (key == GLFW_KEY_F3 && action == GLFW_PRESS) {

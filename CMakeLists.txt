@@ -22,7 +22,7 @@ add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 # set(RENDERER_Direct3D12 1)
 # set(RENDERER_Vulkan 1)
 # set(RENDERER_OpenGLES 1)
-#set(RENDERER_Metal 1)
+# set(RENDERER_Metal 1)
 # -------------------------------------------------------------------
 
 if (RENDERER_OpenGL)
