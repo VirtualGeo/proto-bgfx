@@ -249,21 +249,22 @@ void init()
     // bgfx::setDebug(BGFX_DEBUG_TEXT);
     // bgfx::setDebug(BGFX_DEBUG_WIREFRAME);
 
-    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f,
-        0);
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
+    // question : why only here once, not at each frame ?
+
     //    bgfx::setViewRect(0, 0, 0, g_width, g_height);
     bgfx::touch(0);
 
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+    //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Crytek_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
-    //    g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
-    //    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+    //        g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
+    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\Cougar.obj");
 
     g_nbVertices = g_scene.nbVertices();
@@ -283,33 +284,33 @@ void init()
     assert(caps->supported & BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN);
     //    switch (bgfx::getRendererType()) {
     g_renderer = bgfx::getRendererName(caps->rendererType);
-//    switch (caps->rendererType) {
-//    case bgfx::RendererType::Noop:
-//    case bgfx::RendererType::Direct3D9:
-//        g_renderer = "DirectX9";
-//        break;
-//    case bgfx::RendererType::Direct3D11:
-//        g_renderer = "DirectX11";
-//        break;
-//    case bgfx::RendererType::Direct3D12:
-//        g_renderer = "DirectX12";
-//        break;
-//    // case bgfx::RendererType::Gnm:
-//    // shaderPath = "shaders/bin/pssl/";
-//    // break;
-//    case bgfx::RendererType::Metal:
-//        g_renderer = "Metal";
-//        break;
-//    case bgfx::RendererType::OpenGLES:
-//        g_renderer = "OpenGLES";
-//        break;
-//    case bgfx::RendererType::OpenGL:
-//        g_renderer = "OpenGL";
-//        break;
-//    case bgfx::RendererType::Vulkan:
-//        g_renderer = "Vulkan";
-//        break;
-//    }
+    //    switch (caps->rendererType) {
+    //    case bgfx::RendererType::Noop:
+    //    case bgfx::RendererType::Direct3D9:
+    //        g_renderer = "DirectX9";
+    //        break;
+    //    case bgfx::RendererType::Direct3D11:
+    //        g_renderer = "DirectX11";
+    //        break;
+    //    case bgfx::RendererType::Direct3D12:
+    //        g_renderer = "DirectX12";
+    //        break;
+    //    // case bgfx::RendererType::Gnm:
+    //    // shaderPath = "shaders/bin/pssl/";
+    //    // break;
+    //    case bgfx::RendererType::Metal:
+    //        g_renderer = "Metal";
+    //        break;
+    //    case bgfx::RendererType::OpenGLES:
+    //        g_renderer = "OpenGLES";
+    //        break;
+    //    case bgfx::RendererType::OpenGL:
+    //        g_renderer = "OpenGL";
+    //        break;
+    //    case bgfx::RendererType::Vulkan:
+    //        g_renderer = "Vulkan";
+    //        break;
+    //    }
     //    g_debugHMargin = (g_renderer == "OpenGL") ? (0) : (2);
 
     // bgfx::getCaps().vendorId;
@@ -348,10 +349,10 @@ void printDebugMessage()
 {
     //        int margin = 2;
     //   const int margin = (g_renderer == "OpenGL") ? (0) : (2);
-//    tvm.printf(0, pos++, 0x8f, "       Vendor: %s ", m_vendor);
-//    tvm.printf(0, pos++, 0x8f, "     Renderer: %s ", m_renderer);
-//    tvm.printf(0, pos++, 0x8f, "      Version: %s ", m_version);
-//    tvm.printf(0, pos++, 0x8f, " GLSL version: %s ", m_glslVersion);
+    //    tvm.printf(0, pos++, 0x8f, "       Vendor: %s ", m_vendor);
+    //    tvm.printf(0, pos++, 0x8f, "     Renderer: %s ", m_renderer);
+    //    tvm.printf(0, pos++, 0x8f, "      Version: %s ", m_version);
+    //    tvm.printf(0, pos++, 0x8f, " GLSL version: %s ", m_glslVersion);
 
     //    int line = g_debugHMargin - 1;
     if (g_showStats) {
@@ -361,17 +362,17 @@ void printDebugMessage()
         bgfx::setDebug(BGFX_DEBUG_TEXT);
         const bgfx::Stats* stats = bgfx::getStats();
         int line = -1;
-        bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats F2:Vsync F3:Msaa F4: F5: F6: F7:");
-//        bgfx::dbgTextPrintf(0, ++line, 0x0F, " %s / " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ", bgfx::getRendererName(bgfx::getRendererType());
+        bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats | F2:Vsync | F3:Msaa | F4: | F5: | F6: | F7:");
+        //        bgfx::dbgTextPrintf(0, ++line, 0x0F, " %s / " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ", bgfx::getRendererName(bgfx::getRendererType());
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.2f | Objects:%d | Textures:%d (%.1f MiB)",
             g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_nbTextures, g_texturesSize);
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Vertex buffer:%d | Index buffer:%d | Index buffer/Vertex buffer:%.2f",
             g_nbVertexBuffer, g_nbIndexBuffer, (float)g_nbIndexBuffer / g_nbVertexBuffer);
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ");
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Arch: " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ");
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Renderer: %s", g_renderer.c_str());
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Graphic Vendor: %s Corporation", g_vendorID.c_str());
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Backbuffer %dx%d in pixels", stats->width, stats->height);
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Parsing time: %d ms", g_parsingTime);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "TinyObj parsing time: %d ms", g_parsingTime);
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Loading materials time: %d ms", g_loadingMaterialsTime);
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Loading objects time: %d ms", g_loadingObjectsTime);
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Total loading time: %d ms", g_totalLoadingTime);
@@ -485,7 +486,6 @@ uint32_t getResetFlags()
     case 4:
         flags |= BGFX_RESET_MSAA_X16; // question : why msaa_16 only differ
         break;
-
     }
     return flags;
 }
@@ -549,7 +549,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         resetWindow();
     }
     if (key == GLFW_KEY_F3 && action == GLFW_PRESS) {
-        g_mssaLevel = ++ g_mssaLevel % 5;
+        g_mssaLevel = ++g_mssaLevel % 5;
         resetWindow();
     }
 }
