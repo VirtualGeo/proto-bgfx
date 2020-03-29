@@ -285,7 +285,7 @@ void init()
     //    printDebugMessage();
 
     const bgfx::Caps* caps = bgfx::getCaps();
-    assert(caps->supported & BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN);
+//    assert(caps->supported & BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN);
     //    switch (bgfx::getRendererType()) {
     g_renderer = bgfx::getRendererName(caps->rendererType);
     //    switch (caps->rendererType) {
