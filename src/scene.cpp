@@ -28,6 +28,7 @@ void Scene::addModel(const std::string& filename)
     std::string absoluteFilename(filename);
     std::string bin = absoluteFilename.substr(0, absoluteFilename.find_last_of('.')) + ".bin";
     //    std::cout << "bin : " << bin << std::endl;
+    bool loadBinFailed = false;
 #ifdef AUTO_GENERATE_BIN_MODEL
     if (FileExists(bin)) {
         std::ifstream file;
@@ -36,16 +37,31 @@ void Scene::addModel(const std::string& filename)
             std::cerr << "cannot open file" << std::endl;
             exit(1);
         }
-        load(file);
+        try {
+            load(file);
+        } catch (std::exception) {
+            loadBinFailed = true;
+        }
+//        catch (std::bad_alloc) {
+//            //            std::cout << "bad_alloc" << std::endl;
+//            loadBinFailed = true;
+//        }
+
         file.close();
 
-        return;
+        if (loadBinFailed) {
+            m_objects.clear();
+            m_materials.clear();
+            m_textures.clear();
+        } else {
+            return;
+        }
     }
 #endif
 
-    tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
+    tinyobj::attrib_t tinyObjAttrib;
+    std::vector<tinyobj::shape_t> tinyObjShapes;
+    std::vector<tinyobj::material_t> tinyObjMaterials;
     //    std::map<std::string, uint> textures;
 
     timerutil tm;
@@ -63,7 +79,7 @@ void Scene::addModel(const std::string& filename)
 
     std::string warn;
     std::string err;
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, absoluteFilename.c_str(),
+    bool ret = tinyobj::LoadObj(&tinyObjAttrib, &tinyObjShapes, &tinyObjMaterials, &warn, &err, absoluteFilename.c_str(),
         base_dir.c_str());
     if (!warn.empty()) {
         std::cout << "[Scene] WARN: " << warn << std::endl;
@@ -86,36 +102,36 @@ void Scene::addModel(const std::string& filename)
     //    printf("[Scene] Parsing time: %d [ms]\n", (int)tm.msec());
     m_parsingTime = tm.msec();
 
-    const int nbMaterials = materials.size();
-    const int nbObjects = shapes.size();
+    const int nbMaterials = tinyObjMaterials.size();
+    const int nbObjects = tinyObjShapes.size();
 #ifdef DEBUG
-    printf("[Scene] # of vertices  = %d\n", (int)(attrib.vertices.size()) / 3);
-    printf("[Scene] # of normals   = %d\n", (int)(attrib.normals.size()) / 3);
-    printf("[Scene] # of texcoords = %d\n", (int)(attrib.texcoords.size()) / 2);
+    printf("[Scene] # of vertices  = %d\n", (int)(tinyObjAttrib.vertices.size()) / 3);
+    printf("[Scene] # of normals   = %d\n", (int)(tinyObjAttrib.normals.size()) / 3);
+    printf("[Scene] # of texcoords = %d\n", (int)(tinyObjAttrib.texcoords.size()) / 2);
     printf("[Scene] # of materials = %d\n", nbMaterials);
     printf("[Scene] # of shapes    = %d\n", nbObjects);
 #endif
 
     // Append `default` material
-    //    materials.push_back(tinyobj::material_t());
+    //    tinyObjMaterials.push_back(tinyobj::material_t());
 
-    //    for (size_t i = 0; i < materials.size(); i++) {
+    //    for (size_t i = 0; i < tinyObjMaterials.size(); i++) {
     //        printf("material[%d].diffuse_texname = %s\n", int(i),
-    //            materials[i].diffuse_texname.c_str());
+    //            tinyObjMaterials[i].diffuse_texname.c_str());
     //    }
 
     // Load diffuse textures
     //    {
-    //    for (const tinyobj::material_t& material : materials) {
-    m_materials.reserve(materials.size());
-    m_textures.reserve(materials.size());
+    //    for (const tinyobj::material_t& material : tinyObjMaterials) {
+    m_materials.reserve(tinyObjMaterials.size());
+    m_textures.reserve(tinyObjMaterials.size());
 
     //    timerutil tm;
     tm.start();
 
-    //    const size_t nbMaterials = materials.size();
+    //    const size_t nbMaterials = tinyObjMaterials.size();
     for (size_t i = 0; i < nbMaterials; i++) {
-        const tinyobj::material_t& tinyObj_material = materials[i];
+        const tinyobj::material_t& tinyObj_material = tinyObjMaterials[i];
 
         //        printf("material[%d].difname = %s\n", int(i),
         //            material.name.c_str());
@@ -142,9 +158,9 @@ void Scene::addModel(const std::string& filename)
     m_objects.reserve(nbObjects);
     bgfx::frame();
     for (size_t i = 0; i < nbObjects; ++i) {
-        const tinyobj::shape_t& tinyObj_shape = shapes[i];
-        //        m_objects.push_back(Object(tinyObj_shape, attrib, materials, i));
-        m_objects.emplace_back(tinyObj_shape, attrib, materials, i, m_layout);
+        const tinyobj::shape_t& tinyObj_shape = tinyObjShapes[i];
+        //        m_objects.push_back(Object(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i));
+        m_objects.emplace_back(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i, m_layout);
         //        nbIndices += m_objects[i].nbTriangles() * 3;
         //        nbMeshes += m_objects[i].nbMeshes();
         //        std::cout << "[Scene] nbIndices:" << nbIndices << std::endl;
@@ -163,12 +179,12 @@ void Scene::addModel(const std::string& filename)
     m_loadingObjectsTime = tm.msec();
 
     //    std::cout << "[Scene] Parsing time: " << m_parsingTime << " [ms]" << std::endl;
-    //    std::cout << "[Scene] Loading materials time: " << m_loadingMaterialsTime << " [ms]" << std::endl;
+    //    std::cout << "[Scene] Loading tinyObjMaterials time: " << m_loadingMaterialsTime << " [ms]" << std::endl;
     //    std::cout << "[Scene] Loading objects time: " << m_loadingObjectsTime << " [ms]" << std::endl;
 
 #ifdef AUTO_GENERATE_BIN_MODEL
     //    save(file);
-    if (!FileExists(bin)) {
+    if (!FileExists(bin) || loadBinFailed) {
         std::ofstream file;
         file.open(bin, std::ios::binary | std::ios::out);
         if (!file.is_open()) {
