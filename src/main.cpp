@@ -89,8 +89,9 @@ std::string g_vendorID;
 size_t g_nbVertexBuffer;
 size_t g_nbIndexBuffer;
 bool g_showStats = false;
-bool g_vsyncEnable = true;
+bool g_vsyncEnable = false;
 int g_mssaLevel = 0;
+bool g_shiftPressed = false;
 
 int main(int argc, char const* argv[])
 {
@@ -258,13 +259,13 @@ void init()
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-    //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+        g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Crytek_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
     //        g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
-    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+//    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\Cougar.obj");
 
     g_nbVertices = g_scene.nbVertices();
@@ -509,7 +510,10 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
     }
 
-    float cameraSpeed = 3.0 * g_deltaTime;
+    float cameraSpeed = g_shiftPressed ? 1.0f :5.0f;
+    cameraSpeed *= g_deltaTime;
+//    cameraSpeed= 5.0 * g_deltaTime;
+
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         g_cameraPos = bx::add(g_cameraPos, bx::mul(g_cameraFront, cameraSpeed));
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
@@ -551,6 +555,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_F3 && action == GLFW_PRESS) {
         g_mssaLevel = ++g_mssaLevel % 5;
         resetWindow();
+    }
+    if (key == GLFW_KEY_LEFT_SHIFT) {
+        g_shiftPressed = action == GLFW_PRESS;
+//        if (action == GLFW_PRESS) {
+//            g_shiftPressed = true;
+//        }
+//        else if (action == GLFW_RELEASE) {
+//            g_shiftPressed = false;
+//        }
+//        g_shiftPressed = ! g_shiftPressed;
     }
 }
 
