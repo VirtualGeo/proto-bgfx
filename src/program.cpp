@@ -144,6 +144,9 @@ bgfx::ShaderHandle loadShader(const std::string& filename)
     file.close();
 
     //    free(filePath);
+    bgfx::ShaderHandle handle = bgfx::createShader(mem);
+    bgfx::setName(handle, filename.c_str());
 
-    return bgfx::createShader(mem);
+    return handle;
+//    return bgfx::createShader(mem);
 }
