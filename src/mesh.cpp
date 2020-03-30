@@ -85,7 +85,7 @@ void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
 //        const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MAG_ANISOTROPIC | BGFX_SAMPLER_MIN_ANISOTROPIC;
         // const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
         bgfx::setTexture(0, program.m_sDiffuse,
-            texture.textureHandle());
+            texture.textureHandle(), Texture::s_textureSamplerFlags);
 
         //  textureFlags | samplerFlags);
 
@@ -94,6 +94,9 @@ void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
         //        bgfx::setUniform(m_uHasDiffuseTexture, temp);
         //                 bgfx::setUniform(m_uHasDiffuseTexture);
     }
+    else {
+        bgfx::setTexture(0, program.m_sDiffuse, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+    }
 
     bgfx::setUniform(program.m_uTexturesEnable, material.texturesEnable());
     const int iTexOpacity = material.iTexOpacity();
@@ -101,7 +104,11 @@ void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
         assert(iTexOpacity < textures.size());
         const Texture& texture = textures[iTexOpacity];
 
-        bgfx::setTexture(1, program.m_sOpacity, texture.textureHandle());
+        bgfx::setTexture(1, program.m_sOpacity, texture.textureHandle(), Texture::s_textureSamplerFlags);
+    }
+    else {
+        bgfx::setTexture(1, program.m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+
     }
 
     // else {
