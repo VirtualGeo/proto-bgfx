@@ -93,6 +93,8 @@ bool g_showStats = false;
 bool g_vsyncEnable = false;
 int g_mssaLevel = 0;
 bool g_shiftPressed = false;
+bool g_slowMotion = false;
+int g_textureSamplerFlags = 0;
 
 int main(int argc, char const* argv[])
 {
@@ -129,7 +131,7 @@ int main(int argc, char const* argv[])
         if (g_counter >= g_epoch) {
             //		    g_lastFrame = currentFrame;
 
-            g_epoch = (g_fps = g_epoch / sum) / 2; // sum is float
+            g_epoch = (g_fps = g_epoch / sum) / 2; // fps echo epoch = 0.5 sec
             // fps = 1.0f / g_deltaTime;
             sum = 0.0f;
             g_counter = 0;
@@ -262,13 +264,13 @@ void init()
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-        g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+            g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+//    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+    //        g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Crytek_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
-    //        g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
-//    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
 
     g_nbVertices = g_scene.nbVertices();
@@ -285,7 +287,7 @@ void init()
     //    printDebugMessage();
 
     const bgfx::Caps* caps = bgfx::getCaps();
-//    assert(caps->supported & BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN);
+    //    assert(caps->supported & BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN);
     //    switch (bgfx::getRendererType()) {
     g_renderer = bgfx::getRendererName(caps->rendererType);
     //    switch (caps->rendererType) {
@@ -366,7 +368,7 @@ void printDebugMessage()
         bgfx::setDebug(BGFX_DEBUG_TEXT);
         const bgfx::Stats* stats = bgfx::getStats();
         int line = -1;
-        bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats | F2:Vsync | F3:Msaa | F4: | F5: | F6: | F7:");
+        bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats | F2:Vsync | F3:Msaa | F4:Sampler | F5: | F6: | F7:");
         //        bgfx::dbgTextPrintf(0, ++line, 0x0F, " %s / " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ", bgfx::getRendererName(bgfx::getRendererType());
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.2f | Objects:%d | Textures:%d (%.1f MiB)",
             g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_nbTextures, g_texturesSize);
@@ -513,9 +515,10 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
     }
 
-    float cameraSpeed = g_shiftPressed ? 1.0f :5.0f;
+    //    float cameraSpeed = g_shiftPressed ? 1.0f : 5.0f;
+    float cameraSpeed = g_slowMotion ? 1.0f : 5.0f;
     cameraSpeed *= g_deltaTime;
-//    cameraSpeed= 5.0 * g_deltaTime;
+    //    cameraSpeed= 5.0 * g_deltaTime;
 
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         g_cameraPos = bx::add(g_cameraPos, bx::mul(g_cameraFront, cameraSpeed));
@@ -541,6 +544,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     g_height = height;
 
     resetWindow();
+
     //    bgfx::reset(g_width, g_height, g_vsyncEnable ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
     //    std::cout << "size_callback" << std::endl;
     // glViewport(0, 0, width, height);
@@ -560,15 +564,46 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         g_mssaLevel = ++g_mssaLevel % 5;
         resetWindow();
     }
-    if (key == GLFW_KEY_LEFT_SHIFT) {
+    if (key == GLFW_KEY_F4 && action == GLFW_PRESS) {
+        g_textureSamplerFlags = ++ g_textureSamplerFlags % 5;
+        switch (g_textureSamplerFlags) {
+        case 0:
+            Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE;
+            break;
+        case 1:
+            Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIN_POINT;
+            break;
+        case 2:
+            Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MAG_ANISOTROPIC | BGFX_SAMPLER_MIN_POINT;
+            break;
+        case 3:
+            Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MAG_SHIFT | BGFX_SAMPLER_MIN_SHIFT;
+            break;
+        case 4:
+            Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MAG_ANISOTROPIC | BGFX_SAMPLER_MIN_ANISOTROPIC;
+            break;
+//        case 4:
+//            Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MAG_MASK | BGFX_SAMPLER_MIN_MASK; // question : why failed
+//            break;
+        }
+
+    }
+    if (key == GLFW_KEY_RIGHT_CONTROL && action == GLFW_RELEASE) {
+        g_slowMotion = !g_slowMotion;
+    }
+    if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_KEY_RIGHT_SHIFT) {
         g_shiftPressed = action == GLFW_PRESS;
-//        if (action == GLFW_PRESS) {
-//            g_shiftPressed = true;
-//        }
-//        else if (action == GLFW_RELEASE) {
-//            g_shiftPressed = false;
-//        }
-//        g_shiftPressed = ! g_shiftPressed;
+        //        if (action == GLFW_RELEASE) {
+        //            g_slowMotion = !g_slowMotion;
+        //        }
+
+        //        if (action == GLFW_PRESS) {
+        //            g_shiftPressed = true;
+        //        }
+        //        else if (action == GLFW_RELEASE) {
+        //            g_shiftPressed = false;
+        //        }
+        //        g_shiftPressed = ! g_shiftPressed;
     }
 }
 

@@ -12,6 +12,8 @@
 #include <bimg/bimg.h>
 
 class Texture {
+public:
+    static u_int64_t s_textureSamplerFlags;
 
 public:
     Texture(const std::string& texName, const std::string& baseDir);
@@ -24,6 +26,8 @@ public:
     void save(std::ofstream& file) const;
 
     void createTextureHandle();
+//    void setSamplerAnisotropic();
+//    void setSamplerPoint();
 
     friend std::ostream& operator<<(std::ostream& os, const Texture& texture);
 
@@ -43,13 +47,16 @@ private:
 
     //    bgfx::TextureInfo m_texInfo;
     //    bimg::Orientation::Enum m_orientation;
-
-        bool m_last = true;
+    bool m_last = true;
+    //        static u_int64_t s_textureFlags;
+    //        static u_int64_t s_samplerFlags;
 
 public: // ---------------------------------------------- getters
     const bgfx::TextureHandle& textureHandle() const;
     std::string name() const;
     size_t textureSize() const;
+
+//    static u_int64_t get_textureSamplerFlags();
 };
 
 using Textures = std::vector<Texture>;

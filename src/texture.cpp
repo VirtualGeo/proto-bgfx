@@ -19,6 +19,11 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb/stb_image_resize.h>
 
+//u_int64_t Texture::s_textureFlags = 0 | BGFX_TEXTURE_NONE;
+//u_int64_t Texture::s_samplerFlags = 0 | BGFX_SAMPLER_NONE;
+//u_int64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE;
+u_int64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_ANISOTROPIC;
+
 // Texture::Texture(const char *filename) {
 Texture::Texture(const std::string& texName, const std::string& baseDir)
 {
@@ -272,7 +277,7 @@ void Texture::createTextureHandle()
     //                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     //                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     //    const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
-    const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+//    const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
     //            const uint64_t textureFlags = 0 | BGFX_TEXTURE_RT_MSAA_X8;
     //                 const uint64_t textureFlags = 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
     //                 const uint64_t textureFlags = 0 | BGFX_RESOLVE_AUTO_GEN_MIPS;
@@ -281,8 +286,9 @@ void Texture::createTextureHandle()
     //         const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
     // BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN
     //    const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
-    const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
-    //            const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MIN_ANISOTROPIC | BGFX_SAMPLER_MAG_ANISOTROPIC;
+//    const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
+    //                const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MIN_ANISOTROPIC | BGFX_SAMPLER_MAG_ANISOTROPIC;
+    //                const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT;
     //    / m_fun->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     //    m_fun->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     //    m_fun->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -295,8 +301,13 @@ void Texture::createTextureHandle()
 
     m_textureHandle = bgfx::createTexture2D(
         m_width, m_height, hasMips, 1, texFormat,
-        textureFlags | samplerFlags, bgfx::copy(m_image, m_textureSize));
+        s_textureSamplerFlags, bgfx::copy(m_image, m_textureSize));
 }
+
+//u_int64_t Texture::get_textureSamplerFlags()
+//{
+//    return s_textureFlags | s_samplerFlags;
+//}
 
 std::ostream& operator<<(std::ostream& os, const Texture& texture)
 {
