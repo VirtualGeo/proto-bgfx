@@ -343,6 +343,7 @@ void init()
     //    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
     //    g_program = bgfx::createProgram(vsh, fsh, true);
     g_program.init("cubes");
+//    g_program.init("lookDev");
 
     // g_texColor = bgfx::createUniform("s_texColor",
     // bgfx::UniformType::Sampler);
