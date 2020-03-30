@@ -1,59 +1,167 @@
 #include "program.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include <string>
+#include <cassert>
+//#include <bx/bx.h>
+#include <bx/file.h>
+
+const std::string Program::shadingFileNames[Program::Shading::Count] { "normal", "material", "rendered" };
 
 //bgfx::ShaderHandle loadShader(const char* filename);
-bgfx::ShaderHandle loadShader(const std::string & filename);
+bgfx::ShaderHandle loadShader(const std::string& filename);
 
 Program::Program()
 {
-
 }
 
 Program::~Program()
 {
-//    bgfx::destroy(m_handle);
-//    bgfx::destroy(m_uDiffuse);
-//    bgfx::destroy(m_sDiffuse);
-
+    //    bgfx::destroy(m_handle);
+    //    bgfx::destroy(m_uDiffuse);
+    //    bgfx::destroy(m_sDiffuse);
 }
 
-void Program::init(const char *shaderName)
+//void Program::init(const char *shaderName)
+void Program::init()
 {
 
-//    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
-    bgfx::ShaderHandle vsh = loadShader(std::string(shaderName) + ".vert");
-//    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
-    bgfx::ShaderHandle fsh = loadShader(std::string(shaderName) + ".frag");
-    // bgfx::ShaderHandle vsh = loadShader("mesh.vert");
-    // bgfx::ShaderHandle fsh = loadShader("mesh.frag");
-    m_handle = bgfx::createProgram(vsh, fsh, true);
+    for (int i =0; i < Shading::Count; ++i) {
+        //    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
+        const std::string & shadingFileName = shadingFileNames[i];
 
-    m_uDiffuse = bgfx::createUniform("u_diffuse", bgfx::UniformType::Vec4);
+        const bgfx::ShaderHandle vsh = loadShader(shadingFileName + ".vert");
+        bgfx::setName(vsh, shadingFileName.c_str());
+
+        //    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
+        bgfx::ShaderHandle fsh = loadShader(shadingFileName + ".frag");
+        bgfx::setName(fsh, shadingFileName.c_str());
+        // bgfx::ShaderHandle vsh = loadShader("mesh.vert");
+        // bgfx::ShaderHandle fsh = loadShader("mesh.frag");
+        m_handlePrograms[i] = bgfx::createProgram(vsh, fsh, true);
+//        bgfx::setName(m_handlePrograms[i], shadingFileName.c_str());
+    }
+
+//    m_uDiffuse = bgfx::createUniform("u_diffuse", bgfx::UniformType::Vec4);
     m_sDiffuse = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
 
     m_sOpacity = bgfx::createUniform("s_opacity", bgfx::UniformType::Sampler);
     //    m_uHasDiffuseTexture = bgfx::createUniform("u_hasDiffuseTexture", bgfx::UniformType::Vec4);
-    m_uTexturesEnable = bgfx::createUniform("u_texturesEnable", bgfx::UniformType::Vec4);
+//    m_uTexturesEnable = bgfx::createUniform("u_texturesEnable", bgfx::UniformType::Vec4);
+
+    m_handleUniform = bgfx::createUniform("u_params", bgfx::UniformType::Vec4, s_num_vec4_uniforms);
 }
 
 void Program::clear()
 {
-    bgfx::destroy(m_handle);
-    bgfx::destroy(m_uDiffuse);
+    for (int i =0; i <Shading::Count; ++i) {
+        bgfx::destroy(m_handlePrograms[i]);
+    }
+//    bgfx::destroy(m_handle);
+//    bgfx::destroy(m_uDiffuse);
     bgfx::destroy(m_sDiffuse);
 
     bgfx::destroy(m_sOpacity);
-    bgfx::destroy(m_uTexturesEnable);
+//    bgfx::destroy(m_uTexturesEnable);
+
+    bgfx::destroy(m_handleUniform);
+}
+
+void Program::setShading(Program::Shading shading)
+{
+    m_iHandleProgram = shading;
+}
+
+Program::Shading Program::shading() const
+{
+    return Shading(m_iHandleProgram);
+}
+
+void Program::submit(const Material &material, const DirLight &dirLight, const Textures &textures) const
+{
+
+    switch (m_iHandleProgram) {
+    case Program::Shading::NORMAL:
+        break;
+
+    case Program::Shading::MATERIAL:
+    case Program::Shading::RENDERED:
+        //    const int iMaterial = m_iMaterial;
+
+//        bgfx::setUniform(m_uDiffuse, material.diffuse());
+
+        //    		if (group.m_texture != nullptr) {
+//        const int iTexDiffuse = material.iTexDiffuse();
+        const int iTexDiffuse = material.m_iTexDiffuse;
+        if (iTexDiffuse >= 0) {
+
+            assert(iTexDiffuse < textures.size());
+            const Texture& texture = textures[iTexDiffuse];
+            //                }
+            // uint32_t flags = UINT32_MAX;
+            // uint32_t flags = BGFX_TEXTURE_USE_DEFAULT;
+
+            // const uint64_t textureFlags =
+            // 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
+            // const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+            //        const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MAG_ANISOTROPIC | BGFX_SAMPLER_MIN_ANISOTROPIC;
+            // const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
+            bgfx::setTexture(0, m_sDiffuse,
+                texture.textureHandle(), Texture::s_textureSamplerFlags);
+
+            //  textureFlags | samplerFlags);
+
+            //                 bgfx::setUniform(m_uHasDiffuseTexture, (void*)true);
+            //        float temp[1] = { 1.0 };
+            //        bgfx::setUniform(m_uHasDiffuseTexture, temp);
+            //                 bgfx::setUniform(m_uHasDiffuseTexture);
+        } else {
+            bgfx::setTexture(0, m_sDiffuse, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+        }
+
+//        bgfx::setUniform(m_uTexturesEnable, material.texturesEnable());
+//        const int iTexOpacity = material.iTexOpacity();
+        const int iTexOpacity = material.m_iTexOpacity;
+        if (iTexOpacity >= 0) {
+            assert(iTexOpacity < textures.size());
+            const Texture& texture = textures[iTexOpacity];
+
+            bgfx::setTexture(1, m_sOpacity, texture.textureHandle(), Texture::s_textureSamplerFlags);
+        } else {
+            bgfx::setTexture(1, m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+        }
+
+//        const std::array<float[4], s_num_vec4_uniforms> buffer = {{
+        const float buffer[s_num_vec4_uniforms][4] = {
+            {material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3]}, // question how do smaller, without glm::vec4
+            {material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_specular[3]}, // question how do smaller, without glm::vec4
+            {material.m_ambient[0], material.m_ambient[1], material.m_ambient[2], material.m_shininess}, // question how do smaller, without glm::vec4
+            {material.m_texturesEnable[0]},
+            {dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z},
+            {dirLight.m_ambient.x, dirLight.m_ambient.y, dirLight.m_ambient.z},
+            {dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z},
+            {dirLight.m_specular.x, dirLight.m_specular.y, dirLight.m_specular.z},
+//            {}
+        };
+//        buffer[0] = material.m_diffuse;
+        bgfx::setUniform(m_handleUniform, buffer, s_num_vec4_uniforms);
+//        bgfx::setUniform(m_handleUniform, buffer.data(), s_num_vec4_uniforms);
+
+        break;
+    }
+}
+
+
+bgfx::ProgramHandle Program::handleProgram() const
+{
+    return m_handlePrograms[m_iHandleProgram];
 }
 
 //bgfx::ProgramHandle Program::program() const
 //{
 //    return m_program;
 //}
-
 
 bgfx::ShaderHandle loadShader(const std::string& filename)
 //bgfx::ShaderHandle loadShader(const char* filename)
@@ -148,5 +256,5 @@ bgfx::ShaderHandle loadShader(const std::string& filename)
     bgfx::setName(handle, filename.c_str());
 
     return handle;
-//    return bgfx::createShader(mem);
+    //    return bgfx::createShader(mem);
 }

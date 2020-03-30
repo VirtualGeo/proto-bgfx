@@ -60,8 +60,14 @@ set(SHADER_SRC_DIR ${SHADER_DIR}/src)
 # set(SHADERS test.vert.sc)
 
 set(IN_SHADERS
-    cubes.vert.sc
-    cubes.frag.sc
+#    cubes.vert.sc
+#    cubes.frag.sc
+    material.vert.sc
+    material.frag.sc
+    rendered.vert.sc
+    rendered.frag.sc
+    normal.vert.sc
+    normal.frag.sc
     # blinnphong_vert.sc
     # blinnphong_frag.sc
     # mesh_vert.sc

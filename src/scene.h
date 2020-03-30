@@ -9,6 +9,8 @@
 #include "texture.h"
 #include "program.h"
 
+#include "dirLight.h"
+
 class Scene
 {
 public:
@@ -32,6 +34,7 @@ private:
 //    std::vector<Texture> m_textures;
     Textures m_textures;
 
+    DirLight m_dirLight;
 //    bgfx::UniformHandle m_uDiffuse;
 //    bgfx::UniformHandle m_samplerDiffuse;
 //    bgfx::UniformHandle m_uHasDiffuseTexture;

@@ -9,6 +9,7 @@
 
 #include "material.h"
 #include "program.h"
+#include "dirLight.h"
 
 // using indice_type = uint16_t;
 using indice_type = unsigned short;
@@ -28,8 +29,7 @@ public:
 
     void draw(const bgfx::ViewId id, const Program& program, const float* mtx,
         const uint64_t state, const Materials& materials,
-        const Textures& textures,
-        const bgfx::VertexBufferHandle& vbh) const;
+        const Textures& textures, const DirLight & dirLight) const;
 
     //    std::vector<uint16_t> indices() const;
     friend std::ostream& operator<<(std::ostream& os, const Mesh& mesh);

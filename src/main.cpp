@@ -66,11 +66,14 @@ float g_deltaTime = 0.0f;
 
 bool g_firstMouse = true;
 float g_yaw = 0.0f;
+//float g_yaw = 180.0f;
 float g_pitch = 0.0f;
+//float g_pitch = -45.0f;
 float g_lastX = g_width / 2.0f;
 float g_lastY = g_height / 2.0f;
 float g_fov = 60.0f;
 bx::Vec3 g_cameraPos = { 0.0f, 2.0f, 0.0f };
+//bx::Vec3 g_cameraPos = { 20.0f, 20.0f, 0.0f };
 bx::Vec3 g_cameraFront;
 bx::Vec3 g_cameraUp = { 0.0f, 1.0f, 0.0f };
 const float g_maxFov = 120.0f;
@@ -95,6 +98,10 @@ int g_mssaLevel = 0;
 bool g_shiftPressed = false;
 bool g_slowMotion = false;
 int g_textureSamplerFlags = 0;
+std::string g_viewportShading = "rendered";
+int g_iViewportShading = Program::Shading::RENDERED;
+//int g_iViewportShading = Program::Shading::NORMAL;
+float g_mtx[16];
 
 int main(int argc, char const* argv[])
 {
@@ -264,8 +271,8 @@ void init()
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-            g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
-//    g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+//        g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //        g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Crytek_Sponza/sponza-blend.obj");
@@ -342,8 +349,13 @@ void init()
     //    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
     //    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
     //    g_program = bgfx::createProgram(vsh, fsh, true);
-    g_program.init("cubes");
-//    g_program.init("lookDev");
+    //    g_program.init("cubes");
+    //    g_program.init("rendered");
+    g_program.init();
+    g_program.setShading(Program::Shading(g_iViewportShading));
+    g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+    //    g_program.init("material");
+    bx::mtxIdentity(g_mtx);
 
     // g_texColor = bgfx::createUniform("s_texColor",
     // bgfx::UniformType::Sampler);
@@ -369,12 +381,13 @@ void printDebugMessage()
         bgfx::setDebug(BGFX_DEBUG_TEXT);
         const bgfx::Stats* stats = bgfx::getStats();
         int line = -1;
-        bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats | F2:Vsync | F3:Msaa | F4:Sampler | F5: | F6: | F7:");
+        bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats | F2:Vsync | F3:Msaa | F4:Sampler | F5:Shading | F6: | F7:");
         //        bgfx::dbgTextPrintf(0, ++line, 0x0F, " %s / " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ", bgfx::getRendererName(bgfx::getRendererType());
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.1f | Verts:%d | Tris:%d | Verts/Tris:%.2f | Objects:%d | Textures:%d (%.1f MiB)",
             g_fps, g_nbVertices, g_nbTriangles, (float)g_nbVertices / g_nbTriangles, g_nbObjects, g_nbTextures, g_texturesSize);
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Vertex buffer:%d | Index buffer:%d | Index buffer/Vertex buffer:%.2f",
             g_nbVertexBuffer, g_nbIndexBuffer, (float)g_nbIndexBuffer / g_nbVertexBuffer);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Viewport shading: %s", g_viewportShading.c_str());
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Arch: " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ");
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Renderer: %s", g_renderer.c_str());
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Graphic Vendor: %s Corporation", g_vendorID.c_str());
@@ -399,8 +412,9 @@ void update()
     //    bgfx::dbgTextPrintf(0, 0, 0x0F, "Fps:%.1f", g_fps);
 
     // ------------------------- RENDER SCENE
-    const bx::Vec3 at = { 0.0f, 2.0f, 0.0f };
-    const bx::Vec3 eye = { 0.0f, 2.0f, -2.0f };
+    //    const bx::Vec3 at = { 0.0f, 2.0f, 0.0f };
+    //    const bx::Vec3 at = { 0.0f, 2.0f, 0.0f };
+    //    const bx::Vec3 eye = { 0.0f, 2.0f, -2.0f };
     // {
     float view[16];
     // bx::mtxLookAt(view, eye, at);
@@ -412,17 +426,19 @@ void update()
 
     bgfx::setViewTransform(0, view, proj);
 
-    float mtx[16];
-    // bx::mtxRotateXY(mtx, g_counter * 0.01f, g_counter * 0.01f);
+//    float mtx[16];
+    //     bx::mtxRotateXY(mtx, g_counter * 0.001f, g_counter * 0.001f);
     // if (g_focused) {
-    bx::mtxIdentity(mtx);
+    //    bx::mtxIdentity(mtx);
     // bx::mtxScale(mtx, 0.01f);
     // } else {
 
-    // bx::mtxRotateY(mtx, g_counter * 0.01f);
+//    bx::mtxRotateY(mtx, 0.001f);
+//    bx::mtxMul(g_mtx, g_mtx, mtx);
+
     // }
     // bx::mtxScale(mtx, 0.1f);
-    // bgfx::setTransform(mtx);
+//     bgfx::setTransform(mtx);
 
     // const uint64_t state = 0 | BGFX_STATE_WRITE_R | BGFX_STATE_WRITE_G |
     // 					   BGFX_STATE_WRITE_B | BGFX_STATE_WRITE_A |
@@ -449,7 +465,7 @@ void update()
 
     // const uint64_t stateOpaque = BGFX_STATE_DEFAULT;
 
-    g_scene.draw(0, g_program, mtx, state);
+    g_scene.draw(0, g_program, g_mtx, state);
 
     // Advance to next frame. Process submitted rendering primitives.
     bgfx::frame();
@@ -566,7 +582,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         resetWindow();
     }
     if (key == GLFW_KEY_F4 && action == GLFW_PRESS) {
-        g_textureSamplerFlags = ++ g_textureSamplerFlags % 5;
+        g_textureSamplerFlags = ++g_textureSamplerFlags % 5;
         switch (g_textureSamplerFlags) {
         case 0:
             Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE;
@@ -583,11 +599,36 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         case 4:
             Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MAG_ANISOTROPIC | BGFX_SAMPLER_MIN_ANISOTROPIC;
             break;
-//        case 4:
-//            Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MAG_MASK | BGFX_SAMPLER_MIN_MASK; // question : why failed
-//            break;
+            //        case 4:
+            //            Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MAG_MASK | BGFX_SAMPLER_MIN_MASK; // question : why failed
+            //            break;
         }
-
+    }
+    if (key == GLFW_KEY_F5 && action == GLFW_PRESS) {
+        g_iViewportShading = ++g_iViewportShading % Program::Shading::Count;
+        g_program.setShading(Program::Shading(g_iViewportShading));
+        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+    }
+    if (key == GLFW_KEY_L && action == GLFW_RELEASE) {
+        g_iViewportShading = Program::Shading::NORMAL;
+        g_program.setShading(Program::Shading(g_iViewportShading));
+        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+        //            g_viewportShading = "Normal";
+        //            g_program.setShading(Program::Shading::NORMAL);
+    }
+    if (key == GLFW_KEY_M && action == GLFW_RELEASE) {
+        g_iViewportShading = Program::Shading::MATERIAL;
+        g_program.setShading(Program::Shading(g_iViewportShading));
+        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+        //            g_viewportShading = "Material";
+        //            g_program.setShading(Program::Shading::MATERIAL);
+    }
+    if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
+        g_iViewportShading = Program::Shading::RENDERED;
+        g_program.setShading(Program::Shading(g_iViewportShading));
+        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+        //            g_viewportShading = "Rendered";
+        //            g_program.setShading(Program::Shading::RENDERED);
     }
     if (key == GLFW_KEY_RIGHT_CONTROL && action == GLFW_RELEASE) {
         g_slowMotion = !g_slowMotion;

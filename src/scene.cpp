@@ -11,6 +11,7 @@
 //#include <bimg/bimg.h>
 
 Scene::Scene()
+    : m_dirLight(bx::normalize(bx::Vec3(0.0f, -1.0f, 0.0f)))
 {
     //    Vertex::init();
     m_layout.begin()
@@ -206,7 +207,7 @@ void Scene::draw(const bgfx::ViewId id, const Program& program, const float* mtx
         //        for (int i =0; i <nbObjects; ++i) {
         //            const Object & object = m_objects[i];
 
-        object.draw(id, program, mtx, state, m_materials, m_textures);
+        object.draw(id, program, mtx, state, m_materials, m_textures, m_dirLight);
 
         //             bgfx::submit(id, program, 0, i != nbObjects - 1);
     }
