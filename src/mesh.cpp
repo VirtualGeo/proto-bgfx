@@ -8,7 +8,6 @@ Mesh::Mesh(int iMaterial)
 {
 }
 
-
 Mesh::Mesh(Mesh&& mesh)
     : m_iMaterial(mesh.m_iMaterial)
     , m_indices(std::move(m_indices))
@@ -30,11 +29,11 @@ Mesh::~Mesh()
         bgfx::destroy(m_ibh);
     }
 
-//#ifdef DEBUG
-//    std::cout << "\033[31m";
-//    std::cout << "[Mesh] " << this << " deleted" << std::endl;
-//    std::cout << "\033[0m";
-//#endif
+    //#ifdef DEBUG
+    //    std::cout << "\033[31m";
+    //    std::cout << "[Mesh] " << this << " deleted" << std::endl;
+    //    std::cout << "\033[0m";
+    //#endif
 }
 
 Mesh::Mesh(std::ifstream& file)
@@ -58,73 +57,19 @@ void Mesh::save(std::ofstream& file) const
 
 //}
 
-void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx, const uint64_t state, const Materials& materials, const Textures& textures, const bgfx::VertexBufferHandle& vbh) const
+void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx, const uint64_t state, const Materials& materials, const Textures& textures, const DirLight &dirLight) const
 {
     bgfx::setTransform(mtx);
     bgfx::setState(state);
 
-    //    const int iMaterial = m_iMaterial;
     assert(0 <= m_iMaterial && m_iMaterial < materials.size());
     const Material& material = materials[m_iMaterial];
 
-    bgfx::setUniform(program.m_uDiffuse, material.diffuse());
-
-    //    		if (group.m_texture != nullptr) {
-    const int iTexDiffuse = material.iTexDiffuse();
-    if (iTexDiffuse >= 0) {
-
-        assert(iTexDiffuse < textures.size());
-        const Texture& texture = textures[iTexDiffuse];
-        //                }
-        // uint32_t flags = UINT32_MAX;
-        // uint32_t flags = BGFX_TEXTURE_USE_DEFAULT;
-
-        // const uint64_t textureFlags =
-        // 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
-        // const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
-//        const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MAG_ANISOTROPIC | BGFX_SAMPLER_MIN_ANISOTROPIC;
-        // const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
-        bgfx::setTexture(0, program.m_sDiffuse,
-            texture.textureHandle(), Texture::s_textureSamplerFlags);
-
-        //  textureFlags | samplerFlags);
-
-        //                 bgfx::setUniform(m_uHasDiffuseTexture, (void*)true);
-        //        float temp[1] = { 1.0 };
-        //        bgfx::setUniform(m_uHasDiffuseTexture, temp);
-        //                 bgfx::setUniform(m_uHasDiffuseTexture);
-    }
-    else {
-        bgfx::setTexture(0, program.m_sDiffuse, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
-    }
-
-    bgfx::setUniform(program.m_uTexturesEnable, material.texturesEnable());
-    const int iTexOpacity = material.iTexOpacity();
-    if (iTexOpacity >= 0) {
-        assert(iTexOpacity < textures.size());
-        const Texture& texture = textures[iTexOpacity];
-
-        bgfx::setTexture(1, program.m_sOpacity, texture.textureHandle(), Texture::s_textureSamplerFlags);
-    }
-    else {
-        bgfx::setTexture(1, program.m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
-
-    }
-
-    // else {
-    // bgfx::setTexture(0, group.m_texture->m_sampler, bgfx::Tex)
-    // }
-
-    // }
-    // else {
-    //     continue;
-    // }
-
-    //    		bgfx::setIndexBuffer(group.m_ibh);
+    program.submit(material, dirLight, textures);
 
     bgfx::setIndexBuffer(m_ibh);
     //    bgfx::setVertexBuffer(0, vbh);
-    bgfx::submit(id, program.m_handle);
+    bgfx::submit(id, program.handleProgram());
 }
 
 std::ostream& operator<<(std::ostream& os, const Mesh& mesh)

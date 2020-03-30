@@ -36,6 +36,10 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
 //        m_diffuse[i] = material.diffuse[i];
 //    }
     memcpy(m_diffuse, material.diffuse, 3 * sizeof(float));
+    memcpy(m_specular, material.specular, 3 * sizeof(float));
+    memcpy(m_ambient, material.ambient, 3 * sizeof(float));
+    m_shininess = material.shininess;
+
 //    m_diffuse = material.diffuse;
 //    std::memcpy();
     //    std::cout << m_diffuse[0] << m_diffuse[1] << m_diffuse[2] << std::endl;
@@ -89,6 +93,9 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
 Material::Material(Material&& material)
     : m_name(std::move(material.m_name))
     , m_iTexDiffuse(material.m_iTexDiffuse)
+    , m_shininess(material.m_shininess)
+//    , m_diffuse(std::move(*material.m_diffuse))
+    // TODO : copy colors
 {
 #ifdef DEBUG
     std::cout << "\033[34m";
@@ -111,6 +118,9 @@ Material::Material(std::ifstream& file)
     FileIO::read(m_name, file);
     FileIO::read(m_iTexDiffuse, file);
     FileIO::read(m_diffuse, 4, file);
+    FileIO::read(m_specular, 4, file);
+    FileIO::read(m_ambient, 4, file);
+    FileIO::read(m_shininess, file);
 
     FileIO::read(m_texturesEnable, 4, file);
     FileIO::read(m_iTexOpacity, file);
@@ -121,6 +131,9 @@ void Material::save(std::ofstream& file) const
     FileIO::write(m_name, file);
     FileIO::write(m_iTexDiffuse, file);
     FileIO::write(m_diffuse, 4, file);
+    FileIO::write(m_specular, 4, file);
+    FileIO::write(m_ambient, 4, file);
+    FileIO::write(m_shininess, file);
 
     FileIO::write(m_texturesEnable, 4, file);
     FileIO::write(m_iTexOpacity, file);
@@ -133,32 +146,32 @@ std::ostream &operator <<(std::ostream &os, const Material &material)
 }
 
 // -------------------------- GETTERS
-const float* Material::diffuse() const
-{
-    //    float ret[4];
-    //    for (int i =0; i <3; ++i) {
-    //        ret[i] = i;
-    //    }
-    //    ret[3] = (m_iTexDiffuse >= 0) ?(1.0) :(0.0);
-    return m_diffuse;
-}
+//const float* Material::diffuse() const
+//{
+//    //    float ret[4];
+//    //    for (int i =0; i <3; ++i) {
+//    //        ret[i] = i;
+//    //    }
+//    //    ret[3] = (m_iTexDiffuse >= 0) ?(1.0) :(0.0);
+//    return m_diffuse;
+//}
 
-const float *Material::texturesEnable() const
-{
-    return m_texturesEnable;
-}
+//const float *Material::texturesEnable() const
+//{
+//    return m_texturesEnable;
+//}
 
-int Material::iTexDiffuse() const
-{
-    return m_iTexDiffuse;
-}
+//int Material::iTexDiffuse() const
+//{
+//    return m_iTexDiffuse;
+//}
 
-int Material::iTexOpacity() const
-{
-    return m_iTexOpacity;
-}
+//int Material::iTexOpacity() const
+//{
+//    return m_iTexOpacity;
+//}
 
-std::string Material::name() const
-{
-    return m_name;
-}
+//std::string Material::name() const
+//{
+//    return m_name;
+//}

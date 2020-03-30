@@ -29,6 +29,7 @@ endfunction(GET_SHADER_INFOS)
 set(OUT_SHADERS )
 set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
 set(BGFX_SHADER ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src/bgfx_shader.sh)
+set(SHADER_LIB ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src/shaderlib.sh)
 
 macro(COMPILE_SHADER SHADER)
     get_shader_infos(${SHADER} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)
@@ -126,7 +127,7 @@ macro(COMPILE_SHADER SHADER)
             MAIN_DEPENDENCY ${SHADER_SRC_DIR}/${SHADER}
             COMMENT "Compiling ${SHADER_TYPE} shader ${SHADER_NAME}"
             )
-        message(${SHADER_SRC_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME})
+#        message(${SHADER_SRC_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME})
         # add_custom_target(src DEPENDS ${SHADER_DIR}/bin/${BIN_SHADER_NAME})
 
         list(APPEND OUT_SHADERS ${SHADER_DIR}/bin/${SHADER_BIN_REP}/${BIN_SHADER_NAME})
