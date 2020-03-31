@@ -19,7 +19,7 @@ public:
     void addModel(const std::string &filename);
 //    void draw()
     void draw(const bgfx::ViewId id, const Program & program, const float *mtx,
-                const uint64_t state) const;
+                const uint64_t state, bx::Vec3 cameraPos) const;
     void clear(); // clear scene (bgfx::destroy(handle)) before bgfx::shutdown() from main shutdown()
 
     void load(std::ifstream & file);
