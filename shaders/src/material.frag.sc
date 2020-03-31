@@ -1,142 +1,135 @@
-$input v_normal, v_texcoord0, v_pos, v_view
+$input v_pos, v_normal, v_texcoord0
 
 #include <bgfx_shader.sh>
-
-struct DirLight {
-    vec3 m_dir;
-    vec3 m_intensity;
-};
-
-struct Material {
-    vec3 m_diffuse;
-    vec3 m_specular;
-    vec3 m_ambient;
-    float m_shininess;
-};
-
+#include "shaderlib.sh"
 
 SAMPLER2D(s_diffuse, 0);
-//uniform vec4 u_diffuse;
-//#define u_diffuseColor u_diffuse.xyz
-//#define u_hasDiffuseTexture u_diffuse.w
-//uniform vec4 u_hasDiffuseTexture;
+//SAMPLER2D(s_opacity, 1);
 
-SAMPLER2D(s_opacity, 1);
-//uniform vec4 u_texturesEnable;
-//#define u_hasOpacityTexture u_texturesEnable.x
+// struct DirLight
+// {
+//     vec3 dir;
+//     vec3 intensity;
+// };
 
-uniform vec4 u_params[6];
-//#define u_diffuseColor 			u_params[0].xyz
-//#define u_hasDiffuseTexture 	u_params[0].w
-//#define u_hasOpacityTexture		u_params[1].x
-#define u_mat_diffuse          		u_params[0].xyz
-#define u_mat_hasDiffuseTexture 	u_params[0].w
-#define u_mat_specular          	u_params[1].xyz
-#define u_mat_ambient           	u_params[2].xyz
-#define u_mat_shininess         	u_params[2].w
-#define u_mat_hasOpacityTexture 	u_params[3].x
+struct Material
+{
+    vec3 diffuse;
+    vec3 specular;
+    vec3 ambient;
+    float shininess;
+};
 
-#define u_dirLight_0_dir   		u_params[4].xyz
-#define u_dirLight_0_color 		u_params[5].xyz
+uniform vec4 u_params[7];
+#define u_diffuse           u_params[0].xyz
+#define u_hasDiffuseTexture 	u_params[0].w
+#define u_specular          u_params[1].xyz
+#define u_ambient           u_params[2].xyz
+#define u_shininess         u_params[2].w
+#define u_dir_light_0_dir   u_params[3].xyz
+#define u_dir_light_0_color u_params[4].xyz
+#define u_viewPos			u_params[5].xyz
+//#define u_dir_light_1_dir   u_params[5].xyz
+//#define u_dir_light_1_color u_params[6].xyz
 
-//#define u_dir_light_1_dir   	u_params[5].xyz
-//#define u_dir_light_1_color 	u_params[6].xyz
 
-//const float gamma = 2.2;
+// vec3 calculateLambertDiffuse(vec3 normal, vec3 light_dir, vec3 diffuse_color)
+// {
+//     return max(dot(normal, light_dir), 0.0) * diffuse_color;
+// }
 
-//vec3 calculateLambertDiffuse(vec3 normal, vec3 light_dir, vec3 diffuse_color)
-//{
-//    return max(dot(normal, light_dir), 0.0) * diffuse_color;
-//}
+// vec3 calculateBlinnSpecular(vec3 normal, vec3 view_dir, vec3 light_dir, vec3 specular_color, float shininess)
+// {
+//     vec3 half_dir = normalize(light_dir + view_dir);
+//     float angle = max(dot(half_dir, normal), 0.0);
+//     float strength = pow(angle, shininess);
+//     return strength * specular_color;
+// }
 
-//vec3 calculateBlinnSpecular(vec3 normal, vec3 view_dir, vec3 light_dir, vec3 specular_color, float shininess)
-//{
-//    vec3 half_dir = normalize(light_dir + view_dir);
-//    float angle = max(dot(half_dir, normal), 0.0);
-//    float strength = pow(angle, shininess);
-//    return strength * specular_color;
-//}
+// vec3 calculateSingleLightShading(DirLight dir_light, Material material, vec3 color, vec3 normal, vec3 view_dir)
+// {
+//     vec3 light_dir = normalize(-dir_light.dir);
+//     //    vec3 diffuse = dir_light.intensity * calculateLambertDiffuse(normal, light_dir, material.diffuse);
+//     //    vec3 specular = dir_light.intensity * calculateBlinnSpecular(normal, view_dir, light_dir, material.specular, material.shininess);
 
-//vec3 calculateSingleLightShading(DirLight dir_light, Material material, vec3 normal, vec3 view_dir)
-//{
-//    vec3 light_dir = normalize(dir_light.dir);
+//     vec3 diffuse = dir_light.intensity * calculateLambertDiffuse(normal, light_dir, color);
+//     vec3 specular = dir_light.intensity * calculateBlinnSpecular(normal, view_dir, light_dir, color, material.shininess);
+//     //    return diffuse;
+//     //    return specular;
 
-//    vec3 diffuse = dir_light.intensity * calculateLambertDiffuse(normal, light_dir, material.diffuse);
-//    vec3 specular = dir_light.intensity * calculateBlinnSpecular(normal, view_dir, light_dir, material.specular, material.shininess);
-
-//    return diffuse + specular;
-//}
-
-//void main()
-//{
-//    vec3 linear_color = vec3(0.0, 0.0, 0.0);
-
-//    Material material = Material(
-//        u_diffuse,
-//        u_specular,
-//        u_ambient,
-//        u_shininess
-//    );
-
-//    // When the triangle is back-facing, the normal direction will be flipped
-//    vec3 view_dir = normalize(- v_view);
-//    vec3 normal = dot(v_normal, view_dir) > 0.0 ? normalize(v_normal) : normalize(- v_normal);
-
-//    linear_color += calculateSingleLightShading(DirLight(u_dir_light_0_dir, u_dir_light_0_color), material, normal, view_dir);
-//    linear_color += calculateSingleLightShading(DirLight(u_dir_light_1_dir, u_dir_light_1_color), material, normal, view_dir);
-
-//    linear_color += material.ambient;
-
-//    vec3 corrected_color = pow(linear_color, vec3_splat(1.0 / gamma));
-
-//    gl_FragColor.xyz = corrected_color;
-//    gl_FragColor.w = 1.0;
-//}
-
+//     return diffuse + specular;
+// }
 
 void main()
 {
+    vec3 result = vec3_splat(0.0); // vec3_splat != vec3 for direct3D
 
-	//gl_FragColor = v_color0;
+#ifdef BGFX_SHADER_LANGUAGE_PSSL
+    Material material;
+    material.diffuse = u_diffuse;
+    material.specular = u_specular;
+    material.ambient = u_ambient;
+    material.shininess = u_shininess;
 
-	vec3 normal = normalize(v_normal);
-//    gl_FragColor.xyz = (normal + 1.0) * 0.5;
-//    gl_FragColor.w = 1.0;
-//    return;
+    // DirLight dirLight;
+    // dirLight.dir = u_dir_light_0_dir;
+    // dirLight.intensity = u_dir_light_0_color;
+#else
+    Material material = Material(
+        u_diffuse,
+        u_specular,
+        u_ambient,
+        u_shininess
+    );
+    // DirLight dirLight = DirLight(
+    //     u_dir_light_0_dir,
+    //     u_dir_light_0_color
+    // );
+#endif
 
-//     vec4 color;
-//    = vec4(v_texcoord0.x, v_texcoord0.y, 1.0, 1.0);
-//        color = texture2D(s_diffuse, v_texcoord0);
-//    gl_FragColor = color;
-//    return;
+    // When the triangle is back-facing, the normal direction will be flipped
+    //    vec3 view_dir = normalize(v_view);
+    // vec3 view_dir = normalize(u_viewPos - v_pos);
+    //    vec3 normal = dot(v_normal, view_dir) > 0.0 ? normalize(v_normal) : normalize(- v_normal);
+    // vec3 normal = normalize(v_normal);
 
-
-
-    vec4 color;
-    if (u_mat_hasDiffuseTexture > 0.5) {
-        color = texture2D(s_diffuse, v_texcoord0);
-
+//        vec3 color = texture2D(s_diffuse, v_texcoord0).xyz;
+    vec3 color;
+    if (u_hasDiffuseTexture > 0.5) {
+        color = texture2D(s_diffuse, v_texcoord0).xyz;
+        // color = toLinear(texture2D(s_diffuse, v_texcoord0) ).xyz;
+    }
+    else {
+        color = material.diffuse;
+    }
 
 //        if (color.w < 0.1) {
 //            discard;
 //        }
-        if (u_mat_hasOpacityTexture > 0.5) {
-            if (texture2D(s_opacity, v_texcoord0).x < 0.5) {
-                discard;
-            }
-        }
+//    vec3 color = toLinear(texture2D(s_diffuse, v_texcoord0) ).xyz;
 
-    }
-    else {
-        color = vec4(u_mat_diffuse, 1.0);
-    }
 
-//    color = vec4(u_diffuseColor.xyz, 1.0);
-    gl_FragColor = color;
-//    vec3 lightDir = vec3(0.0, 0.0, -1.0);
-//    float ndotl = dot(normalize(v_normal), lightDir);
-//    float spec = pow(ndotl, 30.0);
-//    gl_FragColor = vec4(pow(pow(color.xyz, vec3_splat(2.2) ) * ndotl + spec, vec3_splat(1.0/2.2) ), 1.0);
+    // result += calculateSingleLightShading(dirLight, material, color, normal, view_dir);
+    //    result += calculateSingleLightShading(DirLight(u_dir_light_1_dir, u_dir_light_1_color), material, normal, view_dir);
 
-	
+    //    //    vec4 color = texture2D(s_diffuse, v_texcoord0) ;
+    //    //    gl_FragColor.xyz = max(vec3_splat(0.05), lightColor.xyz)*color.xyz;
+
+    //    result += material.ambient;
+//        result += color * 0.01;
+    //    result += material.specular;
+
+    //const float gamma = 2.0;
+    //const float gamma = 5.0;
+
+    // const float gamma = 0.1;
+    // const float exposure = 30.0;
+    // result = vec3_splat(1.0) - exp(-result * exposure);
+    // result = pow(result, vec3_splat(1.0 / gamma));
+
+
+    //    gl_FragColor.xyz = result;
+    gl_FragColor.xyz = color;
+    gl_FragColor.w = 1.0;
+    //   gl_FragColor = toGamma(gl_FragColor);
 }

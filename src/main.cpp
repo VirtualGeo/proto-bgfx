@@ -65,14 +65,20 @@ float g_deltaTime = 0.0f;
 //float g_lastFrame = 0.0f;
 
 bool g_firstMouse = true;
-//float g_yaw = 0.0f;
-float g_yaw = 210.0f;
-//float g_pitch = 0.0f;
-float g_pitch = -27.0f;
+// ------------------------ CAM INIT ---------------------------------
+// SPONZA:
+float g_yaw = 0.0f;
+float g_pitch = 0.0f;
+bx::Vec3 g_cameraPos = { -7.0f, 1.0f, 0.0f };
+// COUGAR:
+// float g_yaw = 210.0f;
+// float g_pitch = -27.0f;
+// bx::Vec3 g_cameraPos = { 10.0f, 5.0f, 7.0f };
+// -------------------------------------------------------------------
+
 float g_lastX = g_width / 2.0f;
 float g_lastY = g_height / 2.0f;
 float g_fov = 60.0f;
-bx::Vec3 g_cameraPos = { 10.0f, 5.0f, 7.0f };
 //bx::Vec3 g_cameraPos = { 20.0f, 20.0f, 0.0f };
 bx::Vec3 g_cameraFront;
 bx::Vec3 g_cameraUp = { 0.0f, 1.0f, 0.0f };
@@ -139,6 +145,8 @@ int main(int argc, char const* argv[])
             //		    g_lastFrame = currentFrame;
 
             g_epoch = (g_fps = g_epoch / sum) / 2; // fps echo epoch = 0.5 sec
+            // g_epoch = (g_fps = g_epoch / sum) * 5; // fps echo epoch = 5 sec (better average)
+
             // fps = 1.0f / g_deltaTime;
             sum = 0.0f;
             g_counter = 0;
@@ -219,20 +227,23 @@ void init()
     bgfxInit.platformData.backBufferDS = NULL;
 
     // std::cout << RENDERER_TYPE << std::endl;
+#ifdef RENDERER_Direct3D9
+    bgfxInit.type = bgfx::RendererType::Direct3D9;
+#endif
+#ifdef RENDERER_Direct3D11
+    bgfxInit.type = bgfx::RendererType::Direct3D11;
+#endif
+#ifdef RENDERER_Direct3D12
+    bgfxInit.type = bgfx::RendererType::Direct3D12;
+#endif
 #ifdef RENDERER_OpenGL
     bgfxInit.type = bgfx::RendererType::OpenGL;
-//    std::cout << "RendererType OpenGL" << std::endl;
 #endif
 #ifdef RENDERER_OpenGLES
     bgfxInit.type = bgfx::RendererType::OpenGLES;
 #endif
 #ifdef RENDERER_Vulkan
     bgfxInit.type = bgfx::RendererType::Vulkan;
-//    std::cout << "RendererType Vulkan" << std::endl;
-#endif
-#ifdef RENDERER_Direct3D12
-    bgfxInit.type = bgfx::RendererType::Direct3D12;
-//    std::cout << "RendererType Direct3D12" << std::endl;
 #endif
 #ifdef RENDERER_Metal
     bgfxInit.type = bgfx::RendererType::Metal;
@@ -271,15 +282,15 @@ void init()
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-//    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
-        g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+   g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+        // g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+    //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
 
     //        g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Crytek_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/San_Miguel/san-miguel-blend.obj");
 
-    //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
 
     g_nbVertices = g_scene.nbVertices();
     g_nbTriangles = g_scene.nbTriangles();
@@ -397,6 +408,7 @@ void printDebugMessage()
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Loading materials time: %d ms", g_loadingMaterialsTime);
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Loading objects time: %d ms", g_loadingObjectsTime);
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Total loading time: %d ms", g_totalLoadingTime);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Total draw call: %d", g_nbIndexBuffer + 1);
     }
 }
 

@@ -11,9 +11,11 @@
 
 #include <bimg/bimg.h>
 
+// uint64_t;
+
 class Texture {
 public:
-    static u_int64_t s_textureSamplerFlags;
+    static uint64_t s_textureSamplerFlags;
 
 public:
     Texture(const std::string& texName, const std::string& baseDir);
@@ -58,6 +60,8 @@ public: // ---------------------------------------------- getters
 
 //    static u_int64_t get_textureSamplerFlags();
 };
+
+// u_int64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_ANISOTROPIC;
 
 using Textures = std::vector<Texture>;
 //using Textures = std::map<std::string, Texture>;

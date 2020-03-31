@@ -35,7 +35,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     #    target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wpedantic -Wextra -DDEBUG -O0 -g -Wfatal-errors)
     # endif()
     # elseif (MSVC)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    # endif()
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 # elseif (MSVC)
     # default debug flags : /MDd /Zi /Ob0 /Od /RTC1
     # default release flags : /MD /O2 /Ob2 /DNDEBUG
