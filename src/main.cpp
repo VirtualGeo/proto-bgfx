@@ -65,14 +65,14 @@ float g_deltaTime = 0.0f;
 //float g_lastFrame = 0.0f;
 
 bool g_firstMouse = true;
-float g_yaw = 0.0f;
-//float g_yaw = 180.0f;
-float g_pitch = 0.0f;
-//float g_pitch = -45.0f;
+//float g_yaw = 0.0f;
+float g_yaw = 210.0f;
+//float g_pitch = 0.0f;
+float g_pitch = -27.0f;
 float g_lastX = g_width / 2.0f;
 float g_lastY = g_height / 2.0f;
 float g_fov = 60.0f;
-bx::Vec3 g_cameraPos = { 0.0f, 2.0f, 0.0f };
+bx::Vec3 g_cameraPos = { 10.0f, 5.0f, 7.0f };
 //bx::Vec3 g_cameraPos = { 20.0f, 20.0f, 0.0f };
 bx::Vec3 g_cameraFront;
 bx::Vec3 g_cameraUp = { 0.0f, 1.0f, 0.0f };
@@ -271,8 +271,9 @@ void init()
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
-//        g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+//    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+        g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+
     //        g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Crytek_Sponza/sponza-blend.obj");
@@ -465,7 +466,7 @@ void update()
 
     // const uint64_t stateOpaque = BGFX_STATE_DEFAULT;
 
-    g_scene.draw(0, g_program, g_mtx, state);
+    g_scene.draw(0, g_program, g_mtx, state, g_cameraPos);
 
     // Advance to next frame. Process submitted rendering primitives.
     bgfx::frame();

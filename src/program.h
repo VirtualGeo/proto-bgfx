@@ -17,7 +17,7 @@ public:
         Count
     };
     static const std::string shadingFileNames[Program::Shading::Count];
-    static constexpr unsigned int s_num_vec4_uniforms = 8;
+    static constexpr unsigned int s_num_vec4_uniforms = 6;
 
     Program();
     ~Program();
@@ -28,7 +28,7 @@ public:
     void clear();
     void setShading(Shading shading);
     Shading shading() const;
-    void submit(const Material & material, const DirLight & light, const Textures & textures) const;
+    void submit(const Material & material, const DirLight & light, const Textures & textures, bx::Vec3 cameraPos) const;
 
     //    bgfx::ProgramHandle program() const;
 
