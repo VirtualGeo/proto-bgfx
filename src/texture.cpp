@@ -22,7 +22,7 @@
 //u_int64_t Texture::s_textureFlags = 0 | BGFX_TEXTURE_NONE;
 //u_int64_t Texture::s_samplerFlags = 0 | BGFX_SAMPLER_NONE;
 //u_int64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE;
-u_int64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_ANISOTROPIC;
+uint64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_ANISOTROPIC;
 
 // Texture::Texture(const char *filename) {
 Texture::Texture(const std::string& texName, const std::string& baseDir)

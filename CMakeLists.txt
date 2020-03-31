@@ -18,27 +18,32 @@ add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 #endif()
 
 # default renderer linux:opengl, window:DirectX11
-# set(RENDERER_OpenGL 1)
+# set(RENDERER_Direct3D9 1)
+# set(RENDERER_Direct3D11 1) #default on win
 # set(RENDERER_Direct3D12 1)
+# set(RENDERER_OpenGL 1) #default on linux
+# set(RENDERER_OpenGLES 1) #only on android
 # set(RENDERER_Vulkan 1)
-# set(RENDERER_OpenGLES 1)
-# set(RENDERER_Metal 1)
+# set(RENDERER_Metal 1) #only on ios
 # -------------------------------------------------------------------
 
-if (RENDERER_OpenGL)
+if(RENDERER_Direct3D9)
+    add_definitions(-DRENDERER_Direct3D9)
+elseif(RENDERER_Direct3D11)
+    add_definitions(-DRENDERER_Direct3D11)
+elseif(RENDERER_Direct3D12)
+    add_definitions(-DRENDERER_Direct3D12)
+elseif (RENDERER_OpenGL)
     add_definitions(-DRENDERER_OpenGL)
-    # add_definitions(-DRENDERER_DirectX 0)
 elseif(RENDERER_OpenGLES)
     add_definitions(-DRENDERER_OpenGLES)
-elseif(RENDERER_Direct3D12)
-    # add_definitions(-DRENDERER_OpenGL 0)
-    add_definitions(-DRENDERER_Direct3D12)
 elseif(RENDERER_Vulkan)
     add_definitions(-DRENDERER_Vulkan)
 elseif(RENDERER_Metal)
     add_definitions(-DRENDERER_Metal)
 else()
     add_definitions(-DRENDERER_Auto)
+    set(RENDERER_Auto 1) #for shader.cmake
 endif()
 
 # message("BGFX_ROOT = " ${BGFX_ROOT})
