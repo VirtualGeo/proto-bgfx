@@ -1,19 +1,17 @@
 $input v_pos, v_normal, v_texcoord0
 
 #include <bgfx_shader.sh>
-#include "shaderlib.sh"
+#include "shaderlib.sh" // do not include shaderlib.sh before bgfx_shader.sh
 
-SAMPLER2D(s_diffuse, 0);
+                            SAMPLER2D(s_diffuse, 0);
 //SAMPLER2D(s_opacity, 1);
 
-struct DirLight
-{
+struct DirLight {
     vec3 dir;
     vec3 intensity;
 };
 
-struct Material
-{
+struct Material {
     vec3 diffuse;
     vec3 specular;
     vec3 ambient;
@@ -21,17 +19,16 @@ struct Material
 };
 
 uniform vec4 u_params[7];
-#define u_diffuse           u_params[0].xyz
-#define u_hasDiffuseTexture 	u_params[0].w
-#define u_specular          u_params[1].xyz
-#define u_ambient           u_params[2].xyz
-#define u_shininess         u_params[2].w
-#define u_dir_light_0_dir   u_params[3].xyz
+#define u_diffuse u_params[0].xyz
+#define u_hasDiffuseTexture u_params[0].w
+#define u_specular u_params[1].xyz
+#define u_ambient u_params[2].xyz
+#define u_shininess u_params[2].w
+#define u_dir_light_0_dir u_params[3].xyz
 #define u_dir_light_0_color u_params[4].xyz
-#define u_viewPos			u_params[5].xyz
+#define u_viewPos u_params[5].xyz
 //#define u_dir_light_1_dir   u_params[5].xyz
 //#define u_dir_light_1_color u_params[6].xyz
-
 
 vec3 calculateLambertDiffuse(vec3 normal, vec3 light_dir, vec3 diffuse_color)
 {
@@ -79,12 +76,10 @@ void main()
         u_diffuse,
         u_specular,
         u_ambient,
-        u_shininess
-    );
+        u_shininess);
     DirLight dirLight = DirLight(
         u_dir_light_0_dir,
-        u_dir_light_0_color
-    );
+        u_dir_light_0_color);
 #endif
 
     // When the triangle is back-facing, the normal direction will be flipped
@@ -93,21 +88,19 @@ void main()
     //    vec3 normal = dot(v_normal, view_dir) > 0.0 ? normalize(v_normal) : normalize(- v_normal);
     vec3 normal = normalize(v_normal);
 
-//        vec3 color = texture2D(s_diffuse, v_texcoord0).xyz;
+    //        vec3 color = texture2D(s_diffuse, v_texcoord0).xyz;
     vec3 color;
     if (u_hasDiffuseTexture > 0.5) {
-        color = texture2D(s_diffuse, v_texcoord0).xyz;
-        // color = toLinear(texture2D(s_diffuse, v_texcoord0) ).xyz;
-    }
-    else {
+        //        color = texture2D(s_diffuse, v_texcoord0).xyz;
+        color = toLinear(texture2D(s_diffuse, v_texcoord0)).xyz;
+    } else {
         color = material.diffuse;
     }
 
-//        if (color.w < 0.1) {
-//            discard;
-//        }
-//    vec3 color = toLinear(texture2D(s_diffuse, v_texcoord0) ).xyz;
-
+    //        if (color.w < 0.1) {
+    //            discard;
+    //        }
+    //    vec3 color = toLinear(texture2D(s_diffuse, v_texcoord0) ).xyz;
 
     result += calculateSingleLightShading(dirLight, material, color, normal, view_dir);
     //    result += calculateSingleLightShading(DirLight(u_dir_light_1_dir, u_dir_light_1_color), material, normal, view_dir);
@@ -116,20 +109,19 @@ void main()
     //    //    gl_FragColor.xyz = max(vec3_splat(0.05), lightColor.xyz)*color.xyz;
 
     //    result += material.ambient;
-//        result += color * 0.01;
+    //        result += color * 0.01;
     //    result += material.specular;
 
     //const float gamma = 2.0;
     //const float gamma = 5.0;
 
-    const float gamma = 0.1;
-    const float exposure = 30.0;
-    result = vec3_splat(1.0) - exp(-result * exposure);
-    result = pow(result, vec3_splat(1.0 / gamma));
-
+    //    const float gamma = 0.1;
+    //    const float exposure = 30.0;
+    //    result = vec3_splat(1.0) - exp(-result * exposure);
+    //    result = pow(result, vec3_splat(1.0 / gamma));
 
     //    gl_FragColor.xyz = result;
     gl_FragColor.xyz = result;
     gl_FragColor.w = 1.0;
-    //   gl_FragColor = toGamma(gl_FragColor);
+    gl_FragColor = toGamma(gl_FragColor);
 }
