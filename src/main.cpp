@@ -284,7 +284,7 @@ void init()
     // ------------------------------- LOADING MODEL
    g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
 //         g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
-//        g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
+    //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
 
     //        g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");
     //    g_scene.addModel(std::string(PROJECT_DIR) + "assets/McGuire/Dabrovic_Sponza/sponza-blend.obj");
