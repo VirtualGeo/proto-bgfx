@@ -1,6 +1,6 @@
 #include "scene.h"
 
-#include "timerUtil.h"
+//#include "timerUtil.h"
 #include <cassert>
 #include <iostream>
 
@@ -9,6 +9,7 @@
 #include "fileIO.h"
 #include <fstream>
 //#include <bimg/bimg.h>
+#include <chrono>
 
 Scene::Scene()
 //    : m_dirLight(bx::normalize(bx::Vec3(0.5f, -1.0f, 0.5f)))
@@ -66,8 +67,9 @@ void Scene::addModel(const std::string& filename)
     std::vector<tinyobj::material_t> tinyObjMaterials;
     //    std::map<std::string, uint> textures;
 
-    timerutil tm;
-    tm.start();
+//    timerutil tm;
+//    tm.start();
+    auto start = std::chrono::steady_clock::now();
 
     std::string base_dir = GetBaseDir(absoluteFilename);
     if (base_dir.empty()) {
@@ -92,7 +94,8 @@ void Scene::addModel(const std::string& filename)
         exit(1);
     }
 
-    tm.end();
+//    tm.end();
+    auto end = std::chrono::steady_clock::now();
 
     if (!ret) {
         std::cerr << "[Scene] Failed to load " << absoluteFilename << std::endl;
@@ -102,7 +105,8 @@ void Scene::addModel(const std::string& filename)
     }
 
     //    printf("[Scene] Parsing time: %d [ms]\n", (int)tm.msec());
-    m_parsingTime = tm.msec();
+//    m_parsingTime = tm.msec();
+    m_parsingTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     const int nbMaterials = tinyObjMaterials.size();
     const int nbObjects = tinyObjShapes.size();
@@ -129,7 +133,8 @@ void Scene::addModel(const std::string& filename)
     m_textures.reserve(tinyObjMaterials.size());
 
     //    timerutil tm;
-    tm.start();
+//    tm.start();
+    start = std::chrono::steady_clock::now();
 
     //    const size_t nbMaterials = tinyObjMaterials.size();
     for (size_t i = 0; i < nbMaterials; i++) {
@@ -150,10 +155,13 @@ void Scene::addModel(const std::string& filename)
     //    }
     assert(nbMaterials == m_materials.size());
 
-    tm.end();
-    m_loadingMaterialsTime = tm.msec();
+//    tm.end();
+    end = std::chrono::steady_clock::now();
+//    m_loadingMaterialsTime = tm.msec();
+    m_loadingMaterialsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-    tm.start();
+//    tm.start();
+    start = std::chrono::steady_clock::now();
 
     //    size_t nbIndices =0;
     //    size_t nbMeshes = 0;
@@ -177,8 +185,11 @@ void Scene::addModel(const std::string& filename)
     }
     assert(nbObjects == m_objects.size());
 
-    tm.end();
-    m_loadingObjectsTime = tm.msec();
+//    tm.end();
+//    m_loadingObjectsTime = tm.msec();
+    end = std::chrono::steady_clock::now();
+//    m_loadingMaterialsTime = tm.msec();
+    m_loadingObjectsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     //    std::cout << "[Scene] Parsing time: " << m_parsingTime << " [ms]" << std::endl;
     //    std::cout << "[Scene] Loading tinyObjMaterials time: " << m_loadingMaterialsTime << " [ms]" << std::endl;
@@ -231,8 +242,9 @@ void Scene::clear()
 void Scene::load(std::ifstream& file)
 {
 
-    timerutil tm;
-    tm.start();
+//    timerutil tm;
+//    tm.start();
+    auto start = std::chrono::steady_clock::now();
 
     size_t size;
     FileIO::read(size, file);
@@ -262,9 +274,12 @@ void Scene::load(std::ifstream& file)
 #endif
     }
 
-    tm.end();
-    m_loadingMaterialsTime = tm.msec();
-    tm.start();
+//    tm.end();
+    auto end = std::chrono::steady_clock::now();
+//    m_loadingMaterialsTime = tm.msec();
+    m_loadingMaterialsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+//    tm.start();
+    start = std::chrono::steady_clock::now();
 
     FileIO::read(size, file);
     m_objects.reserve(size);
@@ -280,8 +295,10 @@ void Scene::load(std::ifstream& file)
         bgfx::frame();
     }
 
-    tm.end();
-    m_loadingObjectsTime = tm.msec();
+//    tm.end();
+    end = std::chrono::steady_clock::now();
+//    m_loadingObjectsTime = tm.msec();
+    m_loadingObjectsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     m_parsingTime = 0;
     //    FileIO::read(m_parsingTime, file);
