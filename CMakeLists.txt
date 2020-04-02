@@ -1,7 +1,13 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 project(proto-bgfx VERSION 1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 14)
+#set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+#set(CMAKE_AUTOUIC ON)
+#set(CMAKE_AUTOMOC ON)
+#set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #option(AUTO_GENERATE_BIN_MODEL "Generate bin file of model for fast loading" ON)
@@ -88,6 +94,7 @@ set(EXTERNAL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external)
 add_subdirectory(modules/glfw)
 add_subdirectory(modules/tinyobjloader)
 # add_subdirectory(Modules/glm)
+set (SRC_DIR ${PROJECT_SOURCE_DIR}/src/)
 
 # add_subdirectory(Modules/stb)
 #add_library(stb STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/stb.cpp)

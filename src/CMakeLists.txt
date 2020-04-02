@@ -16,38 +16,16 @@ file(GLOB_RECURSE SOURCE *.cpp *.h)
 #set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
 add_executable(${PROJECT_NAME} ${SOURCE} ${OUT_SHADERS} ${VARYING_DEF_SHADER} ${BGFX_SHADER} ${SHADER_LIB})
 
-# set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-#message("BGFX_LIBRARY_RELEASE" ${BGFX_LIBRARY_RELEASE})
 
 find_package(bgfx REQUIRED)
-target_include_directories(${PROJECT_NAME} PUBLIC ${BGFX_INCLUDE_DIRS} ${EXTERNAL_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC ${BGFX_INCLUDE_DIRS} ${EXTERNAL_INCLUDE_DIRS} ${SRC_DIR})
 target_compile_definitions(${PROJECT_NAME} PUBLIC __STDC_LIMIT_MACROS __STDC_FORMAT_MACROS __STDC_CONSTANT_MACROS)
 
-# if (UNIX)
-# message(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}) # -g
-# message(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE}) # -03 -DNDEBUG
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    # default debug flags : -g
-    #default release flags : -03 -DNDEBUG
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -Wextra -O0 -Wfatal-errors")
-    #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-    #    target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wpedantic -Werror -DDEBUG -O0 -g -Wfatal-errors)
-    #    target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wpedantic -Wextra -DDEBUG -O0 -g -Wfatal-errors)
-    # endif()
-    # elseif (MSVC)
-    # endif()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-# elseif (MSVC)
-    # default debug flags : /MDd /Zi /Ob0 /Od /RTC1
-    # default release flags : /MD /O2 /Ob2 /DNDEBUG
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX")
-    # target_compile_options(${PROJECT_NAME} PUBLIC /Wall)
-    #   target_compile_options(${PROJECT_NAME} PUBLIC /W4 /WX)
 endif()
-#target_compile_options(${PROJECT_NAME} PRIVATE
-#    "$<$<CONFIG:Debug>:${CMAKE_CXX_FLAGS_DEBUG}>"
-#    "$<$<CONFIG:Release>:${CMAKE_CXX_FLAGS_RELEASE}>"
-#    )
 
 set(SYSTEM_DEPEND_LIBS "")
 if (UNIX)
@@ -77,8 +55,3 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     tinyobjloader
 #    stb
     )
-
-#        OpenGL::GL
-#        ${X11_LIBRARIES}
-#    )
-
