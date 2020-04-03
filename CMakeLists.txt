@@ -24,8 +24,8 @@ add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 #endif()
 
 # select graphic user interface
-#set(GUI_QT 1)
-set(GUI_GLFW 1) #default
+set(GUI_QT 1)
+#set(GUI_GLFW 1) #default
 
 # default renderer linux:opengl, window:DirectX11
 # set(RENDERER_Direct3D9 1)

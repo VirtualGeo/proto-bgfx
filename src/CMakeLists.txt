@@ -14,8 +14,9 @@ file(GLOB_RECURSE SOURCE *.cpp *.h)
 # endforeach()
 
 #set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
-add_executable(${PROJECT_NAME} ${SOURCE} ${OUT_SHADERS} ${VARYING_DEF_SHADER} ${BGFX_SHADER} ${SHADER_LIB})
-
+add_executable(${PROJECT_NAME}
+    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER}
+)
 
 find_package(bgfx REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC
