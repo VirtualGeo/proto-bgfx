@@ -1,3 +1,5 @@
+#ifdef GUI_GLFW
+
 #include "bgfx/platform.h"
 #include <bgfx/bgfx.h>
 #include <bx/bx.h>
@@ -8,6 +10,7 @@
 #include <GLFW/glfw3.h>
 #if BX_PLATFORM_LINUX
 #define GLFW_EXPOSE_NATIVE_X11
+#define GLFW_EXPOSE_NATIVE_GLX // question : quésako ?
 #elif BX_PLATFORM_WINDOWS
 #define GLFW_EXPOSE_NATIVE_WIN32
 #endif
@@ -19,12 +22,14 @@
 // #include <glm/glm.hpp>
 // #include <assert.h>
 //#include "Mesh.h"
-#include "scene.h"
+//#include "scene.h"
+#include <engine/scene.h>
 #include <cassert>
 #include <fstream>
 #include <iostream>
 //#include "Vertex.h"
-#include "program.h"
+//#include "program.h"
+#include <engine/program.h>
 
 //#define WIN_WIDTH 800
 //#define WIN_HEIGHT 600
@@ -736,3 +741,5 @@ void updateCameraFront()
 // void focus_callback(GLFWwindow *window, int focused) {
 // 	g_focused = focused == GLFW_TRUE;
 // }
+
+#endif // GUI_GLFW
