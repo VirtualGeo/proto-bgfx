@@ -141,3 +141,79 @@ if(BGFX_FOUND)
 else()
     message(FATAL_ERROR "could not find bgfx, make sure you have set BGFX_ROOT")
 endif()
+
+# Shader compile utils
+function(GET_SHADER_TYPE IN_TYPE OUT_TYPE)
+    if("${IN_TYPE}" STREQUAL "vert")
+        set(${OUT_TYPE} "vertex" PARENT_SCOPE)
+    elseif("${IN_TYPE}" STREQUAL "frag")
+        set(${OUT_TYPE} "fragment" PARENT_SCOPE)
+    elseif("${IN_TYPE}" STREQUAL "geom")
+        set(${OUT_TYPE} "geometry" PARENT_SCOPE)
+    else()
+        message(FATAL_ERROR "Shader type ${IN_TYPE} to handle")
+    endif()
+endfunction()
+
+function(GET_SHADER_INFOS FILENAME OUT_SHADER_NAME OUT_SHADER_TYPE OUT_BIN_SHADER_NAME OUT_OK)
+    if(${FILENAME} MATCHES "^([a-zA-Z0-9_]+).(vert|frag|tesc|tesv|geom|comp).sc$")
+        get_shader_type(${CMAKE_MATCH_2} SHADER_TYPE)
+        set(${OUT_SHADER_NAME} ${CMAKE_MATCH_1} PARENT_SCOPE)
+        set(${OUT_SHADER_TYPE} ${SHADER_TYPE} PARENT_SCOPE)
+        set(${OUT_BIN_SHADER_NAME} ${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.bin PARENT_SCOPE)
+        set(${OUT_OK} True PARENT_SCOPE)
+    else()
+        message(WARNING "${FILENAME} is not a compatible name")
+        set(${OUT_OK} False PARENT_SCOPE)
+    endif()
+endfunction(GET_SHADER_INFOS)
+
+# file(GLOB_RECURSE IN_SHADERS *.sc)
+
+set(BGFX_SHADER ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src/bgfx_shader.sh)
+
+macro(COMPILE_SHADER_INTERNAL SHADER_IN SHADER_OUT PLATFORM PROFILE)
+    add_custom_command(
+        OUTPUT ${SHADER_OUT}
+        COMMAND
+        ${BGFX_ROOT}/bin/shaderc
+        -f ${SHADER_IN}
+        -o ${SHADER_OUT}
+        --platform ${PLATFORM}
+        --profile ${PROFILE}
+        --type ${SHADER_TYPE}
+        ${PROFILE}
+        -i ${SHADER_INCLUDE_DIR}
+        MAIN_DEPENDENCY ${SHADER_IN}
+        COMMENT "Compiling ${SHADER_IN} to ${SHADER_OUT}"
+    )
+endmacro()
+
+function(COMPILE_SHADER SHADER SHADER_INCLUDE_DIR OUT_SHADERS)
+    get_shader_infos(${SHADER} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)
+    if(OK)
+        if(${SHADER_TYPE} STREQUAL "vertex")
+            set(DXPROFILE "vs_5_0")
+            set(GLPROFILE "120")
+        elseif(${SHADER_TYPE} STREQUAL "fragment")
+            set(DXPROFILE "ps_5_0")
+            set(GLPROFILE "120")
+        elseif(${SHADER_TYPE} STREQUAL "compute")
+            set(DXPROFILE "cs_5_0")
+            set(GLPROFILE "430")
+        endif()
+
+        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_DIR}/bin/dx11/${BIN_SHADER_NAME} "windows" ${DXPROFILE}) # DX11+
+        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_DIR}/bin/glsl/${BIN_SHADER_NAME} "linux" ${GLPROFILE}) # GLSL
+        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_DIR}/bin/spirv/${BIN_SHADER_NAME} "linux" "spirv") # Vulkan
+        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_DIR}/bin/metal/${BIN_SHADER_NAME} "osx" "metal") # Metal
+        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_DIR}/bin/essl/${BIN_SHADER_NAME} "android" ${GLPROFILE}) # GLES Android
+
+        list(APPEND ${OUT_SHADERS} ${SHADER_DIR}/bin/dx11/${BIN_SHADER_NAME})
+        list(APPEND ${OUT_SHADERS} ${SHADER_DIR}/bin/glsl/${BIN_SHADER_NAME})
+        list(APPEND ${OUT_SHADERS} ${SHADER_DIR}/bin/spirv/${BIN_SHADER_NAME})
+        list(APPEND ${OUT_SHADERS} ${SHADER_DIR}/bin/metal/${BIN_SHADER_NAME})
+        list(APPEND ${OUT_SHADERS} ${SHADER_DIR}/bin/essl/${BIN_SHADER_NAME})
+        set(${OUT_SHADERS} "${${OUT_SHADERS}}" PARENT_SCOPE)
+    endif()
+endfunction(COMPILE_SHADER)
