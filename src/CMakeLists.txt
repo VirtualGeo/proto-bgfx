@@ -1,8 +1,24 @@
 # cmake_minimum_required(VERSION 3.0)
 # project(src VERSION 1.0 LANGUAGES CXX)
 
+find_package(bgfx REQUIRED)
+
+# -------------------------------- SHADERS
+set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
+
+set(IN_SHADERS
+    cubes.vert.sc
+    cubes.frag.sc
+    # blinnphong_vert.sc
+    # blinnphong_frag.sc
+    # mesh_vert.sc
+    # mesh_frag.sc
+    )
+
+set(OUT_SHADERS )
 foreach(SHADER ${IN_SHADERS})
-    compile_shader(${SHADER})
+    compile_shader(${SHADER} ${SHADER_DIR}/src ${SHADER_DIR}/bin ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src LOCAL_OUT_SHADERS)
+    list(APPEND OUT_SHADERS ${LOCAL_OUT_SHADERS})
 endforeach()
 
 # set(SOURCE main.cpp)
@@ -19,9 +35,7 @@ add_executable(${PROJECT_NAME} ${SOURCE} ${OUT_SHADERS} ${VARYING_DEF_SHADER} ${
 # set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 #message("BGFX_LIBRARY_RELEASE" ${BGFX_LIBRARY_RELEASE})
 
-find_package(bgfx REQUIRED)
-target_include_directories(${PROJECT_NAME} PUBLIC ${BGFX_INCLUDE_DIRS} ${EXTERNAL_INCLUDE_DIRS})
-target_compile_definitions(${PROJECT_NAME} PUBLIC __STDC_LIMIT_MACROS __STDC_FORMAT_MACROS __STDC_CONSTANT_MACROS)
+target_include_directories(${PROJECT_NAME} PUBLIC ${EXTERNAL_INCLUDE_DIRS})
 
 # if (UNIX)
 # message(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}) # -g
@@ -35,13 +49,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     #    target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wpedantic -Wextra -DDEBUG -O0 -g -Wfatal-errors)
     # endif()
     # elseif (MSVC)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-# elseif (MSVC)
-    # default debug flags : /MDd /Zi /Ob0 /Od /RTC1
-    # default release flags : /MD /O2 /Ob2 /DNDEBUG
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX")
-    # target_compile_options(${PROJECT_NAME} PUBLIC /Wall)
-    #   target_compile_options(${PROJECT_NAME} PUBLIC /W4 /WX)
 endif()
 #target_compile_options(${PROJECT_NAME} PRIVATE
 #    "$<$<CONFIG:Debug>:${CMAKE_CXX_FLAGS_DEBUG}>"
@@ -62,22 +69,13 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     ${SYSTEM_DEPEND_LIBS}
-    #    ${X11_LIBRARIES}
-    #    ${OPENGL_LIBRARIES}
-    $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
-    $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
-    $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
-    $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
-    $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}> # BX not before BIMG
-    $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
-    $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
-    $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
+    BGFX::BGFX
     glfw
     tinyobjloader
 #    stb
-    )
+)
 
-#        OpenGL::GL
-#        ${X11_LIBRARIES}
-#    )
+target_compile_options(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/W3>)
+target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS> $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>)
+
 
