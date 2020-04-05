@@ -52,26 +52,6 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 
-
-# -------------------------------- SHADERS
-set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
-# MAIN_DEPENDENCY ${SHADER_DIR}/src/${SHADER}
-set(SHADER_SRC_DIR ${SHADER_DIR}/src)
-# set(SHADERS test.vert.sc)
-
-set(IN_SHADERS
-    cubes.vert.sc
-    cubes.frag.sc
-    # blinnphong_vert.sc
-    # blinnphong_frag.sc
-    # mesh_vert.sc
-    # mesh_frag.sc
-    )
-
-include (${CMAKE_MODULE_PATH}/shader.cmake)
-#include(${CMAKE_MODULE_PATH}/Findbgfx.cmake)
-# file(GLOB shaders shaders/src/*.sc)
-
 # -------------------------------- EXTERNAL LIBS
 set(EXTERNAL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external)
 add_subdirectory(modules/glfw)
