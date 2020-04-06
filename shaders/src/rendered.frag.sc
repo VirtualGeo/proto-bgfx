@@ -3,8 +3,8 @@ $input v_pos, v_normal, v_texcoord0
 #include <bgfx_shader.sh>
 #include "shaderlib.sh" // do not include shaderlib.sh before bgfx_shader.sh
 
-                            SAMPLER2D(s_diffuse, 0);
-//SAMPLER2D(s_opacity, 1);
+SAMPLER2D(s_diffuse, 0);
+SAMPLER2D(s_opacity, 1);
 
 struct DirLight {
     vec3 dir;
@@ -22,6 +22,7 @@ uniform vec4 u_params[7];
 #define u_diffuse u_params[0].xyz
 #define u_hasDiffuseTexture u_params[0].w
 #define u_specular u_params[1].xyz
+#define u_hasOpacityTexture u_params[1].w
 #define u_ambient u_params[2].xyz
 #define u_shininess u_params[2].w
 #define u_dir_light_0_dir u_params[3].xyz
@@ -59,6 +60,14 @@ vec3 calculateSingleLightShading(DirLight dir_light, Material material, vec3 col
 
 void main()
 {
+    vec3 color;
+    if (u_hasOpacityTexture > 0.5) {
+        color = texture2D(s_opacity, v_texcoord0).xyz;
+        if (color.r < 0.1) {
+            discard;
+        }
+    }
+
     vec3 result = vec3_splat(0.0); // vec3_splat != vec3 for direct3D
 
 #ifdef BGFX_SHADER_LANGUAGE_PSSL
@@ -89,7 +98,6 @@ void main()
     vec3 normal = normalize(v_normal);
 
     //        vec3 color = texture2D(s_diffuse, v_texcoord0).xyz;
-    vec3 color;
     if (u_hasDiffuseTexture > 0.5) {
         //        color = texture2D(s_diffuse, v_texcoord0).xyz;
         color = toLinear(texture2D(s_diffuse, v_texcoord0)).xyz;

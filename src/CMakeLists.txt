@@ -13,9 +13,19 @@ file(GLOB_RECURSE SOURCE *.cpp *.h)
 #     list(APPEND IN_SHADERS_FULL_PATH ${SHADER_SRC_DIR}/${IN_SHADER} ${OUT_SHADERS})
 # endforeach()
 
+if(GUI_QT)
+#    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+    set(CMAKE_AUTOUIC ON)
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_AUTORCC ON)
+    file(GLOB_RECURSE UI_SOURCE *.ui)
+#    add_executable(${PROJECT_NAME} ${UI_SOURCE})
+endif()
+
+
 #set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
 add_executable(${PROJECT_NAME}
-    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER}
+    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${UI_SOURCE}
 )
 
 find_package(bgfx REQUIRED)
@@ -36,6 +46,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX")
 endif()
 
+#---------------------------- TARGET_LINK_LIBRARIES ---------------------------
 #set(SYSTEM_DEPEND_LIBS "")
 if (UNIX)
     find_package(X11 REQUIRED)
@@ -43,7 +54,7 @@ if (UNIX)
 
 #    #        set(OpenGL_GL_PREFERENCE "GLVND")
     set(OpenGL_GL_PREFERENCE "LEGACY")
-    find_package(OpenGL REQUIRED)
+    find_package(OpenGL REQUIRED) # need by bgfx renderer_gl
     target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENGL_LIBRARIES})
 
 #    set(PLATFORM_SPECIFIC_LIBS "-lpthread")
@@ -69,6 +80,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     ${CMAKE_DL_LIBS} #dlclose glibc
 )
 
-if (GUI_GLFW)
+#if (GUI_GLFW)
     target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
+#elseif(GUI_QT)
+if(GUI_QT)
+    find_package(Qt5 COMPONENTS Widgets REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
 endif()

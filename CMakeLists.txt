@@ -68,13 +68,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # find_package(glfw3 3.3 REQUIRED)
 # ------------------------------ GLFW
-if (GUI_GLFW)
+#if (GUI_GLFW)
     set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     add_subdirectory(modules/glfw)
 #    target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
-endif()
+#endif()
 
 
 

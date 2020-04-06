@@ -122,20 +122,21 @@ void Program::submit(const Material &material, const DirLight &dirLight, const T
 
 //        bgfx::setUniform(m_uTexturesEnable, material.texturesEnable());
 //        const int iTexOpacity = material.iTexOpacity();
-//        const int iTexOpacity = material.m_iTexOpacity;
-//        if (iTexOpacity >= 0) {
-//            assert(iTexOpacity < textures.size());
-//            const Texture& texture = textures[iTexOpacity];
+        const int iTexOpacity = material.m_iTexOpacity;
+        if (iTexOpacity >= 0) {
+            assert(iTexOpacity < textures.size());
+            const Texture& texture = textures[iTexOpacity];
 
-//            bgfx::setTexture(1, m_sOpacity, texture.textureHandle(), Texture::s_textureSamplerFlags);
-//        } else {
-//            bgfx::setTexture(1, m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
-//        }
+            bgfx::setTexture(1, m_sOpacity, texture.textureHandle(), Texture::s_textureSamplerFlags);
+        } else {
+            bgfx::setTexture(1, m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+        }
 
 //        const std::array<float[4], s_num_vec4_uniforms> buffer = {{
         const float buffer[s_num_vec4_uniforms][4] = {
             {material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3]}, // question how do smaller, without glm::vec4
-            {material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_specular[3]}, // question how do smaller, without glm::vec4
+//            {material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_specular[3]}, // question how do smaller, without glm::vec4
+            {material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_texturesEnable[0]}, // question how do smaller, without glm::vec4
             {material.m_ambient[0], material.m_ambient[1], material.m_ambient[2], material.m_shininess}, // question how do smaller, without glm::vec4
 //            {material.m_texturesEnable[0]},
             {dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z},

@@ -1,4 +1,4 @@
-#ifdef GUI_GLFW
+//#ifdef GUI_GLFW
 
 #include "bgfx/platform.h"
 #include <bgfx/bgfx.h>
@@ -114,6 +114,7 @@ int g_iViewportShading = Program::Shading::RENDERED;
 //int g_iViewportShading = Program::Shading::NORMAL;
 float g_mtx[16];
 
+#ifdef UNDEF_H
 int main(int argc, char const* argv[])
 {
     glfwSetErrorCallback(error_callback);
@@ -182,6 +183,7 @@ int main(int argc, char const* argv[])
 
     return 0;
 }
+#endif
 
 void init()
 {
@@ -742,4 +744,4 @@ void updateCameraFront()
 // 	g_focused = focused == GLFW_TRUE;
 // }
 
-#endif // GUI_GLFW
+//#endif // GUI_GLFW
