@@ -1,8 +1,30 @@
 # cmake_minimum_required(VERSION 3.0)
 # project(src VERSION 1.0 LANGUAGES CXX)
 
+find_package(bgfx REQUIRED)
+
+# -------------------------------- SHADERS
+set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
+
+set(IN_SHADERS
+#    cubes.vert.sc
+#    cubes.frag.sc
+    material.vert.sc
+    material.frag.sc
+    rendered.vert.sc
+    rendered.frag.sc
+    normal.vert.sc
+    normal.frag.sc
+    # blinnphong_vert.sc
+    # blinnphong_frag.sc
+    # mesh_vert.sc
+    # mesh_frag.sc
+    )
+
+set(OUT_SHADERS )
 foreach(SHADER ${IN_SHADERS})
-    compile_shader(${SHADER})
+    compile_shader(${SHADER} ${SHADER_DIR}/src ${SHADER_DIR}/bin ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src LOCAL_OUT_SHADERS)
+    list(APPEND OUT_SHADERS ${LOCAL_OUT_SHADERS})
 endforeach()
 
 # set(SOURCE main.cpp)
@@ -28,17 +50,10 @@ add_executable(${PROJECT_NAME}
     ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${UI_SOURCE}
 )
 
-find_package(bgfx REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${BGFX_INCLUDE_DIRS}
-    ${EXTERNAL_INCLUDE_DIRS} # libdl
+    ${EXTERNAL_INCLUDE_DIRS}
     ${SRC_DIR}
-#    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
-#    $<INSTALL_INTERFACE:include>
-)
-target_compile_definitions(${PROJECT_NAME} PUBLIC
-    __STDC_LIMIT_MACROS __STDC_FORMAT_MACROS __STDC_CONSTANT_MACROS
-)
+    )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -Wextra -O0 -Wfatal-errors")
@@ -68,17 +83,22 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
 #    ${SYSTEM_DEPEND_LIBS}
-    $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
-    $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
-    $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
-    $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
-    $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}> # BX not before BIMG
-    $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
-    $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
-    $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
+#    $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
+#    $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
+#    $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
+#    $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
+#    $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}> # BX not before BIMG
+#    $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
+#    $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
+#    $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
+    BGFX::BGFX
     tinyobjloader
     ${CMAKE_DL_LIBS} #dlclose glibc
 )
+
+target_compile_options(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/W3>)
+target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS> $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>)
+
 
 if (GUI_GLFW)
     target_link_libraries(${PROJECT_NAME} PUBLIC glfw)

@@ -111,31 +111,14 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
     bgfxInit.platformData.backBufferDS = nullptr;
     //    bgfxInit.platformData.session = nullptr;
     //    bgfx::setPlatformData(pd);
-//    bgfxInit.type = bgfx::RendererType::Count;
-#ifdef RENDERER_Direct3D9
-    bgfxInit.type = bgfx::RendererType::Direct3D9;
-#endif
-#ifdef RENDERER_Direct3D11
-    bgfxInit.type = bgfx::RendererType::Direct3D11;
-#endif
-#ifdef RENDERER_Direct3D12
-    bgfxInit.type = bgfx::RendererType::Direct3D12;
-#endif
-#ifdef RENDERER_OpenGL
-    bgfxInit.type = bgfx::RendererType::OpenGL;
-#endif
-#ifdef RENDERER_OpenGLES
-    bgfxInit.type = bgfx::RendererType::OpenGLES;
-#endif
-#ifdef RENDERER_Vulkan
-    bgfxInit.type = bgfx::RendererType::Vulkan;
-#endif
-#ifdef RENDERER_Metal
-    bgfxInit.type = bgfx::RendererType::Metal;
-#endif
-#ifdef RENDERER_Auto
     bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
-#endif
+//    bgfxInit.type = bgfx::RendererType::Direct3D9;
+//    bgfxInit.type = bgfx::RendererType::Direct3D11;
+//    bgfxInit.type = bgfx::RendererType::Direct3D12;
+//    bgfxInit.type = bgfx::RendererType::OpenGL;
+//    bgfxInit.type = bgfx::RendererType::OpenGLES;
+//    bgfxInit.type = bgfx::RendererType::Vulkan;
+//    bgfxInit.type = bgfx::RendererType::Metal;
 
     bgfxInit.resolution.width = this->width();
     bgfxInit.resolution.height = this->height();
