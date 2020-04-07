@@ -1,4 +1,4 @@
-//#ifdef GUI_GLFW
+#ifdef GUI_GLFW
 
 #include "bgfx/platform.h"
 #include <bgfx/bgfx.h>
@@ -98,15 +98,15 @@ int g_parsingTime;
 int g_loadingMaterialsTime;
 int g_loadingObjectsTime;
 int g_totalLoadingTime;
+size_t g_nbVertexBuffer;
+size_t g_nbIndexBuffer;
 std::string g_renderer;
 std::string g_vendorID;
 //int g_debugHMargin;
-size_t g_nbVertexBuffer;
-size_t g_nbIndexBuffer;
 bool g_showStats = false;
 bool g_vsyncEnable = false;
 int g_mssaLevel = 0;
-bool g_shiftPressed = false;
+//bool g_shiftPressed = false;
 bool g_slowMotion = false;
 int g_textureSamplerFlags = 0;
 std::string g_viewportShading = "rendered";
@@ -114,7 +114,7 @@ int g_iViewportShading = Program::Shading::RENDERED;
 //int g_iViewportShading = Program::Shading::NORMAL;
 float g_mtx[16];
 
-#ifdef UNDEF_H
+//#ifdef UNDEF_H
 int main(int argc, char const* argv[])
 {
     glfwSetErrorCallback(error_callback);
@@ -183,7 +183,7 @@ int main(int argc, char const* argv[])
 
     return 0;
 }
-#endif
+//#endif
 
 void init()
 {
@@ -653,8 +653,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_RIGHT_CONTROL && action == GLFW_RELEASE) {
         g_slowMotion = !g_slowMotion;
     }
-    if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_KEY_RIGHT_SHIFT) {
-        g_shiftPressed = action == GLFW_PRESS;
+//    if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_KEY_RIGHT_SHIFT) {
+//        g_shiftPressed = action == GLFW_PRESS;
         //        if (action == GLFW_RELEASE) {
         //            g_slowMotion = !g_slowMotion;
         //        }
@@ -666,7 +666,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         //            g_shiftPressed = false;
         //        }
         //        g_shiftPressed = ! g_shiftPressed;
-    }
+//    }
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -744,4 +744,4 @@ void updateCameraFront()
 // 	g_focused = focused == GLFW_TRUE;
 // }
 
-//#endif // GUI_GLFW
+#endif // GUI_GLFW

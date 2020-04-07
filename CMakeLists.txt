@@ -18,7 +18,6 @@ add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
 
 # ------------------------ USER CONFIGURATIONS ----------------------
 #set(BGFX_ROOT <PATH_IN_YOUR_SYSTEM>/bgfx-install) // YOU MUST SET BGFX_ROOT TO COMPILE <----- ATTENTION
-
 #if (AUTO_GENERATE_BIN_MODEL)
 add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 #endif()
@@ -27,7 +26,7 @@ add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 set(GUI_QT 1)
 #set(GUI_GLFW 1) #default
 
-# default renderer linux:opengl, window:DirectX11
+# force specific renderer
 # set(RENDERER_Direct3D9 1)
 # set(RENDERER_Direct3D11 1) #default on win
 # set(RENDERER_Direct3D12 1)
@@ -68,13 +67,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # find_package(glfw3 3.3 REQUIRED)
 # ------------------------------ GLFW
-#if (GUI_GLFW)
+if (GUI_GLFW)
     set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     add_subdirectory(modules/glfw)
 #    target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
-#endif()
+endif()
 
 
 
