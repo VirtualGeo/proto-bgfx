@@ -234,31 +234,16 @@ void init()
     bgfxInit.platformData.backBufferDS = NULL;
 
     // std::cout << RENDERER_TYPE << std::endl;
-#ifdef RENDERER_Direct3D9
-    bgfxInit.type = bgfx::RendererType::Direct3D9;
-#endif
-#ifdef RENDERER_Direct3D11
-    bgfxInit.type = bgfx::RendererType::Direct3D11;
-#endif
-#ifdef RENDERER_Direct3D12
-    bgfxInit.type = bgfx::RendererType::Direct3D12;
-#endif
-#ifdef RENDERER_OpenGL
-    bgfxInit.type = bgfx::RendererType::OpenGL;
-#endif
-#ifdef RENDERER_OpenGLES
-    bgfxInit.type = bgfx::RendererType::OpenGLES;
-#endif
-#ifdef RENDERER_Vulkan
-    bgfxInit.type = bgfx::RendererType::Vulkan;
-#endif
-#ifdef RENDERER_Metal
-    bgfxInit.type = bgfx::RendererType::Metal;
-#endif
-#ifdef RENDERER_Auto
     bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
+//    bgfxInit.type = bgfx::RendererType::Direct3D9;
+//    bgfxInit.type = bgfx::RendererType::Direct3D11;
+//    bgfxInit.type = bgfx::RendererType::Direct3D12;
+//    bgfxInit.type = bgfx::RendererType::OpenGL;
+//    bgfxInit.type = bgfx::RendererType::OpenGLES;
+//    bgfxInit.type = bgfx::RendererType::Vulkan;
+//    bgfxInit.type = bgfx::RendererType::Metal;
 //    std::cout << "[main] RendererType auto" << std::endl;
-#endif
+
     glfwGetWindowSize(g_window, &g_width, &g_height);
     bgfxInit.resolution.width = g_width;
     bgfxInit.resolution.height = g_height;
