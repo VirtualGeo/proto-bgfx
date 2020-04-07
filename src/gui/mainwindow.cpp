@@ -1,3 +1,5 @@
+#ifdef GUI_QT
+
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
@@ -33,3 +35,5 @@ void MainWindow::on_actionExit_triggered()
 {
     QCoreApplication::quit();
 }
+
+#endif

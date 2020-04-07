@@ -80,10 +80,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     ${CMAKE_DL_LIBS} #dlclose glibc
 )
 
-#if (GUI_GLFW)
+if (GUI_GLFW)
     target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
-#elseif(GUI_QT)
-if(GUI_QT)
+elseif(GUI_QT)
+#if(GUI_QT)
     find_package(Qt5 COMPONENTS Widgets REQUIRED)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
 endif()

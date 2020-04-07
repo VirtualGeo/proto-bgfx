@@ -1,3 +1,5 @@
+#ifdef GUI_QT
+
 #ifndef QWIDGETBGFX_H
 #define QWIDGETBGFX_H
 
@@ -9,6 +11,7 @@ class QWidgetBgfx : public QWidget
     Q_OBJECT
 public:
     explicit QWidgetBgfx(QWidget *parent = nullptr);
+    virtual ~QWidgetBgfx();
 
 protected:
     void paintEvent(QPaintEvent * event) override;
@@ -16,6 +19,9 @@ protected:
     QPaintEngine * paintEngine() const override;
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
 signals:
 
@@ -25,6 +31,10 @@ private:
     bool m_isInit = false;
 
 
+
 };
 
 #endif // QWIDGETBGFX_H
+
+
+#endif
