@@ -6,3 +6,4 @@ DirLight::DirLight(bx::Vec3 direction)
 {
 
 }
+
