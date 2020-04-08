@@ -7,18 +7,12 @@ find_package(bgfx REQUIRED)
 set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
 
 set(IN_SHADERS
-#    cubes.vert.sc
-#    cubes.frag.sc
     material.vert.sc
     material.frag.sc
     rendered.vert.sc
     rendered.frag.sc
     normal.vert.sc
     normal.frag.sc
-    # blinnphong_vert.sc
-    # blinnphong_frag.sc
-    # mesh_vert.sc
-    # mesh_frag.sc
     )
 
 set(OUT_SHADERS )
@@ -57,8 +51,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -pedantic -Wextra -O0 -Wfatal-errors")
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX")
+# elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX")
 endif()
 
 #---------------------------- TARGET_LINK_LIBRARIES ---------------------------

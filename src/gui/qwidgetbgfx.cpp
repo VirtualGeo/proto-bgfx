@@ -33,7 +33,9 @@ double g_deltaTime;
 int g_cameraMoveFront = 0;
 int g_cameraMoveRight = 0;
 int g_cameraMoveUp = 0;
-std::chrono::time_point<std::chrono::system_clock> g_lastTime;
+// std::chrono::time_point<std::chrono::system_clock> g_lastTime;
+std::chrono::time_point<std::chrono::high_resolution_clock> g_lastTime;
+// std:::chrono::steady_clock::time_point g_lastTime;
 //    const auto currentTime = std::chrono::high_resolution_clock::now();
 //std::chrono::high_resolution_clock g_timer;
 bool g_mouseLeftClicked = false;
@@ -178,6 +180,7 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
     setFocus();
 
     g_lastTime = std::chrono::high_resolution_clock::now();
+    // g_lastTime = std::chrono::steady_clock::now();
 }
 
 QWidgetBgfx::~QWidgetBgfx()
@@ -210,7 +213,7 @@ void QWidgetBgfx::paintEvent(QPaintEvent* event)
     //    const auto currentTime = std::chrono::system_clock::now();
     const auto currentTime = std::chrono::high_resolution_clock::now();
     //    const auto currentTime = g_timer.now();
-    g_deltaTime = std::chrono::duration_cast<timeUnit>(currentTime - g_lastTime).count() / 1000000.0f;
+    g_deltaTime = std::chrono::duration_cast<timeUnit>(currentTime - g_lastTime).count() / 1000000.0;
     g_lastTime = currentTime;
     g_sum += g_deltaTime;
 
