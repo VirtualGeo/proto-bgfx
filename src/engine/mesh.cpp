@@ -57,7 +57,7 @@ void Mesh::save(std::ofstream& file) const
 
 //}
 
-void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx, const uint64_t state, const Materials& materials, const Textures& textures, const DirLight &dirLight, bx::Vec3 cameraPos) const
+void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx, const uint64_t state, const Materials& materials, const Textures& textures, const DirLight &dirLight, const Camera &camera) const
 {
     bgfx::setTransform(mtx);
     bgfx::setState(state);
@@ -65,7 +65,7 @@ void Mesh::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
     assert(0 <= m_iMaterial && m_iMaterial < materials.size());
     const Material& material = materials[m_iMaterial];
 
-    program.submit(material, dirLight, textures, cameraPos);
+    program.submit(material, dirLight, textures, camera);
 
     bgfx::setIndexBuffer(m_ibh);
     //    bgfx::setVertexBuffer(0, vbh);

@@ -68,17 +68,7 @@ void Program::clear()
     bgfx::destroy(m_handleUniform);
 }
 
-void Program::setShading(Program::Shading shading)
-{
-    m_iHandleProgram = shading;
-}
-
-Program::Shading Program::shading() const
-{
-    return Shading(m_iHandleProgram);
-}
-
-void Program::submit(const Material &material, const DirLight &dirLight, const Textures &textures, bx::Vec3 cameraPos) const
+void Program::submit(const Material &material, const DirLight &dirLight, const Textures &textures, const Camera &camera) const
 {
 
     switch (m_iHandleProgram) {
@@ -141,7 +131,7 @@ void Program::submit(const Material &material, const DirLight &dirLight, const T
 //            {material.m_texturesEnable[0]},
             {dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z},
             {dirLight.m_ambient.x, dirLight.m_ambient.y, dirLight.m_ambient.z},
-            {cameraPos.x, cameraPos.y, cameraPos.z},
+            {camera.m_pos.x, camera.m_pos.y, camera.m_pos.z},
 //            {dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z},
 //            {dirLight.m_specular.x, dirLight.m_specular.y, dirLight.m_specular.z},
 //            {}
@@ -155,10 +145,6 @@ void Program::submit(const Material &material, const DirLight &dirLight, const T
 }
 
 
-bgfx::ProgramHandle Program::handleProgram() const
-{
-    return m_handlePrograms[m_iHandleProgram];
-}
 
 //bgfx::ProgramHandle Program::program() const
 //{
@@ -259,4 +245,20 @@ bgfx::ShaderHandle loadShader(const std::string& filename)
 
     return handle;
     //    return bgfx::createShader(mem);
+}
+
+// ------------------------------------ GETTERS AND SETTERS
+bgfx::ProgramHandle Program::handleProgram() const
+{
+    return m_handlePrograms[m_iHandleProgram];
+}
+
+void Program::setShading(Program::Shading shading)
+{
+    m_iHandleProgram = shading;
+}
+
+Program::Shading Program::shading() const
+{
+    return Shading(m_iHandleProgram);
 }

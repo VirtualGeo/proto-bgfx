@@ -7,6 +7,7 @@
 #include "texture.h"
 #include "light.h"
 #include "dirLight.h"
+#include "camera.h"
 
 class Program {
 public:
@@ -26,9 +27,7 @@ public:
     void init();
 
     void clear();
-    void setShading(Shading shading);
-    Shading shading() const;
-    void submit(const Material & material, const DirLight & light, const Textures & textures, bx::Vec3 cameraPos) const;
+    void submit(const Material & material, const DirLight & light, const Textures & textures, const Camera & camera) const;
 
     //    bgfx::ProgramHandle program() const;
 
@@ -51,6 +50,8 @@ public:
 
 public:
     bgfx::ProgramHandle handleProgram() const;
+    void setShading(Shading shading);
+    Shading shading() const;
 };
 
 #endif // PROGRAM_H

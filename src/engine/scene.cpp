@@ -194,6 +194,7 @@ void Scene::addModel(const std::string& filename)
     //    std::cout << "[Scene] Parsing time: " << m_parsingTime << " [ms]" << std::endl;
     //    std::cout << "[Scene] Loading tinyObjMaterials time: " << m_loadingMaterialsTime << " [ms]" << std::endl;
     //    std::cout << "[Scene] Loading objects time: " << m_loadingObjectsTime << " [ms]" << std::endl;
+    updateStats();
 
 #ifdef AUTO_GENERATE_BIN_MODEL
     //    save(file);
@@ -210,8 +211,19 @@ void Scene::addModel(const std::string& filename)
 #endif
 }
 
-void Scene::draw(const bgfx::ViewId id, const Program& program, const float* mtx, const uint64_t state, bx::Vec3 cameraPos) const
+void Scene::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
+                 const uint64_t state, const Camera &camera, float ratio) const
 {
+    float view[16];
+    // bx::mtxLookAt(view, eye, at);
+    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
+
+    float proj[16];
+    bx::mtxProj(proj, camera.m_fov, ratio, 0.1f, 100.0f,
+        bgfx::getCaps()->homogeneousDepth);
+
+    bgfx::setViewTransform(id, view, proj);
+
     for (const Object& object : m_objects) {
         //    const uint nbObjects = m_objects.size();
         //            bgfx::setTransform(mtx);
@@ -219,7 +231,7 @@ void Scene::draw(const bgfx::ViewId id, const Program& program, const float* mtx
         //        for (int i =0; i <nbObjects; ++i) {
         //            const Object & object = m_objects[i];
 
-        object.draw(id, program, mtx, state, m_materials, m_textures, m_dirLight, cameraPos);
+        object.draw(id, program, mtx, state, m_materials, m_textures, m_dirLight, camera);
 
         //             bgfx::submit(id, program, 0, i != nbObjects - 1);
     }
@@ -304,6 +316,7 @@ void Scene::load(std::ifstream& file)
     //    FileIO::read(m_parsingTime, file);
     //    FileIO::read(m_loadingMaterialsTime, file);
     //    FileIO::read(m_loadingObjectsTime, file);
+    updateStats();
 }
 
 void Scene::save(std::ofstream& file) const
@@ -341,72 +354,118 @@ void Scene::save(std::ofstream& file) const
     //    FileIO::write(m_loadingObjectsTime, file);
 }
 
-// ------------------------ GETTERS
-size_t Scene::nbVertices() const
+void Scene::printStats(int & line)
 {
-    size_t nbVertices = 0;
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Scene: Verts:%d | Tris:%d | Verts/Tris:%.2f | Objects:%d | Textures:%d (%.1f MiB)",
+            m_nbVertices, m_nbTriangles, (float)m_nbVertices / m_nbTriangles, m_nbObjects, m_nbTextures, m_texturesSize);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Vertex buffer:%d | Index buffer:%d | Index buffer/Vertex buffer:%.2f",
+            m_nbVertexBuffer, m_nbIndexBuffer, (float)m_nbIndexBuffer / m_nbVertexBuffer);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   TinyObj parsing time: %d ms", m_parsingTime);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Loading materials time: %d ms", m_loadingMaterialsTime);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Loading objects time: %d ms", m_loadingObjectsTime);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Total loading time: %d ms", m_totalLoadingTime);
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Total draw call: %d", m_nbIndexBuffer + 1);
+}
+
+void Scene::updateStats()
+{
+    m_nbVertices = 0;
     for (const Object& object : m_objects) {
-        nbVertices += object.nbVertices();
+        m_nbVertices += object.nbVertices();
     }
 
-    return nbVertices;
-}
 
-size_t Scene::nbTriangles() const
-{
-    size_t nbTriangles = 0;
+    m_nbTriangles = 0;
     for (const Object& object : m_objects) {
-        nbTriangles += object.nbTriangles();
+        m_nbTriangles += object.nbTriangles();
     }
 
-    return nbTriangles;
-}
+    m_nbObjects =  m_objects.size();
 
-size_t Scene::nbObjects() const
-{
-    return m_objects.size();
-}
-
-size_t Scene::texturesSize() const
-{
-    size_t texturesSize = 0;
-    for (const Texture& texture : m_textures) {
-        texturesSize += texture.textureSize();
-    }
-
-    return texturesSize;
-}
-
-size_t Scene::nbVertexBuffer() const
-{
-    return m_objects.size();
-}
-
-size_t Scene::nbIndexBuffer() const
-{
-    size_t ret = 0;
+    m_nbMeshes = 0;
     for (const auto& object : m_objects) {
-        ret += object.nbMeshes();
+        m_nbMeshes += object.nbMeshes();
     }
-    return ret;
+
+    m_texturesSize = 0;
+    for (const Texture& texture : m_textures) {
+        m_texturesSize += texture.textureSize();
+    }
+    m_texturesSize /= 1000000.0f;
+
+    m_nbTextures =  m_textures.size();
+
+    m_totalLoadingTime = m_parsingTime + m_loadingMaterialsTime + m_loadingObjectsTime;
+    m_nbVertexBuffer = m_nbObjects;
+    m_nbIndexBuffer = m_nbMeshes;
 }
 
-size_t Scene::nbTextures() const
-{
-    return m_textures.size();
-}
+// ------------------------ GETTERS
+//size_t Scene::nbVertices() const
+//{
+//    size_t nbVertices = 0;
+//    for (const Object& object : m_objects) {
+//        nbVertices += object.nbVertices();
+//    }
 
-int Scene::parsingTime() const
-{
-    return m_parsingTime;
-}
+//    return nbVertices;
+//}
 
-int Scene::loadingMaterialsTime() const
-{
-    return m_loadingMaterialsTime;
-}
+//size_t Scene::nbTriangles() const
+//{
+//    size_t nbTriangles = 0;
+//    for (const Object& object : m_objects) {
+//        nbTriangles += object.nbTriangles();
+//    }
 
-int Scene::loadingObjectsTime() const
-{
-    return m_loadingObjectsTime;
-}
+//    return nbTriangles;
+//}
+
+//size_t Scene::nbObjects() const
+//{
+//    return m_objects.size();
+//}
+
+//size_t Scene::texturesSize() const
+//{
+//    size_t texturesSize = 0;
+//    for (const Texture& texture : m_textures) {
+//        texturesSize += texture.textureSize();
+//    }
+
+//    return texturesSize;
+//}
+
+//size_t Scene::nbVertexBuffer() const
+//{
+//    return m_objects.size();
+//}
+
+//size_t Scene::nbIndexBuffer() const
+//{
+//    size_t ret = 0;
+//    for (const auto& object : m_objects) {
+//        ret += object.nbMeshes();
+//    }
+//    return ret;
+//}
+
+//size_t Scene::nbTextures() const
+//{
+//    return m_textures.size();
+//}
+
+//int Scene::parsingTime() const
+//{
+//    return m_parsingTime;
+//}
+
+//int Scene::loadingMaterialsTime() const
+//{
+//    return m_loadingMaterialsTime;
+//}
+
+//int Scene::loadingObjectsTime() const
+//{
+//    return m_loadingObjectsTime;
+//}

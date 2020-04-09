@@ -22,7 +22,6 @@
     #{
     #   "cmake.configureSettings": {
     #   "BGFX_ROOT": "D:/bgfx.cmake/bgfx-install",
-    #   "Qt5_DIR": "C:/Qt/Qt5.14.2/5.14.2/msvc2015_64/lib/cmake/Qt5"
     #   },
     #}
     # visual studio
@@ -39,7 +38,7 @@
     #endif()
 
     # select graphic user interface
-    # set(GUI_GLFW 1) #default
+#     set(GUI_GLFW 1) #default
     set(GUI_QT 1)
 
     # -------------------------------------------------------------------
