@@ -274,8 +274,8 @@ void init()
     // glfwMakeContextCurrent(nullptr); // question : why we can do it ?
 
     // ------------------------------- LOADING MODEL
-   g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
-//         g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+//   g_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+         g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
 
     //        g_scene.addModel("/home/gauthier/Downloads/Cougar/Cougar.obj");

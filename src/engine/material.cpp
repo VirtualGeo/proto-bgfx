@@ -93,7 +93,12 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
 Material::Material(Material&& material)
     : m_name(std::move(material.m_name))
     , m_iTexDiffuse(material.m_iTexDiffuse)
+    , m_diffuse{material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3]}
+    , m_specular{material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_specular[3]}
+    , m_ambient{material.m_ambient[0], material.m_ambient[1], material.m_ambient[2], material.m_ambient[3]}
     , m_shininess(material.m_shininess)
+    , m_texturesEnable{material.m_texturesEnable[0], material.m_texturesEnable[1], material.m_texturesEnable[2], material.m_texturesEnable[3]}
+    , m_iTexOpacity(material.m_iTexOpacity)
 //    , m_diffuse(std::move(*material.m_diffuse))
     // TODO : copy colors
 {

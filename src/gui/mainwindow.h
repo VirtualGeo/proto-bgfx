@@ -4,6 +4,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSplitter>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,6 +23,9 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    QSplitter * m_splitter;
+
 };
 #endif // MAINWINDOW_H
 

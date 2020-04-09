@@ -10,6 +10,8 @@
 #include "program.h"
 
 #include "dirLight.h"
+//#include <engine/camera.h>
+#include "camera.h"
 
 class Scene
 {
@@ -19,11 +21,13 @@ public:
     void addModel(const std::string &filename);
 //    void draw()
     void draw(const bgfx::ViewId id, const Program & program, const float *mtx,
-                const uint64_t state, bx::Vec3 cameraPos) const;
+                const uint64_t state, const Camera & camera, float ratio) const;
     void clear(); // clear scene (bgfx::destroy(handle)) before bgfx::shutdown() from main shutdown()
 
     void load(std::ifstream & file);
     void save(std::ofstream & file) const;
+
+    void printStats(int &line);
 
 private:
     bgfx::VertexLayout m_layout;
@@ -40,26 +44,40 @@ private:
 //    bgfx::UniformHandle m_uHasDiffuseTexture;
 
 private:
+//    int m_parsingTime;
+//    int m_loadingMaterialsTime;
+//    int m_loadingObjectsTime;
+
+    void updateStats();
+    size_t m_nbVertices;
+    size_t m_nbTriangles;
+    size_t m_nbObjects;
+    size_t m_nbMeshes;
+    float m_texturesSize;
+    size_t m_nbTextures;
     int m_parsingTime;
     int m_loadingMaterialsTime;
     int m_loadingObjectsTime;
+    int m_totalLoadingTime;
+    size_t m_nbVertexBuffer;
+    size_t m_nbIndexBuffer;
 
 //    uint m_nbVertices;
 //    uint m_nbFaces;
 //    uint m_nbTriangles;
 
 public: // ----------------------- getters
-    size_t nbVertices() const;
-    size_t nbTriangles() const;
-    size_t nbObjects() const;
-    size_t texturesSize() const;
-    size_t nbVertexBuffer() const;
-    size_t nbIndexBuffer() const;
-    size_t nbTextures() const;
+//    size_t nbVertices() const;
+//    size_t nbTriangles() const;
+//    size_t nbObjects() const;
+//    size_t texturesSize() const;
+//    size_t nbVertexBuffer() const;
+//    size_t nbIndexBuffer() const;
+//    size_t nbTextures() const;
 
-    int parsingTime() const;
-    int loadingMaterialsTime() const;
-    int loadingObjectsTime() const;
+//    int parsingTime() const;
+//    int loadingMaterialsTime() const;
+//    int loadingObjectsTime() const;
 };
 
 #endif // SCENE_H

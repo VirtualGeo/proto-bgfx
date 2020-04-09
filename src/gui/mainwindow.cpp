@@ -3,6 +3,9 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+#include "qwidgetbgfx.h"
+#include <QLayout>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -15,6 +18,29 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
 
+//    QVBoxLayout * layout = new QVBoxLayout;
+
+    m_splitter = new QSplitter(ui->centralwidget);
+
+
+    QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
+    QWidgetBgfx * widgetBgfx2 = new QWidgetBgfx;
+    QWidgetBgfx * widgetBgfx3 = new QWidgetBgfx;
+
+//    QLayout * verticalLayout = new QLayout()
+    m_splitter->setOrientation(Qt::Orientation::Vertical);
+    m_splitter->addWidget(widgetBgfx);
+    m_splitter->addWidget(widgetBgfx2);
+    m_splitter->addWidget(widgetBgfx3);
+
+    setCentralWidget(m_splitter);
+//    setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+    setFocus();
+//    layout->addWidget(m_splitter);
+
+//    ui->centralwidget->setLayout(layout);
+//    ui->centralwidget->show();
+//    setCentralWidget(ui->centralwidget);
 //    ui->widget->setVisible(true);
 //    ui->widget->setEnabled(true);
 //    ui->widget->show();

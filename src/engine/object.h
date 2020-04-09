@@ -10,6 +10,8 @@
 #include "program.h"
 #include "vertex.h"
 #include "dirLight.h"
+//#include <engine/camera.h>
+#include "camera.h"
 
 class Object {
 public:
@@ -25,7 +27,7 @@ public:
     //    void draw(bgfx::ViewId id, bgfx::ProgramHandle program, const float *mtx,
     //                uint64_t state) const;
     void draw(const bgfx::ViewId id, const Program& program, const float* mtx,
-        const uint64_t state, const Materials& materials, const Textures& textures, const DirLight & dirLight, bx::Vec3 cameraPos) const;
+        const uint64_t state, const Materials& materials, const Textures& textures, const DirLight & dirLight, const Camera & camera) const;
 
     friend std::ostream& operator<<(std::ostream& os, const Object& object);
 

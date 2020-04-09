@@ -30,7 +30,9 @@ file(GLOB_RECURSE SOURCE *.cpp *.h)
 # endforeach()
 
 if(GUI_QT)
-#    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+    if(CMAKE_VERSION VERSION_LESS "3.7.0")
+        set(CMAKE_INCLUDE_CURRENT_DIR ON)
+    endif()
     set(CMAKE_AUTOUIC ON)
     set(CMAKE_AUTOMOC ON)
     set(CMAKE_AUTORCC ON)
@@ -39,9 +41,10 @@ if(GUI_QT)
 endif()
 
 
-#set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
+set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
+file(GLOB_RECURSE LIB_SHADER ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src/*.sh)
 add_executable(${PROJECT_NAME}
-    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${UI_SOURCE}
+    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${VARYING_DEF_SHADER} ${UI_SOURCE}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
