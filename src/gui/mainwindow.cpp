@@ -20,22 +20,23 @@ MainWindow::MainWindow(QWidget *parent)
 
 //    QVBoxLayout * layout = new QVBoxLayout;
 
-    m_splitter = new QSplitter(ui->centralwidget);
 
+    m_splitter = new QSplitter(ui->centralwidget);
 
     QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
     QWidgetBgfx * widgetBgfx2 = new QWidgetBgfx;
-    QWidgetBgfx * widgetBgfx3 = new QWidgetBgfx;
+//    QWidgetBgfx * widgetBgfx3 = new QWidgetBgfx;
 
 //    QLayout * verticalLayout = new QLayout()
     m_splitter->setOrientation(Qt::Orientation::Vertical);
     m_splitter->addWidget(widgetBgfx);
     m_splitter->addWidget(widgetBgfx2);
-    m_splitter->addWidget(widgetBgfx3);
-
+//    m_splitter->addWidget(widgetBgfx3);
     setCentralWidget(m_splitter);
-//    setFocusPolicy(Qt::FocusPolicy::ClickFocus);
     setFocus();
+
+
+//    setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 //    layout->addWidget(m_splitter);
 
 //    ui->centralwidget->setLayout(layout);
@@ -55,6 +56,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
 
 
 void MainWindow::on_actionExit_triggered()

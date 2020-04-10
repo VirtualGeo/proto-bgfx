@@ -211,7 +211,7 @@ void Scene::addModel(const std::string& filename)
 #endif
 }
 
-void Scene::draw(const bgfx::ViewId id, const Program& program, const float* mtx,
+void Scene::draw(const bgfx::ViewId id, const Shading & shading, const float* mtx,
                  const uint64_t state, const Camera &camera, float ratio) const
 {
     float view[16];
@@ -231,7 +231,7 @@ void Scene::draw(const bgfx::ViewId id, const Program& program, const float* mtx
         //        for (int i =0; i <nbObjects; ++i) {
         //            const Object & object = m_objects[i];
 
-        object.draw(id, program, mtx, state, m_materials, m_textures, m_dirLight, camera);
+        object.draw(id, shading, mtx, state, m_materials, m_textures, m_dirLight, camera);
 
         //             bgfx::submit(id, program, 0, i != nbObjects - 1);
     }

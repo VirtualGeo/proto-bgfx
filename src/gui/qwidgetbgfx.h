@@ -50,8 +50,8 @@ private:
     float g_lastX;
     float g_lastY;
     bool g_firstMouse = true;
-    std::string g_viewportShading = "rendered";
-    int g_iViewportShading = Program::Shading::RENDERED;
+//    std::string g_viewportShading = "rendered";
+//    int g_iViewportShading = Program::Shading::RENDERED;
     int g_mssaLevel = 0;
     int g_textureSamplerFlags = 0;
     bool g_vsyncEnable = false;

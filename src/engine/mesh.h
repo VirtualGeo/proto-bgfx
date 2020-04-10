@@ -28,7 +28,7 @@ public:
     Mesh(std::ifstream& file);
     void save(std::ofstream& file) const;
 
-    void draw(const bgfx::ViewId id, const Program& program, const float* mtx,
+    void draw(const bgfx::ViewId id, const Shading & shading, const float* mtx,
         const uint64_t state, const Materials& materials,
         const Textures& textures, const DirLight & dirLight, const Camera & camera) const;
 

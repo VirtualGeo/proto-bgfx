@@ -3,6 +3,7 @@
 
 
 #include <bgfx/bgfx.h>
+#include "program.h"
 
 class WindowState {
 public:
@@ -15,6 +16,7 @@ public:
     bgfx::FrameBufferHandle m_fbh;
     void* m_nwh = nullptr;
     float m_fps;
+    Shading m_shading = Shading::RENDERED;
 };
 
 #endif // WINDOWSTATE_H
