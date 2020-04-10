@@ -20,7 +20,7 @@ public:
 //    void addModel(const char * filename);
     void addModel(const std::string &filename);
 //    void draw()
-    void draw(const bgfx::ViewId id, const Program & program, const float *mtx,
+    void draw(const bgfx::ViewId id, const Shading &shading, const float *mtx,
                 const uint64_t state, const Camera & camera, float ratio) const;
     void clear(); // clear scene (bgfx::destroy(handle)) before bgfx::shutdown() from main shutdown()
 

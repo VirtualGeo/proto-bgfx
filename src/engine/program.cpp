@@ -7,21 +7,27 @@
 //#include <bx/bx.h>
 #include <bx/file.h>
 
-const std::string Program::shadingFileNames[Program::Shading::Count] { "normal", "material", "rendered" };
+const std::string shadingFileNames[Shading::Count] { "normal", "material", "rendered" };
+static constexpr unsigned int s_num_vec4_uniforms = 6;
+
+bgfx::UniformHandle Program::m_sDiffuse;
+bgfx::UniformHandle Program::m_sOpacity;
+bgfx::ProgramHandle Program::m_handlePrograms[Shading::Count];
+bgfx::UniformHandle Program::m_handleUniform;
 
 //bgfx::ShaderHandle loadShader(const char* filename);
 bgfx::ShaderHandle loadShader(const std::string& filename);
 
-Program::Program()
-{
-}
+//Program::Program()
+//{
+//}
 
-Program::~Program()
-{
-    //    bgfx::destroy(m_handle);
-    //    bgfx::destroy(m_uDiffuse);
-    //    bgfx::destroy(m_sDiffuse);
-}
+//Program::~Program()
+//{
+//    //    bgfx::destroy(m_handle);
+//    //    bgfx::destroy(m_uDiffuse);
+//    //    bgfx::destroy(m_sDiffuse);
+//}
 
 //void Program::init(const char *shaderName)
 void Program::init()
@@ -68,15 +74,15 @@ void Program::clear()
     bgfx::destroy(m_handleUniform);
 }
 
-void Program::submit(const Material &material, const DirLight &dirLight, const Textures &textures, const Camera &camera) const
+void Program::submit(const bgfx::ViewId id, const Shading & shading, const Material &material, const DirLight &dirLight, const Textures &textures, const Camera &camera)
 {
 
-    switch (m_iHandleProgram) {
-    case Program::Shading::NORMAL:
+    switch (shading) {
+    case Shading::NORMAL:
         break;
 
-    case Program::Shading::MATERIAL:
-    case Program::Shading::RENDERED:
+    case Shading::MATERIAL:
+    case Shading::RENDERED:
         //    const int iMaterial = m_iMaterial;
 
 //        bgfx::setUniform(m_uDiffuse, material.diffuse());
@@ -142,6 +148,8 @@ void Program::submit(const Material &material, const DirLight &dirLight, const T
 
         break;
     }
+
+    bgfx::submit(id, m_handlePrograms[shading]);
 }
 
 
@@ -248,17 +256,22 @@ bgfx::ShaderHandle loadShader(const std::string& filename)
 }
 
 // ------------------------------------ GETTERS AND SETTERS
-bgfx::ProgramHandle Program::handleProgram() const
+//bgfx::ProgramHandle Program::handleProgram(const Shading &shading)
+//{
+//    return m_handlePrograms[shading];
+//}
+
+const char *Program::filename(const Shading &shading)
 {
-    return m_handlePrograms[m_iHandleProgram];
+    return shadingFileNames[shading].c_str();
 }
 
-void Program::setShading(Program::Shading shading)
-{
-    m_iHandleProgram = shading;
-}
+//void Program::setShading(Program::Shading shading)
+//{
+//    m_iHandleProgram = shading;
+//}
 
-Program::Shading Program::shading() const
-{
-    return Shading(m_iHandleProgram);
-}
+//Program::Shading Program::shading() const
+//{
+//    return Shading(m_iHandleProgram);
+//}

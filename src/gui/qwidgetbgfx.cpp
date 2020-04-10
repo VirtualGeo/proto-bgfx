@@ -12,6 +12,7 @@
 #include <chrono>
 #include <engine/camerafps.h>
 #include <engine/scene.h>
+#include <QSurface>
 
 //#define MAX_WINDOWS 8
 
@@ -19,7 +20,7 @@
 namespace {
 std::vector<WindowState> s_windows;
 Scene s_scene;
-Program s_program;
+//Program s_program;
 
 bool g_showStats = false;
 //Scene g_scene;
@@ -200,9 +201,10 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
         //        g_nbIndexBuffer = g_scene.nbIndexBuffer();
 
         // -------------------------------- INIT PROGRAM (SHADERS)
-        s_program.init();
-        s_program.setShading(Program::Shading(g_iViewportShading));
-        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+        //        s_program.init();
+        Program::init();
+        //        s_program.setShading(Program::Shading(g_iViewportShading));
+        //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
     }
     //    m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
     m_iWindow = s_windows.size();
@@ -231,7 +233,8 @@ QWidgetBgfx::~QWidgetBgfx()
 {
     if (m_iWindow == 0) {
         s_scene.clear();
-        s_program.clear();
+        //        s_program.clear();
+        Program::clear();
 
         bgfx::shutdown();
     }
@@ -283,7 +286,9 @@ void QWidgetBgfx::paintEvent(QPaintEvent* event)
 
     //    bgfx::setViewTransform(m_iWidget, view, proj);
 
-    bgfx::setViewFrameBuffer(m_iWindow, window.m_fbh);
+    if (m_iWindow != 0) {
+        bgfx::setViewFrameBuffer(m_iWindow, window.m_fbh);
+    }
     // Set view 0 default viewport.
     bgfx::setViewRect(m_iWindow, 0, 0, uint16_t(width()), uint16_t(height()));
     // This dummy draw call is here to make sure that view 0 is cleared
@@ -308,7 +313,7 @@ void QWidgetBgfx::paintEvent(QPaintEvent* event)
         | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
         | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
     const float ratio = float(width()) / height();
-    s_scene.draw(m_iWindow, s_program, g_mtx, state, m_cameraFps, ratio);
+    s_scene.draw(m_iWindow, window.m_shading, g_mtx, state, m_cameraFps, ratio);
     //    g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
 
     // Advance to next frame. Process submitted rendering primitives.
@@ -335,6 +340,7 @@ void QWidgetBgfx::resizeEvent(QResizeEvent* event)
     //    m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
     bgfx::destroy(window.m_fbh);
     window.m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
+
     //    bgfx::reset(window.m_width, window.m_height, getResetFlags());
     //    bgfx::res
     //    bgfx::setViewFrameBuffer(m_iWidget, m_fbh);
@@ -352,6 +358,9 @@ QPaintEngine* QWidgetBgfx::paintEngine() const
 
 void QWidgetBgfx::keyPressEvent(QKeyEvent* event)
 {
+    auto& window = s_windows[m_iWindow];
+    auto& shading = window.m_shading;
+
     qDebug() << "QWidgetBgfx::keyPressEvent(" << event << ")";
     switch (event->key()) {
     case Qt::Key_F1:
@@ -387,9 +396,11 @@ void QWidgetBgfx::keyPressEvent(QKeyEvent* event)
         }
         break;
     case Qt::Key_F5:
-        g_iViewportShading = ++g_iViewportShading % Program::Shading::Count;
-        s_program.setShading(Program::Shading(g_iViewportShading));
-        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+        ++shading;
+        //        g_iViewportShading = ++g_iViewportShading % Program::Shading::Count;
+        //        s_program.setShading(Program::Shading(g_iViewportShading));
+        //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+        //        shading = ++shading % Program::Shading::Count;
         break;
     case Qt::Key_Up:
         m_cameraMoveFront = 1;
@@ -410,19 +421,22 @@ void QWidgetBgfx::keyPressEvent(QKeyEvent* event)
         m_cameraMoveUp = -1;
         break;
     case Qt::Key_N:
-        g_iViewportShading = Program::Shading::NORMAL;
-        s_program.setShading(Program::Shading(g_iViewportShading));
-        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+        shading = Shading::NORMAL;
+        //        g_iViewportShading = Program::Shading::NORMAL;
+        //        s_program.setShading(Program::Shading(g_iViewportShading));
+        //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
         break;
     case Qt::Key_M:
-        g_iViewportShading = Program::Shading::MATERIAL;
-        s_program.setShading(Program::Shading(g_iViewportShading));
-        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+        shading = Shading::MATERIAL;
+        //        g_iViewportShading = Program::Shading::MATERIAL;
+        //        s_program.setShading(Program::Shading(g_iViewportShading));
+        //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
         break;
     case Qt::Key_R:
-        g_iViewportShading = Program::Shading::RENDERED;
-        s_program.setShading(Program::Shading(g_iViewportShading));
-        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+        shading = Shading::RENDERED;
+        //        g_iViewportShading = Program::Shading::RENDERED;
+        //        s_program.setShading(Program::Shading(g_iViewportShading));
+        //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
         break;
     case Qt::Key_Control:
         g_slowMotion = !g_slowMotion;
@@ -535,7 +549,7 @@ void QWidgetBgfx::printDebugMessage()
         for (int i = 0; i < s_windows.size(); ++i) {
             //        for (const auto& window : m_windows) {
             const auto& window = s_windows[i];
-            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window.m_fps, window.m_width, window.m_height, g_viewportShading.c_str());
+            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window.m_fps, window.m_width, window.m_height, Program::filename(window.m_shading));
         }
         s_scene.printStats(line);
     }
@@ -544,8 +558,11 @@ void QWidgetBgfx::printDebugMessage()
 void QWidgetBgfx::resetWindow()
 {
     //    bgfx::reset(g_width, g_height, getResetFlags());
-    const auto& window = s_windows[m_iWindow];
-    bgfx::reset(window.m_width, window.m_height, getResetFlags());
+    if (m_iWindow == 0) {
+        const auto& window = s_windows[m_iWindow];
+        bgfx::reset(window.m_width, window.m_height, getResetFlags());
+    }
+
     //    bgfx::setViewRect(m_iWindow, 0, 0, bgfx::BackbufferRatio::Equal);
 }
 
@@ -573,6 +590,14 @@ uint32_t QWidgetBgfx::getResetFlags()
         flags |= BGFX_RESET_MSAA_X16; // question : why msaa_16 only differ
         break;
     }
+//    QSurfaceFormat format;
+//    format.setVersion(4, 1);
+////    format.setProfile(QSurfaceFormat::CoreProfile);
+//    format.setProfile(QSurfaceFormat::CompatibilityProfile);
+//    format.setDepthBufferSize(24);
+//    format.setSamples(bx::pow(2, g_mssaLevel));
+//    QSurfaceFormat::setDefaultFormat(format);
+
     return flags;
 }
 
