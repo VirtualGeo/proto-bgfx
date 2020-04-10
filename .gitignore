@@ -8,3 +8,4 @@ build/
 CMakeLists.txt.user
 
 assets/**/*.bin
+shaders/bin/*/*.bin

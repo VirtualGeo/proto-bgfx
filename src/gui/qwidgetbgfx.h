@@ -17,15 +17,15 @@ public:
     explicit QWidgetBgfx(QWidget* parent = nullptr);
     virtual ~QWidgetBgfx();
 
-    void render();
+//    void render();
 private:
-    void doRender();
-    void init();
+//    void doRender();
+//    void init();
 
 protected:
     void paintEvent(QPaintEvent* event) override;
-    void showEvent(QShowEvent *event) override;
-    bool event(QEvent *event) override;
+//    void showEvent(QShowEvent *event) override;
+//    bool event(QEvent *event) override;
 
     void resizeEvent(QResizeEvent* event) override;
     QPaintEngine* paintEngine() const override;
@@ -47,9 +47,9 @@ private:
     uint32_t getResetFlags();
 
 private:
-    bool m_updatePending = false;
-    bool m_isInit = false;
-    bool m_continuousRender = true;
+//    bool m_updatePending = false;
+//    bool m_isInit = false;
+//    bool m_continuousRender = true;
 
     int m_iWindow;
     CameraFps m_cameraFps; //({-7.0f, 1.0f, 0.0f});
