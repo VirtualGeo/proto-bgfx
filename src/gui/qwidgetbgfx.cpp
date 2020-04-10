@@ -44,107 +44,6 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_NoSystemBackground);
 
-}
-
-QWidgetBgfx::~QWidgetBgfx()
-{
-    if (m_iWindow == 0) {
-        s_scene.clear();
-        //        s_program.clear();
-        Program::clear();
-
-        bgfx::shutdown();
-    }
-
-#ifdef DEBUG
-    std::cout << "[main] shutdown done" << std::endl;
-#endif
-}
-
-void QWidgetBgfx::render()
-{
-    if (m_updatePending == false) {
-        m_updatePending = true;
-        QApplication::postEvent(this, new QEvent{QEvent::UpdateRequest});
-    }
-
-}
-
-void QWidgetBgfx::doRender()
-{
-    if (isVisible() == false)
-        return;
-    if (m_isInit == false)
-        return;
-
-    //    qDebug() << "QWidgetBgfx::paintEvent(" << event << ")";
-    //    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
-
-    if (m_iWindow == 0) {
-        printDebugMessage();
-    }
-
-    //    const std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
-    //    const auto currentTime = std::chrono::system_clock::now();
-    const auto currentTime = std::chrono::high_resolution_clock::now();
-    auto& window = s_windows[m_iWindow];
-    //    const auto currentTime = g_timer.now();
-    g_deltaTime = std::chrono::duration_cast<timeUnit>(currentTime - g_lastTime).count() / 1000000.0;
-    g_lastTime = currentTime;
-    g_sum += g_deltaTime;
-
-    //    qDebug() << g_epoch << g_sum << g_fps;
-    if (g_counter >= g_epoch) {
-        //        g_epoch = (g_fps = g_epoch / g_sum) / 2; // update g_fps each 0.5 sec
-        g_epoch = (window.m_fps = g_epoch / g_sum); // update g_fps each sec
-        g_sum = 0.0f;
-        g_counter = 0;
-    }
-    ++g_counter;
-
-    updateCameraPos();
-
-    // --------------------------------- SET CAMERA VIEW
-    //    float view[16];
-    //    // bx::mtxLookAt(view, eye, at);
-    //    bx::mtxLookAt(view, g_cameraFps.m_pos, bx::add(g_cameraFps.m_pos, g_cameraFps.m_front), g_cameraFps.m_up);
-
-    //    float proj[16];
-    //    bx::mtxProj(proj, g_cameraFps.m_fov, float(width()) / float(height()), 0.1f, 100.0f,
-    //        bgfx::getCaps()->homogeneousDepth);
-
-    //    bgfx::setViewTransform(m_iWidget, view, proj);
-
-    if (m_iWindow != 0) {
-        bgfx::setViewFrameBuffer(m_iWindow, window.m_fbh);
-    }
-    // Set view 0 default viewport.
-    bgfx::setViewRect(m_iWindow, 0, 0, uint16_t(width()), uint16_t(height()));
-    // This dummy draw call is here to make sure that view 0 is cleared
-    // if no other draw calls are submitted to view 0.
-    bgfx::setViewClear(m_iWindow, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X00FF00FF);
-    bgfx::touch(m_iWindow);
-
-
-    // --------------------------------- DRAW SCENE
-    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
-        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
-        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
-    const float ratio = float(width()) / height();
-    s_scene.draw(m_iWindow, window.m_shading, g_mtx, state, m_cameraFps, ratio);
-    //    g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
-
-    // Advance to next frame. Process submitted rendering primitives.
-//    if (m_iWindow == 0) {
-        bgfx::frame();
-//    }
-
-    if (m_continuousRender == true)
-        render();
-}
-
-void QWidgetBgfx::init()
-{
     if (s_windows.empty()) {
         //        s_bgfxInit = true;
         // Call bgfx::renderFrame before bgfx::init to signal to bgfx not to create a render thread.
@@ -258,49 +157,150 @@ void QWidgetBgfx::init()
     //    m_iWidget = 1;
     //    ++g_nWidget;
 
-    m_isInit = true;
 }
+
+QWidgetBgfx::~QWidgetBgfx()
+{
+    if (m_iWindow == 0) {
+        s_scene.clear();
+        //        s_program.clear();
+        Program::clear();
+
+        bgfx::shutdown();
+    }
+
+#ifdef DEBUG
+    std::cout << "[main] shutdown done" << std::endl;
+#endif
+}
+
+//void QWidgetBgfx::render()
+//{
+//    if (m_updatePending == false) {
+//        m_updatePending = true;
+//        QApplication::postEvent(this, new QEvent{QEvent::UpdateRequest});
+//    }
+
+//}
+
+//void QWidgetBgfx::doRender()
+//{
+//    if (isVisible() == false)
+//        return;
+//    if (m_isInit == false)
+//        return;
+
+
+//    if (m_continuousRender == true)
+//        render();
+//}
+
+//void QWidgetBgfx::init()
+//{
+////    m_isInit = true;
+//}
 
 void QWidgetBgfx::paintEvent(QPaintEvent* event)
 {
-    if (m_isInit == false) {
-        init();
+//    if (m_isInit == false) {
+//        init();
+//    }
+//    render();
+    //    qDebug() << "QWidgetBgfx::paintEvent(" << event << ")";
+    //    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
+
+    if (m_iWindow == 0) {
+        printDebugMessage();
     }
-    render();
+
+    //    const std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
+    //    const auto currentTime = std::chrono::system_clock::now();
+    const auto currentTime = std::chrono::high_resolution_clock::now();
+    auto& window = s_windows[m_iWindow];
+    //    const auto currentTime = g_timer.now();
+    g_deltaTime = std::chrono::duration_cast<timeUnit>(currentTime - g_lastTime).count() / 1000000.0;
+    g_lastTime = currentTime;
+    g_sum += g_deltaTime;
+
+    //    qDebug() << g_epoch << g_sum << g_fps;
+    if (g_counter >= g_epoch) {
+        //        g_epoch = (g_fps = g_epoch / g_sum) / 2; // update g_fps each 0.5 sec
+        g_epoch = (window.m_fps = g_epoch / g_sum); // update g_fps each sec
+        g_sum = 0.0f;
+        g_counter = 0;
+    }
+    ++g_counter;
+
+    updateCameraPos();
+
+    // --------------------------------- SET CAMERA VIEW
+    //    float view[16];
+    //    // bx::mtxLookAt(view, eye, at);
+    //    bx::mtxLookAt(view, g_cameraFps.m_pos, bx::add(g_cameraFps.m_pos, g_cameraFps.m_front), g_cameraFps.m_up);
+
+    //    float proj[16];
+    //    bx::mtxProj(proj, g_cameraFps.m_fov, float(width()) / float(height()), 0.1f, 100.0f,
+    //        bgfx::getCaps()->homogeneousDepth);
+
+    //    bgfx::setViewTransform(m_iWidget, view, proj);
+
+    if (m_iWindow != 0) {
+        bgfx::setViewFrameBuffer(m_iWindow, window.m_fbh);
+    }
+    // Set view 0 default viewport.
+    bgfx::setViewRect(m_iWindow, 0, 0, uint16_t(width()), uint16_t(height()));
+    // This dummy draw call is here to make sure that view 0 is cleared
+    // if no other draw calls are submitted to view 0.
+    bgfx::setViewClear(m_iWindow, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X00FF00FF);
+    bgfx::touch(m_iWindow);
+
+
+    // --------------------------------- DRAW SCENE
+    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
+        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
+        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
+    const float ratio = float(width()) / height();
+    s_scene.draw(m_iWindow, window.m_shading, g_mtx, state, m_cameraFps, ratio);
+    //    g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
+
+    // Advance to next frame. Process submitted rendering primitives.
+    if (m_iWindow == 0) {
+        bgfx::frame();
+    }
 //    return;
-//    update();
+    update();
 }
 
-void QWidgetBgfx::showEvent(QShowEvent *event)
-{
-    QWidget::showEvent(event);
-    if (m_isInit == false) {
-        init();
-    }
-}
+//void QWidgetBgfx::showEvent(QShowEvent *event)
+//{
+//    QWidget::showEvent(event);
+//    if (m_isInit == false) {
+//        init();
+//    }
+//}
 
-bool QWidgetBgfx::event(QEvent *event)
-{
-    switch (event->type()) {
-    case QEvent::UpdateRequest:
-        m_updatePending = false;
-        doRender();
-        return true;
+//bool QWidgetBgfx::event(QEvent *event)
+//{
+//    switch (event->type()) {
+//    case QEvent::UpdateRequest:
+//        m_updatePending = false;
+//        doRender();
+//        return true;
 
-    default:
-        return QWidget::event(event);
-    }
+//    default:
+//        return QWidget::event(event);
+//    }
 
-}
+//}
 
 void QWidgetBgfx::resizeEvent(QResizeEvent* event)
 {
     qDebug() << "QWidgetBgfx::resizeEvent(" << event << ")";
     QWidget::resizeEvent(event);
 
-    if (m_isInit == false) {
-        init();
-    }
+//    if (m_isInit == false) {
+//        init();
+//    }
 
     auto& window = s_windows[m_iWindow];
     const auto& size = event->size();
@@ -318,7 +318,7 @@ void QWidgetBgfx::resizeEvent(QResizeEvent* event)
     bgfx::destroy(window.m_fbh);
     window.m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
 
-    render();
+//    render();
 }
 
 QPaintEngine* QWidgetBgfx::paintEngine() const
