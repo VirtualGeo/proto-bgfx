@@ -6,7 +6,7 @@
 #include "qwidgetbgfx.h"
 #include <QLayout>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, int nbWidget)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
@@ -23,14 +23,24 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_splitter = new QSplitter(ui->centralwidget);
 
-    QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
-    QWidgetBgfx * widgetBgfx2 = new QWidgetBgfx;
 //    QWidgetBgfx * widgetBgfx3 = new QWidgetBgfx;
 
 //    QLayout * verticalLayout = new QLayout()
     m_splitter->setOrientation(Qt::Orientation::Vertical);
-    m_splitter->addWidget(widgetBgfx);
-    m_splitter->addWidget(widgetBgfx2);
+
+//    QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
+//    m_splitter->addWidget(widgetBgfx);
+    for (int i =0; i <nbWidget; ++i) {
+        QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
+        m_splitter->addWidget(widgetBgfx);
+    }
+
+//    QWidgetBgfx * widgetBgfx2 = new QWidgetBgfx;
+//    m_splitter->addWidget(widgetBgfx2);
+
+//    QWidgetBgfx * widgetBgfx3 = new QWidgetBgfx;
+//    m_splitter->addWidget(widgetBgfx3);
+
 //    m_splitter->addWidget(widgetBgfx3);
     setCentralWidget(m_splitter);
     setFocus();
