@@ -17,8 +17,16 @@ public:
     explicit QWidgetBgfx(QWidget* parent = nullptr);
     virtual ~QWidgetBgfx();
 
+    void render();
+private:
+    void doRender();
+    void init();
+
 protected:
     void paintEvent(QPaintEvent* event) override;
+    void showEvent(QShowEvent *event) override;
+    bool event(QEvent *event) override;
+
     void resizeEvent(QResizeEvent* event) override;
     QPaintEngine* paintEngine() const override;
     void keyPressEvent(QKeyEvent* event) override;
@@ -30,15 +38,18 @@ protected:
 signals:
 
 private:
+//    void doRender();
+//    void init();
+
     void updateCameraPos();
     void printDebugMessage();
     void resetWindow();
     uint32_t getResetFlags();
 
 private:
-    //    static std::vector<WindowState> s_windows;
-    //    static Scene s_scene;
-    //    static Program s_program;
+    bool m_updatePending = false;
+    bool m_isInit = false;
+    bool m_continuousRender = true;
 
     int m_iWindow;
     CameraFps m_cameraFps; //({-7.0f, 1.0f, 0.0f});

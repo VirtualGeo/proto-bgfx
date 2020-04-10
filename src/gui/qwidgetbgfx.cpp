@@ -13,96 +13,25 @@
 #include <engine/camerafps.h>
 #include <engine/scene.h>
 #include <QSurface>
+#include <QApplication>
 
-//#define MAX_WINDOWS 8
 
-//bool g_slowMotion = false;
 namespace {
-std::vector<WindowState> s_windows;
-Scene s_scene;
-//Program s_program;
+    std::vector<WindowState> s_windows;
+    Scene s_scene;
 
-bool g_showStats = false;
-//Scene g_scene;
-//Program g_program;
-float g_mtx[16];
-//bx::Vec3 g_cameraPos = { -7.0f, 1.0f, 0.0f };
-//float g_yaw = 0.0f;
-//float g_pitch = 0.0f;
-//float g_fov = 60.0f;
-//bx::Vec3 g_cameraFront;
-//bx::Vec3 g_cameraUp = { 0.0f, 1.0f, 0.0f };
-//CameraFps g_cameraFps({ -7.0f, 1.0f, 0.0f });
-//bool g_slowMotion = false;
-//std::chrono::duration<double> g_deltaTime;
-//using timeUnit = std::chrono::seconds;
-//timeUnit g_deltaTime;
-//int g_cameraMoveFront = 0;
-//int g_cameraMoveRight = 0;
-//int g_cameraMoveUp = 0;
-// std::chrono::time_point<std::chrono::system_clock> g_lastTime;
-// std:::chrono::steady_clock::time_point g_lastTime;
-//    const auto currentTime = std::chrono::high_resolution_clock::now();
-//std::chrono::high_resolution_clock g_timer;
-//bool g_mouseLeftClicked = false;
-//float g_lastX;
-//float g_lastY;
-//bool g_firstMouse = true;
-//size_t g_nbVertices;
-//size_t g_nbTriangles;
-//size_t g_nbObjects;
-//float g_texturesSize;
-//size_t g_nbTextures;
-//int g_parsingTime;
-//int g_loadingMaterialsTime;
-//int g_loadingObjectsTime;
-//int g_totalLoadingTime;
-//size_t g_nbVertexBuffer;
-//size_t g_nbIndexBuffer;
-//std::string g_viewportShading = "rendered";
-//int g_iViewportShading = Program::Shading::RENDERED;
+    bool g_showStats = false;
+    float g_mtx[16];
 
-std::string g_renderer;
-std::string g_vendorID;
-//int g_width;
-//int g_height;
-
-//int g_mssaLevel = 0;
-//int g_textureSamplerFlags = 0;
-
-//int g_width;
-//int g_height;
-//bgfx::FrameBufferHandle m_fbhs[MAX_WINDOWS];
-//std::vector<bgfx::FrameBufferHandle> m_fbhs;
-//bgfx::FrameBufferHandle m_fbh;
-
-//uint32_t getResetFlags();
-//void resetWindow();
-//void printDebugMessage();
-//void updateCameraPos();
-//void updateCameraFront();
+    std::string g_renderer;
+    std::string g_vendorID;
 
 }
 
 //CameraFps g_cameraFps({ -7.0f, 1.0f, 0.0f });
 
-//static int g_nWidget = 0;
-//std::vector<WindowState> QWidgetBgfx::s_windows;
-//Scene QWidgetBgfx::s_scene;
-//Program QWidgetBgfx::s_program;
-
 using timeUnit = std::chrono::microseconds;
-//std::chrono::time_point<std::chrono::high_resolution_clock> g_lastTime;
-//double g_deltaTime;
-//double g_fps = 0.0;
-//double g_sum = 0.0;
-//size_t g_counter = 0;
-//size_t g_epoch = 10; // compute first fps mean with 10 frames
-//int m_iWidget;
-//bgfx::FrameBufferHandle m_fbh;
 
-//static int g_nWidget = 0;
-//static bool s_bgfxInit = false;
 
 QWidgetBgfx::QWidgetBgfx(QWidget* parent)
     : QWidget(parent)
@@ -115,6 +44,107 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_NoSystemBackground);
 
+}
+
+QWidgetBgfx::~QWidgetBgfx()
+{
+    if (m_iWindow == 0) {
+        s_scene.clear();
+        //        s_program.clear();
+        Program::clear();
+
+        bgfx::shutdown();
+    }
+
+#ifdef DEBUG
+    std::cout << "[main] shutdown done" << std::endl;
+#endif
+}
+
+void QWidgetBgfx::render()
+{
+    if (m_updatePending == false) {
+        m_updatePending = true;
+        QApplication::postEvent(this, new QEvent{QEvent::UpdateRequest});
+    }
+
+}
+
+void QWidgetBgfx::doRender()
+{
+    if (isVisible() == false)
+        return;
+    if (m_isInit == false)
+        return;
+
+    //    qDebug() << "QWidgetBgfx::paintEvent(" << event << ")";
+    //    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
+
+    if (m_iWindow == 0) {
+        printDebugMessage();
+    }
+
+    //    const std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
+    //    const auto currentTime = std::chrono::system_clock::now();
+    const auto currentTime = std::chrono::high_resolution_clock::now();
+    auto& window = s_windows[m_iWindow];
+    //    const auto currentTime = g_timer.now();
+    g_deltaTime = std::chrono::duration_cast<timeUnit>(currentTime - g_lastTime).count() / 1000000.0;
+    g_lastTime = currentTime;
+    g_sum += g_deltaTime;
+
+    //    qDebug() << g_epoch << g_sum << g_fps;
+    if (g_counter >= g_epoch) {
+        //        g_epoch = (g_fps = g_epoch / g_sum) / 2; // update g_fps each 0.5 sec
+        g_epoch = (window.m_fps = g_epoch / g_sum); // update g_fps each sec
+        g_sum = 0.0f;
+        g_counter = 0;
+    }
+    ++g_counter;
+
+    updateCameraPos();
+
+    // --------------------------------- SET CAMERA VIEW
+    //    float view[16];
+    //    // bx::mtxLookAt(view, eye, at);
+    //    bx::mtxLookAt(view, g_cameraFps.m_pos, bx::add(g_cameraFps.m_pos, g_cameraFps.m_front), g_cameraFps.m_up);
+
+    //    float proj[16];
+    //    bx::mtxProj(proj, g_cameraFps.m_fov, float(width()) / float(height()), 0.1f, 100.0f,
+    //        bgfx::getCaps()->homogeneousDepth);
+
+    //    bgfx::setViewTransform(m_iWidget, view, proj);
+
+    if (m_iWindow != 0) {
+        bgfx::setViewFrameBuffer(m_iWindow, window.m_fbh);
+    }
+    // Set view 0 default viewport.
+    bgfx::setViewRect(m_iWindow, 0, 0, uint16_t(width()), uint16_t(height()));
+    // This dummy draw call is here to make sure that view 0 is cleared
+    // if no other draw calls are submitted to view 0.
+    bgfx::setViewClear(m_iWindow, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X00FF00FF);
+    bgfx::touch(m_iWindow);
+
+
+    // --------------------------------- DRAW SCENE
+    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
+        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
+        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
+    const float ratio = float(width()) / height();
+    s_scene.draw(m_iWindow, window.m_shading, g_mtx, state, m_cameraFps, ratio);
+    //    g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
+
+    // Advance to next frame. Process submitted rendering primitives.
+//    if (m_iWindow == 0) {
+        bgfx::frame();
+//    }
+
+    if (m_continuousRender == true)
+        render();
+}
+
+void QWidgetBgfx::init()
+{
     if (s_windows.empty()) {
         //        s_bgfxInit = true;
         // Call bgfx::renderFrame before bgfx::init to signal to bgfx not to create a render thread.
@@ -227,100 +257,40 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
     //    bgfx::setViewFrameBuffer(m_iWidget, m_fbh);
     //    m_iWidget = 1;
     //    ++g_nWidget;
-}
 
-QWidgetBgfx::~QWidgetBgfx()
-{
-    if (m_iWindow == 0) {
-        s_scene.clear();
-        //        s_program.clear();
-        Program::clear();
-
-        bgfx::shutdown();
-    }
-
-#ifdef DEBUG
-    std::cout << "[main] shutdown done" << std::endl;
-#endif
+    m_isInit = true;
 }
 
 void QWidgetBgfx::paintEvent(QPaintEvent* event)
 {
-    //    qDebug() << "QWidgetBgfx::paintEvent(" << event << ")";
-    //    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
+    if (m_isInit == false) {
+        init();
+    }
+    render();
+//    return;
+//    update();
+}
 
-    if (m_iWindow == 0) {
-        printDebugMessage();
+void QWidgetBgfx::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    if (m_isInit == false) {
+        init();
+    }
+}
+
+bool QWidgetBgfx::event(QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::UpdateRequest:
+        m_updatePending = false;
+        doRender();
+        return true;
+
+    default:
+        return QWidget::event(event);
     }
 
-    //    const std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
-    //    const auto currentTime = std::chrono::system_clock::now();
-    const auto currentTime = std::chrono::high_resolution_clock::now();
-    auto& window = s_windows[m_iWindow];
-    //    const auto currentTime = g_timer.now();
-    g_deltaTime = std::chrono::duration_cast<timeUnit>(currentTime - g_lastTime).count() / 1000000.0;
-    g_lastTime = currentTime;
-    g_sum += g_deltaTime;
-
-    //    qDebug() << g_epoch << g_sum << g_fps;
-    if (g_counter >= g_epoch) {
-        //        g_epoch = (g_fps = g_epoch / g_sum) / 2; // update g_fps each 0.5 sec
-        g_epoch = (window.m_fps = g_epoch / g_sum); // update g_fps each sec
-        //        g_fps = g_epoch / g_sum;
-        //        g_fps = 24 / g_sum;
-        g_sum = 0.0f;
-        g_counter = 0;
-    }
-    ++g_counter;
-
-    updateCameraPos();
-
-    // --------------------------------- SET CAMERA VIEW
-    //    float view[16];
-    //    // bx::mtxLookAt(view, eye, at);
-    //    bx::mtxLookAt(view, g_cameraFps.m_pos, bx::add(g_cameraFps.m_pos, g_cameraFps.m_front), g_cameraFps.m_up);
-
-    //    float proj[16];
-    //    bx::mtxProj(proj, g_cameraFps.m_fov, float(width()) / float(height()), 0.1f, 100.0f,
-    //        bgfx::getCaps()->homogeneousDepth);
-
-    //    bgfx::setViewTransform(m_iWidget, view, proj);
-
-    if (m_iWindow != 0) {
-        bgfx::setViewFrameBuffer(m_iWindow, window.m_fbh);
-    }
-    // Set view 0 default viewport.
-    bgfx::setViewRect(m_iWindow, 0, 0, uint16_t(width()), uint16_t(height()));
-    // This dummy draw call is here to make sure that view 0 is cleared
-    // if no other draw calls are submitted to view 0.
-    bgfx::setViewClear(m_iWindow, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X00FF00FF);
-    bgfx::touch(m_iWindow);
-
-    //    printDebugMessage();
-    //    bgfx::setViewTransform(1, view, proj);
-    //    bgfx::setViewFrameBuffer(1, m_fbh);
-    //    bgfx::setViewRect(1, 0, 0, uint16_t(width() / 2), uint16_t(height() / 2));
-    //    bgfx::setViewClear(1, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X00FF00FF);
-
-    //    bgfx::setViewFrameBuffer(0, bgfx::FrameBufferHandle(0));
-    //    bgfx::setViewTransform(1, view, proj);
-    //    // Set view 0 default viewport.
-    //    bgfx::setViewRect(1, height() - height() / 2, width() - width() / 2, uint16_t(width() / 4), uint16_t(height() / 4));
-    //    bgfx::touch(1);
-
-    // --------------------------------- DRAW SCENE
-    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
-        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
-        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
-    const float ratio = float(width()) / height();
-    s_scene.draw(m_iWindow, window.m_shading, g_mtx, state, m_cameraFps, ratio);
-    //    g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
-
-    // Advance to next frame. Process submitted rendering primitives.
-    if (m_iWindow == 0) {
-        bgfx::frame();
-    }
-    update();
 }
 
 void QWidgetBgfx::resizeEvent(QResizeEvent* event)
@@ -328,9 +298,16 @@ void QWidgetBgfx::resizeEvent(QResizeEvent* event)
     qDebug() << "QWidgetBgfx::resizeEvent(" << event << ")";
     QWidget::resizeEvent(event);
 
+    if (m_isInit == false) {
+        init();
+    }
+
     auto& window = s_windows[m_iWindow];
     const auto& size = event->size();
     Q_ASSERT(size.width() == width());
+    if ((size.width() < 0) || (size.height() < 0)) {
+        return;
+    }
     //    g_width = size.width();
     window.m_width = size.width();
     //    g_height = size.height();
@@ -341,13 +318,7 @@ void QWidgetBgfx::resizeEvent(QResizeEvent* event)
     bgfx::destroy(window.m_fbh);
     window.m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
 
-    //    bgfx::reset(window.m_width, window.m_height, getResetFlags());
-    //    bgfx::res
-    //    bgfx::setViewFrameBuffer(m_iWidget, m_fbh);
-    //    const auto & size = event->size();
-    //        bgfx::reset(size.width(), size.height(), BGFX_RESET_VSYNC);
-    //    bgfx::reset(size.width(), size.height(), BGFX_RESET_NONE);
-    //    bgfx::setViewRect(0, 0, 0, bgfx::BackbufferRatio::Equal);
+    render();
 }
 
 QPaintEngine* QWidgetBgfx::paintEngine() const
@@ -397,9 +368,6 @@ void QWidgetBgfx::keyPressEvent(QKeyEvent* event)
         break;
     case Qt::Key_F5:
         ++shading;
-        //        g_iViewportShading = ++g_iViewportShading % Program::Shading::Count;
-        //        s_program.setShading(Program::Shading(g_iViewportShading));
-        //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
         //        shading = ++shading % Program::Shading::Count;
         break;
     case Qt::Key_Up:
@@ -422,21 +390,12 @@ void QWidgetBgfx::keyPressEvent(QKeyEvent* event)
         break;
     case Qt::Key_N:
         shading = Shading::NORMAL;
-        //        g_iViewportShading = Program::Shading::NORMAL;
-        //        s_program.setShading(Program::Shading(g_iViewportShading));
-        //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
         break;
     case Qt::Key_M:
         shading = Shading::MATERIAL;
-        //        g_iViewportShading = Program::Shading::MATERIAL;
-        //        s_program.setShading(Program::Shading(g_iViewportShading));
-        //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
         break;
     case Qt::Key_R:
         shading = Shading::RENDERED;
-        //        g_iViewportShading = Program::Shading::RENDERED;
-        //        s_program.setShading(Program::Shading(g_iViewportShading));
-        //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
         break;
     case Qt::Key_Control:
         g_slowMotion = !g_slowMotion;
@@ -510,6 +469,7 @@ void QWidgetBgfx::mouseMoveEvent(QMouseEvent* event)
         m_cameraFps.rotate(xoffset, yoffset);
     }
 }
+
 
 void QWidgetBgfx::updateCameraPos()
 {
@@ -600,34 +560,5 @@ uint32_t QWidgetBgfx::getResetFlags()
 
     return flags;
 }
-
-// ---------------------------------------------- PRIVATE
-//namespace {
-
-//uint32_t getResetFlags()
-//{
-//    uint32_t flags = 0 | BGFX_RESET_NONE;
-//    if (g_vsyncEnable) {
-//        flags |= BGFX_RESET_VSYNC;
-//    }
-
-//    switch (g_mssaLevel) {
-//    case 1:
-//        flags |= BGFX_RESET_MSAA_X2;
-//        break;
-//    case 2:
-//        flags |= BGFX_RESET_MSAA_X4;
-//        break;
-//    case 3:
-//        flags |= BGFX_RESET_MSAA_X8;
-//        break;
-//    case 4:
-//        flags |= BGFX_RESET_MSAA_X16; // question : why msaa_16 only differ
-//        break;
-//    }
-//    return flags;
-//}
-
-//}
 
 #endif

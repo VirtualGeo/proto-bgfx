@@ -8,19 +8,19 @@
 
 int main(int argc, char *argv[])
 {
-    QSurfaceFormat format;
-    format.setVersion(4, 1);
-//    format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setProfile(QSurfaceFormat::CompatibilityProfile);
-    format.setDepthBufferSize(24);
-    format.setSamples(16);
-    QSurfaceFormat::setDefaultFormat(format);
+//    QSurfaceFormat format;
+//    format.setVersion(4, 1);
+////    format.setProfile(QSurfaceFormat::CoreProfile);
+//    format.setProfile(QSurfaceFormat::CompatibilityProfile);
+//    format.setDepthBufferSize(24);
+//    format.setSamples(8);
+//    QSurfaceFormat::setDefaultFormat(format);
 
 
     QApplication a(argc, argv);
-    MainWindow w;
+    MainWindow w(nullptr, 2);
     w.show();
-//    MainWindow w2;
+//    MainWindow w2(nullptr, 3);
 //    w2.show();
     return a.exec();
 }
