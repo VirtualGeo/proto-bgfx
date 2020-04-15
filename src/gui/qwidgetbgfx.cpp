@@ -44,11 +44,13 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_NoSystemBackground);
 
+
     if (s_windows.empty()) {
         //        s_bgfxInit = true;
         // Call bgfx::renderFrame before bgfx::init to signal to bgfx not to create a render thread.
         // Most graphics APIs must be used on the same thread that created the window.
         bgfx::renderFrame();
+
 
         bgfx::Init bgfxInit = {};
         //    bgfxInit.platformData.ndt = this->winId;
@@ -73,11 +75,11 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
         //    bgfx::setPlatformData(pd);
         bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
         //    bgfxInit.type = bgfx::RendererType::Direct3D9;
-        //    bgfxInit.type = bgfx::RendererType::Direct3D11;
-        //    bgfxInit.type = bgfx::RendererType::Direct3D12;
-        //    bgfxInit.type = bgfx::RendererType::OpenGL;
+//            bgfxInit.type = bgfx::RendererType::Direct3D11;
+//            bgfxInit.type = bgfx::RendererType::Direct3D12;
+//            bgfxInit.type = bgfx::RendererType::OpenGL;
         //    bgfxInit.type = bgfx::RendererType::OpenGLES;
-        //    bgfxInit.type = bgfx::RendererType::Vulkan;
+//            bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
         //    bgfxInit.type = bgfx::RendererType::Metal;
 
         bgfxInit.resolution.width = this->width();
@@ -92,6 +94,7 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
 
         const bgfx::Caps* caps = bgfx::getCaps();
         g_renderer = bgfx::getRendererName(caps->rendererType);
+//        Q_ASSERT(0 != (caps->supported & BGFX_CAPS_SWAP_CHAIN)); // vulkan no swap chain
 
         switch (caps->vendorId) {
         case BGFX_PCI_ID_AMD:
@@ -114,9 +117,11 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
         bgfx::touch(0);
 
         // ------------------------------- LOAD MODEL
-        s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+         s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+
         //         g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
-        //    g_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
+//         s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\teapot.obj");
+//            s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
         //        g_nbVertices = g_scene.nbVertices();
         //        g_nbTriangles = g_scene.nbTriangles();
         //        g_nbObjects = g_scene.nbObjects();
@@ -134,14 +139,23 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
         Program::init();
         //        s_program.setShading(Program::Shading(g_iViewportShading));
         //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+//        m_isInit = true;
+        Q_ASSERT(s_windows.size() == 0);
     }
     //    m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
     m_iWindow = s_windows.size();
     //    m_windows[m_iWindow].m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
     //    winId();
-    void* nwh = (void*)(uintptr_t)winId();
     //    WindowState wstate(nwh, 20, 40);
+
+    void* nwh = (void*)(uintptr_t)winId();
     s_windows.push_back(WindowState(nwh, width(), height()));
+
+    if (m_iWindow != 0) {
+        s_windows.back().m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
+    }
+
+
     //    m_windows.emplace_back(nwh, width(), height());
     //    bgfx::setViewFrameBuffer(m_iWidget, m_fbh);
 
@@ -157,14 +171,21 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
     //    m_iWidget = 1;
     //    ++g_nWidget;
 
+//    init();
 }
 
 QWidgetBgfx::~QWidgetBgfx()
 {
+//    auto & window = s_windows[m_iWindow];
+//    window.clear();
     if (m_iWindow == 0) {
         s_scene.clear();
         //        s_program.clear();
         Program::clear();
+//        for (auto & window : s_windows) {
+//            window.clear();
+//        }
+
 
         bgfx::shutdown();
     }
@@ -202,9 +223,19 @@ QWidgetBgfx::~QWidgetBgfx()
 
 void QWidgetBgfx::paintEvent(QPaintEvent* event)
 {
-//    if (m_isInit == false) {
-//        init();
-//    }
+    // return;
+//   if (m_isInit == false) {
+////       init();
+//        return;
+//   }
+//    bgfx::setViewRect(1, 0, 0, uint16_t(width()), uint16_t(height()));
+//    // This dummy draw call is here to make sure that view 0 is cleared
+//    // if no other draw calls are submitted to view 0.
+//    bgfx::setViewClear(1, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X00FF00FF);
+//    bgfx::touch(1);
+//    bgfx::frame();
+
+//        return;
 //    render();
     //    qDebug() << "QWidgetBgfx::paintEvent(" << event << ")";
     //    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
@@ -223,9 +254,9 @@ void QWidgetBgfx::paintEvent(QPaintEvent* event)
     g_sum += g_deltaTime;
 
     //    qDebug() << g_epoch << g_sum << g_fps;
-    if (g_counter >= g_epoch) {
+    if (g_counter >= window.m_epoch) {
         //        g_epoch = (g_fps = g_epoch / g_sum) / 2; // update g_fps each 0.5 sec
-        g_epoch = (window.m_fps = g_epoch / g_sum); // update g_fps each sec
+        window.m_epoch = (window.m_fps = window.m_epoch / g_sum); // update g_fps each sec
         g_sum = 0.0f;
         g_counter = 0;
     }
@@ -243,30 +274,36 @@ void QWidgetBgfx::paintEvent(QPaintEvent* event)
     //        bgfx::getCaps()->homogeneousDepth);
 
     //    bgfx::setViewTransform(m_iWidget, view, proj);
+//    bgfx::setViewT
+//    bgfx::setViewRect(0, 0, 0, uint16_t(width()), uint16_t(height()));
+//    bgfx::touch(0);
 
-    if (m_iWindow != 0) {
+
+     if (m_iWindow != 0) {
+         Q_ASSERT(bgfx::isValid(window.m_fbh));
         bgfx::setViewFrameBuffer(m_iWindow, window.m_fbh);
-    }
+     }
     // Set view 0 default viewport.
-    bgfx::setViewRect(m_iWindow, 0, 0, uint16_t(width()), uint16_t(height()));
+    bgfx::setViewRect(m_iWindow, 0, 0, uint16_t(window.m_width), uint16_t(window.m_height));
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
-    bgfx::setViewClear(m_iWindow, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X00FF00FF);
-    bgfx::touch(m_iWindow);
+    bgfx::setViewClear(m_iWindow, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+//    bgfx::touch(m_iWindow);
 
 
     // --------------------------------- DRAW SCENE
+//    if (m_iWindow == 0) {
     const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
         | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
         | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL;
-    const float ratio = float(width()) / height();
+    const float ratio = float(window.m_width) / window.m_height;
     s_scene.draw(m_iWindow, window.m_shading, g_mtx, state, m_cameraFps, ratio);
     //    g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
 
     // Advance to next frame. Process submitted rendering primitives.
-    if (m_iWindow == 0) {
+     if (m_iWindow == 0) { // avoid flipping, put F1 to show (only with direct3D)
         bgfx::frame();
-    }
+     }
 //    return;
     update();
 }
@@ -295,19 +332,24 @@ void QWidgetBgfx::paintEvent(QPaintEvent* event)
 
 void QWidgetBgfx::resizeEvent(QResizeEvent* event)
 {
+//    return;
     qDebug() << "QWidgetBgfx::resizeEvent(" << event << ")";
     QWidget::resizeEvent(event);
 
-//    if (m_isInit == false) {
-//        init();
-//    }
+    // return;
+//   if (m_isInit == false) {
+//       init();
+//       return;
+//   }
 
     auto& window = s_windows[m_iWindow];
     const auto& size = event->size();
     Q_ASSERT(size.width() == width());
+
     if ((size.width() < 0) || (size.height() < 0)) {
         return;
     }
+
     //    g_width = size.width();
     window.m_width = size.width();
     //    g_height = size.height();
@@ -315,8 +357,13 @@ void QWidgetBgfx::resizeEvent(QResizeEvent* event)
     resetWindow();
 
     //    m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
-    bgfx::destroy(window.m_fbh);
-    window.m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
+
+    if (m_iWindow != 0) {
+        Q_ASSERT(bgfx::isValid(window.m_fbh));
+         bgfx::destroy(window.m_fbh);
+         window.m_fbh.idx = bgfx::kInvalidHandle;
+         window.m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(window.m_width), uint16_t(window.m_height));
+    }
 
 //    render();
 }
@@ -339,7 +386,10 @@ void QWidgetBgfx::keyPressEvent(QKeyEvent* event)
         break;
     case Qt::Key_F2:
         g_vsyncEnable = !g_vsyncEnable;
-        g_epoch = 10;
+        for (int i =0; i < s_windows.size(); ++i) {
+            s_windows[i].m_epoch = 10;
+        }
+//        window.m_epoch = 10;
         resetWindow();
         break;
     case Qt::Key_F3:

@@ -16,7 +16,7 @@
     #set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
     add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
 
-    # ------------------------ USER CONFIGURATIONS ----------------------
+# ------------------------ USER CONFIGURATIONS ----------------------
     #set(BGFX_ROOT <PATH_IN_YOUR_SYSTEM>/bgfx-install) // YOU MUST SET BGFX_ROOT TO COMPILE <----- ATTENTION
     # vscode: settings.json
     #{

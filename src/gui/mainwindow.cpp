@@ -5,6 +5,7 @@
 
 #include "qwidgetbgfx.h"
 #include <QLayout>
+#include <QSurface>
 
 MainWindow::MainWindow(QWidget *parent, int nbWidget)
     : QMainWindow(parent)
@@ -15,6 +16,10 @@ MainWindow::MainWindow(QWidget *parent, int nbWidget)
 //    setAttribute(Qt::WA_PaintOnScreen, false); // disables qt double buffering
 //    setAttribute(Qt::WA_NoSystemBackground, true);
 //    setAutoFillBackground(true);
+
+//    QSurfaceFormat lDefault = QSurfaceFormat::defaultFormat();
+//    lDefault.setSwapInterval(0);
+//    QSurfaceFormat::setDefaultFormat(lDefault);
 
     ui->setupUi(this);
 

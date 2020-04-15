@@ -20,7 +20,7 @@ public:
 //    void render();
 private:
 //    void doRender();
-//    void init();
+//   void init();
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -48,7 +48,7 @@ private:
 
 private:
 //    bool m_updatePending = false;
-//    bool m_isInit = false;
+//   bool m_isInit = false;
 //    bool m_continuousRender = true;
 
     int m_iWindow;
@@ -74,7 +74,7 @@ private:
     //double g_fps = 0.0;
     double g_sum = 0.0;
     size_t g_counter = 0;
-    size_t g_epoch = 10; // compute first fps mean with 10 frames
+//    size_t g_epoch = 10; // compute first fps mean with 10 frames
     std::chrono::time_point<std::chrono::high_resolution_clock> g_lastTime;
 };
 

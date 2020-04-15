@@ -119,7 +119,7 @@ void Scene::addModel(const std::string& filename)
 #endif
 
     // Append `default` material
-    //    tinyObjMaterials.push_back(tinyobj::material_t());
+//        tinyObjMaterials.push_back(tinyobj::material_t());
 
     //    for (size_t i = 0; i < tinyObjMaterials.size(); i++) {
     //        printf("material[%d].diffuse_texname = %s\n", int(i),

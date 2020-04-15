@@ -16,12 +16,16 @@ int main(int argc, char *argv[])
 //    format.setSamples(8);
 //    QSurfaceFormat::setDefaultFormat(format);
 
+//    QSurfaceFormat lDefault = QSurfaceFormat::defaultFormat();
+//    lDefault.setSwapInterval(0);
+//    QSurfaceFormat::setDefaultFormat(lDefault);
+
 
     QApplication a(argc, argv);
     MainWindow w(nullptr, 2);
     w.show();
-//    MainWindow w2(nullptr, 3);
-//    w2.show();
+    MainWindow w2(nullptr, 2);
+    w2.show();
     return a.exec();
 }
 
