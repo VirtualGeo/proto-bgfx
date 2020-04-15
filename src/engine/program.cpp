@@ -34,6 +34,7 @@ void Program::init()
 {
 
     for (int i =0; i < Shading::Count; ++i) {
+//        int i= Shading::NORMAL;
         //    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
         const std::string & shadingFileName = shadingFileNames[i];
 
@@ -61,6 +62,7 @@ void Program::init()
 
 void Program::clear()
 {
+//        int i= Shading::NORMAL;
     for (int i =0; i <Shading::Count; ++i) {
         bgfx::destroy(m_handlePrograms[i]);
     }

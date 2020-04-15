@@ -310,12 +310,12 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
                 assert(attrib.texcoords.size() > size_t(2 * idx2.texcoord_index + 1));
 
                 // Flip X coord.
-                tc[0][0] = attrib.texcoords[2 * idx0.texcoord_index];
-                tc[1][0] = attrib.texcoords[2 * idx1.texcoord_index];
-                tc[2][0] = attrib.texcoords[2 * idx2.texcoord_index];
-//                tc[0][0] = 1.0f - attrib.texcoords[2 * idx0.texcoord_index];
-//                tc[1][0] = 1.0f - attrib.texcoords[2 * idx1.texcoord_index];
-//                tc[2][0] = 1.0f - attrib.texcoords[2 * idx2.texcoord_index];
+//                tc[0][0] = attrib.texcoords[2 * idx0.texcoord_index];
+//                tc[1][0] = attrib.texcoords[2 * idx1.texcoord_index];
+//                tc[2][0] = attrib.texcoords[2 * idx2.texcoord_index];
+                tc[0][0] = 1.0f - attrib.texcoords[2 * idx0.texcoord_index];
+                tc[1][0] = 1.0f - attrib.texcoords[2 * idx1.texcoord_index];
+                tc[2][0] = 1.0f - attrib.texcoords[2 * idx2.texcoord_index];
                 // Flip Y coord.
 //                tc[0][1] = attrib.texcoords[2 * idx0.texcoord_index + 1];
 //                tc[1][1] = attrib.texcoords[2 * idx1.texcoord_index + 1];
