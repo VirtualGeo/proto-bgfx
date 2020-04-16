@@ -29,4 +29,4 @@ private:
 };
 #endif // MAINWINDOW_H
 
-#endif
+#endif // GUI_QT
