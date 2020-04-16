@@ -7,7 +7,7 @@ CameraFps::CameraFps(bx::Vec3 pos)
     updateCameraFront();
 }
 
-void CameraFps::rotate(float xoffset, float yoffset)
+void CameraFps::mouseMove(float xoffset, float yoffset)
 {
     m_yaw += xoffset;
     m_pitch += yoffset;

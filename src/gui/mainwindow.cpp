@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent, int nbWidget)
 
 //    m_splitter->addWidget(widgetBgfx3);
     setCentralWidget(m_splitter);
-    setFocus();
+//    setFocus();
 
 
 //    setFocusPolicy(Qt::FocusPolicy::ClickFocus);

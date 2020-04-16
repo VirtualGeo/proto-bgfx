@@ -22,10 +22,10 @@ int main(int argc, char *argv[])
 
 
     QApplication a(argc, argv);
-    MainWindow w(nullptr, 2);
+    MainWindow w(nullptr, 1);
     w.show();
-    MainWindow w2(nullptr, 2);
-    w2.show();
+//    MainWindow w2(nullptr, 2);
+//    w2.show();
     return a.exec();
 }
 
