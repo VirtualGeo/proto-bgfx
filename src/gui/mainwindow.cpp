@@ -79,4 +79,4 @@ void MainWindow::on_actionExit_triggered()
     QCoreApplication::quit();
 }
 
-#endif
+#endif // GUI_QT

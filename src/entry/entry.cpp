@@ -1,6 +1,5 @@
 #include "entry.h"
 
-
 //std::vector<WindowState> entry::s_windows;
 std::vector<std::unique_ptr<Camera>> entry::s_cameras; // question : Camera* ?
 Scene entry::s_scene;

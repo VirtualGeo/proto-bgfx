@@ -1,12 +1,13 @@
 #include "windowstate.h"
 //#include <QDebug>
+#include <bgfx/bgfx.h>
+#include <bgfx/platform.h>
 #include <cassert>
 #include <engine/camerafps.h>
 #include <entry/entry.h>
-#include <bgfx/bgfx.h>
-#include <bgfx/platform.h>
 
-std::vector<WindowState> WindowState::s_windows;
+//std::vector<WindowState*> WindowState::s_windows;
+std::vector<WindowState*> s_windows;
 
 WindowState::WindowState(void* nwh, int width, int height)
     : m_nwh(nwh)
@@ -16,6 +17,7 @@ WindowState::WindowState(void* nwh, int width, int height)
     //    , m_fbh(bgfx::createFrameBuffer(nwh, uint16_t(width), uint16_t(height)))
     , m_iCamera(entry::s_cameras.size())
 {
+    s_windows.emplace_back(this);
     //    entry::s_cameras.emplace_back(std::make_unique<CameraFps>(bx::Vec3 { -7.0f, 1.0f, 0.0f })); // question : push_back ?
     //    std::cout << &entry::s_cameras << std::endl;
     entry::s_cameras.emplace_back(std::make_unique<CameraFps>(bx::Vec3 { -7.0f, 1.0f, 0.0f })); // question : push_back ?
@@ -132,7 +134,7 @@ WindowState::WindowState(void* nwh, int width, int height)
     //        entry::s_cameras.emplace_back(std::make_unique<CameraFps>(bx::Vec3 { -7.0f, 1.0f, 0.0f })); // question : push_back ?
     //    std::cout << &entry::s_cameras << std::endl;
 
-//    auto& window = entry::s_windows[m_id];
+    //    auto& window = entry::s_windows[m_id];
     if (m_id != 0) {
         m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)m_nwh, uint16_t(m_width), uint16_t(m_height));
     }
@@ -158,17 +160,16 @@ WindowState::WindowState(void* nwh, int width, int height)
 WindowState::~WindowState()
 {
 
-//    if (m_id == 0) {
-//        entry::s_scene.clear();
-//        //        s_program.clear();
-//        Program::clear();
-//        //        for (auto & window : s_windows) {
-//        //            window.clear();
-//        //        }
+    if (m_id == 0) {
+        entry::s_scene.clear();
+        //        s_program.clear();
+        Program::clear();
+        //        for (auto & window : s_windows) {
+        //            window.clear();
+        //        }
 
-//        bgfx::shutdown();
-//    }
-
+        bgfx::shutdown();
+    }
 }
 
 //WindowState::~WindowState()
@@ -230,8 +231,8 @@ void WindowState::render()
     //    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
 
     if (m_id == 0) {
-                printDebugMessage();
-//        entry::printDebugMessage();
+        printDebugMessage();
+        //        entry::printDebugMessage();
     }
 
     //    const std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
@@ -297,7 +298,6 @@ void WindowState::render()
         bgfx::frame();
     }
     //    return;
-
 }
 
 void WindowState::printDebugMessage()
@@ -321,7 +321,7 @@ void WindowState::printDebugMessage()
         //        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", g_fps, stats->width, stats->height, g_viewportShading.c_str());
         for (int i = 0; i < s_windows.size(); ++i) {
             //        for (const auto& window : m_windows) {
-            const auto& window = s_windows[i];
+            const auto& window = *s_windows[i];
             bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window.m_fps, window.m_width, window.m_height, Program::filename(window.m_shading));
         }
         entry::s_scene.printStats(line);
@@ -426,7 +426,7 @@ void WindowState::keyPressEvent(Key::Enum key)
     case Key::F2:
         entry::g_vsyncEnable = !entry::g_vsyncEnable;
         for (int i = 0; i < s_windows.size(); ++i) {
-            s_windows[i].m_epoch = 10;
+            s_windows[i]->m_epoch = 10;
         }
         //        window.m_epoch = 10;
         resetWindow();

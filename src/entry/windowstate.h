@@ -2,9 +2,9 @@
 #define WINDOWSTATE_H
 
 //#include "program.h"
-#include <engine/program.h>
 #include <bgfx/bgfx.h>
 #include <chrono>
+#include <engine/program.h>
 //#include <entry/entry.h>
 
 struct MouseButton {
@@ -42,7 +42,6 @@ struct Key {
 
 class WindowState {
 public:
-    static std::vector<WindowState> s_windows;
 
 public:
     WindowState(void* nwh, int width, int height);
@@ -63,10 +62,12 @@ public:
     void resizeEvent(int width, int height);
 
 private:
+//    static std::vector<WindowState*> s_windows;
+
     void* m_nwh = nullptr;
     int m_width;
     int m_height;
-        const int m_id;
+    const int m_id;
 
     bgfx::FrameBufferHandle m_fbh;
     float m_fps;
@@ -88,6 +89,5 @@ private:
     float g_lastY;
     bool g_firstMouse = true;
 };
-
 
 #endif // WINDOWSTATE_H
