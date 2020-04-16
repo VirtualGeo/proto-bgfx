@@ -9,8 +9,10 @@ class CameraFps : public Camera
 public:
     CameraFps(bx::Vec3 pos);
 
-    void rotate(float xoffset, float yoffset);
     void updateCameraFront();
+
+protected:
+    void mouseMove(float xoffset, float yoffset) override;
 
 private:
     float m_yaw = 0.0f;

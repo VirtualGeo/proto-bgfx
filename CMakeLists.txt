@@ -7,7 +7,7 @@
     #set(CMAKE_AUTOMOC ON)
     #set(CMAKE_AUTORCC ON)
 
-    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 14) # need by std::make_unique
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
     #option(AUTO_GENERATE_BIN_MODEL "Generate bin file of model for fast loading" ON)

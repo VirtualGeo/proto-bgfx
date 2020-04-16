@@ -30,6 +30,7 @@
 //#include "Vertex.h"
 //#include "program.h"
 #include <engine/program.h>
+#include <engine/windowstate.h>
 
 //#define WIN_WIDTH 800
 //#define WIN_HEIGHT 600
@@ -59,12 +60,14 @@ int g_width = 800;
 int g_height = 600;
 GLFWwindow* g_window = nullptr;
 // bgfx::ProgramHandle g_program;
-Program g_program;
+//Program g_program;
 size_t g_counter = 0; // avoid g_fps = epoch / sum; with sum = 0
 int g_epoch = 10;
 // Mesh* g_mesh = nullptr;
 Scene g_scene;
 bool g_clicked = false;
+
+WindowState g_windowState;
 
 float g_deltaTime = 0.0f;
 //float g_lastFrame = 0.0f;
@@ -355,9 +358,10 @@ void init()
     //    g_program = bgfx::createProgram(vsh, fsh, true);
     //    g_program.init("cubes");
     //    g_program.init("rendered");
-    g_program.init();
-    g_program.setShading(Program::Shading(g_iViewportShading));
-    g_viewportShading = Program::shadingFileNames[g_iViewportShading];
+//    g_program.init();
+    Program::init();
+//    g_program.setShading(Program::Shading(g_iViewportShading));
+//    g_viewportShading = Program::shadingFileNames[g_iViewportShading];
     //    g_program.init("material");
     bx::mtxIdentity(g_mtx);
 
@@ -470,7 +474,7 @@ void update()
 
     // const uint64_t stateOpaque = BGFX_STATE_DEFAULT;
 
-    g_scene.draw(0, g_program, g_mtx, state, g_cameraPos);
+    g_scene.draw(0, , g_mtx, state, g_cameraPos);
 
     // Advance to next frame. Process submitted rendering primitives.
     bgfx::frame();
