@@ -5,9 +5,12 @@
 #include <cassert>
 #include <engine/camerafps.h>
 #include <entry/entry.h>
+#include <list>
 
 //std::vector<WindowState*> WindowState::s_windows;
-std::vector<WindowState*> s_windows;
+//std::vector<WindowState*> s_windows;
+std::list<WindowState*> s_windows;
+//std::list<WindowState&> s_windows;
 
 WindowState::WindowState(void* nwh, int width, int height)
     : m_nwh(nwh)
@@ -17,7 +20,6 @@ WindowState::WindowState(void* nwh, int width, int height)
     //    , m_fbh(bgfx::createFrameBuffer(nwh, uint16_t(width), uint16_t(height)))
     , m_iCamera(entry::s_cameras.size())
 {
-    s_windows.emplace_back(this);
     //    entry::s_cameras.emplace_back(std::make_unique<CameraFps>(bx::Vec3 { -7.0f, 1.0f, 0.0f })); // question : push_back ?
     //    std::cout << &entry::s_cameras << std::endl;
     entry::s_cameras.emplace_back(std::make_unique<CameraFps>(bx::Vec3 { -7.0f, 1.0f, 0.0f })); // question : push_back ?
@@ -37,16 +39,17 @@ WindowState::WindowState(void* nwh, int width, int height)
         //    bgfxInit.platformData.ndt = this->winId;
         //    bgfx::PlatformData pd;
         bgfxInit.platformData.ndt = nullptr;
-#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-        //    bgfxInit.platformData.ndt = glfwGetX11Display();
         bgfxInit.platformData.nwh = nwh;
-#elif BX_PLATFORM_OSX
-        //    bgfxInit.platformData.nwh = glfwGetCocoaWindow(g_window);
-        bgfxInit.platformData.nwh = nwh;
-#elif BX_PLATFORM_WINDOWS
-        //    bgfxInit.platformData.nwh = (void*)(uintptr_t)glfwGetX11Window(g_window);
-        bgfxInit.platformData.nwh = nwh;
-#endif
+        //#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+        //        //    bgfxInit.platformData.ndt = glfwGetX11Display();
+        //        bgfxInit.platformData.nwh = nwh;
+        //#elif BX_PLATFORM_OSX
+        //        //    bgfxInit.platformData.nwh = glfwGetCocoaWindow(g_window);
+        //        bgfxInit.platformData.nwh = nwh;
+        //#elif BX_PLATFORM_WINDOWS
+        //        //    bgfxInit.platformData.nwh = (void*)(uintptr_t)glfwGetX11Window(g_window);
+        //        bgfxInit.platformData.nwh = nwh;
+        //#endif
         //    bgfxInit.platformData.nwh = nullptr;
         //    bgfxInit.platformData.nwh = (void*)(uintptr_t)this->effectiveWinId();
         bgfxInit.platformData.context = nullptr;
@@ -146,15 +149,16 @@ WindowState::WindowState(void* nwh, int width, int height)
 
     //    setFocus();
 
-    //    g_lastTime = std::chrono::high_resolution_clock::now();
-    g_lastTime = std::chrono::high_resolution_clock::now();
-    // g_lastTime = std::chrono::steady_clock::now();
+    //    m_lastTime = std::chrono::high_resolution_clock::now();
+    m_lastTime = std::chrono::high_resolution_clock::now();
+    // m_lastTime = std::chrono::steady_clock::now();
     //    m_iWidget = g_nWidget;
     //    bgfx::setViewFrameBuffer(m_iWidget, m_fbh);
     //    m_iWidget = 1;
     //    ++g_nWidget;
 
     //    init();
+    s_windows.emplace_back(this);
 }
 
 WindowState::~WindowState()
@@ -169,7 +173,13 @@ WindowState::~WindowState()
         //        }
 
         bgfx::shutdown();
+    } else {
+        assert(bgfx::isValid(m_fbh));
+        bgfx::destroy(m_fbh);
+        m_fbh.idx = bgfx::kInvalidHandle;
     }
+
+    s_windows.remove(this);
 }
 
 //WindowState::~WindowState()
@@ -178,17 +188,17 @@ WindowState::~WindowState()
 
 //}
 
-void WindowState::clear()
-{
-    bgfx::destroy(m_fbh);
-}
+//void WindowState::clear()
+//{
+//    bgfx::destroy(m_fbh);
+//}
 
 void WindowState::updateCameraPos()
 {
     //    auto& window = entry::s_windows[m_iWindow];
 
-    float cameraSpeed = g_slowMotion ? 1.0f : 5.0f;
-    cameraSpeed *= g_deltaTime;
+    float cameraSpeed = m_slowMotion ? 1.0f : 5.0f;
+    cameraSpeed *= m_deltaTime;
 
     auto& camera = *entry::s_cameras[m_iCamera];
     if (m_cameraMoveFront) {
@@ -240,18 +250,18 @@ void WindowState::render()
     const auto currentTime = std::chrono::high_resolution_clock::now();
 
     //    const auto currentTime = g_timer.now();
-    g_deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - g_lastTime).count() / 1000000.0;
-    g_lastTime = currentTime;
-    g_sum += g_deltaTime;
+    m_deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - m_lastTime).count() / 1000000.0;
+    m_lastTime = currentTime;
+    m_sum += m_deltaTime;
 
-    //    qDebug() << g_epoch << g_sum << g_fps;
-    if (g_counter >= m_epoch) {
-        //        g_epoch = (g_fps = g_epoch / g_sum) / 2; // update g_fps each 0.5 sec
-        m_epoch = (m_fps = m_epoch / g_sum); // update g_fps each sec
-        g_sum = 0.0f;
-        g_counter = 0;
+    //    qDebug() << g_epoch << m_sum << g_fps;
+    if (m_counter >= m_epoch) {
+        m_epoch = (m_fps = m_epoch / m_sum) / 2; // update g_fps each 0.5 sec
+        //        m_epoch = (m_fps = m_epoch / m_sum); // update g_fps each sec
+        m_sum = 0.0f;
+        m_counter = 0;
     }
-    ++g_counter;
+    ++m_counter;
 
     //    updateCameraPos();
     updateCameraPos();
@@ -319,10 +329,15 @@ void WindowState::printDebugMessage()
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Graphic Vendor: %s Corporation", entry::g_vendorID.c_str());
         //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.1f", g_fps);
         //        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", g_fps, stats->width, stats->height, g_viewportShading.c_str());
-        for (int i = 0; i < s_windows.size(); ++i) {
-            //        for (const auto& window : m_windows) {
-            const auto& window = *s_windows[i];
-            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window.m_fps, window.m_width, window.m_height, Program::filename(window.m_shading));
+        //        for (int i = 0; i < s_windows.size(); ++i) {
+        //            //        for (const auto& window : m_windows) {
+        //            const auto& window = *s_windows[i];
+        //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window.m_fps, window.m_width, window.m_height, Program::filename(window.m_shading));
+        //        }
+        int i = 0;
+        for (const auto& window : s_windows) {
+            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window->m_fps, window->m_width, window->m_height, Program::filename(window->m_shading));
+            ++i;
         }
         entry::s_scene.printStats(line);
     }
@@ -333,22 +348,22 @@ void WindowState::mouseMoveEvent(int x, int y)
 {
     //    auto& window = entry::s_windows[m_iWindow];
     //        qDebug() << "QWidgetBgfx::mouseMoveEvent(" << event << ")";
-    if (g_mouseLeftClicked) {
+    if (m_mouseLeftClicked) {
         //        int xpos = event->x();
         //        int ypos = event->y();
         //        int xpos = x;
         //        int ypos = y;
-        if (g_firstMouse) {
-            g_lastX = x;
-            g_lastY = y;
-            g_firstMouse = false;
+        if (m_firstMouse) {
+            m_lastX = x;
+            m_lastY = y;
+            m_firstMouse = false;
         }
 
-        // float xoffset = xpos - g_lastX;
-        float xoffset = g_lastX - x;
-        float yoffset = g_lastY - y; // reversed since y-coordinates go from bottom to top
-        g_lastX = x;
-        g_lastY = y;
+        // float xoffset = xpos - m_lastX;
+        float xoffset = m_lastX - x;
+        float yoffset = m_lastY - y; // reversed since y-coordinates go from bottom to top
+        m_lastX = x;
+        m_lastY = y;
 
         float sensitivity = 0.5f; // change this value to your liking
         xoffset *= sensitivity;
@@ -364,12 +379,18 @@ void WindowState::mouseReleaseEvent(MouseButton::Enum mouseButton)
 {
     switch (mouseButton) {
     case MouseButton::Left:
-        g_mouseLeftClicked = false;
+        m_mouseLeftClicked = false;
         break;
 
-    case MouseButton::None:
-        assert(mouseButton != MouseButton::None);
+    case MouseButton::NONE:
+    default:
+        //        assert(mouseButton != MouseButton::NONE);
+        std::cout << "unknown key " << mouseButton << std::endl;
         break;
+
+        //    default:
+        //        assert(false);
+        //        break;
     }
 }
 
@@ -377,13 +398,18 @@ void WindowState::mousePressEvent(MouseButton::Enum mouseButton)
 {
     switch (mouseButton) {
     case MouseButton::Left:
-        g_mouseLeftClicked = true;
-        g_firstMouse = true;
+        m_mouseLeftClicked = true;
+        m_firstMouse = true;
         break;
 
-    case MouseButton::None:
-        assert(mouseButton != MouseButton::None);
+    case MouseButton::NONE:
+    default:
+        //        assert(mouseButton != MouseButton::NONE);
+        std::cout << "unknown key " << mouseButton << std::endl;
         break;
+        //    default:
+        //        assert(false);
+        //        break;
     }
 }
 
@@ -404,11 +430,20 @@ void WindowState::keyReleaseEvent(Key::Enum key)
         m_cameraMoveUp = 0;
         break;
 
-    case Key::None:
-        assert(key != Key::None);
+    case Key::Control:
+        m_ctrlPressed = false;
+        break;
+
+    case Key::NONE:
+    default:
+        //        assert(key != Key::NONE);
+        std::cout << "unknown key " << key << std::endl;
         break;
         //    default:
         //        QWidget::keyReleaseEvent(event);
+        //        break;
+        //    default:
+        //        assert(false);
         //        break;
     }
 }
@@ -425,8 +460,11 @@ void WindowState::keyPressEvent(Key::Enum key)
         break;
     case Key::F2:
         entry::g_vsyncEnable = !entry::g_vsyncEnable;
-        for (int i = 0; i < s_windows.size(); ++i) {
-            s_windows[i]->m_epoch = 10;
+        //        for (int i = 0; i < s_windows.size(); ++i) {
+        //            s_windows[i]->m_epoch = 10;
+        //        }
+        for (auto& window : s_windows) {
+            window->m_epoch = 10;
         }
         //        window.m_epoch = 10;
         resetWindow();
@@ -486,17 +524,27 @@ void WindowState::keyPressEvent(Key::Enum key)
     case Key::R:
         m_shading = Shading::RENDERED;
         break;
+        //    case Key::Q:
+        //        if (m_ctrlPressed) {
+        //        }
+        break;
     case Key::Control:
-        g_slowMotion = !g_slowMotion;
+        m_ctrlPressed = true;
+        m_slowMotion = !m_slowMotion;
         break;
 
-    case Key::None:
-        //    default:
-        assert(key != Key::None);
-        break;
+    case Key::NONE:
+    default:
+        std::cout << "unknown key " << key << std::endl;
+        //        assert(key != Key::NONE);
+        //        break;
         //    default:
         //        QWidget::keyPressEvent(event);
         break;
+
+        //    default:
+        //        assert(false);
+        //        break;
     }
 }
 
@@ -517,4 +565,10 @@ void WindowState::resizeEvent(int width, int height)
     } else {
         resetWindow();
     }
+}
+
+void WindowState::mouseScrollEvent(int offset)
+{
+    auto& camera = *entry::s_cameras[m_iCamera];
+    camera.zoom(offset);
 }

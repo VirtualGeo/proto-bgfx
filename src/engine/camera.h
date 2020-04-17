@@ -17,6 +17,7 @@ public:
 
     void move(Direction direction, float distance);
     virtual void mouseMove(float xoffset, float yoffset) = 0;
+    void zoom(float offset);
 
 //private:
     bx::Vec3 m_pos;
