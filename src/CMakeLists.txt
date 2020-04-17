@@ -99,7 +99,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:MSVC>:_CRT
 
 
 if (GUI_GLFW)
-    target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
+    target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
 elseif(GUI_QT)
 #if(GUI_QT)
     find_package(Qt5 COMPONENTS Widgets REQUIRED)

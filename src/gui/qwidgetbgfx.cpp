@@ -14,7 +14,6 @@ static const std::map<int, MouseButton::Enum> s_translateMouseKey = {
 };
 static const std::map<int, Key::Enum> s_translateKey = {
     { Qt::Key_Up, Key::Up },
-    { Qt::Key_Up, Key::Up },
     { Qt::Key_Down, Key::Down },
     { Qt::Key_Right, Key::Right },
     { Qt::Key_Left, Key::Left },
@@ -53,7 +52,7 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
 //{
 //}
 
-//void QWidgetBgfx::render()
+//void QWidgetBgfx::render() // source: https://zeduckmaster.frama.io/2016/how-to-create-a-custom-rendering-in-a-qt5-widget/
 //{
 //    if (m_updatePending == false) {
 //        m_updatePending = true;

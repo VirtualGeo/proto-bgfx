@@ -9,7 +9,7 @@
 
 struct MouseButton {
     enum Enum {
-        None = 0,
+        NONE = 0, // glfw None conflict
         Left,
         Middle,
         Right,
@@ -19,7 +19,7 @@ struct MouseButton {
 
 struct Key {
     enum Enum {
-        None = 0,
+        NONE = 0,
         Up,
         Down,
         Right,
@@ -34,11 +34,13 @@ struct Key {
         N,
         M,
         R,
+//        Q,
         Control,
 
         Count
     };
 };
+
 
 class WindowState {
 public:
@@ -47,7 +49,7 @@ public:
     WindowState(void* nwh, int width, int height);
     ~WindowState();
 
-    void clear();
+//    void clear();
     void updateCameraPos();
     void resetWindow();
     void render();
@@ -60,6 +62,7 @@ public:
     void keyReleaseEvent(Key::Enum key);
     void keyPressEvent(Key::Enum key);
     void resizeEvent(int width, int height);
+    void mouseScrollEvent(int offset);
 
 private:
 //    static std::vector<WindowState*> s_windows;
@@ -72,10 +75,10 @@ private:
     bgfx::FrameBufferHandle m_fbh;
     float m_fps;
     size_t m_epoch = 10;
-    double g_deltaTime;
-    double g_sum = 0.0;
-    size_t g_counter = 0;
-    std::chrono::time_point<std::chrono::high_resolution_clock> g_lastTime;
+    double m_deltaTime;
+    double m_sum = 0.0;
+    size_t m_counter = 0;
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_lastTime;
 
     Shading m_shading = Shading::RENDERED;
     int m_iCamera;
@@ -83,11 +86,13 @@ private:
     int m_cameraMoveFront = 0;
     int m_cameraMoveRight = 0;
     int m_cameraMoveUp = 0;
-    bool g_slowMotion = false;
-    bool g_mouseLeftClicked = false;
-    float g_lastX;
-    float g_lastY;
-    bool g_firstMouse = true;
+    bool m_slowMotion = false;
+    bool m_mouseLeftClicked = false;
+    float m_lastX;
+    float m_lastY;
+    bool m_firstMouse = true;
+
+    bool m_ctrlPressed = false;
 };
 
 #endif // WINDOWSTATE_H
