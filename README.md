@@ -7,24 +7,24 @@
 
 ## Building (command line instruction)
 ```bash
-$ git submodule init
-$ git submodule update
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
+git submodule init
+git submodule update
+mkdir build
+cd build
+cmake ..
+make -j4
 ```
 
 ---
 
 ## How to install bgfx, bx, bimg libraries
 ```bash
-$ git clone https://github.com/JoshuaBrookover/bgfx.cmake.git
-$ cd bgfx.cmake
-$ rm -r bgfx bimg bx
-$ git clone git://github.com/bkaradzic/bx.git
-$ git clone git://github.com/bkaradzic/bimg.git
-$ git clone git://github.com/bkaradzic/bgfx.git
+git clone https://github.com/JoshuaBrookover/bgfx.cmake.git
+cd bgfx.cmake
+rm -r bgfx bimg bx
+git clone git://github.com/bkaradzic/bx.git
+git clone git://github.com/bkaradzic/bimg.git
+git clone git://github.com/bkaradzic/bgfx.git
 ```
 
 ### Add line in root CMakeLists.txt
@@ -35,8 +35,8 @@ set_target_properties( astc-codec PROPERTIES DEBUG_POSTFIX d)
 
 ### Run these commands to generate all the bgfx-install library in the bgfx.cmake repository
 ```bash
-$ cmake --build <BGFX_CMAKE_BUILD_DEBUG_DIR> --target install
-$ cmake --build <BGFX_CMAKE_BUILD_RELEASE_DIR> --target install
+cmake --build <BGFX_CMAKE_BUILD_DEBUG_DIR> --target install
+cmake --build <BGFX_CMAKE_BUILD_RELEASE_DIR> --target install
 ```
 
 ## How to include bgfx, bx, bimg library into proto-bgfx project
