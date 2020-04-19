@@ -7,12 +7,16 @@
 
 ## Building (command line instruction)
 ```bash
-git submodule init
-git submodule update
+git clone --recurse-submodules -j4 https://github.com/VirtualGeo/proto-bgfx.git
 mkdir build
 cd build
 cmake ..
 make -j4
+```
+
+## Run executable (in build directory)
+```bash
+src/proto-bgfx
 ```
 
 ---
@@ -21,7 +25,7 @@ make -j4
 ```bash
 git clone https://github.com/JoshuaBrookover/bgfx.cmake.git
 cd bgfx.cmake
-rm -r bgfx bimg bx
+rm -rf bgfx bimg bx
 git clone git://github.com/bkaradzic/bx.git
 git clone git://github.com/bkaradzic/bimg.git
 git clone git://github.com/bkaradzic/bgfx.git
@@ -41,6 +45,12 @@ cmake --build <BGFX_CMAKE_BUILD_RELEASE_DIR> --target install
 
 ## How to include bgfx, bx, bimg library into proto-bgfx project
 You must set the cmake variable BGFX_ROOT as the path of bgfx-install on your system
+
+### System Environment (linux) example
+add this line into /etc/environment file
+```bash
+BGFX_ROOT="<PATH_IN_YOUR_SYSTEM>/bgfx-install"
+```
 
 ### Visual Studio Code example
 in .vscode/settings.json of proto-bgfx project add these lines
