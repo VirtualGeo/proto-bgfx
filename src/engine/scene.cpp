@@ -30,7 +30,6 @@ void Scene::addModel(const std::string& filename)
     //    std::string absoluteFilename(std::string(PROJECT_DIR) + filename);
     std::string absoluteFilename(filename);
     std::string bin = absoluteFilename.substr(0, absoluteFilename.find_last_of('.')) + ".bin";
-    //    std::cout << "bin : " << bin << std::endl;
     bool loadBinFailed = false;
 #ifdef AUTO_GENERATE_BIN_MODEL
     if (FileExists(bin)) {
@@ -46,7 +45,6 @@ void Scene::addModel(const std::string& filename)
             loadBinFailed = true;
         }
 //        catch (std::bad_alloc) {
-//            //            std::cout << "bad_alloc" << std::endl;
 //            loadBinFailed = true;
 //        }
 
@@ -110,7 +108,7 @@ void Scene::addModel(const std::string& filename)
 
     const int nbMaterials = tinyObjMaterials.size();
     const int nbObjects = tinyObjShapes.size();
-#ifdef DEBUG
+#ifdef MODEL_LOADER_INFO
     printf("[Scene] # of vertices  = %d\n", (int)(tinyObjAttrib.vertices.size()) / 3);
     printf("[Scene] # of normals   = %d\n", (int)(tinyObjAttrib.normals.size()) / 3);
     printf("[Scene] # of texcoords = %d\n", (int)(tinyObjAttrib.texcoords.size()) / 2);
@@ -144,7 +142,7 @@ void Scene::addModel(const std::string& filename)
         //            material.name.c_str());
         //        m_materials.push_back(Material(material, m_textures, base_dir));
         m_materials.emplace_back(tinyObj_material, m_textures, base_dir);
-#ifdef DEBUG
+#ifdef MODEL_LOADER_INFO
         const Material& material = m_materials.back();
         std::cout << "[Scene] Load material[" << i << "/" << nbMaterials << "] : " << material << std::endl;
 #endif
@@ -173,12 +171,8 @@ void Scene::addModel(const std::string& filename)
         m_objects.emplace_back(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i, m_layout);
         //        nbIndices += m_objects[i].nbTriangles() * 3;
         //        nbMeshes += m_objects[i].nbMeshes();
-        //        std::cout << "[Scene] nbIndices:" << nbIndices << std::endl;
-        //        std::cout << "[Scene] nbMeshes:" << nbMeshes << std::endl;
-        //        std::cout << "[Scene] Load object[" << i << "/" << nbObjects << "] " << m_objects.back().name() << std::endl;
-#ifdef DEBUG
+#ifdef MODEL_LOADER_INFO
         const Object& object = m_objects.back();
-        //        std::cout << "[Scene] Load object[" << i << "/" << nbObjects << "] '" << object.name() << "', nbMeshes=" << object.nbMeshes() << ", nbTriangles=" << object.nbTriangles() << std::endl;
         std::cout << "[Scene] Load object[" << i << "/" << nbObjects << "] : " << object << std::endl;
 #endif
         bgfx::frame();
@@ -265,7 +259,7 @@ void Scene::load(std::ifstream& file)
         //            m_materials.emplace_back(file, &m_textures);
         //        m_materials.push_back(file);
         m_materials.emplace_back(file);
-#ifdef DEBUG
+#ifdef MODEL_LOADER_INFO
         std::cout << "[Scene] Load material[" << i << "/" << size << "] : " << m_materials.back() << std::endl;
 #endif
     }
@@ -280,7 +274,7 @@ void Scene::load(std::ifstream& file)
         //        m_textures.push_back(file);
         //        m_textures.emplace_back(texName, baseDir);
         m_textures.emplace_back(file);
-#ifdef DEBUG
+#ifdef MODEL_LOADER_INFO
         const Texture& texture = m_textures.back();
         std::cout << "[Scene] Load texture[" << i << "/" << size << "] : " << texture << std::endl;
 #endif
@@ -300,7 +294,7 @@ void Scene::load(std::ifstream& file)
         //        m_objects.push_back(Object(file, i, m_layout));
         //        const Object && object = Object(file, i, m_layout);
         m_objects.emplace_back(file, i, m_layout);
-#ifdef DEBUG
+#ifdef MODEL_LOADER_INFO
         const Object& object = m_objects.back();
         std::cout << "[Scene] Load object[" << i << "/" << size << "] : " << object << std::endl;
 #endif

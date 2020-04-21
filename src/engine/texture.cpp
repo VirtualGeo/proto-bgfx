@@ -146,7 +146,7 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
     createTextureHandle();
 //    free(m_image); // not possible because scene.save() need image data to save bin model
 //    m_image = nullptr;
-#ifdef DEBUG
+#ifdef MODEL_LOADER_INFO
     std::cout << "    [Material] Load texture : '" << m_name << "', width=" << m_width << ", height=" << m_height << ", nbChannel=" << m_nChannels << ", textureSize=" << m_textureSize << ", bitPerPixel=" << m_nChannels << std::endl;
 #endif
 }

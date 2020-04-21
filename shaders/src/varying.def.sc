@@ -11,3 +11,5 @@ vec3 a_position  : POSITION;
 vec3 a_normal    : NORMAL;
 //vec3 a_normal    : TEXCOORD1;
 vec2 a_texcoord0 : TEXCOORD0;
+
+

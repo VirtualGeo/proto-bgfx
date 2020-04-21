@@ -3,6 +3,7 @@ $input v_pos, v_normal, v_texcoord0
 #include <bgfx_shader.sh>
 #include "shaderlib.sh" // do not include shaderlib.sh before bgfx_shader.sh
 
+
 SAMPLER2D(s_diffuse, 0);
 SAMPLER2D(s_opacity, 1);
 

@@ -3,6 +3,7 @@ $output v_pos, v_normal, v_texcoord0
 
 #include <bgfx_shader.sh>
 
+
 void main()
 {
     // vec3 pos = a_position;
