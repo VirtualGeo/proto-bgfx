@@ -13,6 +13,7 @@ enum Shading {
     NORMAL = 0,
     MATERIAL,
     RENDERED,
+    EMISSIVE,
     Count
 };
 //inline Shading operator++(Shading& shading, int)

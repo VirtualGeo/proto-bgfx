@@ -169,6 +169,9 @@ function(GET_SHADER_INFOS FILENAME OUT_SHADER_NAME OUT_SHADER_TYPE OUT_BIN_SHADE
 endfunction(GET_SHADER_INFOS)
 
 macro(COMPILE_SHADER_INTERNAL SHADER_IN SHADER_OUT PLATFORM PROFILE)
+    set(DEPENDS)
+    list(APPEND DEPENDS ${SHADER_IN} ${VARYING_DEF_SHADER})
+
     add_custom_command(
         OUTPUT ${SHADER_OUT}
         COMMAND
@@ -181,12 +184,14 @@ macro(COMPILE_SHADER_INTERNAL SHADER_IN SHADER_OUT PLATFORM PROFILE)
         ${PROFILE}
         -i ${SHADER_INCLUDE_DIR}
         MAIN_DEPENDENCY ${SHADER_IN}
+        DEPENDS ${VARYING_DEF_SHADER}
         COMMENT "Compiling ${SHADER_IN} to ${SHADER_OUT}"
     )
 endmacro()
 
 function(COMPILE_SHADER SHADER SHADER_SRC_DIR SHADER_BIN_DIR SHADER_INCLUDE_DIR OUT_SHADERS)
-    get_shader_infos(${SHADER} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)
+    get_filename_component(SHADER_FILENAME ${SHADER} NAME)
+    get_shader_infos(${SHADER_FILENAME} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)
     if(OK)
         if(${SHADER_TYPE} STREQUAL "vertex")
             set(DXPROFILE "vs_5_0")
@@ -199,15 +204,25 @@ function(COMPILE_SHADER SHADER SHADER_SRC_DIR SHADER_BIN_DIR SHADER_INCLUDE_DIR 
             set(GLPROFILE "430")
         endif()
 
+#        if(MSVC)
+#            compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_BIN_DIR}/dx11/${BIN_SHADER_NAME} "windows" ${DXPROFILE}) # DX11+
+#            list(APPEND ${OUT_SHADERS} ${SHADER_BIN_DIR}/dx11/${BIN_SHADER_NAME})
+#        endif()
+
+#        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_BIN_DIR}/glsl/${BIN_SHADER_NAME} "linux" ${GLPROFILE}) # GLSL
+#        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_BIN_DIR}/spirv/${BIN_SHADER_NAME} "linux" "spirv") # Vulkan
+#        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_BIN_DIR}/metal/${BIN_SHADER_NAME} "osx" "metal") # Metal
+#        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_BIN_DIR}/essl/${BIN_SHADER_NAME} "android" ${GLPROFILE}) # GLES Android
+
         if(MSVC)
-            compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_BIN_DIR}/dx11/${BIN_SHADER_NAME} "windows" ${DXPROFILE}) # DX11+
+            compile_shader_internal(${SHADER} ${SHADER_BIN_DIR}/dx11/${BIN_SHADER_NAME} "windows" ${DXPROFILE}) # DX11+
             list(APPEND ${OUT_SHADERS} ${SHADER_BIN_DIR}/dx11/${BIN_SHADER_NAME})
         endif()
 
-        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_BIN_DIR}/glsl/${BIN_SHADER_NAME} "linux" ${GLPROFILE}) # GLSL
-        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_BIN_DIR}/spirv/${BIN_SHADER_NAME} "linux" "spirv") # Vulkan
-        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_BIN_DIR}/metal/${BIN_SHADER_NAME} "osx" "metal") # Metal
-        compile_shader_internal(${SHADER_SRC_DIR}/${SHADER} ${SHADER_BIN_DIR}/essl/${BIN_SHADER_NAME} "android" ${GLPROFILE}) # GLES Android
+        compile_shader_internal(${SHADER} ${SHADER_BIN_DIR}/glsl/${BIN_SHADER_NAME} "linux" ${GLPROFILE}) # GLSL
+        compile_shader_internal(${SHADER} ${SHADER_BIN_DIR}/spirv/${BIN_SHADER_NAME} "linux" "spirv") # Vulkan
+        compile_shader_internal(${SHADER} ${SHADER_BIN_DIR}/metal/${BIN_SHADER_NAME} "osx" "metal") # Metal
+        compile_shader_internal(${SHADER} ${SHADER_BIN_DIR}/essl/${BIN_SHADER_NAME} "android" ${GLPROFILE}) # GLES Android
 
         list(APPEND ${OUT_SHADERS} ${SHADER_BIN_DIR}/glsl/${BIN_SHADER_NAME})
         list(APPEND ${OUT_SHADERS} ${SHADER_BIN_DIR}/spirv/${BIN_SHADER_NAME})

@@ -495,7 +495,7 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
             //            mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(indice_type) * mmesh.m_indices.size()), BGFX_BUFFER_INDEX32);
             mmesh.m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(mmesh.m_indices.data(), sizeof(indice_type) * mmesh.m_indices.size()));
             m_nbTriangles += mmesh.m_indices.size() / 3;
-#ifdef DEBUG
+#ifdef MODEL_LOADER_INFO
             std::cout << "        [Mesh] " << i << " nbIndices=" << mmesh.m_indices.size() << std::endl;
 #endif
         }

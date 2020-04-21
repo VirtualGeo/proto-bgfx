@@ -150,7 +150,6 @@ WindowState::WindowState(void* nwh, int width, int height)
     //    setFocus();
 
     //    m_lastTime = std::chrono::high_resolution_clock::now();
-    m_lastTime = std::chrono::high_resolution_clock::now();
     // m_lastTime = std::chrono::steady_clock::now();
     //    m_iWidget = g_nWidget;
     //    bgfx::setViewFrameBuffer(m_iWidget, m_fbh);
@@ -159,6 +158,7 @@ WindowState::WindowState(void* nwh, int width, int height)
 
     //    init();
     s_windows.emplace_back(this);
+    m_lastTime = std::chrono::high_resolution_clock::now();
 }
 
 WindowState::~WindowState()
@@ -437,7 +437,7 @@ void WindowState::keyReleaseEvent(Key::Enum key)
     case Key::NONE:
     default:
         //        assert(key != Key::NONE);
-        std::cout << "unknown key " << key << std::endl;
+//        std::cout << "unknown key " << key << std::endl;
         break;
         //    default:
         //        QWidget::keyReleaseEvent(event);

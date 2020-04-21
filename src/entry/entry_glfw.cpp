@@ -35,6 +35,7 @@ void update();
 const int g_width = 800;
 const int g_height = 600;
 GLFWwindow* g_window = nullptr;
+//bool g_ctrlPressed = false;
 
 WindowState* g_windowState = nullptr;
 
@@ -165,6 +166,7 @@ void error_callback(int error, const char* description)
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+//    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
 }
@@ -181,11 +183,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 //        g_windowState->keyPressEvent(s_translateKey.at(key));
         g_windowState->keyPressEvent(s_translateKey[key]);
+//        if (key == GLFW_KEY_RIGHT_CONTROL) {
+//            g_ctrlPressed = true;
+//        }
         break;
 
     case GLFW_RELEASE:
 //        g_windowState->keyReleaseEvent(s_translateKey.at(key));
         g_windowState->keyReleaseEvent(s_translateKey[key]);
+//        if (key == GLFW_KEY_RIGHT_CONTROL) {
+//            g_ctrlPressed = false;
+//        }
         break;
     }
 }

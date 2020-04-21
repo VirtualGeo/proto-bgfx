@@ -57,7 +57,7 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
         int i;
         if (hasLoaded(diffuseTexName, textures, i)) {
             m_iTexDiffuse = i;
-#ifdef DEBUG
+#ifdef MODEL_LOADER_INFO
             std::cout << "        [Material] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
 #endif
             //            return;
@@ -79,7 +79,7 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
         int i;
         if (hasLoaded(opacityTexName, textures, i)) {
             m_iTexOpacity = i;
-#ifdef DEBUG
+#ifdef MODEL_LOADER_INFO
             std::cout << "        [Material] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
 #endif
         }

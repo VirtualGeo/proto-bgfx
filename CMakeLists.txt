@@ -35,6 +35,7 @@
 
     #if (AUTO_GENERATE_BIN_MODEL)
     add_definitions(-DAUTO_GENERATE_BIN_MODEL)
+#    add_definitions(-DMODEL_LOADER_INFO)
     #endif()
 
     # select graphic user interface
@@ -74,5 +75,7 @@
     #add_library(stb STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/stb.cpp)
     #target_include_directories(stb SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/)
 
+#    set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
+#    add_subdirectory(shaders)
     set (SRC_DIR ${PROJECT_SOURCE_DIR}/src/)
     add_subdirectory(src)

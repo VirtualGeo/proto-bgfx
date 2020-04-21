@@ -2,24 +2,42 @@
 # project(src VERSION 1.0 LANGUAGES CXX)
 
 find_package(bgfx REQUIRED)
+#include_directories(shaders)
 
 # -------------------------------- SHADERS
 set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
 
-set(IN_SHADERS
-    material.vert.sc
-    material.frag.sc
-    rendered.vert.sc
-    rendered.frag.sc
-    normal.vert.sc
-    normal.frag.sc
-    )
+set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
+file(GLOB_RECURSE SHADER_SOURCES ${CMAKE_SOURCE_DIR}/shaders/src/*.sc)
+list(REMOVE_ITEM SHADER_SOURCES ${VARYING_DEF_SHADER})
+#message(${SHADER_SOURCES})
+#set(IN_SHADERS)
+# foreach(SHADER_SOURCE ${SHADER_SOURCES})
+##     list(APPEND IN_SHADERS_FULL_PATH ${SHADER_SRC_DIR}/${IN_SHADER} ${OUT_SHADERS})
+#        get_filename_component(VAR ${SHADER_SOURCE} NAME)
+#        message(${VAR})
+# endforeach()
+
+
+#set(IN_SHADERS
+#    material.vert.sc
+#    material.frag.sc
+#    rendered.vert.sc
+#    rendered.frag.sc
+#    normal.vert.sc
+#    normal.frag.sc
+#    )
 
 set(OUT_SHADERS )
-foreach(SHADER ${IN_SHADERS})
+#foreach(SHADER ${IN_SHADERS})
+foreach(SHADER ${SHADER_SOURCES})
     compile_shader(${SHADER} ${SHADER_DIR}/src ${SHADER_DIR}/bin ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src LOCAL_OUT_SHADERS)
     list(APPEND OUT_SHADERS ${LOCAL_OUT_SHADERS})
 endforeach()
+
+#message(${OUT_SHADERS})
+
+#include_directories(shaders)
 
 # set(SOURCE main.cpp)
 file(GLOB_RECURSE SOURCE *.cpp *.h)
@@ -41,15 +59,22 @@ if(GUI_QT)
 endif()
 
 
-set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
 file(GLOB_RECURSE LIB_SHADER ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src/*.sh)
+#file(GLOB_RECURSE SHADER_SOURCES ${CMAKE_SOURCE_DIR}/shaders/src/*)
+#file(GLOB_RECURSE SHADER_BINS ${CMAKE_SOURCE_DIR}/shaders/bin/*)
+#file(GLOB_RECURSE SHADER_FILES ${CMAKE_SOURCE_DIR}/shaders/bin/metal/*.bin)
+file(GLOB_RECURSE SHADER_FILES ${SHADER_DIR}/*)
+#message("shaderFiles: " ${SHADER_FILES})
+#include_directories(${SHADER_DIR})
 add_executable(${PROJECT_NAME}
-    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${VARYING_DEF_SHADER} ${UI_SOURCE}
+#    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${VARYING_DEF_SHADER} ${UI_SOURCE} ${SHADER_SOURCES} ${SHADER_BINS}
+    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${UI_SOURCE} ${SHADER_FILES}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${EXTERNAL_INCLUDE_DIRS}
     ${SRC_DIR}
+#    ${SHADER_DIR}
     )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
