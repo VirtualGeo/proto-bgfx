@@ -8,6 +8,7 @@
 #include "texture.h"
 #include <bgfx/bgfx.h>
 #include <iostream>
+#include "spotlight.h"
 
 enum Shading {
     NORMAL = 0,
@@ -39,7 +40,7 @@ public:
     //    void init(const char* shaderName);
     static void init();
     static void clear();
-    static void submit(const bgfx::ViewId id, const Shading & shading, const Material& material, const DirLight& light, const Textures& textures, const Camera& camera);
+    static void submit(const bgfx::ViewId id, const Shading & shading, const Material& material, const SpotLights& spotLights, const Textures& textures, const Camera& camera);
 //    static bgfx::ProgramHandle handleProgram(const Shading &shading);
     static const char *filename(const Shading & shading) ;
 

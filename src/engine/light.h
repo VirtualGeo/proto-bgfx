@@ -2,6 +2,7 @@
 #define LIGHT_H
 
 #include <bx/file.h>
+#include <vector>
 
 class Light {
 public:
@@ -13,5 +14,7 @@ public:
     bx::Vec3 m_diffuse;
     bx::Vec3 m_specular;
 };
+
+using Lights = std::vector<Light>;
 
 #endif // LIGHT_H

@@ -81,8 +81,8 @@ private:
     size_t m_counter = 0;
     std::chrono::time_point<std::chrono::high_resolution_clock> m_lastTime;
 
-//    Shading m_shading = Shading::RENDERED;
-    Shading m_shading = Shading::EMISSIVE;
+    Shading m_shading = Shading::RENDERED;
+//    Shading m_shading = Shading::EMISSIVE;
 //    Shading m_shading = Shading::NORMAL;
 
     int m_iCamera;
