@@ -34,6 +34,7 @@ struct Key {
         N,
         M,
         R,
+        E,
 //        Q,
         Control,
 
@@ -81,8 +82,9 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> m_lastTime;
 
 //    Shading m_shading = Shading::RENDERED;
-//    Shading m_shading = Shading::EMISSIVE;
-    Shading m_shading = Shading::NORMAL;
+    Shading m_shading = Shading::EMISSIVE;
+//    Shading m_shading = Shading::NORMAL;
+
     int m_iCamera;
 
     int m_cameraMoveFront = 0;

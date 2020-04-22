@@ -61,6 +61,7 @@ static std::map<int, Key::Enum> s_translateKey = {
     { GLFW_KEY_L, Key::N }, // qwerty to dvorak
     { GLFW_KEY_M, Key::M }, // qwerty to dvorak
     { GLFW_KEY_O, Key::R }, // qwerty to dvorak
+    { GLFW_KEY_D, Key::E }, // qwerty to dvorak
     { GLFW_KEY_RIGHT_CONTROL, Key::Control },
 };
 
@@ -178,6 +179,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+//    std::cout << key << std::endl;
     switch (action) {
     case GLFW_PRESS:
 

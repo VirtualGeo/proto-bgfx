@@ -17,9 +17,13 @@ $input v_normal
 //SAMPLER2D(s_opacity, 1);
 //uniform vec4 u_texturesEnable;
 //#define u_hasOpacityTexture u_texturesEnable.x
+//uniform vec4 diffuse;
+
 
 void main()
 {
+//    gl_FragColor = diffuse;
+//    return;
 
     //gl_FragColor = v_color0;
 

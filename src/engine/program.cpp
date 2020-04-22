@@ -20,6 +20,8 @@ bgfx::UniformHandle Program::m_sDiffuse;
 bgfx::UniformHandle Program::m_sOpacity;
 bgfx::ProgramHandle Program::m_handlePrograms[Shading::Count];
 bgfx::UniformHandle Program::m_handleUniform;
+//bgfx::UniformHandle Program::m_vrMaterialParameters;
+bgfx::UniformHandle Program::m_diffuse;
 
 //bgfx::ShaderHandle loadShader(const char* filename);
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType);
@@ -38,41 +40,46 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
 //void Program::init(const char *shaderName)
 void Program::init()
 {
+    m_sDiffuse = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
+    m_sOpacity = bgfx::createUniform("s_opacity", bgfx::UniformType::Sampler);
+    m_handleUniform = bgfx::createUniform("u_params", bgfx::UniformType::Vec4, s_num_vec4_uniforms);
+    //    m_vrMaterialParameters = bgfx::createUniform("uVrMateralParamaters", bgfx::UniformType::Vec4, 4);
+    m_diffuse = bgfx::createUniform("diffuse", bgfx::UniformType::Vec4);
+
 
     for (int i = 0; i < Shading::Count; ++i) {
         m_handlePrograms[i] = BGFX_INVALID_HANDLE;
-        if (i == Shading::EMISSIVE)
-            continue;
-        //        if (i != (int)Shading::NORMAL)
-        //            continue;
+//        if (i != Shading::EMISSIVE)
+//                if (i != Shading::NORMAL)
+//            continue;
         //        int i= Shading::NORMAL;
         //    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
         const std::string& shadingFileName = shadingFileNames[i];
 
-        std::cout << "[program] load vertex shader " << i << std::endl;
+//        std::cout << "[program] load vertex shader " << i << std::endl;
         const bgfx::ShaderHandle vsh = loadShader(shadingFileName + ".vert", Vertex);
+        if (! bgfx::isValid(vsh))
+            continue;
+
         bgfx::setName(vsh, shadingFileName.c_str());
 
         //    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
-        std::cout << "[program] load fragment shader " << i << std::endl;
+//        std::cout << "[program] load fragment shader " << i << std::endl;
         bgfx::ShaderHandle fsh = loadShader(shadingFileName + ".frag", Fragment);
         bgfx::setName(fsh, shadingFileName.c_str());
         // bgfx::ShaderHandle vsh = loadShader("mesh.vert");
         // bgfx::ShaderHandle fsh = loadShader("mesh.frag");
-        std::cout << "[program] create program " << i << std::endl;
+//        std::cout << "[program] create program " << i << std::endl;
         m_handlePrograms[i] = bgfx::createProgram(vsh, fsh, true);
-        bgfx::frame();
+//        bgfx::frame();
         //        bgfx::setName(m_handlePrograms[i], shadingFileName.c_str());
     }
 
     //        m_uDiffuse = bgfx::createUniform("u_diffuse", bgfx::UniformType::Vec4);
 
-    m_sDiffuse = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
-    m_sOpacity = bgfx::createUniform("s_opacity", bgfx::UniformType::Sampler);
-    m_handleUniform = bgfx::createUniform("u_params", bgfx::UniformType::Vec4, s_num_vec4_uniforms);
-
     //    m_uHasDiffuseTexture = bgfx::createUniform("u_hasDiffuseTexture", bgfx::UniformType::Vec4);
     //        m_uTexturesEnable = bgfx::createUniform("u_texturesEnable", bgfx::UniformType::Vec4);
+    bgfx::frame();
 }
 
 void Program::clear()
@@ -90,13 +97,36 @@ void Program::clear()
     //    bgfx::destroy(m_uTexturesEnable);
 
     bgfx::destroy(m_handleUniform);
+    //    bgfx::destroy(m_vrMaterialParameters);
+    bgfx::destroy(m_diffuse);
 }
 
 void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material, const DirLight& dirLight, const Textures& textures, const Camera& camera)
 {
+//    float vec4[4] = { 0.0, 1.0, 1.0, 1.0 };
 
     switch (shading) {
     case Shading::NORMAL:
+        //        break;
+    case Shading::EMISSIVE:
+        // question : why static ?
+        //        static const float buffer2[4][4] = {
+        //            { material.m_ambient[0], material.m_ambient[1], material.m_ambient[2], material.m_texturesEnable[0] }, // question how do smaller, without glm::vec4
+        //            { material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3] }, // question how do smaller, without glm::vec4
+        //            //            {material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_specular[3]}, // question how do smaller, without glm::vec4
+        //            { material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_shininess }, // question how do smaller, without glm::vec4
+        //            { material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3] }, // question how do smaller, without glm::vec4
+        //            //            {material.m_texturesEnable[0]},
+        //            //            {dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z},
+        //            //            {dirLight.m_specular.x, dirLight.m_specular.y, dirLight.m_specular.z},
+        //            //            {}
+        //        };
+        //        //        buffer[0] = material.m_diffuse;
+        //        bgfx::setUniform(m_vrMaterialParameters, buffer2, 4);
+        //        float vec4[4] = {0.0, 1.0, 1.0, 1.0};
+//        static float vec4[4] = {material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], 1.0f};
+        bgfx::setUniform(m_diffuse, material.m_diffuse);
+        //        bgfx::setUniform(handle, buffer2, 4);
         break;
 
     case Shading::MATERIAL:
@@ -175,6 +205,56 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
 //    return m_program;
 //}
 
+const char* s_uniformTypeName[] = {
+    "int",
+    "int",
+    NULL,
+    NULL,
+    "vec4",
+    "float4",
+    "mat3",
+    "float3x3",
+    "mat4",
+    "float4x4",
+};
+BX_STATIC_ASSERT(BX_COUNTOF(s_uniformTypeName) == bgfx::UniformType::Count * 2);
+
+bx::StringView nextWord(bx::StringView& _parse)
+{
+    bx::StringView word = bx::strWord(bx::strLTrimSpace(_parse));
+    _parse = bx::strLTrimSpace(bx::StringView(word.getTerm(), _parse.getTerm()));
+    return word;
+}
+
+bgfx::UniformType::Enum nameToUniformTypeEnum(const char* _name)
+{
+    for (uint32_t ii = 0; ii < bgfx::UniformType::Count * 2; ++ii) {
+        if (NULL != s_uniformTypeName[ii]
+            && 0 == bx::strCmp(_name, s_uniformTypeName[ii])) {
+            return bgfx::UniformType::Enum(ii / 2);
+        }
+    }
+
+    return bgfx::UniformType::Count;
+}
+
+void strReplace(char* _str, const char* _find, const char* _replace)
+{
+    const int32_t len = bx::strLen(_find);
+
+    char* replace = (char*)alloca(len + 1);
+    bx::strCopy(replace, len + 1, _replace);
+    for (int32_t ii = bx::strLen(replace); ii < len; ++ii) {
+        replace[ii] = ' ';
+    }
+    replace[len] = '\0';
+
+    BX_CHECK(len >= bx::strLen(_replace), "");
+    for (bx::StringView ptr = bx::strFind(_str, _find); !ptr.isEmpty(); ptr = bx::strFind(ptr.getPtr() + len, _find)) {
+        bx::memCopy(const_cast<char*>(ptr.getPtr()), replace, len);
+    }
+}
+
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType)
 //bgfx::ShaderHandle loadShader(const char* filename)
 {
@@ -212,39 +292,26 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
     std::ifstream file;
     std::string filePath;
 
-    //    if (bgfx::RendererType::OpenGL) {
-    filePath = PROJECT_DIR + shaderPath + filename + ".glsl";
-
-    //    std::fstream file;
-    file = std::ifstream(filePath, std::ios::binary);
-    //    file.open(filePath, std::ios::in | std::ios::binary);
-
-    //    if (file == NULL) {
     bool binFile = false;
+    filePath = PROJECT_DIR + shaderPath + filename + ".glsl";
+    file = std::ifstream(filePath, std::ios::binary);
     if (!file.is_open()) {
-        //            std::cout << "[main] Failed to load '" << filePath << "' '" << filename << "'"
-        //                      << std::endl;
-
-        //            exit(-1);
         file.close();
+
         filePath = PROJECT_DIR + shaderPath + filename + ".bin";
 
-        //    std::fstream file;
-        //    std::ifstream file(filePath, std::ios::binary);
         file = std::ifstream(filePath, std::ios::binary);
-        //    file.open(filePath, std::ios::in | std::ios::binary);
 
-        //    if (file == NULL) {
         if (!file.is_open()) {
             std::cout << "[main] Failed to load '" << filePath << "' '" << filename << "'"
                       << std::endl;
 
-            exit(-1);
+//            exit(-1);
             file.close();
+            return BGFX_INVALID_HANDLE;
         }
         binFile = true;
     }
-    //    }
     long begin = file.tellg();
     file.seekg(0, std::ios::end);
     long end = file.tellg();
@@ -253,6 +320,10 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
 
     const bgfx::Memory* mem;
     if (!binFile) {
+        char code[fileSize];
+        file.read(code, fileSize);
+
+
         const int headerSize = 18;
         char header[headerSize] = { 0 };
         switch (shaderType) {
@@ -266,9 +337,18 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
         header[1] = 'S';
         header[2] = 'H';
         header[3] = 6; // bgfx_shader_bin_version
+                header[3] = 99; // bgfx_shader_bin_version
 
         uint32_t hash = 0;
         memcpy(&header[4], &hash, sizeof(hash));
+
+        //        std::string uniformHeader;
+        //        char buff[9999];
+//        std::cout << "uniform size : " << uniforms.size() << std::endl;
+//        uint16_t countUniform = uniforms.size();
+        uint16_t countUniform = 0;
+
+        memcpy(&header[12], &countUniform, sizeof(countUniform));
 
         uint32_t shaderSize = fileSize;
         memcpy(&header[14], &shaderSize, sizeof(shaderSize));
@@ -277,18 +357,22 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
         //        }
         //        std::cout << std::endl;
         //        std::cout << "file size = " << fileSize << std::endl;
+
         mem = bgfx::alloc(headerSize + fileSize + 1);
         //    fread(mem->data, 1, fileSize, file);
-        memcpy((char*)mem->data, header, sizeof(header));
+        //        mem->data[0] = 1;
+        memcpy((char*)&mem->data[0], header, headerSize);
 
-        file.read((char*)&mem->data[headerSize], fileSize);
+        //                file.read((char*)&mem->data[headerSize], fileSize);
+        memcpy((char*)&mem->data[headerSize], code, fileSize);
     } else {
 
         mem = bgfx::alloc(fileSize + 1);
         //    fread(mem->data, 1, fileSize, file);
         //        memcpy((char*)mem->data, header, sizeof(header));
 
-        file.read((char*)mem->data, fileSize);
+        file.read((char*)&mem->data[0], fileSize);
+        //        mem->data[0] = 0;
     }
     file.close();
     //    mem->data[mem->size - 1] = '\0';
@@ -297,6 +381,7 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
     //    free(filePath);
     bgfx::ShaderHandle handle = bgfx::createShader(mem);
     bgfx::setName(handle, filename.c_str());
+//    std::cout << "[program] createShader " << filename << std::endl;
 
     return handle;
     //    return bgfx::createShader(mem);
