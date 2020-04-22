@@ -93,7 +93,7 @@ WindowState::WindowState(void* nwh, int width, int height)
             break;
 
         default:
-            std::cout << "unknown vendor graphic id" << std::endl;
+            std::cout << "[WindowState] unknown vendor graphic id" << std::endl;
             exit(1);
             break;
         }
@@ -102,11 +102,10 @@ WindowState::WindowState(void* nwh, int width, int height)
         bgfx::touch(0);
 
         // ------------------------------- LOAD MODEL
-        entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
-
-        //         g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
-        //         s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\teapot.obj");
-        //            s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
+                entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+//        entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+        //                 entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\teapot.obj");
+        //            entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
         //        g_nbVertices = g_scene.nbVertices();
         //        g_nbTriangles = g_scene.nbTriangles();
         //        g_nbObjects = g_scene.nbObjects();
@@ -382,11 +381,11 @@ void WindowState::mouseReleaseEvent(MouseButton::Enum mouseButton)
         m_mouseLeftClicked = false;
         break;
 
-    case MouseButton::NONE:
-    default:
-        //        assert(mouseButton != MouseButton::NONE);
-        std::cout << "unknown key " << mouseButton << std::endl;
-        break;
+//    case MouseButton::NONE:
+//    default:
+//        //        assert(mouseButton != MouseButton::NONE);
+//        std::cout << "[WindowState] unknown key " << mouseButton << std::endl;
+//        break;
 
         //    default:
         //        assert(false);
@@ -402,11 +401,12 @@ void WindowState::mousePressEvent(MouseButton::Enum mouseButton)
         m_firstMouse = true;
         break;
 
-    case MouseButton::NONE:
-    default:
-        //        assert(mouseButton != MouseButton::NONE);
-        std::cout << "unknown key " << mouseButton << std::endl;
-        break;
+//    case MouseButton::NONE:
+//    default:
+//        //        assert(mouseButton != MouseButton::NONE);
+//        std::cout << "[WindowState] unknown key " << mouseButton << std::endl;
+//        break;
+
         //    default:
         //        assert(false);
         //        break;
@@ -437,7 +437,7 @@ void WindowState::keyReleaseEvent(Key::Enum key)
     case Key::NONE:
     default:
         //        assert(key != Key::NONE);
-//        std::cout << "unknown key " << key << std::endl;
+        //        std::cout << "[WindowState] unknown key " << key << std::endl;
         break;
         //    default:
         //        QWidget::keyReleaseEvent(event);
@@ -524,6 +524,10 @@ void WindowState::keyPressEvent(Key::Enum key)
     case Key::R:
         m_shading = Shading::RENDERED;
         break;
+    case Key::E:
+        m_shading = Shading::EMISSIVE;
+        break;
+
         //    case Key::Q:
         //        if (m_ctrlPressed) {
         //        }
@@ -533,14 +537,14 @@ void WindowState::keyPressEvent(Key::Enum key)
         m_slowMotion = !m_slowMotion;
         break;
 
-    case Key::NONE:
-    default:
-        std::cout << "unknown key " << key << std::endl;
-        //        assert(key != Key::NONE);
-        //        break;
-        //    default:
-        //        QWidget::keyPressEvent(event);
-        break;
+//    case Key::NONE:
+//    default:
+//        std::cout << "[WindowState] unknown key " << key << std::endl;
+//        //        assert(key != Key::NONE);
+//        //        break;
+//        //    default:
+//        //        QWidget::keyPressEvent(event);
+//        break;
 
         //    default:
         //        assert(false);

@@ -27,6 +27,7 @@ static const std::map<int, Key::Enum> s_translateKey = {
     { Qt::Key_N, Key::N },
     { Qt::Key_M, Key::M },
     { Qt::Key_R, Key::R },
+    { Qt::Key_E, Key::E },
     { Qt::Key_Control, Key::Control },
 };
 

@@ -61,6 +61,8 @@ private:
     //    int m_iHandleProgram = Shading::RENDERED;
 
     static bgfx::UniformHandle m_handleUniform;
+//    static bgfx::UniformHandle m_vrMaterialParameters;
+    static bgfx::UniformHandle m_diffuse;
 
 public:
 //    bgfx::ProgramHandle handleProgram(Shading & shading) const;
