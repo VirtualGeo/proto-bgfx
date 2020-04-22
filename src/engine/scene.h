@@ -12,6 +12,7 @@
 #include "dirLight.h"
 //#include <engine/camera.h>
 #include "camera.h"
+#include "spotlight.h"
 
 class Scene
 {
@@ -28,6 +29,8 @@ public:
     void save(std::ofstream & file) const;
 
     void printStats(int &line);
+//    void addLight(Light && light);
+    void addLight(SpotLight && spotLight);
 
 private:
     bgfx::VertexLayout m_layout;
@@ -38,7 +41,10 @@ private:
 //    std::vector<Texture> m_textures;
     Textures m_textures;
 
-    DirLight m_dirLight;
+//    DirLight m_dirLight;
+//    Lights m_lights;
+    SpotLights m_spotLights;
+
 //    bgfx::UniformHandle m_uDiffuse;
 //    bgfx::UniformHandle m_samplerDiffuse;
 //    bgfx::UniformHandle m_uHasDiffuseTexture;

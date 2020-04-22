@@ -102,8 +102,11 @@ WindowState::WindowState(void* nwh, int width, int height)
         bgfx::touch(0);
 
         // ------------------------------- LOAD MODEL
-                entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
-//        entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+        entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+        //        entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+
+        entry::s_scene.addLight(SpotLight({0.0f, -1.0f, 0.5f}));
+
         //                 entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\teapot.obj");
         //            entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
         //        g_nbVertices = g_scene.nbVertices();
@@ -381,11 +384,11 @@ void WindowState::mouseReleaseEvent(MouseButton::Enum mouseButton)
         m_mouseLeftClicked = false;
         break;
 
-//    case MouseButton::NONE:
-//    default:
-//        //        assert(mouseButton != MouseButton::NONE);
-//        std::cout << "[WindowState] unknown key " << mouseButton << std::endl;
-//        break;
+        //    case MouseButton::NONE:
+        //    default:
+        //        //        assert(mouseButton != MouseButton::NONE);
+        //        std::cout << "[WindowState] unknown key " << mouseButton << std::endl;
+        //        break;
 
         //    default:
         //        assert(false);
@@ -401,11 +404,11 @@ void WindowState::mousePressEvent(MouseButton::Enum mouseButton)
         m_firstMouse = true;
         break;
 
-//    case MouseButton::NONE:
-//    default:
-//        //        assert(mouseButton != MouseButton::NONE);
-//        std::cout << "[WindowState] unknown key " << mouseButton << std::endl;
-//        break;
+        //    case MouseButton::NONE:
+        //    default:
+        //        //        assert(mouseButton != MouseButton::NONE);
+        //        std::cout << "[WindowState] unknown key " << mouseButton << std::endl;
+        //        break;
 
         //    default:
         //        assert(false);
@@ -537,14 +540,14 @@ void WindowState::keyPressEvent(Key::Enum key)
         m_slowMotion = !m_slowMotion;
         break;
 
-//    case Key::NONE:
-//    default:
-//        std::cout << "[WindowState] unknown key " << key << std::endl;
-//        //        assert(key != Key::NONE);
-//        //        break;
-//        //    default:
-//        //        QWidget::keyPressEvent(event);
-//        break;
+        //    case Key::NONE:
+        //    default:
+        //        std::cout << "[WindowState] unknown key " << key << std::endl;
+        //        //        assert(key != Key::NONE);
+        //        //        break;
+        //        //    default:
+        //        //        QWidget::keyPressEvent(event);
+        //        break;
 
         //    default:
         //        assert(false);

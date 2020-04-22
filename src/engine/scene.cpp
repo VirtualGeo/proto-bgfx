@@ -13,7 +13,7 @@
 
 Scene::Scene()
 //    : m_dirLight(bx::normalize(bx::Vec3(0.5f, -1.0f, 0.5f)))
-    : m_dirLight(bx::normalize(bx::Vec3(0.0f, -1.0f, 0.5f)))
+//    : m_dirLight(bx::normalize(bx::Vec3(0.0f, -1.0f, 0.5f)))
 {
     //    Vertex::init();
     m_layout.begin()
@@ -225,7 +225,7 @@ void Scene::draw(const bgfx::ViewId id, const Shading & shading, const float* mt
         //        for (int i =0; i <nbObjects; ++i) {
         //            const Object & object = m_objects[i];
 
-        object.draw(id, shading, mtx, state, m_materials, m_textures, m_dirLight, camera);
+        object.draw(id, shading, mtx, state, m_materials, m_textures, m_spotLights, camera);
 
         //             bgfx::submit(id, program, 0, i != nbObjects - 1);
     }
@@ -360,6 +360,17 @@ void Scene::printStats(int & line)
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Total loading time: %d ms", m_totalLoadingTime);
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Total draw call: %d", m_nbIndexBuffer + 1);
 }
+
+void Scene::addLight(SpotLight &&spotLight)
+{
+    m_spotLights.emplace_back(spotLight); // question : std_move not required
+}
+
+//void Scene::addLight(Light &&light)
+//{
+//    m_lights.emplace_back(light);
+////    m_lights.push_back(std::move(light));
+//}
 
 void Scene::updateStats()
 {

@@ -101,7 +101,7 @@ void Program::clear()
     bgfx::destroy(m_diffuse);
 }
 
-void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material, const DirLight& dirLight, const Textures& textures, const Camera& camera)
+void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material, const SpotLights &spotLights, const Textures& textures, const Camera& camera)
 {
 //    float vec4[4] = { 0.0, 1.0, 1.0, 1.0 };
 
@@ -176,6 +176,7 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
             bgfx::setTexture(1, m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
         }
 
+        const SpotLight & spotLight = spotLights[0];
         //        const std::array<float[4], s_num_vec4_uniforms> buffer = {{
         const float buffer[s_num_vec4_uniforms][4] = {
             { material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3] }, // question how do smaller, without glm::vec4
@@ -183,8 +184,10 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
             { material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_texturesEnable[0] }, // question how do smaller, without glm::vec4
             { material.m_ambient[0], material.m_ambient[1], material.m_ambient[2], material.m_shininess }, // question how do smaller, without glm::vec4
             //            {material.m_texturesEnable[0]},
-            { dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z },
-            { dirLight.m_ambient.x, dirLight.m_ambient.y, dirLight.m_ambient.z },
+            {spotLight.m_direction.x, spotLight.m_direction.y, spotLight.m_direction.z},
+            {spotLight.m_ambient.x, spotLight.m_ambient.y, spotLight.m_ambient.z},
+//            { lights.m_direction.x, lights.m_direction.y, lights.m_direction.z },
+//            { lights.m_ambient.x, lights.m_ambient.y, lights.m_ambient.z },
             { camera.m_pos.x, camera.m_pos.y, camera.m_pos.z },
             //            {dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z},
             //            {dirLight.m_specular.x, dirLight.m_specular.y, dirLight.m_specular.z},
