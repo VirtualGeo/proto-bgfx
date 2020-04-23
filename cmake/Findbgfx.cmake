@@ -155,12 +155,18 @@ function(GET_SHADER_TYPE IN_TYPE OUT_TYPE)
     endif()
 endfunction()
 
+
 function(GET_SHADER_INFOS FILENAME OUT_SHADER_NAME OUT_SHADER_TYPE OUT_BIN_SHADER_NAME OUT_OK)
-    if(${FILENAME} MATCHES "^([a-zA-Z0-9_]+).(vert|frag|tesc|tesv|geom|comp).sc$")
-        get_shader_type(${CMAKE_MATCH_2} SHADER_TYPE)
-        set(${OUT_SHADER_NAME} ${CMAKE_MATCH_1} PARENT_SCOPE)
+    if(${FILENAME} MATCHES "^(.*/)*([a-zA-Z0-9_]+).(vert|frag|tesc|tesv|geom|comp).sc$")
+        get_shader_type(${CMAKE_MATCH_3} SHADER_TYPE)
+        set(${OUT_SHADER_NAME} ${CMAKE_MATCH_2} PARENT_SCOPE)
         set(${OUT_SHADER_TYPE} ${SHADER_TYPE} PARENT_SCOPE)
-        set(${OUT_BIN_SHADER_NAME} ${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.bin PARENT_SCOPE)
+        file(MAKE_DIRECTORY ${SHADER_BIN_DIR}/dx11/${CMAKE_MATCH_1})
+        file(MAKE_DIRECTORY ${SHADER_BIN_DIR}/glsl/${CMAKE_MATCH_1})
+        file(MAKE_DIRECTORY ${SHADER_BIN_DIR}/spirv/${CMAKE_MATCH_1})
+        file(MAKE_DIRECTORY ${SHADER_BIN_DIR}/metal/${CMAKE_MATCH_1})
+        file(MAKE_DIRECTORY ${SHADER_BIN_DIR}/essl/${CMAKE_MATCH_1})
+        set(${OUT_BIN_SHADER_NAME} ${CMAKE_MATCH_1}${CMAKE_MATCH_2}.${CMAKE_MATCH_3}.bin PARENT_SCOPE)
         set(${OUT_OK} True PARENT_SCOPE)
     else()
         message(WARNING "${FILENAME} is not a compatible name")
@@ -183,6 +189,7 @@ macro(COMPILE_SHADER_INTERNAL SHADER_IN SHADER_OUT PLATFORM PROFILE)
         --type ${SHADER_TYPE}
         ${PROFILE}
         -i ${SHADER_INCLUDE_DIR}
+        --varyingdef ${VARYING_DEF_SHADER}
         MAIN_DEPENDENCY ${SHADER_IN}
         DEPENDS ${VARYING_DEF_SHADER}
         COMMENT "Compiling ${SHADER_IN} to ${SHADER_OUT}"
@@ -190,8 +197,14 @@ macro(COMPILE_SHADER_INTERNAL SHADER_IN SHADER_OUT PLATFORM PROFILE)
 endmacro()
 
 function(COMPILE_SHADER SHADER SHADER_SRC_DIR SHADER_BIN_DIR SHADER_INCLUDE_DIR OUT_SHADERS)
-    get_filename_component(SHADER_FILENAME ${SHADER} NAME)
-    get_shader_infos(${SHADER_FILENAME} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)
+#    get_filename_component(SHADER_FILENAME ${SHADER} NAME)
+    file(RELATIVE_PATH SHADER_RELATIVE ${SHADER_SRC_DIR} ${SHADER})
+#    message("RELATIVE_PATH: " ${SHADER_RELATIVE})
+    get_shader_infos(${SHADER_RELATIVE} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)
+#    get_shader_infos(${SHADER_FILENAME} SHADER_NAME SHADER_TYPE BIN_SHADER_NAME OK)
+#        message("OUT_SHADER_NAME:" ${SHADER_NAME})
+#        message("OUT_BIN_SHADER_NAME:" ${BIN_SHADER_NAME})
+
     if(OK)
         if(${SHADER_TYPE} STREQUAL "vertex")
             set(DXPROFILE "vs_5_0")

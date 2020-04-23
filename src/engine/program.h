@@ -38,7 +38,7 @@ public:
     ~Program() = delete;
 
     //    void init(const char* shaderName);
-    static void init();
+    static void init(const bgfx::Caps * caps);
     static void clear();
     static void submit(const bgfx::ViewId id, const Shading & shading, const Material& material, const SpotLights& spotLights, const Textures& textures, const Camera& camera);
 //    static bgfx::ProgramHandle handleProgram(const Shading &shading);
@@ -50,6 +50,7 @@ private:
     //    bgfx::ProgramHandle m_handle;
     //    bgfx::ShaderHandle m_vsh;
     //    bgfx::ShaderHandle m_fsh;
+    static const bgfx::Caps * m_caps;
 
     //    bgfx::UniformHandle m_uDiffuse;
     static bgfx::UniformHandle m_sDiffuse;
@@ -58,12 +59,17 @@ private:
     //    bgfx::UniformHandle m_uTexturesEnable;
 
     //private:
-    static bgfx::ProgramHandle m_handlePrograms[Shading::Count];
+    static bgfx::ProgramHandle m_programs[Shading::Count];
     //    int m_iHandleProgram = Shading::RENDERED;
 
-    static bgfx::UniformHandle m_handleUniform;
+    static bgfx::UniformHandle m_uniformArray;
 //    static bgfx::UniformHandle m_vrMaterialParameters;
-    static bgfx::UniformHandle m_diffuse;
+//    static bgfx::UniformHandle m_diffuse;
+
+    static bgfx::UniformHandle m_sShadowMap;
+    static bgfx::UniformHandle m_uLightPos;
+    static bgfx::UniformHandle m_uLightMtx;
+    static bgfx::UniformHandle m_uDepthScaleOffset;
 
 public:
 //    bgfx::ProgramHandle handleProgram(Shading & shading) const;
