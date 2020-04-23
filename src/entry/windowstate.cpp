@@ -78,6 +78,7 @@ WindowState::WindowState(void* nwh, int width, int height)
         //         g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
 
         const bgfx::Caps* caps = bgfx::getCaps();
+
         entry::g_renderer = bgfx::getRendererName(caps->rendererType);
         //        Q_ASSERT(0 != (caps->supported & BGFX_CAPS_SWAP_CHAIN)); // vulkan no swap chain
 
@@ -123,7 +124,7 @@ WindowState::WindowState(void* nwh, int width, int height)
 
         // -------------------------------- INIT PROGRAM (SHADERS)
         //        s_program.init();
-        Program::init();
+        Program::init(caps);
         //        s_program.setShading(Program::Shading(g_iViewportShading));
         //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
         //        m_isInit = true;

@@ -74,6 +74,7 @@
     # add_subdirectory(Modules/stb)
     #add_library(stb STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/stb.cpp)
     #target_include_directories(stb SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/)
+#    set(SHADER_SOURCES)
 
 #    set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
 #    add_subdirectory(shaders)

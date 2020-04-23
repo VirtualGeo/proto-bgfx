@@ -6,17 +6,20 @@ find_package(bgfx REQUIRED)
 
 # -------------------------------- SHADERS
 set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
+set(SHADER_SOURCE_DIR ${SHADER_DIR}/src)
+
+#message("shader sources: " ${SHADER_SOURCES})
 
 set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
+#set(VARYING_DEF_SHADER ${CMAKE_SOURCE_DIR}/shaders/src/varying.def.sc)
 file(GLOB_RECURSE SHADER_SOURCES ${CMAKE_SOURCE_DIR}/shaders/src/*.sc)
 list(REMOVE_ITEM SHADER_SOURCES ${VARYING_DEF_SHADER})
-#message(${SHADER_SOURCES})
+
+
 #set(IN_SHADERS)
-# foreach(SHADER_SOURCE ${SHADER_SOURCES})
 ##     list(APPEND IN_SHADERS_FULL_PATH ${SHADER_SRC_DIR}/${IN_SHADER} ${OUT_SHADERS})
 #        get_filename_component(VAR ${SHADER_SOURCE} NAME)
 #        message(${VAR})
-# endforeach()
 
 
 #set(IN_SHADERS
