@@ -57,7 +57,7 @@ void Mesh::save(std::ofstream& file) const
 
 //}
 
-void Mesh::draw(const bgfx::ViewId id, const Shading &shading, const float* mtx, const uint64_t state, const Materials& materials, const Textures& textures, const SpotLights &spotLights, const Camera &camera) const
+void Mesh::draw(const bgfx::ViewId id, const Shading &shading, const float* mtx, const uint64_t state, const Materials& materials, const Textures& textures) const
 {
     bgfx::setTransform(mtx);
     bgfx::setState(state);
@@ -67,7 +67,7 @@ void Mesh::draw(const bgfx::ViewId id, const Shading &shading, const float* mtx,
 
     bgfx::setIndexBuffer(m_ibh);
 
-    Program::submit(id, shading, material, spotLights, textures, camera);
+    Program::submit(id, shading, material, textures);
     //    bgfx::setVertexBuffer(0, vbh);
 //    bgfx::submit(id, Program::handleProgram(shading));
 }

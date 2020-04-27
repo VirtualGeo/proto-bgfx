@@ -1,8 +1,8 @@
 #include "material.h"
 
-#include <cassert>
 #include "fileIO.h"
 #include "system.h"
+#include <cassert>
 //#include <iostream>
 //#include <stdio.h>
 //#include <string>
@@ -32,23 +32,23 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
     m_name = material.name;
 
     //        float diffuse[3];
-//    for (size_t i = 0; i < 3; i++) {
-//        m_diffuse[i] = material.diffuse[i];
-//    }
+    //    for (size_t i = 0; i < 3; i++) {
+    //        m_diffuse[i] = material.diffuse[i];
+    //    }
     memcpy(m_diffuse, material.diffuse, 3 * sizeof(float));
     memcpy(m_specular, material.specular, 3 * sizeof(float));
     memcpy(m_ambient, material.ambient, 3 * sizeof(float));
     m_shininess = material.shininess;
 
-//    m_diffuse = material.diffuse;
-//    std::memcpy();
+    //    m_diffuse = material.diffuse;
+    //    std::memcpy();
     //    std::cout << m_diffuse[0] << m_diffuse[1] << m_diffuse[2] << std::endl;
     //    m_diffuse[0] = 0.0f;
     //    m_diffuse[1] = 1.0f;
     //    m_diffuse[2] = 1.0f;
 
     const std::string& diffuseTexName = material.diffuse_texname;
-//    material.diffuse_texopt.;
+    //    material.diffuse_texopt.;
 
     if (diffuseTexName.length() > 0) {
         m_diffuse[3] = 1.0f;
@@ -62,8 +62,8 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
 #endif
             //            return;
         } else {
-//            std::cout << "        [Material] Load texture: '" << diffuseTexName << "' " << std::endl;
-//    std::cout << "'" << m_name << "', width=" << m_width << ", height=" << m_height << ", nbChannel=" << m_nChannels << ", textureSize=" << m_textureSize << ", bitPerPixel=" << m_nChannels << std::endl;
+            //            std::cout << "        [Material] Load texture: '" << diffuseTexName << "' " << std::endl;
+            //    std::cout << "'" << m_name << "', width=" << m_width << ", height=" << m_height << ", nbChannel=" << m_nChannels << ", textureSize=" << m_textureSize << ", bitPerPixel=" << m_nChannels << std::endl;
             m_iTexDiffuse = static_cast<int>(textures.size());
             textures.emplace_back(diffuseTexName, baseDir);
         }
@@ -74,7 +74,7 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
 
     const std::string& opacityTexName = material.alpha_texname;
     if (opacityTexName.length() > 0) {
-        m_texturesEnable[0] = 1.0f;
+        //        m_texturesEnable[0] = 1.0f;
 
         int i;
         if (hasLoaded(opacityTexName, textures, i)) {
@@ -82,26 +82,30 @@ Material::Material(const tinyobj::material_t& material, Textures& textures, cons
 #ifdef MODEL_LOADER_INFO
             std::cout << "        [Material] Already loaded texture: '" << diffuseTexName << "' " << std::endl;
 #endif
-        }
-        else {
+        } else {
             m_iTexOpacity = static_cast<int>(textures.size());
             textures.emplace_back(opacityTexName, baseDir);
         }
     }
+
+    updateData();
 }
 
 Material::Material(Material&& material)
     : m_name(std::move(material.m_name))
     , m_iTexDiffuse(material.m_iTexDiffuse)
-    , m_diffuse{material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3]}
-    , m_specular{material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_specular[3]}
-    , m_ambient{material.m_ambient[0], material.m_ambient[1], material.m_ambient[2], material.m_ambient[3]}
+    , m_diffuse { material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3] }
+    , m_specular { material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_specular[3] }
+    , m_ambient { material.m_ambient[0], material.m_ambient[1], material.m_ambient[2], material.m_ambient[3] }
     , m_shininess(material.m_shininess)
-    , m_texturesEnable{material.m_texturesEnable[0], material.m_texturesEnable[1], material.m_texturesEnable[2], material.m_texturesEnable[3]}
+    //    , m_texturesEnable{material.m_texturesEnable[0], material.m_texturesEnable[1], material.m_texturesEnable[2], material.m_texturesEnable[3]}
     , m_iTexOpacity(material.m_iTexOpacity)
+//    , m_data(std::move(material.m_data))
 //    , m_diffuse(std::move(*material.m_diffuse))
-    // TODO : copy colors
+// TODO : copy colors
 {
+    memcpy(m_data, material.m_data, sizeof(m_data));
+
 #ifdef DEBUG
     std::cout << "\033[34m";
     std::cout << "[Material] " << this << " '" << m_name << "' right moving from " << &material << std::endl;
@@ -111,11 +115,11 @@ Material::Material(Material&& material)
 
 Material::~Material()
 {
-//#ifdef DEBUG
-//    std::cout << "\033[31m";
-//    std::cout << "[Material] '" << m_name << "' deleted " << this << std::endl;
-//    std::cout << "\033[0m";
-//#endif
+    //#ifdef DEBUG
+    //    std::cout << "\033[31m";
+    //    std::cout << "[Material] '" << m_name << "' deleted " << this << std::endl;
+    //    std::cout << "\033[0m";
+    //#endif
 }
 
 Material::Material(std::ifstream& file)
@@ -127,8 +131,10 @@ Material::Material(std::ifstream& file)
     FileIO::read(m_ambient, 4, file);
     FileIO::read(m_shininess, file);
 
-    FileIO::read(m_texturesEnable, 4, file);
+    //    FileIO::read(m_texturesEnable, 4, file);
     FileIO::read(m_iTexOpacity, file);
+
+    updateData();
 }
 
 void Material::save(std::ofstream& file) const
@@ -140,12 +146,24 @@ void Material::save(std::ofstream& file) const
     FileIO::write(m_ambient, 4, file);
     FileIO::write(m_shininess, file);
 
-    FileIO::write(m_texturesEnable, 4, file);
+    //    FileIO::write(m_texturesEnable, 4, file);
     FileIO::write(m_iTexOpacity, file);
 }
 
+void Material::updateData()
+{
 
-std::ostream &operator <<(std::ostream &os, const Material &material)
+    const float temp[4][4] = {
+        { m_diffuse[0], m_diffuse[1], m_diffuse[2], m_diffuse[3] }, // question how do smaller, without glm::vec4
+        { m_specular[0], m_specular[1], m_specular[2], m_specular[3] }, // question how do smaller, without glm::vec4
+        { m_ambient[0], m_ambient[1], m_ambient[2], m_ambient[3] }, // question how do smaller, without glm::vec4
+        { m_shininess, (float)m_iTexDiffuse, (float)m_iTexOpacity }
+    };
+//    m_data = std::move(temp);
+    memcpy(m_data, temp, sizeof (m_data));
+}
+
+std::ostream& operator<<(std::ostream& os, const Material& material)
 {
     return os << "'" << material.m_name << "'";
 }

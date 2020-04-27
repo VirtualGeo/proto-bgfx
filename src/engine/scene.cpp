@@ -10,6 +10,8 @@
 #include <fstream>
 //#include <bimg/bimg.h>
 #include <chrono>
+#include <cstring>
+//#include <iostream>
 
 Scene::Scene()
 //    : m_dirLight(bx::normalize(bx::Vec3(0.5f, -1.0f, 0.5f)))
@@ -44,9 +46,9 @@ void Scene::addModel(const std::string& filename)
         } catch (std::exception) {
             loadBinFailed = true;
         }
-//        catch (std::bad_alloc) {
-//            loadBinFailed = true;
-//        }
+        //        catch (std::bad_alloc) {
+        //            loadBinFailed = true;
+        //        }
 
         file.close();
 
@@ -65,8 +67,8 @@ void Scene::addModel(const std::string& filename)
     std::vector<tinyobj::material_t> tinyObjMaterials;
     //    std::map<std::string, uint> textures;
 
-//    timerutil tm;
-//    tm.start();
+    //    timerutil tm;
+    //    tm.start();
     auto start = std::chrono::steady_clock::now();
 
     std::string base_dir = GetBaseDir(absoluteFilename);
@@ -92,7 +94,7 @@ void Scene::addModel(const std::string& filename)
         exit(1);
     }
 
-//    tm.end();
+    //    tm.end();
     auto end = std::chrono::steady_clock::now();
 
     if (!ret) {
@@ -103,7 +105,7 @@ void Scene::addModel(const std::string& filename)
     }
 
     //    printf("[Scene] Parsing time: %d [ms]\n", (int)tm.msec());
-//    m_parsingTime = tm.msec();
+    //    m_parsingTime = tm.msec();
     m_parsingTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     const int nbMaterials = tinyObjMaterials.size();
@@ -117,7 +119,7 @@ void Scene::addModel(const std::string& filename)
 #endif
 
     // Append `default` material
-//        tinyObjMaterials.push_back(tinyobj::material_t());
+    //        tinyObjMaterials.push_back(tinyobj::material_t());
 
     //    for (size_t i = 0; i < tinyObjMaterials.size(); i++) {
     //        printf("material[%d].diffuse_texname = %s\n", int(i),
@@ -131,7 +133,7 @@ void Scene::addModel(const std::string& filename)
     m_textures.reserve(tinyObjMaterials.size());
 
     //    timerutil tm;
-//    tm.start();
+    //    tm.start();
     start = std::chrono::steady_clock::now();
 
     //    const size_t nbMaterials = tinyObjMaterials.size();
@@ -153,12 +155,12 @@ void Scene::addModel(const std::string& filename)
     //    }
     assert(nbMaterials == m_materials.size());
 
-//    tm.end();
+    //    tm.end();
     end = std::chrono::steady_clock::now();
-//    m_loadingMaterialsTime = tm.msec();
+    //    m_loadingMaterialsTime = tm.msec();
     m_loadingMaterialsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-//    tm.start();
+    //    tm.start();
     start = std::chrono::steady_clock::now();
 
     //    size_t nbIndices =0;
@@ -179,10 +181,10 @@ void Scene::addModel(const std::string& filename)
     }
     assert(nbObjects == m_objects.size());
 
-//    tm.end();
-//    m_loadingObjectsTime = tm.msec();
+    //    tm.end();
+    //    m_loadingObjectsTime = tm.msec();
     end = std::chrono::steady_clock::now();
-//    m_loadingMaterialsTime = tm.msec();
+    //    m_loadingMaterialsTime = tm.msec();
     m_loadingObjectsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     //    std::cout << "[Scene] Parsing time: " << m_parsingTime << " [ms]" << std::endl;
@@ -205,32 +207,6 @@ void Scene::addModel(const std::string& filename)
 #endif
 }
 
-void Scene::draw(const bgfx::ViewId id, const Shading & shading, const float* mtx,
-                 const uint64_t state, const Camera &camera, float ratio) const
-{
-    float view[16];
-    // bx::mtxLookAt(view, eye, at);
-    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
-
-    float proj[16];
-    bx::mtxProj(proj, camera.m_fov, ratio, 0.1f, 100.0f,
-        bgfx::getCaps()->homogeneousDepth);
-
-    bgfx::setViewTransform(id, view, proj);
-
-    for (const Object& object : m_objects) {
-        //    const uint nbObjects = m_objects.size();
-        //            bgfx::setTransform(mtx);
-        //            bgfx::setState(state);
-        //        for (int i =0; i <nbObjects; ++i) {
-        //            const Object & object = m_objects[i];
-
-        object.draw(id, shading, mtx, state, m_materials, m_textures, m_spotLights, camera);
-
-        //             bgfx::submit(id, program, 0, i != nbObjects - 1);
-    }
-}
-
 void Scene::clear()
 {
     //        bgfx::destroy(m_layout);
@@ -248,8 +224,8 @@ void Scene::clear()
 void Scene::load(std::ifstream& file)
 {
 
-//    timerutil tm;
-//    tm.start();
+    //    timerutil tm;
+    //    tm.start();
     auto start = std::chrono::steady_clock::now();
 
     size_t size;
@@ -280,11 +256,11 @@ void Scene::load(std::ifstream& file)
 #endif
     }
 
-//    tm.end();
+    //    tm.end();
     auto end = std::chrono::steady_clock::now();
-//    m_loadingMaterialsTime = tm.msec();
+    //    m_loadingMaterialsTime = tm.msec();
     m_loadingMaterialsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-//    tm.start();
+    //    tm.start();
     start = std::chrono::steady_clock::now();
 
     FileIO::read(size, file);
@@ -301,9 +277,9 @@ void Scene::load(std::ifstream& file)
         bgfx::frame();
     }
 
-//    tm.end();
+    //    tm.end();
     end = std::chrono::steady_clock::now();
-//    m_loadingObjectsTime = tm.msec();
+    //    m_loadingObjectsTime = tm.msec();
     m_loadingObjectsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     m_parsingTime = 0;
@@ -348,22 +324,183 @@ void Scene::save(std::ofstream& file) const
     //    FileIO::write(m_loadingObjectsTime, file);
 }
 
-void Scene::printStats(int & line)
+void Scene::printStats(int& line)
 {
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Scene: Verts:%d | Tris:%d | Verts/Tris:%.2f | Objects:%d | Textures:%d (%.1f MiB)",
-            m_nbVertices, m_nbTriangles, (float)m_nbVertices / m_nbTriangles, m_nbObjects, m_nbTextures, m_texturesSize);
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Vertex buffer:%d | Index buffer:%d | Index buffer/Vertex buffer:%.2f",
-            m_nbVertexBuffer, m_nbIndexBuffer, (float)m_nbIndexBuffer / m_nbVertexBuffer);
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   TinyObj parsing time: %d ms", m_parsingTime);
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Loading materials time: %d ms", m_loadingMaterialsTime);
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Loading objects time: %d ms", m_loadingObjectsTime);
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Total loading time: %d ms", m_totalLoadingTime);
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Total draw call: %d", m_nbIndexBuffer + 1);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "Scene: Verts:%d | Tris:%d | Verts/Tris:%.2f | Objects:%d | Textures:%d (%.1f MiB)",
+        m_nbVertices, m_nbTriangles, (float)m_nbVertices / m_nbTriangles, m_nbObjects, m_nbTextures, m_texturesSize);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Vertex buffer:%d | Index buffer:%d | Index buffer/Vertex buffer:%.2f",
+        m_nbVertexBuffer, m_nbIndexBuffer, (float)m_nbIndexBuffer / m_nbVertexBuffer);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "   TinyObj parsing time: %d ms", m_parsingTime);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Loading materials time: %d ms", m_loadingMaterialsTime);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Loading objects time: %d ms", m_loadingObjectsTime);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Total loading time: %d ms", m_totalLoadingTime);
+    bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Total draw call: %d", m_nbIndexBuffer + 1);
 }
 
-void Scene::addLight(SpotLight &&spotLight)
+void Scene::addLight(SpotLight&& spotLight)
 {
     m_spotLights.emplace_back(spotLight); // question : std_move not required
+}
+
+void Scene::addLight(DirLight&& dirLight)
+{
+    m_dirLights.emplace_back(dirLight);
+}
+
+void Scene::updateLightShadowMaps()
+{
+    //    entry::s_scene.draw(m_id, m_shading, entry::g_mtx, state, camera, ratio);
+    for (auto& spotLight : m_spotLights) {
+        spotLight.updateLightShadowMaps();
+    }
+}
+
+void Scene::render(const bgfx::ViewId id, const Shading& shading, const float* mtx,
+    const uint64_t state) const
+{
+    //    float view[16];
+    //    // bx::mtxLookAt(view, eye, at);
+    //    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
+
+    //    float proj[16];
+    //    bx::mtxProj(proj, camera.m_fov, ratio, 0.1f, 100.0f,
+    //        bgfx::getCaps()->homogeneousDepth);
+    //    bgfx::setViewTransform(id, view, proj);
+
+    //    bgfx::setState(state);
+    //    bgfx::setTransform(mtx);
+    //    bgfx::touch(id);
+    //    draw(id, shading, mtx, state);
+    //    bgfx::submit(id, Program::m_programs[shading], 0, BGFX_DISCARD_ALL);
+    //    return;
+
+//    draw(id, shading, mtx, state);
+//    return;
+
+    switch (shading) {
+    case RENDERED:
+        //        const int size = Program::s_num_vec4_dirLight * m_dirLights.size();
+        //        std::vector<float[4]> buffer;
+        //        float buffer[Program::s_numDirLightMax][8];
+//                float buffer[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4];
+//        float buffer[Program::s_dirLightSizeMax] = {0.0f};
+
+//        //        float * buffer[8];
+////                std::array<float[4], Program::s_num_vec4_dirLight> buffer;
+////                std::vector<std::array<std::array<float, 4>, Program::s_num_vec4_dirLight>> buffer;
+//                int i = 0;
+//                for (const auto& dirLight : m_dirLights) {
+////                int offset = 0;
+////                    for (int i =0; i <m_dirLights.size(); ++i) {
+////                        const auto & dirLight = m_dirLights[i];
+////                    const float temp[8] {
+////                        dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 0.0,
+////                        dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 0.0f
+////                    };
+////                    buffer[i][0][0] = 0;
+//                    buffer[i+ 0] = dirLight.m_direction.x;
+//                    buffer[i+ 1] = dirLight.m_direction.y;
+//                    buffer[i+ 2] = dirLight.m_direction.z;
+
+//                    buffer[i+ 4] = dirLight.m_diffuse.x;
+//                    buffer[i+ 5] = dirLight.m_diffuse.y;
+//                    buffer[i+ 6] = dirLight.m_diffuse.z;
+
+//        //            buffer[i] = &temp;
+////                    memcpy(&buffer[i], temp, sizeof(temp));
+//                    //            &buffer[i] = std::move(temp);
+
+//                    i += 8;
+////                    ++i;
+//                }
+//                buffer[3] = m_dirLights.size();
+
+////        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
+//        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
+
+        float buffer[Program::s_dirLightSizeMax] = {0.0f};
+        int i = 0;
+        for (const auto & dirLight : m_dirLights) {
+            memcpy(&buffer[i], dirLight.m_data, 4 * Program::s_num_vec4_dirLight * sizeof (float));
+            i += 4 * Program::s_num_vec4_dirLight;
+        }
+        buffer[3] = m_dirLights.size();
+        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
+
+
+        float buffer2[Program::s_spotLightSizeMax] = {0.0f};
+        i = 4;
+        buffer2[0] = m_spotLights.size();
+        for (const auto & spotLight : m_spotLights) {
+            memcpy(&buffer2[i], spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof (float));
+            i += 4 * Program::s_num_vec4_spotLight;
+        }
+        bgfx::setUniform(Program::m_uSpotLights, buffer2, Program::s_num_vec4_spotLight * m_spotLights.size() + 1);
+
+//                const float temp[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
+//                    {{0.0f, -1.0f, 0.5f, 1.0f},
+//                    {1.0f, 1.0f, 1.0f, 0.0f}},
+//                    {{0.0f, 0.0f, 0.0f, 0.0f},
+//                    {1.0f, 1.0f, 1.0f, 0.0f}}
+//                };
+////                bgfx::setUniform(Program::m_uDirLights, temp, 4);
+
+//        const auto& dirLight = m_dirLights[0];
+//        const auto& dirLight2 = m_dirLights[1];
+
+//        float buffer[Program::s_dirLightSizeMax];
+//        for (int i =0; i <m_dirLights.size(); ++i) {
+
+//        }
+
+//        std::array<std::array<float, 4>, Program::s_num_vec4_dirLight> array {{0.0f}, {0.0f}};
+//        const float buffer[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
+//            { { dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 1.0f },
+//                { dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 1.0f } },
+//            { { dirLight2.m_direction.x, dirLight2.m_direction.y, dirLight2.m_direction.z, 1.0f },
+//                { dirLight2.m_diffuse.x, dirLight2.m_diffuse.y, dirLight2.m_diffuse.z, 1.0f } },
+//        };
+//        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
+
+//        using type = float[Program::s_num_vec4_dirLight * 4];
+//        typedef float[Program::s_num_vec4_dirLight * 4] type
+//        std::vector<type> buffer;
+
+//            new type(  dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 1.0f
+//                , dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 1.0f  ));
+
+//            { { dirLight2.m_direction.x, dirLight2.m_direction.y, dirLight2.m_direction.z, 1.0f },
+//                { dirLight2.m_diffuse.x, dirLight2.m_diffuse.y, dirLight2.m_diffuse.z, 1.0f } },
+//        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
+
+        //        const float temp[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
+        //            {{0.0f, -1.0f, 0.5f, 1.0f},
+        //            {1.0f, 1.0f, 1.0f, 0.0f}},
+        //            {{0.0f, 0.0f, 0.0f, 0.0f},
+        //            {1.0f, 1.0f, 1.0f, 0.0f}}
+        //        };
+        //        bgfx::setUniform(Program::m_uDirLights, temp, 4);
+        break;
+    }
+
+    //    bgfx::touch(id);
+    //    bgfx::submit(id, Program::m_programs[shading], 0, BGFX_DISCARD_ALL);
+    draw(id, shading, mtx, state);
+}
+
+void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx, const uint64_t state) const
+{
+    for (const Object& object : m_objects) {
+        //    const uint nbObjects = m_objects.size();
+        //            bgfx::setTransform(mtx);
+        //            bgfx::setState(state);
+        //        for (int i =0; i <nbObjects; ++i) {
+        //            const Object & object = m_objects[i];
+
+        object.draw(id, shading, mtx, state, m_materials, m_textures);
+
+        //             bgfx::submit(id, program, 0, i != nbObjects - 1);
+    }
 }
 
 //void Scene::addLight(Light &&light)
@@ -379,13 +516,12 @@ void Scene::updateStats()
         m_nbVertices += object.nbVertices();
     }
 
-
     m_nbTriangles = 0;
     for (const Object& object : m_objects) {
         m_nbTriangles += object.nbTriangles();
     }
 
-    m_nbObjects =  m_objects.size();
+    m_nbObjects = m_objects.size();
 
     m_nbMeshes = 0;
     for (const auto& object : m_objects) {
@@ -398,7 +534,7 @@ void Scene::updateStats()
     }
     m_texturesSize /= 1000000.0f;
 
-    m_nbTextures =  m_textures.size();
+    m_nbTextures = m_textures.size();
 
     m_totalLoadingTime = m_parsingTime + m_loadingMaterialsTime + m_loadingObjectsTime;
     m_nbVertexBuffer = m_nbObjects;

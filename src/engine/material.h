@@ -18,6 +18,8 @@ public:
     Material(std::ifstream & file);
     void save(std::ofstream & file) const;
 
+    void updateData();
+
 
     friend std::ostream & operator <<(std::ostream & os, const Material & material);
 
@@ -32,8 +34,10 @@ public:
 //    bx::Vec3 m_colorDiffuse;
     float m_shininess;
 
-    float m_texturesEnable[4] = {0.0f};
+//    float m_texturesEnable[4] = {0.0f};
     int m_iTexOpacity = -1;
+
+    float m_data[4][4];
 
 //public: // ------------------------- getters
 //    const float * diffuse() const;
