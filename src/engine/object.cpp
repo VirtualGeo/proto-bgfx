@@ -604,12 +604,12 @@ void Object::save(std::ofstream& file) const
     }
 }
 
-void Object::draw(const bgfx::ViewId id, const Shading &shading, const float *mtx, const uint64_t state, const Materials &materials, const Textures &textures, const SpotLights &spotLights, const Camera &camera) const
+void Object::draw(const bgfx::ViewId id, const Shading &shading, const float *mtx, const uint64_t state, const Materials &materials, const Textures &textures) const
 {
     for (const Mesh& mesh : m_meshes) {
         bgfx::setVertexBuffer(0, m_vbh);
 
-        mesh.draw(id, shading, mtx, state, materials, textures, spotLights, camera);
+        mesh.draw(id, shading, mtx, state, materials, textures);
 
         //        bgfx::submit(id, program.m_handle);
     }

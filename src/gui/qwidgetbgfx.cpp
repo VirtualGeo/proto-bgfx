@@ -7,12 +7,14 @@
 #include <QResizeEvent>
 #include <QSurface>
 
-static const std::map<int, MouseButton::Enum> s_translateMouseKey = {
+//static const std::map<int, MouseButton::Enum> s_translateMouseKey = {
+static std::map<int, MouseButton::Enum> s_translateMouseKey = {
     { Qt::LeftButton, MouseButton::Left },
     { Qt::RightButton, MouseButton::Right },
     { Qt::MiddleButton, MouseButton::Middle },
 };
-static const std::map<int, Key::Enum> s_translateKey = {
+//static const std::map<int, Key::Enum> s_translateKey = {
+static std::map<int, Key::Enum> s_translateKey = {
     { Qt::Key_Up, Key::Up },
     { Qt::Key_Down, Key::Down },
     { Qt::Key_Right, Key::Right },
@@ -139,7 +141,8 @@ void QWidgetBgfx::resizeEvent(QResizeEvent* event)
 void QWidgetBgfx::keyPressEvent(QKeyEvent* event)
 {
 //    m_window->keyPressEvent(s_translateKey.at(event->key()));
-    WindowState::keyPressEvent(s_translateKey.at(event->key()));
+//    WindowState::keyPressEvent(s_translateKey.at(event->key()));
+    WindowState::keyPressEvent(s_translateKey[event->key()]);
     //    default:
     //        QWidget::keyPressEvent(event);
     //        break;
@@ -149,7 +152,8 @@ void QWidgetBgfx::keyPressEvent(QKeyEvent* event)
 void QWidgetBgfx::keyReleaseEvent(QKeyEvent* event)
 {
 //    m_window->keyReleaseEvent(s_translateKey.at(event->key()));
-    WindowState::keyReleaseEvent(s_translateKey.at(event->key()));
+//    WindowState::keyReleaseEvent(s_translateKey.at(event->key()));
+    WindowState::keyReleaseEvent(s_translateKey[event->key()]);
     //    default:
     //        QWidget::keyReleaseEvent(event);
     //        break;
@@ -159,14 +163,16 @@ void QWidgetBgfx::keyReleaseEvent(QKeyEvent* event)
 void QWidgetBgfx::mousePressEvent(QMouseEvent* event)
 {
 //    m_window->mousePressEvent(s_translateMouseKey.at(event->button()));
-    WindowState::mousePressEvent(s_translateMouseKey.at(event->button()));
+//    WindowState::mousePressEvent(s_translateMouseKey.at(event->button()));
+    WindowState::mousePressEvent(s_translateMouseKey[event->button()]);
     //    qDebug() << this << "QWidgetBgfx::mousePressEvent(" << event << ")";
 }
 
 void QWidgetBgfx::mouseReleaseEvent(QMouseEvent* event)
 {
 //    m_window->mouseReleaseEvent(s_translateMouseKey.at(event->button()));
-    WindowState::mouseReleaseEvent(s_translateMouseKey.at(event->button()));
+//    WindowState::mouseReleaseEvent(s_translateMouseKey.at(event->button()));
+    WindowState::mouseReleaseEvent(s_translateMouseKey[event->button()]);
     //    qDebug() << "QWidgetBgfx::mouseReleaseEvent(" << event << ")";
 }
 

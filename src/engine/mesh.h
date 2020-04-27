@@ -31,7 +31,7 @@ public:
 
     void draw(const bgfx::ViewId id, const Shading & shading, const float* mtx,
         const uint64_t state, const Materials& materials,
-        const Textures& textures, const SpotLights & spotLights, const Camera & camera) const;
+        const Textures& textures) const;
 
     //    std::vector<uint16_t> indices() const;
     friend std::ostream& operator<<(std::ostream& os, const Mesh& mesh);

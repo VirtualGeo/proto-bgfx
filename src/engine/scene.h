@@ -21,8 +21,6 @@ public:
 //    void addModel(const char * filename);
     void addModel(const std::string &filename);
 //    void draw()
-    void draw(const bgfx::ViewId id, const Shading &shading, const float *mtx,
-                const uint64_t state, const Camera & camera, float ratio) const;
     void clear(); // clear scene (bgfx::destroy(handle)) before bgfx::shutdown() from main shutdown()
 
     void load(std::ifstream & file);
@@ -31,6 +29,15 @@ public:
     void printStats(int &line);
 //    void addLight(Light && light);
     void addLight(SpotLight && spotLight);
+    void addLight(DirLight && dirLight);
+    void updateLightShadowMaps();
+
+    void render(const bgfx::ViewId id, const Shading &shading, const float *mtx,
+                const uint64_t state) const;
+
+private:
+    void draw(const bgfx::ViewId id, const Shading &shading, const float *mtx,
+                const uint64_t state) const;
 
 private:
     bgfx::VertexLayout m_layout;
@@ -41,7 +48,7 @@ private:
 //    std::vector<Texture> m_textures;
     Textures m_textures;
 
-//    DirLight m_dirLight;
+    DirLights m_dirLights;
 //    Lights m_lights;
     SpotLights m_spotLights;
 
