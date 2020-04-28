@@ -13,6 +13,7 @@
 //#include <engine/camera.h>
 #include "camera.h"
 #include "spotlight.h"
+#include "pointlight.h"
 
 class Scene
 {
@@ -30,6 +31,7 @@ public:
 //    void addLight(Light && light);
     void addLight(SpotLight && spotLight);
     void addLight(DirLight && dirLight);
+    void addLight(PointLight && pointLight);
     void updateLightShadowMaps();
 
     void render(const bgfx::ViewId id, const Shading &shading, const float *mtx,
@@ -51,6 +53,7 @@ private:
     DirLights m_dirLights;
 //    Lights m_lights;
     SpotLights m_spotLights;
+    PointLights m_pointLights;
 
 //    bgfx::UniformHandle m_uDiffuse;
 //    bgfx::UniformHandle m_samplerDiffuse;

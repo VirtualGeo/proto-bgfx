@@ -347,6 +347,11 @@ void Scene::addLight(DirLight&& dirLight)
     m_dirLights.emplace_back(dirLight);
 }
 
+void Scene::addLight(PointLight&& pointLight)
+{
+    m_pointLights.emplace_back(pointLight);
+}
+
 void Scene::updateLightShadowMaps()
 {
     //    entry::s_scene.draw(m_id, m_shading, entry::g_mtx, state, camera, ratio);
@@ -374,104 +379,117 @@ void Scene::render(const bgfx::ViewId id, const Shading& shading, const float* m
     //    bgfx::submit(id, Program::m_programs[shading], 0, BGFX_DISCARD_ALL);
     //    return;
 
-//    draw(id, shading, mtx, state);
-//    return;
+    //    draw(id, shading, mtx, state);
+    //    return;
 
     switch (shading) {
     case RENDERED:
         //        const int size = Program::s_num_vec4_dirLight * m_dirLights.size();
         //        std::vector<float[4]> buffer;
         //        float buffer[Program::s_numDirLightMax][8];
-//                float buffer[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4];
-//        float buffer[Program::s_dirLightSizeMax] = {0.0f};
+        //                float buffer[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4];
+        //        float buffer[Program::s_dirLightSizeMax] = {0.0f};
 
-//        //        float * buffer[8];
-////                std::array<float[4], Program::s_num_vec4_dirLight> buffer;
-////                std::vector<std::array<std::array<float, 4>, Program::s_num_vec4_dirLight>> buffer;
-//                int i = 0;
-//                for (const auto& dirLight : m_dirLights) {
-////                int offset = 0;
-////                    for (int i =0; i <m_dirLights.size(); ++i) {
-////                        const auto & dirLight = m_dirLights[i];
-////                    const float temp[8] {
-////                        dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 0.0,
-////                        dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 0.0f
-////                    };
-////                    buffer[i][0][0] = 0;
-//                    buffer[i+ 0] = dirLight.m_direction.x;
-//                    buffer[i+ 1] = dirLight.m_direction.y;
-//                    buffer[i+ 2] = dirLight.m_direction.z;
+        //        //        float * buffer[8];
+        ////                std::array<float[4], Program::s_num_vec4_dirLight> buffer;
+        ////                std::vector<std::array<std::array<float, 4>, Program::s_num_vec4_dirLight>> buffer;
+        //                int i = 0;
+        //                for (const auto& dirLight : m_dirLights) {
+        ////                int offset = 0;
+        ////                    for (int i =0; i <m_dirLights.size(); ++i) {
+        ////                        const auto & dirLight = m_dirLights[i];
+        ////                    const float temp[8] {
+        ////                        dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 0.0,
+        ////                        dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 0.0f
+        ////                    };
+        ////                    buffer[i][0][0] = 0;
+        //                    buffer[i+ 0] = dirLight.m_direction.x;
+        //                    buffer[i+ 1] = dirLight.m_direction.y;
+        //                    buffer[i+ 2] = dirLight.m_direction.z;
 
-//                    buffer[i+ 4] = dirLight.m_diffuse.x;
-//                    buffer[i+ 5] = dirLight.m_diffuse.y;
-//                    buffer[i+ 6] = dirLight.m_diffuse.z;
+        //                    buffer[i+ 4] = dirLight.m_diffuse.x;
+        //                    buffer[i+ 5] = dirLight.m_diffuse.y;
+        //                    buffer[i+ 6] = dirLight.m_diffuse.z;
 
-//        //            buffer[i] = &temp;
-////                    memcpy(&buffer[i], temp, sizeof(temp));
-//                    //            &buffer[i] = std::move(temp);
+        //        //            buffer[i] = &temp;
+        ////                    memcpy(&buffer[i], temp, sizeof(temp));
+        //                    //            &buffer[i] = std::move(temp);
 
-//                    i += 8;
-////                    ++i;
-//                }
-//                buffer[3] = m_dirLights.size();
+        //                    i += 8;
+        ////                    ++i;
+        //                }
+        //                buffer[3] = m_dirLights.size();
 
-////        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
-//        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
+        ////        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
+        //        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
 
-        float buffer[Program::s_dirLightSizeMax] = {0.0f};
-        int i = 0;
-        for (const auto & dirLight : m_dirLights) {
-            memcpy(&buffer[i], dirLight.m_data, 4 * Program::s_num_vec4_dirLight * sizeof (float));
-            i += 4 * Program::s_num_vec4_dirLight;
+        if (!m_dirLights.empty()) {
+            float buffer[Program::s_dirLightSizeMax] = { 0.0f };
+            int i = 0;
+            for (const auto& dirLight : m_dirLights) {
+                memcpy(&buffer[i], dirLight.m_data, 4 * Program::s_num_vec4_dirLight * sizeof(float));
+                i += 4 * Program::s_num_vec4_dirLight;
+            }
+//            buffer[3] = m_dirLights.size();
+            bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
         }
-        buffer[3] = m_dirLights.size();
-        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
 
-
-        float buffer2[Program::s_spotLightSizeMax] = {0.0f};
-        i = 4;
-        buffer2[0] = m_spotLights.size();
-        for (const auto & spotLight : m_spotLights) {
-            memcpy(&buffer2[i], spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof (float));
-            i += 4 * Program::s_num_vec4_spotLight;
+        if (!m_spotLights.empty()) {
+            float buffer[Program::s_spotLightSizeMax] = { 0.0f };
+            int i = 0;
+//            buffer[0] = m_spotLights.size();
+            for (const auto& spotLight : m_spotLights) {
+                memcpy(&buffer[i], spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
+                i += 4 * Program::s_num_vec4_spotLight;
+            }
+            bgfx::setUniform(Program::m_uSpotLights, buffer, Program::s_num_vec4_spotLight * m_spotLights.size());
         }
-        bgfx::setUniform(Program::m_uSpotLights, buffer2, Program::s_num_vec4_spotLight * m_spotLights.size() + 1);
 
-//                const float temp[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
-//                    {{0.0f, -1.0f, 0.5f, 1.0f},
-//                    {1.0f, 1.0f, 1.0f, 0.0f}},
-//                    {{0.0f, 0.0f, 0.0f, 0.0f},
-//                    {1.0f, 1.0f, 1.0f, 0.0f}}
-//                };
-////                bgfx::setUniform(Program::m_uDirLights, temp, 4);
+        if (!m_pointLights.empty()) {
+            float buffer[Program::s_pointLightSizeMax] = { 0.0f };
+            int i = 0;
+            for (const auto& pointLight : m_pointLights) {
+                memcpy(&buffer[i], pointLight.m_data, 4 * Program::s_num_vec4_pointLight * sizeof(float));
+                i += 4 * Program::s_num_vec4_pointLight;
+            }
+//            buffer[3] = m_pointLights.size();
+            bgfx::setUniform(Program::m_uPointLights, buffer, Program::s_num_vec4_pointLight * m_pointLights.size());
+        }
+        //                const float temp[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
+        //                    {{0.0f, -1.0f, 0.5f, 1.0f},
+        //                    {1.0f, 1.0f, 1.0f, 0.0f}},
+        //                    {{0.0f, 0.0f, 0.0f, 0.0f},
+        //                    {1.0f, 1.0f, 1.0f, 0.0f}}
+        //                };
+        ////                bgfx::setUniform(Program::m_uDirLights, temp, 4);
 
-//        const auto& dirLight = m_dirLights[0];
-//        const auto& dirLight2 = m_dirLights[1];
+        //        const auto& dirLight = m_dirLights[0];
+        //        const auto& dirLight2 = m_dirLights[1];
 
-//        float buffer[Program::s_dirLightSizeMax];
-//        for (int i =0; i <m_dirLights.size(); ++i) {
+        //        float buffer[Program::s_dirLightSizeMax];
+        //        for (int i =0; i <m_dirLights.size(); ++i) {
 
-//        }
+        //        }
 
-//        std::array<std::array<float, 4>, Program::s_num_vec4_dirLight> array {{0.0f}, {0.0f}};
-//        const float buffer[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
-//            { { dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 1.0f },
-//                { dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 1.0f } },
-//            { { dirLight2.m_direction.x, dirLight2.m_direction.y, dirLight2.m_direction.z, 1.0f },
-//                { dirLight2.m_diffuse.x, dirLight2.m_diffuse.y, dirLight2.m_diffuse.z, 1.0f } },
-//        };
-//        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
+        //        std::array<std::array<float, 4>, Program::s_num_vec4_dirLight> array {{0.0f}, {0.0f}};
+        //        const float buffer[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
+        //            { { dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 1.0f },
+        //                { dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 1.0f } },
+        //            { { dirLight2.m_direction.x, dirLight2.m_direction.y, dirLight2.m_direction.z, 1.0f },
+        //                { dirLight2.m_diffuse.x, dirLight2.m_diffuse.y, dirLight2.m_diffuse.z, 1.0f } },
+        //        };
+        //        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
 
-//        using type = float[Program::s_num_vec4_dirLight * 4];
-//        typedef float[Program::s_num_vec4_dirLight * 4] type
-//        std::vector<type> buffer;
+        //        using type = float[Program::s_num_vec4_dirLight * 4];
+        //        typedef float[Program::s_num_vec4_dirLight * 4] type
+        //        std::vector<type> buffer;
 
-//            new type(  dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 1.0f
-//                , dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 1.0f  ));
+        //            new type(  dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 1.0f
+        //                , dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 1.0f  ));
 
-//            { { dirLight2.m_direction.x, dirLight2.m_direction.y, dirLight2.m_direction.z, 1.0f },
-//                { dirLight2.m_diffuse.x, dirLight2.m_diffuse.y, dirLight2.m_diffuse.z, 1.0f } },
-//        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
+        //            { { dirLight2.m_direction.x, dirLight2.m_direction.y, dirLight2.m_direction.z, 1.0f },
+        //                { dirLight2.m_diffuse.x, dirLight2.m_diffuse.y, dirLight2.m_diffuse.z, 1.0f } },
+        //        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
 
         //        const float temp[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
         //            {{0.0f, -1.0f, 0.5f, 1.0f},
