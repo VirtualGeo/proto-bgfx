@@ -108,6 +108,7 @@ WindowState::WindowState(void* nwh, int width, int height)
 
 //        entry::s_scene.addLight(DirLight({ 0.0f, -1.0f, 0.5f }));
         entry::s_scene.addLight(SpotLight({ 1.0f, 0.0f, 0.0f }, {-5.0f, 1.0f, 0.0f}));
+//        entry::s_scene.addLight(PointLight({ 0.0f, 1.0f, 0.0f }));
 
         //    : m_dirLight(bx::normalize(bx::Vec3(0.5f, -1.0f, 0.5f)))
         //        entry::s_scene.addLight(SpotLight({0.0f, -1.0f, 0.5f}));

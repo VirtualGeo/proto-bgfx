@@ -43,6 +43,10 @@ public:
     static constexpr unsigned int s_numSpotLightMax = 20;
     static constexpr unsigned int s_spotLightSizeMax = s_num_vec4_spotLight * s_numSpotLightMax * 4;
 
+    static constexpr unsigned int s_num_vec4_pointLight = 4;
+    static constexpr unsigned int s_numPointLightMax = 20;
+    static constexpr unsigned int s_pointLightSizeMax = s_num_vec4_pointLight * s_numPointLightMax * 4;
+
     Program() = delete;
     ~Program() = delete;
 
@@ -78,6 +82,7 @@ public:
 //    static bgfx::UniformHandle m_uDirLights[s_numDirLightMax][s_num_vec4_dirLight];
     static bgfx::UniformHandle m_uDirLights;
     static bgfx::UniformHandle m_uSpotLights;
+    static bgfx::UniformHandle m_uPointLights;
 //    static bgfx::UniformHandle m_uNbDirLights;
 
     static bgfx::UniformHandle m_uViewPos;

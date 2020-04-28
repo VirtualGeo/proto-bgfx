@@ -34,6 +34,7 @@ bgfx::FrameBufferHandle Program::m_shadowMapFB;
 //bgfx::UniformHandle Program::m_uDirLights[s_numDirLightMax][s_num_vec4_dirLight];
 bgfx::UniformHandle Program::m_uDirLights;
 bgfx::UniformHandle Program::m_uSpotLights;
+bgfx::UniformHandle Program::m_uPointLights;
 //bgfx::ShaderHandle loadShader(const char* filename);
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType);
 bgfx::ProgramHandle loadProgram(const std::string& shaderName);
@@ -60,6 +61,7 @@ void Program::init(const bgfx::Caps* caps)
 
     m_uDirLights = bgfx::createUniform("u_dirLights", bgfx::UniformType::Vec4, s_numDirLightMax * s_num_vec4_dirLight);
     m_uSpotLights = bgfx::createUniform("u_spotLights", bgfx::UniformType::Vec4, s_numSpotLightMax * s_num_vec4_spotLight);
+    m_uPointLights = bgfx::createUniform("u_pointLights", bgfx::UniformType::Vec4, s_numPointLightMax * s_num_vec4_pointLight);
 
     //    std::string dirLight = "u_dirLights[";
     //    for (int i = 0; i < s_numDirLightMax; ++i) {
@@ -153,6 +155,7 @@ void Program::clear()
     bgfx::destroy(m_uDepthScaleOffset);
     bgfx::destroy(m_uDirLights);
     bgfx::destroy(m_uSpotLights);
+    bgfx::destroy(m_uPointLights);
     //    for (int i = 0; i < s_numDirLightMax; ++i) {
     //        bgfx::destroy(m_uDirLights[i][0]);
     //        bgfx::destroy(m_uDirLights[i][1]);

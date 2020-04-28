@@ -8,6 +8,8 @@ $input v_view // vec3
 
 // source: https://learnopengl.com/code_viewer_gh.php?code=src/2.lighting/6.multiple_lights/6.multiple_lights.fs
 // ------------------------------------ DIR_LIGHT
+#define N_DIR_LIGHT 0
+#if N_DIR_LIGHT > 0
 struct DirLight {
     vec3 ambient;
     vec3 diffuse;
@@ -15,12 +17,20 @@ struct DirLight {
 
     vec3 direction;
 };
-#define N_DIR_LIGHT_MAX 2
 #define N_DIR_LIGHT_VEC4 4
-uniform vec4 u_dirLights[N_DIR_LIGHT_VEC4 * N_DIR_LIGHT_MAX];
-#define nbDirLights u_dirLights[0].w
+//#if N_DIR_LIGHT > 0
+uniform vec4 u_dirLights[N_DIR_LIGHT_VEC4 * N_DIR_LIGHT];
+#define dirLights(i) DirLight(vec3(u_dirLights[i * N_DIR_LIGHT_VEC4]), \
+                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 1]), \
+                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 2]), \
+                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 3]))
+//#endif
+//#define nbDirLights u_dirLights[0].w
+#endif
 
 // ------------------------------------ SPOT_LIGHT
+#define N_SPOT_LIGHT 1
+#if N_SPOT_LIGHT > 0
 struct SpotLight {
     vec3 ambient;
     vec3 diffuse;
@@ -35,11 +45,48 @@ struct SpotLight {
     float _linear; // linear bgfx exist
     float quadratic;
 };
-#define N_SPOT_LIGHT_MAX 20
 #define N_SPOT_LIGHT_VEC4 5
-uniform vec4 u_spotLights[N_SPOT_LIGHT_VEC4 * N_SPOT_LIGHT_MAX + 1];
-#define nbSpotLights u_spotLights[0].x
+uniform vec4 u_spotLights[N_SPOT_LIGHT_VEC4 * N_SPOT_LIGHT];
+#define spotLights(i) SpotLight(vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4]), \
+                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1]), \
+                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2]), \
+                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3]), \
+                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4]), \
+                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 0].w, \
+                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1].w, \
+                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2].w, \
+                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3].w, \
+                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4].w)
 
+//#define nbSpotLights u_spotLights[0].x
+#endif
+
+
+// ------------------------------------ POINT_LIGHT
+#define N_POINT_LIGHT 0
+#if N_POINT_LIGHT > 0
+struct PointLight {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+
+    vec3 position;
+    float constant;
+    float _linear;
+    float quadratic;
+};
+#define N_POINT_LIGHT_VEC4 4
+//#if N_POINT_LIGHT > 0
+uniform vec4 u_pointLights[N_POINT_LIGHT_VEC4 * N_POINT_LIGHT];
+#define pointLights(i) PointLight(vec3(u_pointLights[i * N_POINT_LIGHT_VEC4]), \
+                vec3(u_pointLights[i * N_POINT_LIGHT_VEC4 + 1]), \
+                vec3(u_pointLights[i * N_POINT_LIGHT_VEC4 + 2]), \
+                vec3(u_pointLights[i * N_POINT_LIGHT_VEC4 + 3]), \
+                u_pointLights[i * N_POINT_LIGHT_VEC4 + 1].w, \
+                u_pointLights[i * N_POINT_LIGHT_VEC4 + 2].w, \
+                u_pointLights[i * N_POINT_LIGHT_VEC4 + 3].w)
+#endif
+//#define nbPointLights u_pointLights[0].w
 
 
 // ------------------------------------ MATERIAL
@@ -65,15 +112,24 @@ uniform vec4 u_viewPos;
 #define viewPos u_viewPos.xyz
 
 // function prototypes
+#if N_DIR_LIGHT > 0
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
-//vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+#endif
+#if N_POINT_LIGHT > 0
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+#endif
+#if N_SPOT_LIGHT > 0
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+#endif
 
 void main()
 {
 //    if (nbSpotLights != 1)
 //    if (nbDirLights != 1)
+//    if (nbPointLights != 1) {
+//        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 //        return;
+//    }
 
     if (material_hasOpacityTexture > -0.5) {
         float opacity = texture2D(s_opacity, v_texcoord0).r;
@@ -82,28 +138,39 @@ void main()
         }
     }
 
-    SpotLight spotLights[N_SPOT_LIGHT_MAX];
-    for (int i =0; i <nbSpotLights; ++i) {
-        spotLights[i] = SpotLight(vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1]),
-                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2]),
-                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3]),
-                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4]),
-                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 5]),
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1].w,
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2].w,
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3].w,
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4].w,
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 5].w);
-    }
+//    SpotLight spotLights[N_SPOT_LIGHT];
+//    for (int i =0; i <N_SPOT_LIGHT; ++i) {
+//        spotLights[i] = SpotLight(vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1]),
+//                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2]),
+//                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3]),
+//                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4]),
+//                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 5]),
+//                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1].w,
+//                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2].w,
+//                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3].w,
+//                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4].w,
+//                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 5].w);
+//    }
 
-    DirLight dirLights[N_DIR_LIGHT_MAX];
-    for (int i =0; i <nbDirLights; ++i) {
-//        dirLights[i] = DirLight(vec3(u_dirLights[i * 2]), vec3(u_dirLights[i * 2 + 1]));
-        dirLights[i] = DirLight(vec3(u_dirLights[i * N_DIR_LIGHT_VEC4]),
-                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 1]),
-                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 2]),
-                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 3]));
-    }
+//    DirLight dirLights[N_DIR_LIGHT];
+//    for (int i =0; i <N_DIR_LIGHT; ++i) {
+////        dirLights[i] = DirLight(vec3(u_dirLights[i * 2]), vec3(u_dirLights[i * 2 + 1]));
+//        dirLights[i] = DirLight(vec3(u_dirLights[i * N_DIR_LIGHT_VEC4]),
+//                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 1]),
+//                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 2]),
+//                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 3]));
+//    }
+
+//    PointLight pointLights[N_POINT_LIGHT];
+//    for (int i =0; i <N_POINT_LIGHT; ++i) {
+//        pointLights[i] = PointLight(vec3(u_pointLights[i * N_POINT_LIGHT_VEC4]),
+//                vec3(u_pointLights[i * N_POINT_LIGHT_VEC4 + 1]),
+//                vec3(u_pointLights[i * N_POINT_LIGHT_VEC4 + 2]),
+//                vec3(u_pointLights[i * N_POINT_LIGHT_VEC4 + 3]),
+//                u_pointLights[i * N_POINT_LIGHT_VEC4 + 1].w,
+//                u_pointLights[i * N_POINT_LIGHT_VEC4 + 2].w,
+//                u_pointLights[i * N_POINT_LIGHT_VEC4 + 3].w);
+//    }
 
     vec3 color;
     if (material_hasDiffuseTexture > -0.5) {
@@ -125,20 +192,28 @@ void main()
     // == =====================================================
     // phase 1: directional lighting
     vec3 result = vec3_splat(0.0);
-    for(int i = 0; i < nbDirLights; i++)
-        result = CalcDirLight(dirLights[i], norm, viewDir);
+#if N_DIR_LIGHT > 0
+    for(int i = 0; i < N_DIR_LIGHT; i++)
+        result = CalcDirLight(dirLights(i), norm, viewDir);
+#endif
     // phase 2: point lights
-//    for(int i = 0; i < NR_POINT_LIGHTS; i++)
-//        result += CalcPointLight(pointLights[i], norm, v_fragPos, viewDir);
+#if N_POINT_LIGHT > 0
+    for(int i = 0; i < N_POINT_LIGHT; i++)
+        result += CalcPointLight(pointLights(i), norm, v_fragPos, viewDir);
+#endif
     // phase 3: spot light
-    for(int i = 0; i < nbSpotLights; i++)
-        result += CalcSpotLight(spotLights[i], norm, v_fragPos, viewDir);
+#if N_SPOT_LIGHT > 0
+    for(int i = 0; i < N_SPOT_LIGHT; i++)
+        result += CalcSpotLight(spotLights(i), norm, v_fragPos, viewDir);
+#endif
+
     result *= color;
 
     gl_FragColor = vec4(result, 1.0);
     gl_FragColor = toGamma(gl_FragColor);
 }
 
+#if N_DIR_LIGHT > 0
 // calculates the color when using a directional light.
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
@@ -157,32 +232,36 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 specular = light.specular * spec;
     return (ambient + diffuse + specular);
 }
+#endif
 
+#if N_POINT_LIGHT > 0
 // calculates the color when using a point light.
-//vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-//{
-//    vec3 lightDir = normalize(light.position - fragPos);
-//    // diffuse shading
-//    float diff = max(dot(normal, lightDir), 0.0);
-//    // specular shading
-//    vec3 reflectDir = reflect(-lightDir, normal);
-//    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material_shininess);
-//    // attenuation
-//    float distance = length(light.position - fragPos);
-//    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-//    // combine results
-////    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
-////    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
-////    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
-//    vec3 ambient = light.ambient;
-//    vec3 diffuse = light.diffuse * diff;
-//    vec3 specular = light.specular * spec;
-//    ambient *= attenuation;
-//    diffuse *= attenuation;
-//    specular *= attenuation;
-//    return (ambient + diffuse + specular);
-//}
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+    vec3 lightDir = normalize(light.position - fragPos);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material_shininess);
+    // attenuation
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light._linear * distance + light.quadratic * (distance * distance));
+    // combine results
+//    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+//    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
+//    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+    vec3 ambient = light.ambient;
+    vec3 diffuse = light.diffuse * diff;
+    vec3 specular = light.specular * spec;
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
+    return (ambient + diffuse + specular);
+}
+#endif
 
+#if N_SPOT_LIGHT > 0
 // calculates the color when using a spot light.
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
@@ -211,10 +290,11 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specular *= attenuation * intensity;
     return (ambient + diffuse + specular);
 }
+#endif
 
 //void main()
 //{
-//    SpotLight spotLights[N_SPOT_LIGHT_MAX];
+//    SpotLight spotLights[N_SPOT_LIGHT];
 //    for (int i =0; i <nbSpotLights; ++i) {
 //        spotLights[i] = SpotLight(vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1]),
 //                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2]),
@@ -368,7 +448,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 ////        u_ambient,
 ////        u_shininess);
 
-//    DirLight dirLights[N_DIR_LIGHT_MAX];
+//    DirLight dirLights[N_DIR_LIGHT];
 //    for (int i =0; i <nbDirLights; ++i) {
 //        dirLights[i] = DirLight(vec3(u_dirLights[i * 2]), vec3(u_dirLights[i * 2 + 1]));
 //    }
