@@ -11,6 +11,7 @@
 //#include "Mesh.h"
 #include "fileIO.h"
 #include <algorithm>
+#include "geometry.h"
 
 static void CalcNormal(float N[3], float v0[3], float v1[3], float v2[3])
 {
@@ -133,8 +134,7 @@ void computeSmoothingNormals(const tinyobj::attrib_t& attrib, const tinyobj::sha
 } // namespace
 
 Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
-    const std::vector<tinyobj::material_t>& materials, const size_t iShape,
-    const bgfx::VertexLayout& layout)
+    const std::vector<tinyobj::material_t>& materials, const size_t iShape)
 
 //Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t & attrib)
 {
@@ -512,7 +512,7 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
 
         m_vbh = bgfx::createVertexBuffer(
             bgfx::makeRef(m_vertices.data(), sizeof(Vertex) * m_vertices.size()),
-            layout);
+            Geometry::m_layout);
 
         //        printf("[Object] shape[%d] # of triangles = %d\n", static_cast<int>(iShape),
         //            m_nbTriangles);
@@ -561,7 +561,7 @@ Object::~Object()
 //#endif
 }
 
-Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayout& layout)
+Object::Object(std::ifstream& file, const size_t iShape)
 {
     FileIO::read(m_vertices, file);
     FileIO::read(m_nbTriangles, file);
@@ -580,7 +580,7 @@ Object::Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayou
     }
     m_vbh = bgfx::createVertexBuffer(
         bgfx::makeRef(m_vertices.data(), sizeof(Vertex) * m_vertices.size()),
-        layout);
+        Geometry::m_layout);
 
     //        printf("[Object] shape[%d] # of triangles = %d\n", static_cast<int>(iShape),
     //            m_nbTriangles);

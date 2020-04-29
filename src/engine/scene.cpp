@@ -18,12 +18,12 @@ Scene::Scene()
 //    : m_dirLight(bx::normalize(bx::Vec3(0.0f, -1.0f, 0.5f)))
 {
     //    Vertex::init();
-    m_layout.begin()
-        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-        .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-        .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-        // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-        .end();
+//    m_layout.begin()
+//        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+//        .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+//        .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+//        // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+//        .end();
 }
 
 //void Scene::addModel(const char* filename)
@@ -170,7 +170,7 @@ void Scene::addModel(const std::string& filename)
     for (size_t i = 0; i < nbObjects; ++i) {
         const tinyobj::shape_t& tinyObj_shape = tinyObjShapes[i];
         //        m_objects.push_back(Object(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i));
-        m_objects.emplace_back(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i, m_layout);
+        m_objects.emplace_back(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i);
         //        nbIndices += m_objects[i].nbTriangles() * 3;
         //        nbMeshes += m_objects[i].nbMeshes();
 #ifdef MODEL_LOADER_INFO
@@ -269,7 +269,7 @@ void Scene::load(std::ifstream& file)
     for (size_t i = 0; i < size; ++i) {
         //        m_objects.push_back(Object(file, i, m_layout));
         //        const Object && object = Object(file, i, m_layout);
-        m_objects.emplace_back(file, i, m_layout);
+        m_objects.emplace_back(file, i);
 #ifdef MODEL_LOADER_INFO
         const Object& object = m_objects.back();
         std::cout << "[Scene] Load object[" << i << "/" << size << "] : " << object << std::endl;
@@ -337,27 +337,47 @@ void Scene::printStats(int& line)
     bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Total draw call: %d", m_nbIndexBuffer + 1);
 }
 
-void Scene::addLight(SpotLight&& spotLight)
-{
-    m_spotLights.emplace_back(spotLight); // question : std_move not required
-}
 
-void Scene::addLight(DirLight&& dirLight)
-{
-    m_dirLights.emplace_back(dirLight);
-}
+//void Scene::addLight(SpotLight&& spotLight)
+//{
+////    m_spotLights.emplace_back(spotLight); // question : std_move not required
+//    m_spotLights.emplace_back(spotLight); // question : std_move not required
+//}
 
-void Scene::addLight(PointLight&& pointLight)
-{
-    m_pointLights.emplace_back(pointLight);
-}
+//void Scene::addLight(DirLight&& dirLight)
+//{
+//    m_dirLights.emplace_back(dirLight);
+//}
+
+//void Scene::addLight(PointLight&& pointLight)
+//{
+//    m_pointLights.emplace_back(pointLight);
+//}
 
 void Scene::updateLightShadowMaps()
 {
     //    entry::s_scene.draw(m_id, m_shading, entry::g_mtx, state, camera, ratio);
+    float mtx[16];
+    bx::mtxIdentity(mtx);
+//    uint64_t state = 0;
+    const uint64_t state = 0
+        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
+        | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA;
+
     for (auto& spotLight : m_spotLights) {
         spotLight.updateLightShadowMaps();
+        draw(10, Shading::SHADOW, mtx, state);
+
+//        bgfx::touch(1);
+//        bgfx::frame();
     }
+
+//    for (auto& dirLight : m_dirLights) {
+//        dirLight.updateLightShadowMaps();
+//    }
+//    for (auto& pointLight : m_pointLights) {
+//        pointLight.updateLightShadowMaps();
+//    }
 }
 
 void Scene::render(const bgfx::ViewId id, const Shading& shading, const float* mtx,
