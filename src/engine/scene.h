@@ -28,10 +28,18 @@ public:
     void save(std::ofstream & file) const;
 
     void printStats(int &line);
+//    template<typename T>
+//    void addLight(T && light);
+    template <class... Args>
+    void addSpotLight(Args&&... args);
+    template <class... Args>
+    void addDirLight(Args&&... args);
+    template <class... Args>
+    void addPointLight(Args&&... args);
 //    void addLight(Light && light);
-    void addLight(SpotLight && spotLight);
-    void addLight(DirLight && dirLight);
-    void addLight(PointLight && pointLight);
+//    void addLight(SpotLight && spotLight);
+//    void addLight(DirLight && dirLight);
+//    void addLight(PointLight && pointLight);
     void updateLightShadowMaps();
 
     void render(const bgfx::ViewId id, const Shading &shading, const float *mtx,
@@ -42,7 +50,8 @@ private:
                 const uint64_t state) const;
 
 private:
-    bgfx::VertexLayout m_layout;
+public:
+//    bgfx::VertexLayout m_layout;
     std::vector<Object> m_objects;
 
 //    std::vector<Material> m_materials;
@@ -93,7 +102,36 @@ public: // ----------------------- getters
 
 //    int parsingTime() const;
 //    int loadingMaterialsTime() const;
-//    int loadingObjectsTime() const;
+    //    int loadingObjectsTime() const;
 };
+
+template<class... Args>
+void Scene::addPointLight(Args &&...args)
+{
+    m_pointLights.emplace_back(std::forward<Args>(args)...);
+
+}
+
+template<class... Args>
+void Scene::addDirLight(Args &&...args)
+{
+    m_dirLights.emplace_back(std::forward<Args>(args)...);
+
+}
+
+template<class... Args>
+void Scene::addSpotLight(Args&&... args)
+{
+    m_spotLights.emplace_back(std::forward<Args>(args)...);
+//    m_spotLights.emplace_back(args...);
+}
+
+//template<class... Args>
+//void Scene::addLight(Args &&... args)
+//{
+//    m_spotLights.emplace_back(std::forward<Args>(args)...);
+////    m_spotLights.emplace_back(bx::Vec3(1.0f, 0.0f, 0.0f), bx::Vec3(-5.0f, 1.0f, 0.0f));
+//}
+
 
 #endif // SCENE_H

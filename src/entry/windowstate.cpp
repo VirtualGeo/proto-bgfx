@@ -6,6 +6,7 @@
 #include <engine/camerafps.h>
 #include <entry/entry.h>
 #include <list>
+#include <engine/geometry.h>
 
 //std::vector<WindowState*> WindowState::s_windows;
 //std::vector<WindowState*> s_windows;
@@ -78,6 +79,7 @@ WindowState::WindowState(void* nwh, int width, int height)
         //         g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
 
         const bgfx::Caps* caps = bgfx::getCaps();
+        assert(caps->supported & BGFX_CAPS_TEXTURE_COMPARE_LEQUAL); // sampler supported
 
         entry::g_renderer = bgfx::getRendererName(caps->rendererType);
         //        Q_ASSERT(0 != (caps->supported & BGFX_CAPS_SWAP_CHAIN)); // vulkan no swap chain
@@ -102,13 +104,20 @@ WindowState::WindowState(void* nwh, int width, int height)
         bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
         bgfx::touch(0);
 
+        Program::init(caps);
+        Geometry::init();
         // ------------------------------- LOAD MODEL
-        entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
-        //                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+                entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+//        entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
 
-//        entry::s_scene.addLight(DirLight({ 0.0f, -1.0f, 0.5f }));
-        entry::s_scene.addLight(SpotLight({ 1.0f, 0.0f, 0.0f }, {-5.0f, 1.0f, 0.0f}));
-//        entry::s_scene.addLight(PointLight({ 0.0f, 1.0f, 0.0f }));
+        //        entry::s_scene.addLight(DirLight({ 0.0f, -1.0f, 0.5f }));
+//        entry::s_scene.addSpotLight(SpotLight({ 1.0f, 0.0f, 0.0f }, { -5.0f, 1.0f, 0.0f }));
+//        entry::s_scene.addLight({ 1.0f, 0.0f, 0.0f }, { -5.0f, 1.0f, 0.0f });
+//        entry::s_scene.addLight(bx::Vec3(1.0f, 0.0f, 0.0f), bx::Vec3(-5.0f, 1.0f, 0.0f));
+        entry::s_scene.addSpotLight(bx::Vec3(1.0f, 0.0f, 0.0f), bx::Vec3(-5.0f, 1.0f, 0.0f));
+//        entry::s_scene.addLight<SpotLight>({});
+
+        //        entry::s_scene.addLight(PointLight({ 0.0f, 1.0f, 0.0f }));
 
         //    : m_dirLight(bx::normalize(bx::Vec3(0.5f, -1.0f, 0.5f)))
         //        entry::s_scene.addLight(SpotLight({0.0f, -1.0f, 0.5f}));
@@ -129,7 +138,6 @@ WindowState::WindowState(void* nwh, int width, int height)
 
         // -------------------------------- INIT PROGRAM (SHADERS)
         //        s_program.init();
-        Program::init(caps);
         //        s_program.setShading(Program::Shading(g_iViewportShading));
         //        g_viewportShading = Program::shadingFileNames[g_iViewportShading];
         //        m_isInit = true;
@@ -176,6 +184,7 @@ WindowState::~WindowState()
         entry::s_scene.clear();
         //        s_program.clear();
         Program::clear();
+        Geometry::clear();
         //        for (auto & window : s_windows) {
         //            window.clear();
         //        }
@@ -275,6 +284,17 @@ void WindowState::render()
     updateCameraPos();
 
     entry::s_scene.updateLightShadowMaps();
+//    bgfx::frame();
+//    return;
+
+    bgfx::setViewRect(1, 50, 50, 400, 400);
+    bgfx::setViewClear(1, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
+//    bgfx::touch(1);
+    bgfx::setTexture(3, Program::m_sShadowMap, Program::m_shadowMapTexture);
+    Geometry::drawQuad();
+    bgfx::submit(1, Program::m_programs[DEBUG_QUAD]);
+    bgfx::frame();
+    return;
 
     // --------------------------------- SET CAMERA VIEW
     //    float view[16];
@@ -290,6 +310,7 @@ void WindowState::render()
     //    bgfx::setViewRect(0, 0, 0, uint16_t(width()), uint16_t(height()));
     //    bgfx::touch(0);
 
+
     if (m_id != 0) {
         assert(bgfx::isValid(m_fbh));
         bgfx::setViewFrameBuffer(m_id, m_fbh);
@@ -299,7 +320,8 @@ void WindowState::render()
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
     bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
-    //    bgfx::touch(m_id);
+//        bgfx::touch(m_id);
+
 
     // --------------------------------- DRAW SCENE
     //    if (m_id == 0) {

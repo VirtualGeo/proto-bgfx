@@ -16,12 +16,12 @@
 
 class Object {
 public:
-    Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib, const std::vector<tinyobj::material_t>& materials, const size_t iShape, const bgfx::VertexLayout& layout);
+    Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib, const std::vector<tinyobj::material_t>& materials, const size_t iShape);
     Object(const Object&) = delete; // copy constructor
     Object(Object&& object);
     ~Object();
 
-    Object(std::ifstream& file, const size_t iShape, const bgfx::VertexLayout& layout);
+    Object(std::ifstream& file, const size_t iShape);
     void save(std::ofstream& file) const;
 
     //    void draw() const;

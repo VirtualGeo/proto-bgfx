@@ -13,7 +13,8 @@ enum ShaderType {
     Fragment
 };
 
-const std::string shadingFileNames[Shading::Count] { "normal", "material", "rendered", "emissive" };
+const std::string shadingFileNames[Shading::Count] { "normal", "material", "rendered", "emissive", "shadow", "debugQuad" };
+
 
 bgfx::UniformHandle Program::m_sDiffuse;
 bgfx::UniformHandle Program::m_sOpacity;
@@ -28,8 +29,9 @@ bgfx::UniformHandle Program::m_uLightPos;
 bgfx::UniformHandle Program::m_uLightMtx;
 bgfx::UniformHandle Program::m_uDepthScaleOffset;
 const bgfx::Caps* Program::m_caps = nullptr;
-bgfx::ProgramHandle Program::m_progShadow;
+//bgfx::ProgramHandle Program::m_progShadow;
 bgfx::FrameBufferHandle Program::m_shadowMapFB;
+bgfx::TextureHandle Program::m_shadowMapTexture = BGFX_INVALID_HANDLE;
 
 //bgfx::UniformHandle Program::m_uDirLights[s_numDirLightMax][s_num_vec4_dirLight];
 bgfx::UniformHandle Program::m_uDirLights;
@@ -82,6 +84,26 @@ void Program::init(const bgfx::Caps* caps)
     m_uLightMtx = bgfx::createUniform("u_lightMtx", bgfx::UniformType::Mat4);
     m_uDepthScaleOffset = bgfx::createUniform("u_depthScaleOffset", bgfx::UniformType::Vec4);
 
+
+    m_shadowMapTexture = {
+        bgfx::createTexture2D(
+          m_shadowMapSize
+        , m_shadowMapSize
+        , false
+        , 1
+        , bgfx::TextureFormat::D16
+        , BGFX_TEXTURE_RT | BGFX_SAMPLER_COMPARE_LEQUAL
+        ),
+    };
+    m_shadowMapFB = bgfx::createFrameBuffer(1, &m_shadowMapTexture, false);
+    assert(bgfx::isValid(m_shadowMapFB));
+    assert(bgfx::isValid(m_shadowMapTexture));
+
+//    m_shadowMapFB.idx = bgfx::kInvalidHandle;
+//    m_shadowMapTexture = fbtextures[0];
+//    m_shadowMapFB = bgfx::createFrameBuffer(1, &m_shadowMapTexture, false);
+
+
     for (int i = 0; i < Shading::Count; ++i) {
         m_programs[i] = BGFX_INVALID_HANDLE;
         if (i == Shading::EMISSIVE)
@@ -89,8 +111,8 @@ void Program::init(const bgfx::Caps* caps)
             continue;
         //        int i= Shading::NORMAL;
         //    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
-        const std::string& shadingFileName = "shading/" + shadingFileNames[i];
-        //        const std::string& shadingFileName = shadingFileNames[i];
+//        const std::string& shadingFileName = "shading/" + shadingFileNames[i];
+                const std::string& shadingFileName = shadingFileNames[i];
 
         m_programs[i] = loadProgram(shadingFileName);
         //        continue;
@@ -113,7 +135,7 @@ void Program::init(const bgfx::Caps* caps)
         //        bgfx::setName(m_programs[i], shadingFileName.c_str());
     }
 
-    m_progShadow = loadProgram("shadow");
+//    m_progShadow = loadProgram("shadow");
     //    bgfx::frame();
 
     //        m_uDiffuse = bgfx::createUniform("u_diffuse", bgfx::UniformType::Vec4);

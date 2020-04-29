@@ -15,6 +15,8 @@ enum Shading {
     MATERIAL,
     RENDERED,
     EMISSIVE,
+    SHADOW,
+    DEBUG_QUAD,
     Count
 };
 //inline Shading operator++(Shading& shading, int)
@@ -65,6 +67,7 @@ public:
     //    bgfx::ShaderHandle m_fsh;
     static const bgfx::Caps * m_caps;
 
+
     //    bgfx::UniformHandle m_uDiffuse;
 
     //    bgfx::UniformHandle m_uTexturesEnable;
@@ -89,13 +92,17 @@ public:
     static bgfx::UniformHandle m_uInvModel;
 
     static bgfx::UniformHandle m_sShadowMap;
+    static bgfx::TextureHandle m_shadowMapTexture;
+//    bgfx::TextureHandle m_shadowMapTexture = BGFX_INVALID_HANDLE;
+    static const int m_shadowMapSize = 100;
+    static bgfx::FrameBufferHandle m_shadowMapFB;
+
     static bgfx::UniformHandle m_uLightPos;
     static bgfx::UniformHandle m_uLightMtx;
     static bgfx::UniformHandle m_uDepthScaleOffset;
 
-    uint16_t m_shadowMapSize = 512;
-    static bgfx::ProgramHandle m_progShadow;
-    static bgfx::FrameBufferHandle m_shadowMapFB;
+//    uint16_t m_shadowMapSize = 512;
+//    static bgfx::ProgramHandle m_progShadow;
 
 
 public:

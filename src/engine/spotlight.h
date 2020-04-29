@@ -23,6 +23,7 @@ public:
     float m_quadratic;
 
     float m_data[20];
+
 };
 
 using SpotLights = std::vector<SpotLight>;
