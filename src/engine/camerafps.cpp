@@ -2,8 +2,11 @@
 #include <iostream>
 
 CameraFps::CameraFps(bx::Vec3 pos)
-    : Camera(std::move(pos))
+    : Camera(pos)
+    , m_spotLight({ 1.0f, 0.0f, 0.0f }, pos)
 {
+    m_type = FPS;
+
     updateCameraFront();
 }
 
@@ -25,6 +28,13 @@ void CameraFps::mouseMove(float xoffset, float yoffset)
     updateCameraFront();
 }
 
+void CameraFps::move(Camera::Direction direction, float distance)
+{
+    Camera::move(direction, distance);
+
+    m_spotLight.updatePos(m_pos);
+}
+
 void CameraFps::updateCameraFront()
 {
 
@@ -34,4 +44,6 @@ void CameraFps::updateCameraFront()
     front.z = bx::sin(bx::toRad(m_yaw)) * bx::cos(bx::toRad(m_pitch));
     m_front = bx::normalize(front);
     m_right = bx::normalize(bx::cross(m_up, m_front));
+
+    m_spotLight.updateDirection(m_front);
 }

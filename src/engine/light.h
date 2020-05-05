@@ -17,7 +17,8 @@ public:
     ~Light();
 
 //protected:
-    virtual void updateLightShadowMaps() = 0;
+    virtual void updateLightShadowMaps(int viewId) = 0;
+    void drawDebug();
 
     //private:
     bx::Vec3 m_ambient;
@@ -25,13 +26,19 @@ public:
     bx::Vec3 m_specular;
 
 
-//    bgfx::FrameBufferHandle m_shadowMapFB = BGFX_INVALID_HANDLE;
-//    bgfx::TextureHandle m_shadowMapTexture = BGFX_INVALID_HANDLE;
-//    const int m_shadowMapSize = 100;
+    bgfx::FrameBufferHandle m_shadowMapFB;
+    bgfx::TextureHandle m_shadowMapTexture;
+    const int m_shadowMapSize = 1024;
+    bgfx::UniformHandle m_sShadowMap;
 
-private:
-//    bool m_last = true;
+
+//private:
+protected:
+    int m_id;
+    static int m_nbLight;
+    bool m_last = true;
 };
+
 
 using Lights = std::vector<Light>;
 

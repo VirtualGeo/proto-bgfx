@@ -3,7 +3,6 @@ $input v_fragPos, v_normal, v_texcoord0
 #include <bgfx_shader.sh>
 #include "shaderlib.sh"
 
-SAMPLER2D(s_diffuse, 0);
 //SAMPLER2D(s_opacity, 1);
 
 // struct DirLight
@@ -19,7 +18,7 @@ struct Material
     vec3 ambient;
     float shininess;
 };
-
+SAMPLER2D(s_diffuse, 0);
 uniform vec4 u_material[4];
 #define material_diffuse u_material[0].xyz
 #define material_specular u_material[1].xyz
@@ -102,6 +101,7 @@ void main()
     else {
         color = material_diffuse;
     }
+//        color = texture2D(s_diffuse, v_texcoord0).xyz;
 
 //        if (color.w < 0.1) {
 //            discard;

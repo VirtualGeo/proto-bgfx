@@ -8,7 +8,11 @@
 #include "texture.h"
 #include <bgfx/bgfx.h>
 #include <iostream>
-#include "spotlight.h"
+//#include "spotlight.h"
+
+//#define RENDERVIEW_0_ID 0
+#define VIEWID_CAMERA 0
+#define VIEWID_SHADOW 20
 
 enum Shading {
     NORMAL = 0,
@@ -41,7 +45,7 @@ public:
     static constexpr unsigned int s_numDirLightMax = 2;
     static constexpr unsigned int s_dirLightSizeMax = s_num_vec4_dirLight * s_numDirLightMax * 4;
 
-    static constexpr unsigned int s_num_vec4_spotLight = 5;
+    static constexpr unsigned int s_num_vec4_spotLight = 9;
     static constexpr unsigned int s_numSpotLightMax = 20;
     static constexpr unsigned int s_spotLightSizeMax = s_num_vec4_spotLight * s_numSpotLightMax * 4;
 
@@ -92,10 +96,12 @@ public:
     static bgfx::UniformHandle m_uInvModel;
 
     static bgfx::UniformHandle m_sShadowMap;
-    static bgfx::TextureHandle m_shadowMapTexture;
+    static bgfx::UniformHandle m_uLightSpaceMatrix;
+//    static bgfx::TextureHandle m_shadowMapTexture;
 //    bgfx::TextureHandle m_shadowMapTexture = BGFX_INVALID_HANDLE;
-    static const int m_shadowMapSize = 100;
-    static bgfx::FrameBufferHandle m_shadowMapFB;
+//    static const int m_shadowMapSize = 1024;
+//    static bgfx::FrameBufferHandle m_shadowMapFB;
+
 
     static bgfx::UniformHandle m_uLightPos;
     static bgfx::UniformHandle m_uLightMtx;

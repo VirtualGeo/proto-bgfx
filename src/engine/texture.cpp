@@ -24,6 +24,10 @@
 //u_int64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE;
 uint64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_ANISOTROPIC;
 
+static const uint8_t s_checkerBoardImage[12] = {0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF};
+Texture Texture::m_sampleTextures[Count] {
+    Texture{2, 2, 3, sizeof (s_checkerBoardImage), s_checkerBoardImage, 1}
+};
 // Texture::Texture(const char *filename) {
 Texture::Texture(const std::string& texName, const std::string& baseDir)
 {
@@ -151,6 +155,23 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
 #endif
 }
 
+Texture::Texture(int width, int height, int nChannel, size_t textureSize, const uint8_t *image, int nMip)
+    : m_width(width)
+    , m_height(height)
+    , m_nChannels(nChannel)
+    , m_textureSize(textureSize)
+    , m_nMips(nMip)
+//    , m_image(image)
+{
+//    m_textureSize = textureSize * m_nChannels;
+    //    assert(lenMax > m_textureSize);
+
+    m_image = (uint8_t*)malloc(m_textureSize);
+    memcpy(m_image, image, textureSize);
+//    m_image = image;
+
+}
+
 Texture::Texture(Texture&& texture)
     : m_textureHandle(std::move(texture.m_textureHandle))
     //        : m_textureHandle(texture.m_textureHandle)
@@ -252,7 +273,9 @@ void Texture::createTextureHandle()
 {
     assert(m_image != nullptr);
 
-    bool hasMips = true;
+//    bool hasMips = true;
+    bool hasMips = m_nMips > 1;
+
     //    int width = m_width;
     //    int height = m_height;
     bgfx::TextureFormat::Enum texFormat;
@@ -301,7 +324,23 @@ void Texture::createTextureHandle()
 
     m_textureHandle = bgfx::createTexture2D(
         m_width, m_height, hasMips, 1, texFormat,
-        s_textureSamplerFlags, bgfx::copy(m_image, m_textureSize));
+                s_textureSamplerFlags, bgfx::copy(m_image, m_textureSize));
+}
+
+void Texture::init()
+{
+    for (int i =0; i <Sample::Count; ++i) {
+        m_sampleTextures[i].createTextureHandle();
+    }
+
+}
+
+void Texture::clear()
+{
+    for (int i =0; i <Sample::Count; ++i) {
+//        delete m_sampleTextures[i];
+        bgfx::destroy(m_sampleTextures[i].textureHandle());
+    }
 }
 
 //u_int64_t Texture::get_textureSamplerFlags()

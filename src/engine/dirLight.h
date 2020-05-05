@@ -10,7 +10,7 @@ public:
     DirLight(bx::Vec3 direction);
 
 //protected:
-    void updateLightShadowMaps() override;
+    void updateLightShadowMaps(int viewId) override;
 //private:
     bx::Vec3 m_direction;
 

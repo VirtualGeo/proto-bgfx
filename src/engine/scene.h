@@ -14,6 +14,7 @@
 #include "camera.h"
 #include "spotlight.h"
 #include "pointlight.h"
+#include "camerafps.h"
 
 class Scene
 {
@@ -51,6 +52,8 @@ private:
 
 private:
 public:
+//    Cameras m_cameras;
+    std::vector<CameraFps> m_cameras;
 //    bgfx::VertexLayout m_layout;
     std::vector<Object> m_objects;
 

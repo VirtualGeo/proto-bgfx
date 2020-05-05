@@ -12,7 +12,7 @@ DirLight::DirLight(bx::Vec3 direction)
 
 }
 
-void DirLight::updateLightShadowMaps()
+void DirLight::updateLightShadowMaps(int viewId)
 {
 
 }

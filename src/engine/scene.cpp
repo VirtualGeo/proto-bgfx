@@ -12,18 +12,19 @@
 #include <chrono>
 #include <cstring>
 //#include <iostream>
+#include "camerafps.h"
 
 Scene::Scene()
 //    : m_dirLight(bx::normalize(bx::Vec3(0.5f, -1.0f, 0.5f)))
 //    : m_dirLight(bx::normalize(bx::Vec3(0.0f, -1.0f, 0.5f)))
 {
     //    Vertex::init();
-//    m_layout.begin()
-//        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-//        .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-//        .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-//        // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-//        .end();
+    //    m_layout.begin()
+    //        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+    //        .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+    //        .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+    //        // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+    //        .end();
 }
 
 //void Scene::addModel(const char* filename)
@@ -337,7 +338,6 @@ void Scene::printStats(int& line)
     bgfx::dbgTextPrintf(0, ++line, 0x0F, "   Total draw call: %d", m_nbIndexBuffer + 1);
 }
 
-
 //void Scene::addLight(SpotLight&& spotLight)
 //{
 ////    m_spotLights.emplace_back(spotLight); // question : std_move not required
@@ -359,25 +359,47 @@ void Scene::updateLightShadowMaps()
     //    entry::s_scene.draw(m_id, m_shading, entry::g_mtx, state, camera, ratio);
     float mtx[16];
     bx::mtxIdentity(mtx);
-//    uint64_t state = 0;
+    //    uint64_t state = 0;
+    //    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
+    //        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
+    //        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
     const uint64_t state = 0
+        | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
         | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
-        | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA;
+        | BGFX_STATE_MSAA
+        //            | BGFX_STATE_CULL_MASK
+        | BGFX_STATE_CULL_CCW;
 
+    //        | BGFX_STATE_FRONT_CCW;
+
+    int viewId = 3;
     for (auto& spotLight : m_spotLights) {
-        spotLight.updateLightShadowMaps();
-        draw(10, Shading::SHADOW, mtx, state);
+        spotLight.updateLightShadowMaps(viewId);
+        draw(viewId, Shading::SHADOW, mtx, state);
+        ++viewId;
 
-//        bgfx::touch(1);
-//        bgfx::frame();
+        //        bgfx::touch(1);
+        //        bgfx::frame();
     }
 
-//    for (auto& dirLight : m_dirLights) {
-//        dirLight.updateLightShadowMaps();
-//    }
-//    for (auto& pointLight : m_pointLights) {
-//        pointLight.updateLightShadowMaps();
-//    }
+    for (auto& camera : m_cameras) {
+        if (camera.m_spotLightEnable) {
+            camera.m_spotLight.updateLightShadowMaps(viewId);
+            draw(viewId, Shading::SHADOW, mtx, state);
+            ++viewId;
+            //        if (camera->m_type == Camera::FPS) {
+            //            static_cast<CameraFps&>(camera)
+
+            //        }
+        }
+    }
+
+    //    for (auto& dirLight : m_dirLights) {
+    //        dirLight.updateLightShadowMaps();
+    //    }
+    //    for (auto& pointLight : m_pointLights) {
+    //        pointLight.updateLightShadowMaps();
+    //    }
 }
 
 void Scene::render(const bgfx::ViewId id, const Shading& shading, const float* mtx,
@@ -450,14 +472,14 @@ void Scene::render(const bgfx::ViewId id, const Shading& shading, const float* m
                 memcpy(&buffer[i], dirLight.m_data, 4 * Program::s_num_vec4_dirLight * sizeof(float));
                 i += 4 * Program::s_num_vec4_dirLight;
             }
-//            buffer[3] = m_dirLights.size();
+            //            buffer[3] = m_dirLights.size();
             bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
         }
 
         if (!m_spotLights.empty()) {
             float buffer[Program::s_spotLightSizeMax] = { 0.0f };
             int i = 0;
-//            buffer[0] = m_spotLights.size();
+            //            buffer[0] = m_spotLights.size();
             for (const auto& spotLight : m_spotLights) {
                 memcpy(&buffer[i], spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
                 i += 4 * Program::s_num_vec4_spotLight;
@@ -472,7 +494,7 @@ void Scene::render(const bgfx::ViewId id, const Shading& shading, const float* m
                 memcpy(&buffer[i], pointLight.m_data, 4 * Program::s_num_vec4_pointLight * sizeof(float));
                 i += 4 * Program::s_num_vec4_pointLight;
             }
-//            buffer[3] = m_pointLights.size();
+            //            buffer[3] = m_pointLights.size();
             bgfx::setUniform(Program::m_uPointLights, buffer, Program::s_num_vec4_pointLight * m_pointLights.size());
         }
         //                const float temp[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {

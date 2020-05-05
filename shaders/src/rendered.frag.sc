@@ -2,6 +2,8 @@ $input v_fragPos // vec3
 $input v_normal // vec3
 $input v_texcoord0 // vec2
 $input v_view // vec3
+$input v_fragPosLightSpace
+//$input v_shadowCoord
 
 #include <bgfx_shader.sh>
 #include "shaderlib.sh" // do not include shaderlib.sh before bgfx_shader.sh
@@ -44,8 +46,10 @@ struct SpotLight {
     float constant;
     float _linear; // linear bgfx exist
     float quadratic;
+
+    mat4 lightSpaceMatrix;
 };
-#define N_SPOT_LIGHT_VEC4 5
+#define N_SPOT_LIGHT_VEC4 9
 uniform vec4 u_spotLights[N_SPOT_LIGHT_VEC4 * N_SPOT_LIGHT];
 #define spotLights(i) SpotLight(vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4]), \
                 vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1]), \
@@ -56,7 +60,11 @@ uniform vec4 u_spotLights[N_SPOT_LIGHT_VEC4 * N_SPOT_LIGHT];
                 u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1].w, \
                 u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2].w, \
                 u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3].w, \
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4].w)
+                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4].w, \
+                mat4(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 5], \
+                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 6], \
+                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 7], \
+                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 8]))
 
 //#define nbSpotLights u_spotLights[0].x
 #endif
@@ -110,6 +118,7 @@ uniform vec4 u_material[4];
 
 uniform vec4 u_viewPos;
 #define viewPos u_viewPos.xyz
+SAMPLER2D(s_shadowMap, 3);
 
 // function prototypes
 #if N_DIR_LIGHT > 0
@@ -119,7 +128,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 #endif
 #if N_SPOT_LIGHT > 0
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fragPosLightSpace);
 #endif
 
 void main()
@@ -130,6 +139,8 @@ void main()
 //        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 //        return;
 //    }
+//    gl_FragColor =  vec4(v_fragPosLightSpace.xyz, 1.0);
+//    return;
 
     if (material_hasOpacityTexture > -0.5) {
         float opacity = texture2D(s_opacity, v_texcoord0).r;
@@ -204,7 +215,7 @@ void main()
     // phase 3: spot light
 #if N_SPOT_LIGHT > 0
     for(int i = 0; i < N_SPOT_LIGHT; i++)
-        result += CalcSpotLight(spotLights(i), norm, v_fragPos, viewDir);
+        result += CalcSpotLight(spotLights(i), norm, v_fragPos, viewDir, v_fragPosLightSpace);
 #endif
 
     result *= color;
@@ -276,9 +287,51 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 #endif
 
 
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, SpotLight light)
+{
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+//    if (projCoords.z > 1.0)
+//        return 0.0;
+
+//    vec3 projCoords = fragPosLightSpace.xyz;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+//    float closestDepth = texture2D(s_shadowMap, projCoords.xy).r;
+//    float closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap, projCoords.xy));
+    float closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap, vec2(projCoords.x, projCoords.y)));
+//    float depth = unpackRgbaToFloat(texture2D(s_shadowMap, v_texcoord0));
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+//    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+//    float bias = 0.001;
+//    float bias = max(0.00001 * (1.0 - dot(normal, light.direction)), 0.001);
+    float bias = 0.0003 * (1.0 - dot(normal, light.direction));
+    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+
+    // PCF
+//    float shadow = 0.0;
+//    textureSize(s_shadowMap, 3);
+//    vec2 texelSize = vec2_splat(1.0 / 512.0);
+//    const int size = 1;
+//    for (int x = -size; x <= size; ++x) {
+//        for (int y = -size; y <= size; ++y) {
+//            float pcfDepth = unpackRgbaToFloat(texture2D(s_shadowMap, projCoords.xy + vec2(x, y) * texelSize));
+//            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+//        }
+//    }
+//    const int side = size * 2 + 1;
+//    shadow /= side * side;
+
+    return shadow;
+}
+
+
 #if N_SPOT_LIGHT > 0
 // calculates the color when using a spot light.
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fragPosLightSpace)
 {
     vec3 lightDir = normalize(light.position - fragPos);
     // diffuse shading
@@ -302,10 +355,18 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 diffuse = light.diffuse * diff;
 //    vec3 specular = light.specular * spec;
     vec3 specular = specularTerm(normal, viewDir, lightDir, light.specular, material_shininess);
+
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
-    return (ambient + diffuse + specular);
+
+//    float shadow = ShadowCalculation(v_fragPosLightSpace);
+    float shadow = ShadowCalculation(fragPosLightSpace, normal, light);
+//    return vec3_splat(shadow);
+//    vec3 lighting = ambient + diffuse + specular;
+    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
+//    return (ambient + diffuse + specular);
+    return lighting;
 }
 #endif
 
