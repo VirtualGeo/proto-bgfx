@@ -15,7 +15,7 @@ PointLight::PointLight(bx::Vec3 && position, float constant, float linear, float
 
 }
 
-void PointLight::updateLightShadowMaps()
+void PointLight::updateLightShadowMaps(int viewId)
 {
 
 }

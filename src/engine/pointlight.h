@@ -12,7 +12,7 @@ public:
 //              float quadratic = 0.032);
     PointLight(bx::Vec3 &&position, float constant = 1.0f, float linear = 0.09f, float quadratic = 0.032);
 
-    void updateLightShadowMaps() override;
+    void updateLightShadowMaps(int viewId) override;
 
 
     bx::Vec3 m_position;

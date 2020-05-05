@@ -19,11 +19,13 @@ WindowState::WindowState(void* nwh, int width, int height)
     , m_height(height)
     , m_id(s_windows.size())
     //    , m_fbh(bgfx::createFrameBuffer(nwh, uint16_t(width), uint16_t(height)))
-    , m_iCamera(entry::s_cameras.size())
+//    , m_iCamera(entry::s_cameras.size())
+    , m_iCamera(entry::s_scene.m_cameras.size())
 {
     //    entry::s_cameras.emplace_back(std::make_unique<CameraFps>(bx::Vec3 { -7.0f, 1.0f, 0.0f })); // question : push_back ?
     //    std::cout << &entry::s_cameras << std::endl;
-    entry::s_cameras.emplace_back(std::make_unique<CameraFps>(bx::Vec3 { -4.0f, 1.0f, -0.5f })); // question : push_back ?
+//    entry::s_scene.m_cameras.emplace_back(std::make_unique<CameraFps>(bx::Vec3 { -4.0f, 1.0f, -0.5f })); // question : push_back ?
+//    entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -4.0f, 1.0f, -0.5f }); // question : push_back ?
 
     m_fbh.idx = bgfx::kInvalidHandle;
     //    Q_ASSERT(! bgfx::isValid(m_fbh));
@@ -80,6 +82,7 @@ WindowState::WindowState(void* nwh, int width, int height)
 
         const bgfx::Caps* caps = bgfx::getCaps();
         assert(caps->supported & BGFX_CAPS_TEXTURE_COMPARE_LEQUAL); // sampler supported
+        assert(caps->homogeneousDepth);
 
         entry::g_renderer = bgfx::getRendererName(caps->rendererType);
         //        Q_ASSERT(0 != (caps->supported & BGFX_CAPS_SWAP_CHAIN)); // vulkan no swap chain
@@ -106,6 +109,7 @@ WindowState::WindowState(void* nwh, int width, int height)
 
         Program::init(caps);
         Geometry::init();
+        Texture::init();
         // ------------------------------- LOAD MODEL
                 entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
 //        entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
@@ -144,6 +148,7 @@ WindowState::WindowState(void* nwh, int width, int height)
         //        Q_ASSERT(entry::s_windows.size() == 0);
         //        Q_ASSERT(m_iWindow == 0);
     }
+    entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -4.0f, 1.0f, -0.5f }); // question : push_back ?
     //    m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
     //    m_iWindow = entry::s_windows.size();
     //    m_windows[m_iWindow].m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
@@ -185,6 +190,7 @@ WindowState::~WindowState()
         //        s_program.clear();
         Program::clear();
         Geometry::clear();
+        Texture::clear();
         //        for (auto & window : s_windows) {
         //            window.clear();
         //        }
@@ -217,7 +223,8 @@ void WindowState::updateCameraPos()
     float cameraSpeed = m_slowMotion ? 1.0f : 5.0f;
     cameraSpeed *= m_deltaTime;
 
-    auto& camera = *entry::s_cameras[m_iCamera];
+//    auto& camera = *entry::s_scene.m_cameras[m_iCamera];
+    auto& camera = entry::s_scene.m_cameras[m_iCamera];
     if (m_cameraMoveFront) {
         camera.move(Camera::Direction::FRONT, cameraSpeed * m_cameraMoveFront);
     }
@@ -287,14 +294,7 @@ void WindowState::render()
 //    bgfx::frame();
 //    return;
 
-    bgfx::setViewRect(1, 50, 50, 400, 400);
-    bgfx::setViewClear(1, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
-//    bgfx::touch(1);
-    bgfx::setTexture(3, Program::m_sShadowMap, Program::m_shadowMapTexture);
-    Geometry::drawQuad();
-    bgfx::submit(1, Program::m_programs[DEBUG_QUAD]);
-    bgfx::frame();
-    return;
+//    return;
 
     // --------------------------------- SET CAMERA VIEW
     //    float view[16];
@@ -329,8 +329,10 @@ void WindowState::render()
         | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
         | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
 
-    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
-    const auto& camera = *entry::s_cameras[m_iCamera];
+//    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
+    assert(0 <= m_iCamera && m_iCamera < entry::s_scene.m_cameras.size());
+//    const auto& camera = *entry::s_scene.m_cameras[m_iCamera];
+    const auto& camera = entry::s_scene.m_cameras[m_iCamera];
     float view[16];
     // bx::mtxLookAt(view, eye, at);
     bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
@@ -352,6 +354,7 @@ void WindowState::render()
     }
 
     entry::s_scene.render(m_id, m_shading, entry::g_mtx, state);
+
     //    g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
 
     // Advance to next frame. Process submitted rendering primitives.
@@ -420,7 +423,8 @@ void WindowState::mouseMoveEvent(int x, int y)
         xoffset *= sensitivity;
         yoffset *= sensitivity;
 
-        auto& camera = *entry::s_cameras[m_iCamera];
+//        auto& camera = *entry::s_scene.m_cameras[m_iCamera];
+        auto& camera = entry::s_scene.m_cameras[m_iCamera];
         camera.mouseMove(xoffset, yoffset);
         //        camera.rotate(xoffset, yoffset);
     }
@@ -625,6 +629,7 @@ void WindowState::resizeEvent(int width, int height)
 
 void WindowState::mouseScrollEvent(int offset)
 {
-    auto& camera = *entry::s_cameras[m_iCamera];
+//    auto& camera = *entry::s_scene.m_cameras[m_iCamera];
+    auto& camera = entry::s_scene.m_cameras[m_iCamera];
     camera.zoom(offset);
 }
