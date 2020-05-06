@@ -53,6 +53,8 @@ public:
     static constexpr unsigned int s_numPointLightMax = 20;
     static constexpr unsigned int s_pointLightSizeMax = s_num_vec4_pointLight * s_numPointLightMax * 4;
 
+    static constexpr unsigned int s_num_lightMax = s_numDirLightMax + s_numSpotLightMax + s_numSpotLightMax;
+
     Program() = delete;
     ~Program() = delete;
 
@@ -96,11 +98,16 @@ public:
     static bgfx::UniformHandle m_uInvModel;
 
     static bgfx::UniformHandle m_sShadowMap;
+    static bgfx::UniformHandle m_sShadowMaps[];
+//    static bgfx::UniformHandle m_sShadowMap_light_0;
+//    static bgfx::UniformHandle m_sShadowMap_light_1;
+//    static bgfx::UniformHandle m_sShadowMap_light_2;
     static bgfx::UniformHandle m_uLightSpaceMatrix;
 //    static bgfx::TextureHandle m_shadowMapTexture;
-//    bgfx::TextureHandle m_shadowMapTexture = BGFX_INVALID_HANDLE;
-//    static const int m_shadowMapSize = 1024;
-//    static bgfx::FrameBufferHandle m_shadowMapFB;
+
+    static bgfx::TextureHandle m_shadowMapTexture[];
+    static const int m_shadowMapSize = 1024;
+    static bgfx::FrameBufferHandle m_shadowMapFB[];
 
 
     static bgfx::UniformHandle m_uLightPos;

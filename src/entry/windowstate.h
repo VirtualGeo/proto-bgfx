@@ -97,6 +97,8 @@ private:
     bool m_firstMouse = true;
 
     bool m_ctrlPressed = false;
+
+//    static bool m_firstRenderLooper;
 };
 
 #endif // WINDOWSTATE_H

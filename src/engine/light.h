@@ -26,17 +26,19 @@ public:
     bx::Vec3 m_specular;
 
 
-    bgfx::FrameBufferHandle m_shadowMapFB;
-    bgfx::TextureHandle m_shadowMapTexture;
+//    bgfx::FrameBufferHandle m_shadowMapFB;
+//    bgfx::TextureHandle m_shadowMapTexture;
     const int m_shadowMapSize = 1024;
-    bgfx::UniformHandle m_sShadowMap;
+
+//    bgfx::UniformHandle m_sShadowMap;
 
 
 //private:
 protected:
     int m_id;
-    static int m_nbLight;
     bool m_last = true;
+private:
+    static int m_nbLight;
 };
 
 

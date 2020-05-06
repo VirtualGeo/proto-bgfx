@@ -12,6 +12,7 @@
 //std::vector<WindowState*> s_windows;
 std::list<WindowState*> s_windows;
 //std::list<WindowState&> s_windows;
+//bool WindowState::m_firstRenderLooper = true;
 
 WindowState::WindowState(void* nwh, int width, int height)
     : m_nwh(nwh)
@@ -118,7 +119,9 @@ WindowState::WindowState(void* nwh, int width, int height)
 //        entry::s_scene.addSpotLight(SpotLight({ 1.0f, 0.0f, 0.0f }, { -5.0f, 1.0f, 0.0f }));
 //        entry::s_scene.addLight({ 1.0f, 0.0f, 0.0f }, { -5.0f, 1.0f, 0.0f });
 //        entry::s_scene.addLight(bx::Vec3(1.0f, 0.0f, 0.0f), bx::Vec3(-5.0f, 1.0f, 0.0f));
-        entry::s_scene.addSpotLight(bx::Vec3(1.0f, 0.0f, 0.0f), bx::Vec3(-5.0f, 1.0f, 0.0f));
+//        entry::s_scene.addSpotLight(bx::Vec3(1.0f, -0.1f, 0.1f), bx::Vec3(-3.0f, 1.0f, 0.0f));
+
+//        entry::s_scene.addSpotLight(bx::Vec3(0.0f, 0.0f, 1.0f), bx::Vec3(0.0f, 1.0f, 0.0f));
 //        entry::s_scene.addLight<SpotLight>({});
 
         //        entry::s_scene.addLight(PointLight({ 0.0f, 1.0f, 0.0f }));
@@ -147,8 +150,12 @@ WindowState::WindowState(void* nwh, int width, int height)
         //        m_isInit = true;
         //        Q_ASSERT(entry::s_windows.size() == 0);
         //        Q_ASSERT(m_iWindow == 0);
+                entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
     }
-    entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -4.0f, 1.0f, -0.5f }); // question : push_back ?
+    else {
+        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
+
+    }
     //    m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
     //    m_iWindow = entry::s_windows.size();
     //    m_windows[m_iWindow].m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
@@ -290,7 +297,10 @@ void WindowState::render()
     //    updateCameraPos();
     updateCameraPos();
 
-    entry::s_scene.updateLightShadowMaps();
+    if (m_id == 0) {
+        entry::s_scene.updateLightShadowMaps();
+        entry::s_scene.setLightUniforms();
+    }
 //    bgfx::frame();
 //    return;
 
@@ -322,44 +332,16 @@ void WindowState::render()
     bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
 //        bgfx::touch(m_id);
 
-
-    // --------------------------------- DRAW SCENE
-    //    if (m_id == 0) {
-    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
-        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
-        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
-
-//    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
-    assert(0 <= m_iCamera && m_iCamera < entry::s_scene.m_cameras.size());
-//    const auto& camera = *entry::s_scene.m_cameras[m_iCamera];
-    const auto& camera = entry::s_scene.m_cameras[m_iCamera];
-    float view[16];
-    // bx::mtxLookAt(view, eye, at);
-    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
-
-    float proj[16];
     const float ratio = float(m_width) / m_height;
-    bx::mtxProj(proj, camera.m_fov, ratio, 0.1f, 100.0f,
-        bgfx::getCaps()->homogeneousDepth);
-    bgfx::setViewTransform(m_id, view, proj);
-
-    switch (m_shading) {
-    case RENDERED:
-        const float viewPos[4] = { camera.m_pos.x, camera.m_pos.y, camera.m_pos.z, 0.0f };
-        bgfx::setUniform(Program::m_uViewPos, viewPos);
-        float invModel[16];
-        bx::mtxInverse(invModel, entry::g_mtx);
-        bgfx::setUniform(Program::m_uInvModel, invModel);
-        break;
-    }
-
-    entry::s_scene.render(m_id, m_shading, entry::g_mtx, state);
+    entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
 
     //    g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
 
     // Advance to next frame. Process submitted rendering primitives.
     if (m_id == 0) { // avoid flipping, put F1 to show (only with direct3D)
         bgfx::frame();
+//        entry::s_scene.updateLightShadowMaps();
+//        entry::s_scene.setLightUniforms();
     }
     //    return;
 }

@@ -13,6 +13,8 @@ $input v_texcoord0
 //}
 
 SAMPLER2D(s_shadowMap, 3);
+
+//SAMPLER2DARRAY(s_shadowMaps, 4);
 //SAMPLER2DSHADOW(s_shadowMap, 3);
 
 //#define Sampler sampler2DShadow
@@ -38,6 +40,14 @@ void main()
 //    float depth = texture2D(s_shadowMap, v_texcoord0).r;
 
     float depth = unpackRgbaToFloat(texture2D(s_shadowMap, v_texcoord0));
+//    texture2DArray(s_shadowMap, vec3(v_texcoord0, 0));
+
+//    float depth = unpackRgbaToFloat(texture2DArray(s_shadowMaps, vec3(v_texcoord0, 0)));
+//    float depth = unpackRgbaToFloat(texture2DArrayLod(s_shadowMap, vec3(v_texcoord0, 0), 1.0));
+
+//    float depth = unpackRgbaToFloat(texture2DArrayLod(s_shadowMap, vec3(v_texcoord0, 0));
+//    float depth = 1.0;
+
 //    float depth = shadow2D(s_shadowMap, vec3(v_texcoord0, 1.0));
 
 //    if (depth > 0.99) {

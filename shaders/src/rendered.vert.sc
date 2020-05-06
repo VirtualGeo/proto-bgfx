@@ -6,13 +6,16 @@ $output v_fragPos // vec3
 $output v_normal // vec3
 $output v_texcoord0 // vec2
 $output v_view // vec3
-$output v_fragPosLightSpace
+//$output v_fragPosLightSpace
+$output v_fragPosLightSpace_0
+$output v_fragPosLightSpace_1
+$output v_fragPosLightSpace_2
 //$output v_shadowCoord
 
 #include <bgfx_shader.sh>
 
 // ------------------------------------ SPOT_LIGHT
-#define N_SPOT_LIGHT 1
+#define N_SPOT_LIGHT 2
 #if N_SPOT_LIGHT > 0
 struct SpotLight {
     vec3 ambient;
@@ -66,8 +69,16 @@ void main()
 //    v_normal = mul(mat3(transpose(u_invModel)), a_normal);
     v_texcoord0 = a_texcoord0;
 
-    SpotLight spotLight = spotLights(0);
-    v_fragPosLightSpace = mul(spotLight.lightSpaceMatrix, vec4(v_fragPos, 1.0));
+    SpotLight spotLight_0 = spotLights(0);
+//    SpotLight spotLight_1 = spotLights(1);
+//    SpotLight spotLight_2 = spotLights(2);
+
+    v_fragPosLightSpace_0 = mul(spotLight_0.lightSpaceMatrix, vec4(v_fragPos, 1.0));
+//    v_fragPosLightSpace_1 = mul(spotLight_1.lightSpaceMatrix, vec4(v_fragPos, 1.0));
+//    v_fragPosLightSpace_2 = mul(spotLight_2.lightSpaceMatrix, vec4(v_fragPos, 1.0));
+
+//    u_spotLights[0] = vec4_splat(1.0);
+
 //    const float shadowMapOffset = 0.001;
 //    vec3 posOffset = a_position + v_normal.xyz * shadowMapOffset;
 //    v_shadowCoord = mul(spotLight.lightSpaceMatrix, vec4(posOffset, 1.0));

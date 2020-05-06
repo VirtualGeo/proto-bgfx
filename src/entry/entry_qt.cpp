@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 
 
     QApplication a(argc, argv);
-    MainWindow w(nullptr, 1);
+    MainWindow w(nullptr, 2);
     w.show();
 //    MainWindow w2(nullptr, 2);
 //    w2.show();

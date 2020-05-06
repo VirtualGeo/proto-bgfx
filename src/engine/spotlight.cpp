@@ -5,6 +5,8 @@
 #include <iostream>
 #include <cstring>
 
+bx::Vec3 g_up = {0.0, 1.0, 0.0};
+
 SpotLight::SpotLight(bx::Vec3 direction, bx::Vec3 position, float cutOff, float outerCutOff, float constant, float linear, float quadratic)
     : m_direction(std::move(direction))
     , m_position(std::move(position))
@@ -35,9 +37,10 @@ void SpotLight::updateLightShadowMaps(int viewId)
 
 //    bgfx::setViewFrameBuffer(id, m_shadowMapFB);
 
-    bgfx::setViewRect(viewId, 50 + 210 * m_id, 200, 200, 200);
-//    bgfx::setViewRect(viewId, 0, 0, m_shadowMapSize, m_shadowMapSize);
-//    bgfx::setViewFrameBuffer(id, Program::m_shadowMapFB);
+//    bgfx::setViewRect(viewId, 50 + 210 * m_id, 200, 200, 200);
+    bgfx::setViewRect(viewId, 0, 0, m_shadowMapSize, m_shadowMapSize);
+    bgfx::setViewFrameBuffer(viewId, Program::m_shadowMapFB[m_id]);
+
 //    bgfx::setViewFrameBuffer(viewId, m_shadowMapFB);
 
 //    float view[16];
@@ -66,10 +69,10 @@ void SpotLight::updatePos(bx::Vec3 position)
     m_position = position;
 
     float lightView[16];
-    bx::mtxLookAt(lightView, m_position, bx::add(m_position, m_direction), {0.0f, -1.0f, 0.0f}); // question why y = -1
+    bx::mtxLookAt(lightView, m_position, bx::add(m_position, m_direction), g_up); // question why y = -1
 
     float lightProj[16];
-    bx::mtxProj(lightProj, 45.0f, 1.0f, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+    bx::mtxProj(lightProj, 2 * m_outerCutOff, 1.0f, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 //    float mtxShadow[16];
 //    const bgfx::Caps * caps = bgfx::getCaps();
@@ -104,10 +107,10 @@ void SpotLight::updateDirection(bx::Vec3 direction)
     m_direction = direction;
 
     float lightView[16];
-    bx::mtxLookAt(lightView, m_position, bx::add(m_position, m_direction), {0.0f, -1.0f, 0.0f}); // question why y = -1
+    bx::mtxLookAt(lightView, m_position, bx::add(m_position, m_direction), g_up); // question why y = -1
 
     float lightProj[16];
-    bx::mtxProj(lightProj, 45.0f, 1.0f, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+    bx::mtxProj(lightProj, 2 * m_outerCutOff, 1.0f, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 //    float mtxShadow[16];
 //    const bgfx::Caps * caps = bgfx::getCaps();
@@ -141,10 +144,10 @@ void SpotLight::updateDirection(bx::Vec3 direction)
 void SpotLight::updateData()
 {
     float lightView[16];
-    bx::mtxLookAt(lightView, m_position, bx::add(m_position, m_direction), {0.0f, -1.0f, 0.0f}); // question why y = -1
+    bx::mtxLookAt(lightView, m_position, bx::add(m_position, m_direction), g_up); // question why y = -1
 
     float lightProj[16];
-    bx::mtxProj(lightProj, 45.0f, 1.0f, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+    bx::mtxProj(lightProj, 2 * m_outerCutOff, 1.0f, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 //    float mtxShadow[16];
 //    const bgfx::Caps * caps = bgfx::getCaps();
@@ -168,8 +171,8 @@ void SpotLight::updateData()
 
 
     assert(36 == 4 * Program::s_num_vec4_spotLight);
-    float newData[20] = {m_ambient.x, m_ambient.y, m_ambient.z, m_cutOff,
-              m_diffuse.x, m_diffuse.y, m_diffuse.z, m_outerCutOff,
+    float newData[20] = {m_ambient.x, m_ambient.y, m_ambient.z, bx::cos(bx::toRad(m_cutOff)),
+              m_diffuse.x, m_diffuse.y, m_diffuse.z, bx::cos(bx::toRad(m_outerCutOff)),
               m_specular.x, m_specular.y, m_specular.z, m_constant,
               m_direction.x, m_direction.y, m_direction.z, m_linear,
               m_position.x, m_position.y, m_position.z, m_quadratic

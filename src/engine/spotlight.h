@@ -8,7 +8,7 @@
 class SpotLight : public Light
 {
 public:
-    SpotLight(bx::Vec3 direction, bx::Vec3 position, float cutOff =0.97, float outerCutOff = 0.95, float constant = 1.0, float linear = 0.09, float quadratic = 0.032);
+    SpotLight(bx::Vec3 direction, bx::Vec3 position, float cutOff =20.0f, float outerCutOff = 25.0f, float constant = 1.0, float linear = 0.09, float quadratic = 0.032);
 
 //private:
 //protected:

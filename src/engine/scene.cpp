@@ -376,6 +376,7 @@ void Scene::updateLightShadowMaps()
     for (auto& spotLight : m_spotLights) {
         spotLight.updateLightShadowMaps(viewId);
         draw(viewId, Shading::SHADOW, mtx, state);
+        spotLight.drawDebug();
         ++viewId;
 
         //        bgfx::touch(1);
@@ -386,6 +387,7 @@ void Scene::updateLightShadowMaps()
         if (camera.m_spotLightEnable) {
             camera.m_spotLight.updateLightShadowMaps(viewId);
             draw(viewId, Shading::SHADOW, mtx, state);
+            camera.m_spotLight.drawDebug();
             ++viewId;
             //        if (camera->m_type == Camera::FPS) {
             //            static_cast<CameraFps&>(camera)
@@ -393,6 +395,8 @@ void Scene::updateLightShadowMaps()
             //        }
         }
     }
+
+    //    bgfx::setTexture(4, Program::m_sShadowMaps, );
 
     //    for (auto& dirLight : m_dirLights) {
     //        dirLight.updateLightShadowMaps();
@@ -402,149 +406,92 @@ void Scene::updateLightShadowMaps()
     //    }
 }
 
-void Scene::render(const bgfx::ViewId id, const Shading& shading, const float* mtx,
-    const uint64_t state) const
+void Scene::setLightUniforms()
 {
-    //    float view[16];
-    //    // bx::mtxLookAt(view, eye, at);
-    //    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
+    int nLight = 0;
+    if (!m_dirLights.empty()) {
+        float buffer[Program::s_dirLightSizeMax] = { 0.0f };
+        int i = 0;
+        for (const auto& dirLight : m_dirLights) {
+            memcpy(&buffer[i], dirLight.m_data, 4 * Program::s_num_vec4_dirLight * sizeof(float));
+            i += 4 * Program::s_num_vec4_dirLight;
+            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            ++nLight;
+        }
+        //            buffer[3] = m_dirLights.size();
+        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
+    }
 
-    //    float proj[16];
-    //    bx::mtxProj(proj, camera.m_fov, ratio, 0.1f, 100.0f,
-    //        bgfx::getCaps()->homogeneousDepth);
-    //    bgfx::setViewTransform(id, view, proj);
+    if (!m_pointLights.empty()) {
+        float buffer[Program::s_pointLightSizeMax] = { 0.0f };
+        int i = 0;
+        for (const auto& pointLight : m_pointLights) {
+            memcpy(&buffer[i], pointLight.m_data, 4 * Program::s_num_vec4_pointLight * sizeof(float));
+            i += 4 * Program::s_num_vec4_pointLight;
+            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            ++nLight;
+        }
+        //            buffer[3] = m_pointLights.size();
+        bgfx::setUniform(Program::m_uPointLights, buffer, Program::s_num_vec4_pointLight * m_pointLights.size());
+    }
 
-    //    bgfx::setState(state);
-    //    bgfx::setTransform(mtx);
-    //    bgfx::touch(id);
-    //    draw(id, shading, mtx, state);
-    //    bgfx::submit(id, Program::m_programs[shading], 0, BGFX_DISCARD_ALL);
-    //    return;
+    float buffer[Program::s_spotLightSizeMax] = { 0.0f };
+    int i = 0;
+    if (!m_spotLights.empty()) {
+        //            buffer[0] = m_spotLights.size();
+        for (const auto& spotLight : m_spotLights) {
+            memcpy(&buffer[i], spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
+            i += 4 * Program::s_num_vec4_spotLight;
+            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            ++nLight;
+        }
+    }
+    int nSpotLightCameraEnable = 0;
+    for (const auto& camera : m_cameras) {
+        if (camera.m_spotLightEnable) {
+            memcpy(&buffer[i], camera.m_spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
+            i += 4 * Program::s_num_vec4_spotLight;
+            ++nSpotLightCameraEnable;
+            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            ++nLight;
+        }
+    }
+    bgfx::setUniform(Program::m_uSpotLights, buffer, Program::s_num_vec4_spotLight * (m_spotLights.size() + nSpotLightCameraEnable));
+    //        }
+}
 
-    //    draw(id, shading, mtx, state);
-    //    return;
+void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, const Shading& shading, const float* mtx) const
+{
+    // --------------------------------- DRAW SCENE
+    //    if (m_id == 0) {
+    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
+        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
+        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
+
+    //    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
+    assert(0 <= iCamera && iCamera < m_cameras.size());
+    //    const auto& camera = *entry::s_scene.m_cameras[m_iCamera];
+    const auto& camera = m_cameras[iCamera];
+    float view[16];
+    // bx::mtxLookAt(view, eye, at);
+    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
+
+    float proj[16];
+    //    const float ratio = float(m_width) / m_height;
+    bx::mtxProj(proj, camera.m_fov, ratio, 0.1f, 100.0f,
+        bgfx::getCaps()->homogeneousDepth);
+    bgfx::setViewTransform(id, view, proj);
 
     switch (shading) {
     case RENDERED:
-        //        const int size = Program::s_num_vec4_dirLight * m_dirLights.size();
-        //        std::vector<float[4]> buffer;
-        //        float buffer[Program::s_numDirLightMax][8];
-        //                float buffer[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4];
-        //        float buffer[Program::s_dirLightSizeMax] = {0.0f};
-
-        //        //        float * buffer[8];
-        ////                std::array<float[4], Program::s_num_vec4_dirLight> buffer;
-        ////                std::vector<std::array<std::array<float, 4>, Program::s_num_vec4_dirLight>> buffer;
-        //                int i = 0;
-        //                for (const auto& dirLight : m_dirLights) {
-        ////                int offset = 0;
-        ////                    for (int i =0; i <m_dirLights.size(); ++i) {
-        ////                        const auto & dirLight = m_dirLights[i];
-        ////                    const float temp[8] {
-        ////                        dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 0.0,
-        ////                        dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 0.0f
-        ////                    };
-        ////                    buffer[i][0][0] = 0;
-        //                    buffer[i+ 0] = dirLight.m_direction.x;
-        //                    buffer[i+ 1] = dirLight.m_direction.y;
-        //                    buffer[i+ 2] = dirLight.m_direction.z;
-
-        //                    buffer[i+ 4] = dirLight.m_diffuse.x;
-        //                    buffer[i+ 5] = dirLight.m_diffuse.y;
-        //                    buffer[i+ 6] = dirLight.m_diffuse.z;
-
-        //        //            buffer[i] = &temp;
-        ////                    memcpy(&buffer[i], temp, sizeof(temp));
-        //                    //            &buffer[i] = std::move(temp);
-
-        //                    i += 8;
-        ////                    ++i;
-        //                }
-        //                buffer[3] = m_dirLights.size();
-
-        ////        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
-        //        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
-
-        if (!m_dirLights.empty()) {
-            float buffer[Program::s_dirLightSizeMax] = { 0.0f };
-            int i = 0;
-            for (const auto& dirLight : m_dirLights) {
-                memcpy(&buffer[i], dirLight.m_data, 4 * Program::s_num_vec4_dirLight * sizeof(float));
-                i += 4 * Program::s_num_vec4_dirLight;
-            }
-            //            buffer[3] = m_dirLights.size();
-            bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
-        }
-
-        if (!m_spotLights.empty()) {
-            float buffer[Program::s_spotLightSizeMax] = { 0.0f };
-            int i = 0;
-            //            buffer[0] = m_spotLights.size();
-            for (const auto& spotLight : m_spotLights) {
-                memcpy(&buffer[i], spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
-                i += 4 * Program::s_num_vec4_spotLight;
-            }
-            bgfx::setUniform(Program::m_uSpotLights, buffer, Program::s_num_vec4_spotLight * m_spotLights.size());
-        }
-
-        if (!m_pointLights.empty()) {
-            float buffer[Program::s_pointLightSizeMax] = { 0.0f };
-            int i = 0;
-            for (const auto& pointLight : m_pointLights) {
-                memcpy(&buffer[i], pointLight.m_data, 4 * Program::s_num_vec4_pointLight * sizeof(float));
-                i += 4 * Program::s_num_vec4_pointLight;
-            }
-            //            buffer[3] = m_pointLights.size();
-            bgfx::setUniform(Program::m_uPointLights, buffer, Program::s_num_vec4_pointLight * m_pointLights.size());
-        }
-        //                const float temp[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
-        //                    {{0.0f, -1.0f, 0.5f, 1.0f},
-        //                    {1.0f, 1.0f, 1.0f, 0.0f}},
-        //                    {{0.0f, 0.0f, 0.0f, 0.0f},
-        //                    {1.0f, 1.0f, 1.0f, 0.0f}}
-        //                };
-        ////                bgfx::setUniform(Program::m_uDirLights, temp, 4);
-
-        //        const auto& dirLight = m_dirLights[0];
-        //        const auto& dirLight2 = m_dirLights[1];
-
-        //        float buffer[Program::s_dirLightSizeMax];
-        //        for (int i =0; i <m_dirLights.size(); ++i) {
-
-        //        }
-
-        //        std::array<std::array<float, 4>, Program::s_num_vec4_dirLight> array {{0.0f}, {0.0f}};
-        //        const float buffer[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
-        //            { { dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 1.0f },
-        //                { dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 1.0f } },
-        //            { { dirLight2.m_direction.x, dirLight2.m_direction.y, dirLight2.m_direction.z, 1.0f },
-        //                { dirLight2.m_diffuse.x, dirLight2.m_diffuse.y, dirLight2.m_diffuse.z, 1.0f } },
-        //        };
-        //        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
-
-        //        using type = float[Program::s_num_vec4_dirLight * 4];
-        //        typedef float[Program::s_num_vec4_dirLight * 4] type
-        //        std::vector<type> buffer;
-
-        //            new type(  dirLight.m_direction.x, dirLight.m_direction.y, dirLight.m_direction.z, 1.0f
-        //                , dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z, 1.0f  ));
-
-        //            { { dirLight2.m_direction.x, dirLight2.m_direction.y, dirLight2.m_direction.z, 1.0f },
-        //                { dirLight2.m_diffuse.x, dirLight2.m_diffuse.y, dirLight2.m_diffuse.z, 1.0f } },
-        //        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_dirLightSizeMax);
-
-        //        const float temp[Program::s_numDirLightMax][Program::s_num_vec4_dirLight][4] {
-        //            {{0.0f, -1.0f, 0.5f, 1.0f},
-        //            {1.0f, 1.0f, 1.0f, 0.0f}},
-        //            {{0.0f, 0.0f, 0.0f, 0.0f},
-        //            {1.0f, 1.0f, 1.0f, 0.0f}}
-        //        };
-        //        bgfx::setUniform(Program::m_uDirLights, temp, 4);
+        const float viewPos[4] = { camera.m_pos.x, camera.m_pos.y, camera.m_pos.z, 0.0f };
+        bgfx::setUniform(Program::m_uViewPos, viewPos);
+        float invModel[16];
+        bx::mtxInverse(invModel, mtx);
+        bgfx::setUniform(Program::m_uInvModel, invModel);
         break;
     }
 
-    //    bgfx::touch(id);
-    //    bgfx::submit(id, Program::m_programs[shading], 0, BGFX_DISCARD_ALL);
     draw(id, shading, mtx, state);
 }
 

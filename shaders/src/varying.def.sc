@@ -6,7 +6,10 @@ vec3 v_view      : TEXCOORD2 = vec3(0.0, 0.0, 0.0);
 //vec3 v_fragPos      : TEXCOORD3 = vec3(0.0, 0.0, 0.0);
 //vec3 v_weyepos : TEXCOORD3 = vec3(0.0, 0.0, 0.0);
 vec4 v_position : TEXCOORD4;
-vec4 v_fragPosLightSpace : TEXCOORD5;
+//vec4 v_fragPosLightSpace : TEXCOORD5;
+vec4 v_fragPosLightSpace_0 : TEXCOORD5;
+vec4 v_fragPosLightSpace_1 : TEXCOORD6;
+vec4 v_fragPosLightSpace_2 : TEXCOORD7;
 //vec4 v_shadowCoord : TEXCOORD6;
 
 vec3 a_position  : POSITION;
