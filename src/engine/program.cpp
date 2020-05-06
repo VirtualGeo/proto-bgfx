@@ -24,14 +24,18 @@ bgfx::UniformHandle Program::m_uViewPos;
 bgfx::UniformHandle Program::m_uInvModel;
 //bgfx::UniformHandle Program::m_diffuse;
 bgfx::UniformHandle Program::m_sShadowMap;
+//bgfx::UniformHandle Program::m_sShadowMap_light_0;
+//bgfx::UniformHandle Program::m_sShadowMap_light_1;
+//bgfx::UniformHandle Program::m_sShadowMap_light_2;
+bgfx::UniformHandle Program::m_sShadowMaps[s_num_lightMax];
 bgfx::UniformHandle Program::m_uLightSpaceMatrix;
 bgfx::UniformHandle Program::m_uLightPos;
 bgfx::UniformHandle Program::m_uLightMtx;
 bgfx::UniformHandle Program::m_uDepthScaleOffset;
 const bgfx::Caps* Program::m_caps = nullptr;
 //bgfx::ProgramHandle Program::m_progShadow;
-//bgfx::FrameBufferHandle Program::m_shadowMapFB;
-//bgfx::TextureHandle Program::m_shadowMapTexture = BGFX_INVALID_HANDLE;
+bgfx::FrameBufferHandle Program::m_shadowMapFB[s_num_lightMax];
+bgfx::TextureHandle Program::m_shadowMapTexture[s_num_lightMax];
 
 //bgfx::UniformHandle Program::m_uDirLights[s_numDirLightMax][s_num_vec4_dirLight];
 bgfx::UniformHandle Program::m_uDirLights;
@@ -79,48 +83,79 @@ void Program::init(const bgfx::Caps* caps)
     m_uInvModel = bgfx::createUniform("u_invModel", bgfx::UniformType::Mat4);
 
     m_sShadowMap = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
+    for (int i = 0; i < s_num_lightMax; ++i) {
+        m_sShadowMaps[i] = bgfx::createUniform((std::string("s_shadowMap_light_") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
+    }
+    //    m_sShadowMap_light_0 = bgfx::createUniform("s_shadowMap_light_0", bgfx::UniformType::Sampler);
+    //    m_sShadowMap_light_1 = bgfx::createUniform("s_shadowMap_light_1", bgfx::UniformType::Sampler);
+    //    m_sShadowMap_light_2 = bgfx::createUniform("s_shadowMap_light_2", bgfx::UniformType::Sampler);
+
+//    m_sShadowMaps = bgfx::createUniform("s_shadowMaps", bgfx::UniformType::Sampler, s_num_lightMax);
     m_uLightSpaceMatrix = bgfx::createUniform("u_lightSpaceMatrix", bgfx::UniformType::Mat4);
 
     m_uLightPos = bgfx::createUniform("u_lightPos", bgfx::UniformType::Vec4);
     m_uLightMtx = bgfx::createUniform("u_lightMtx", bgfx::UniformType::Mat4);
     m_uDepthScaleOffset = bgfx::createUniform("u_depthScaleOffset", bgfx::UniformType::Vec4);
 
-//    bgfx::TextureHandle fbtextures[] = {
-////    m_shadowMapTexture = {
-//        bgfx::createTexture2D(
-//            m_shadowMapSize, m_shadowMapSize,
-//            false, 1, bgfx::TextureFormat::D16,
-//            BGFX_TEXTURE_RT | BGFX_SAMPLER_COMPARE_LEQUAL),
-////    };
-//    };
-//    bgfx::TextureHandle fbtextures[] =
-//    {
-//        bgfx::createTexture2D(
-//              m_shadowMapSize
-//            , m_shadowMapSize
-//            , false
-//            , 1
-//            , bgfx::TextureFormat::BGRA8
-//            , BGFX_TEXTURE_RT
-//            ),
-//        bgfx::createTexture2D(
-//              m_shadowMapSize
-//            , m_shadowMapSize
-//            , false
-//            , 1
-//            , bgfx::TextureFormat::D16
-//            , BGFX_TEXTURE_RT_WRITE_ONLY
-//            ),
-//    };
-//    m_shadowMapTexture = fbtextures[0];
-//    m_shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
+    for (int i = 0; i < s_num_lightMax; ++i) {
+        bgfx::TextureHandle fbtextures[] = {
+            bgfx::createTexture2D(
+                m_shadowMapSize,
+                m_shadowMapSize,
+                false,
+                1,
+                bgfx::TextureFormat::BGRA8,
+                BGFX_TEXTURE_RT),
 
-//    m_shadowMapTexture = fbtextures[0];
-//    m_shadowMapFB = bgfx::createFrameBuffer(1, &m_shadowMapTexture, false);
-//    m_shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
+            bgfx::createTexture2D(
+                m_shadowMapSize,
+                m_shadowMapSize,
+                false,
+                1,
+                bgfx::TextureFormat::D16,
+                BGFX_TEXTURE_RT_WRITE_ONLY),
+        };
+        m_shadowMapTexture[i] = fbtextures[0];
+        assert(BX_COUNTOF(fbtextures) == 2);
+        m_shadowMapFB[i] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
+    }
 
-//    assert(bgfx::isValid(m_shadowMapFB));
-//    assert(bgfx::isValid(m_shadowMapTexture));
+    //    bgfx::TextureHandle fbtextures[] = {
+    ////    m_shadowMapTexture = {
+    //        bgfx::createTexture2D(
+    //            m_shadowMapSize, m_shadowMapSize,
+    //            false, 1, bgfx::TextureFormat::D16,
+    //            BGFX_TEXTURE_RT | BGFX_SAMPLER_COMPARE_LEQUAL),
+    ////    };
+    //    };
+    //    bgfx::TextureHandle fbtextures[] =
+    //    {
+    //        bgfx::createTexture2D(
+    //              m_shadowMapSize
+    //            , m_shadowMapSize
+    //            , false
+    //            , 1
+    //            , bgfx::TextureFormat::BGRA8
+    //            , BGFX_TEXTURE_RT
+    //            ),
+    //        bgfx::createTexture2D(
+    //              m_shadowMapSize
+    //            , m_shadowMapSize
+    //            , false
+    //            , 1
+    //            , bgfx::TextureFormat::D16
+    //            , BGFX_TEXTURE_RT_WRITE_ONLY
+    //            ),
+    //    };
+    //    m_shadowMapTexture = fbtextures[0];
+    //    m_shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
+
+    //    m_shadowMapTexture = fbtextures[0];
+    //    m_shadowMapFB = bgfx::createFrameBuffer(1, &m_shadowMapTexture, false);
+    //    m_shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
+
+    //    assert(bgfx::isValid(m_shadowMapFB));
+    //    assert(bgfx::isValid(m_shadowMapTexture));
 
     //    m_shadowMapFB.idx = bgfx::kInvalidHandle;
     //    m_shadowMapTexture = fbtextures[0];
@@ -194,6 +229,18 @@ void Program::clear()
 
     //    bgfx::destroy(m_diffuse);
     bgfx::destroy(m_sShadowMap);
+    for (int i =0; i <s_num_lightMax; ++i) {
+        bgfx::destroy(m_sShadowMaps[i]);
+    }
+//    bgfx::destroy(m_sShadowMap_light_0);
+//    bgfx::destroy(m_sShadowMap_light_1);
+//    bgfx::destroy(m_sShadowMap_light_2);
+
+//    bgfx::destroy(m_sShadowMaps);
+    for (int i = 0; i < s_num_lightMax; ++i) {
+        bgfx::destroy(m_shadowMapTexture[i]);
+        bgfx::destroy(m_shadowMapFB[i]);
+    }
     bgfx::destroy(m_uLightSpaceMatrix);
     bgfx::destroy(m_uLightPos);
     bgfx::destroy(m_uLightMtx);
@@ -315,7 +362,7 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
         break;
     }
 
-    bgfx::submit(id, m_programs[shading]);
+    bgfx::submit(id, m_programs[shading], 1.0);
     //    bgfx::submit(id, m_programs[shading], 0, BGFX_DISCARD_NONE | BGFX_CLEAR_DISCARD_COLOR_0);
 }
 

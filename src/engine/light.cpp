@@ -15,7 +15,7 @@ Light::Light(bx::Vec3 ambient, bx::Vec3 diffuse, bx::Vec3 specular)
 {
     ++m_nbLight;
     //    bgfx::TextureHandle shadowMapTexture;
-    m_sShadowMap = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
+//    m_sShadowMap = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
 
     //    bgfx::TextureHandle fbtextures[] = {
     //        bgfx::createTexture2D(
@@ -53,27 +53,29 @@ Light::Light(bx::Vec3 ambient, bx::Vec3 diffuse, bx::Vec3 specular)
 
 //    assert(bgfx::isValid(m_shadowMapFB));
 //    assert(bgfx::isValid(m_shadowMapTexture));
-    bgfx::TextureHandle fbtextures[] =
-    {
-        bgfx::createTexture2D(
-              m_shadowMapSize
-            , m_shadowMapSize
-            , false
-            , 1
-            , bgfx::TextureFormat::BGRA8
-            , BGFX_TEXTURE_RT
-            ),
-        bgfx::createTexture2D(
-              m_shadowMapSize
-            , m_shadowMapSize
-            , false
-            , 1
-            , bgfx::TextureFormat::D16
-            , BGFX_TEXTURE_RT_WRITE_ONLY
-            ),
-    };
-    m_shadowMapTexture = fbtextures[0];
-    m_shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
+
+//    bgfx::TextureHandle fbtextures[] =
+//    {
+//        bgfx::createTexture2D(
+//              m_shadowMapSize
+//            , m_shadowMapSize
+//            , false
+//            , 1
+//            , bgfx::TextureFormat::BGRA8
+//            , BGFX_TEXTURE_RT
+//            ),
+//        bgfx::createTexture2D(
+//              m_shadowMapSize
+//            , m_shadowMapSize
+//            , false
+//            , 1
+//            , bgfx::TextureFormat::D16
+//            , BGFX_TEXTURE_RT_WRITE_ONLY
+//            ),
+//    };
+//    m_shadowMapTexture = fbtextures[0];
+//    assert(BX_COUNTOF(fbtextures) == 2);
+//    m_shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
 
 
 
@@ -84,10 +86,11 @@ Light::Light(Light&& light)
     , m_diffuse(light.m_diffuse)
     , m_specular(light.m_specular)
 
-    , m_shadowMapFB(light.m_shadowMapFB)
-    , m_shadowMapTexture(light.m_shadowMapTexture)
+//    , m_shadowMapFB(light.m_shadowMapFB)
+//    , m_shadowMapTexture(light.m_shadowMapTexture)
+
 //    , m_shadowMapSize(light.m_shadowMapSize)
-    , m_id(m_nbLight)
+    , m_id(light.m_id)
 {
     light.m_last = false;
     //#ifdef DEBUG
@@ -95,13 +98,14 @@ Light::Light(Light&& light)
     std::cout << "[Light] " << this << " right moving from " << &light << std::endl;
     std::cout << "\033[0m";
     //#endif
+    std::cout << "nbLight : " << m_nbLight << std::endl;
 }
 
 Light::~Light()
 {
     if (m_last) {
-        bgfx::destroy(m_shadowMapFB);
-        bgfx::destroy(m_shadowMapTexture);
+//        bgfx::destroy(m_shadowMapFB);
+//        bgfx::destroy(m_shadowMapTexture);
         --m_nbLight;
 //        m_shadowMapFB = BGFX_INVALID_HANDLE;
 //        m_shadowMapFB.idx = bgfx::kInvalidHandle;
@@ -114,12 +118,18 @@ void Light::drawDebug()
 //    int viewId = 21;
 //    std::cout << viewId << std::endl;
 
-    bgfx::setViewRect(viewId, 50 + m_id *200, 200, 200, 200);
+    bgfx::setViewRect(viewId, 50 + m_id *210, 200, 200, 200);
     bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
 //    bgfx::touch(1);
-    assert(bgfx::isValid(m_shadowMapTexture));
-//    bgfx::setTexture(3, Program::m_sShadowMap, m_shadowMapTexture);
-    bgfx::setTexture(3, m_sShadowMap, m_shadowMapTexture);
+//    assert(bgfx::isValid(m_shadowMapTexture));
+    bgfx::setTexture(3, Program::m_sShadowMap, Program::m_shadowMapTexture[m_id]);
+//    std::cout << Program::m_shadowMapTexture[m_id].idx << std::endl;
+//    bgfx::setTexture(4, Program::m_sShadowMaps, Program::m_shadowMapTexture);
+//    bgfx::sette
+
+//    bgfx::setTexture(3, Program::m_sShadowMap, bgfx::getTexture(Program::m_shadowMapFB, 0));
+
+//    bgfx::setTexture(3, m_sShadowMap, m_shadowMapTexture);
 //    bgfx::setTexture(3, Program::m_sShadowMap, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
 //    bgfx::submit(1, Program::m_programs[DEBUG_QUAD]);
     Geometry::drawQuad();

@@ -42,9 +42,9 @@ public:
 //    void addLight(DirLight && dirLight);
 //    void addLight(PointLight && pointLight);
     void updateLightShadowMaps();
+    void setLightUniforms();
 
-    void render(const bgfx::ViewId id, const Shading &shading, const float *mtx,
-                const uint64_t state) const;
+    void renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, const Shading &shading, const float *mtx) const;
 
 private:
     void draw(const bgfx::ViewId id, const Shading &shading, const float *mtx,

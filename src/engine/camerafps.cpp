@@ -1,11 +1,20 @@
 #include "camerafps.h"
 #include <iostream>
+//#include <bx/math.h>
 
-CameraFps::CameraFps(bx::Vec3 pos)
+CameraFps::CameraFps(bx::Vec3 pos, bx::Vec3 target)
     : Camera(pos)
-    , m_spotLight({ 1.0f, 0.0f, 0.0f }, pos)
+    , m_spotLight(bx::Vec3{0.0, 1.0, 0.0}, pos) // random value for direction
 {
     m_type = FPS;
+
+    float view[16];
+    bx::mtxLookAt(view, pos, target);
+    bx::Vec3 dof = bx::Vec3{view[2], view[6], view[10]};
+    m_yaw = bx::toDeg(bx::atan2(dof.z, dof.x));
+    m_pitch = bx::toDeg(bx::asin(dof.y));
+//    m_pitch = bx::toDeg(bx::asin(dof.z));
+
 
     updateCameraFront();
 }
