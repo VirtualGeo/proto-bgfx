@@ -376,7 +376,7 @@ void Scene::updateLightShadowMaps()
     for (auto& spotLight : m_spotLights) {
         spotLight.updateLightShadowMaps(viewId);
         draw(viewId, Shading::SHADOW, mtx, state);
-        spotLight.drawDebug();
+//        spotLight.drawDebug();
         ++viewId;
 
         //        bgfx::touch(1);
@@ -387,7 +387,7 @@ void Scene::updateLightShadowMaps()
         if (camera.m_spotLightEnable) {
             camera.m_spotLight.updateLightShadowMaps(viewId);
             draw(viewId, Shading::SHADOW, mtx, state);
-            camera.m_spotLight.drawDebug();
+//            camera.m_spotLight.drawDebug();
             ++viewId;
             //        if (camera->m_type == Camera::FPS) {
             //            static_cast<CameraFps&>(camera)
@@ -395,7 +395,16 @@ void Scene::updateLightShadowMaps()
             //        }
         }
     }
+    bgfx::frame();
 
+    for (auto& spotLight : m_spotLights) {
+        spotLight.drawDebug();
+    }
+    for (auto& camera : m_cameras) {
+        if (camera.m_spotLightEnable) {
+            camera.m_spotLight.drawDebug();
+        }
+    }
     //    bgfx::setTexture(4, Program::m_sShadowMaps, );
 
     //    for (auto& dirLight : m_dirLights) {
@@ -415,7 +424,7 @@ void Scene::setLightUniforms()
         for (const auto& dirLight : m_dirLights) {
             memcpy(&buffer[i], dirLight.m_data, 4 * Program::s_num_vec4_dirLight * sizeof(float));
             i += 4 * Program::s_num_vec4_dirLight;
-            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+//            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
             ++nLight;
         }
         //            buffer[3] = m_dirLights.size();
@@ -428,7 +437,7 @@ void Scene::setLightUniforms()
         for (const auto& pointLight : m_pointLights) {
             memcpy(&buffer[i], pointLight.m_data, 4 * Program::s_num_vec4_pointLight * sizeof(float));
             i += 4 * Program::s_num_vec4_pointLight;
-            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+//            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
             ++nLight;
         }
         //            buffer[3] = m_pointLights.size();
@@ -442,7 +451,7 @@ void Scene::setLightUniforms()
         for (const auto& spotLight : m_spotLights) {
             memcpy(&buffer[i], spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
             i += 4 * Program::s_num_vec4_spotLight;
-            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+//            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
             ++nLight;
         }
     }
@@ -452,12 +461,42 @@ void Scene::setLightUniforms()
             memcpy(&buffer[i], camera.m_spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
             i += 4 * Program::s_num_vec4_spotLight;
             ++nSpotLightCameraEnable;
-            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+//            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
             ++nLight;
         }
     }
     bgfx::setUniform(Program::m_uSpotLights, buffer, Program::s_num_vec4_spotLight * (m_spotLights.size() + nSpotLightCameraEnable));
     //        }
+}
+
+void Scene::setLightShadowSamplers()
+{
+    int nLight = 0;
+    if (!m_dirLights.empty()) {
+        for (const auto& dirLight : m_dirLights) {
+            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            ++nLight;
+        }
+    }
+    if (!m_pointLights.empty()) {
+        for (const auto& pointLight : m_pointLights) {
+            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            ++nLight;
+        }
+    }
+
+    if (!m_spotLights.empty()) {
+        for (const auto& spotLight : m_spotLights) {
+            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            ++nLight;
+        }
+    }
+    for (const auto& camera : m_cameras) {
+        if (camera.m_spotLightEnable) {
+            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            ++nLight;
+        }
+    }
 }
 
 void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, const Shading& shading, const float* mtx) const
@@ -478,7 +517,7 @@ void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, co
 
     float proj[16];
     //    const float ratio = float(m_width) / m_height;
-    bx::mtxProj(proj, camera.m_fov, ratio, 0.1f, 100.0f,
+    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
         bgfx::getCaps()->homogeneousDepth);
     bgfx::setViewTransform(id, view, proj);
 

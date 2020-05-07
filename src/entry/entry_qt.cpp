@@ -5,6 +5,19 @@
 
 #include <QApplication>
 #include <QSurface>
+//#include "windowstate.h"
+//#include <thread>
+
+//void renderLoop() {
+//    MainWindow w(nullptr, 2);
+//    w.show();
+//    while (1) {
+//        WindowState::renderAllWindow();
+//    }
+//}
+//#include <QThread>
+
+
 
 int main(int argc, char *argv[])
 {
@@ -26,6 +39,16 @@ int main(int argc, char *argv[])
     w.show();
 //    MainWindow w2(nullptr, 2);
 //    w2.show();
+
+//    std::thread(&WindowState::renderAllWindow);
+//    std::thread thread(renderLoop);
+//    std::thread t(&QApplication::exec, &a);
+//    QThread * thread = QThread::create([&a]{ a.exec();});
+//    QThread * thread = QThread::create(renderLoop);
+//    thread->start();
+//    while (1) {
+//        WindowState::renderAllWindow();
+//    }
     return a.exec();
 }
 

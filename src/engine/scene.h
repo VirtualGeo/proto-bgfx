@@ -43,6 +43,7 @@ public:
 //    void addLight(PointLight && pointLight);
     void updateLightShadowMaps();
     void setLightUniforms();
+    void setLightShadowSamplers();
 
     void renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, const Shading &shading, const float *mtx) const;
 
