@@ -83,7 +83,8 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
 void QWidgetBgfx::paintEvent(QPaintEvent*)
 {
 //    m_window->render();
-    WindowState::render();
+
+    WindowState::renderAllWindow();
     update();
 }
 

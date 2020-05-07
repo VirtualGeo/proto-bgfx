@@ -3,6 +3,7 @@
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 $input v_position
+$input v_texcoord0
 
 //#include "../common/common.sh"
 #include <bgfx_shader.sh>
@@ -16,9 +17,19 @@ $input v_position
 //    float z = depth * 2.0 - 1.0; // back to NDC
 //    return (2.0 * near * far) / (far + near - z * (far - near));
 //}
+#include "uniforms.sc"
+
 
 void main()
 {
+    if (material_hasOpacityTexture > -0.5) {
+        float opacity = texture2D(s_opacity, v_texcoord0).r;
+        if (opacity < 0.1) {
+            discard;
+        }
+    }
+
+
 //    gl_FragColor = vec4_splat(0.0);
 //    return;
 //    gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);

@@ -1,5 +1,6 @@
 $input a_position
 $output v_position
+$outputwb v_texcoord0
 
 /*
  * Copyright 2013-2014 Dario Manesku. All rights reserved.
@@ -9,7 +10,8 @@ $output v_position
 //#include "../common/common.sh"
 #include <bgfx_shader.sh>
 
-uniform mat4 u_lightSpaceMatrix;
+#include "uniforms.sc"
+
 
 void main()
 {

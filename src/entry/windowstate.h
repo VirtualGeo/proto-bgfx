@@ -50,10 +50,12 @@ public:
     WindowState(void* nwh, int width, int height);
     ~WindowState();
 
-//    void clear();
     void updateCameraPos();
     void resetWindow();
-    void render();
+private:
+    void render() const;
+public:
+    void renderAllWindow(); // only first window is able to do that
     void printDebugMessage();
 
 public:
@@ -74,12 +76,13 @@ private:
     const int m_id;
 
     bgfx::FrameBufferHandle m_fbh;
-    float m_fps;
-    size_t m_epoch = 10;
-    double m_deltaTime;
-    double m_sum = 0.0;
-    size_t m_counter = 0;
-    std::chrono::time_point<std::chrono::high_resolution_clock> m_lastTime;
+
+    static float s_fps;
+    static size_t s_epoch;
+    static double s_deltaTime;
+    static std::chrono::time_point<std::chrono::high_resolution_clock> s_lastTime;
+    static double s_sum;
+    static size_t s_counter;
 
     Shading m_shading = Shading::RENDERED;
 //    Shading m_shading = Shading::EMISSIVE;
@@ -98,7 +101,6 @@ private:
 
     bool m_ctrlPressed = false;
 
-//    static bool m_firstRenderLooper;
 };
 
 #endif // WINDOWSTATE_H

@@ -138,7 +138,7 @@ void init()
 
 void update()
 {
-    g_windowState->render();
+    g_windowState->renderAllWindow();
 }
 
 void shutdown()

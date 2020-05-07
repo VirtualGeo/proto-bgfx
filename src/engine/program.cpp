@@ -90,7 +90,7 @@ void Program::init(const bgfx::Caps* caps)
     //    m_sShadowMap_light_1 = bgfx::createUniform("s_shadowMap_light_1", bgfx::UniformType::Sampler);
     //    m_sShadowMap_light_2 = bgfx::createUniform("s_shadowMap_light_2", bgfx::UniformType::Sampler);
 
-//    m_sShadowMaps = bgfx::createUniform("s_shadowMaps", bgfx::UniformType::Sampler, s_num_lightMax);
+    //    m_sShadowMaps = bgfx::createUniform("s_shadowMaps", bgfx::UniformType::Sampler, s_num_lightMax);
     m_uLightSpaceMatrix = bgfx::createUniform("u_lightSpaceMatrix", bgfx::UniformType::Mat4);
 
     m_uLightPos = bgfx::createUniform("u_lightPos", bgfx::UniformType::Vec4);
@@ -229,14 +229,14 @@ void Program::clear()
 
     //    bgfx::destroy(m_diffuse);
     bgfx::destroy(m_sShadowMap);
-    for (int i =0; i <s_num_lightMax; ++i) {
+    for (int i = 0; i < s_num_lightMax; ++i) {
         bgfx::destroy(m_sShadowMaps[i]);
     }
-//    bgfx::destroy(m_sShadowMap_light_0);
-//    bgfx::destroy(m_sShadowMap_light_1);
-//    bgfx::destroy(m_sShadowMap_light_2);
+    //    bgfx::destroy(m_sShadowMap_light_0);
+    //    bgfx::destroy(m_sShadowMap_light_1);
+    //    bgfx::destroy(m_sShadowMap_light_2);
 
-//    bgfx::destroy(m_sShadowMaps);
+    //    bgfx::destroy(m_sShadowMaps);
     for (int i = 0; i < s_num_lightMax; ++i) {
         bgfx::destroy(m_shadowMapTexture[i]);
         bgfx::destroy(m_shadowMapFB[i]);
@@ -257,6 +257,7 @@ void Program::clear()
 void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material, const Textures& textures)
 {
     //    float vec4[4] = { 0.0, 1.0, 1.0, 1.0 };
+    int iTexDiffuse;
 
     switch (shading) {
     case Shading::NORMAL:
@@ -290,7 +291,8 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
 
         //    		if (group.m_texture != nullptr) {
         //        const int iTexDiffuse = material.iTexDiffuse();
-        const int iTexDiffuse = material.m_iTexDiffuse;
+//        static const int iTexDiffuse = material.m_iTexDiffuse; // question: why not work ?
+        iTexDiffuse = material.m_iTexDiffuse;
         if (iTexDiffuse >= 0) {
 
             assert(iTexDiffuse < textures.size());
@@ -320,16 +322,6 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
 
         //        bgfx::setUniform(m_uTexturesEnable, material.texturesEnable());
         //        const int iTexOpacity = material.iTexOpacity();
-        const int iTexOpacity = material.m_iTexOpacity;
-        if (iTexOpacity >= 0) {
-            assert(iTexOpacity < textures.size());
-            const Texture& texture = textures[iTexOpacity];
-
-            bgfx::setTexture(1, m_sOpacity, texture.textureHandle(), Texture::s_textureSamplerFlags);
-        } else {
-            //            bgfx::setTexture(1, m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
-            bgfx::setTexture(1, m_sOpacity, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
-        }
 
         //        const SpotLight& spotLight = spotLights[0];
         //        const std::array<float[4], s_num_vec4_uniforms> buffer = {{
@@ -359,10 +351,21 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
         //            bgfx::setUniform(m_uDirLights[i][0], temp);
         //            bgfx::setUniform(m_uDirLights[i][1], temp);
         //        }
+    case Shading::SHADOW:
+        const int iTexOpacity = material.m_iTexOpacity;
+        if (iTexOpacity >= 0) {
+            assert(iTexOpacity < textures.size());
+            const Texture& texture = textures[iTexOpacity];
+
+            bgfx::setTexture(1, m_sOpacity, texture.textureHandle(), Texture::s_textureSamplerFlags);
+        } else {
+            //            bgfx::setTexture(1, m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+            bgfx::setTexture(1, m_sOpacity, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
+        }
         break;
     }
 
-    bgfx::submit(id, m_programs[shading], 1.0);
+    bgfx::submit(id, m_programs[shading], 1.0 );
     //    bgfx::submit(id, m_programs[shading], 0, BGFX_DISCARD_NONE | BGFX_CLEAR_DISCARD_COLOR_0);
 }
 
