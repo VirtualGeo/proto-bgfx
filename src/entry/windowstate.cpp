@@ -54,13 +54,13 @@ WindowState::WindowState(void* nwh, int width, int height)
         bgfxInit.platformData.backBufferDS = nullptr;
         //    bgfxInit.platformData.session = nullptr;
         //    bgfx::setPlatformData(pd);
-        bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
-        //    bgfxInit.type = bgfx::RendererType::Direct3D9;
-        //            bgfxInit.type = bgfx::RendererType::Direct3D11;
-        //            bgfxInit.type = bgfx::RendererType::Direct3D12;
-        //            bgfxInit.type = bgfx::RendererType::OpenGL;
+//        bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
+//            bgfxInit.type = bgfx::RendererType::Direct3D9;
+//                    bgfxInit.type = bgfx::RendererType::Direct3D11;
+//                    bgfxInit.type = bgfx::RendererType::Direct3D12;
+                    bgfxInit.type = bgfx::RendererType::OpenGL;
         //    bgfxInit.type = bgfx::RendererType::OpenGLES;
-        //            bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
+//                    bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
         //    bgfxInit.type = bgfx::RendererType::Metal;
 
         bgfxInit.resolution.width = width;
@@ -76,7 +76,7 @@ WindowState::WindowState(void* nwh, int width, int height)
 
         const bgfx::Caps* caps = bgfx::getCaps();
         assert(caps->supported & BGFX_CAPS_TEXTURE_COMPARE_LEQUAL); // sampler supported
-        assert(caps->homogeneousDepth);
+//        assert(caps->homogeneousDepth); //
 
         entry::g_renderer = bgfx::getRendererName(caps->rendererType);
         //        Q_ASSERT(0 != (caps->supported & BGFX_CAPS_SWAP_CHAIN)); // vulkan no swap chain
@@ -105,11 +105,14 @@ WindowState::WindowState(void* nwh, int width, int height)
         Geometry::init();
         Texture::init();
         // ------------------------------- LOAD MODEL
-        entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+//        entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
 //                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
 //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-low-poly.obj");
 //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel.obj");
 //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-blend.obj");
+
+        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\CornellBox\\CornellBox-Original.obj");
+//        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
 
         //        entry::s_scene.addLight(DirLight({ 0.0f, -1.0f, 0.5f }));
         //        entry::s_scene.addSpotLight(SpotLight({ 1.0f, 0.0f, 0.0f }, { -5.0f, 1.0f, 0.0f }));
@@ -129,10 +132,12 @@ WindowState::WindowState(void* nwh, int width, int height)
     } else {
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
         m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)m_nwh, uint16_t(m_width), uint16_t(m_height));
+        assert(false);
     }
     //    auto& window = entry::s_windows[m_id];
 
     s_windows.emplace_back(this);
+    m_init = true;
 }
 
 WindowState::~WindowState()
@@ -197,25 +202,36 @@ void WindowState::resetWindow()
 
 void WindowState::render() const
 {
+    if (! m_init)
+        return;
+    assert(m_id == 0);
     if (m_id != 0) {
         //            assert(bgfx::isValid(m_fbh));
         bgfx::setViewFrameBuffer(m_id, m_fbh);
     }
+//    bgfx::setViewFrameBuffer(m_id, m_fbh);
     // Set view 0 default viewport.
     bgfx::setViewRect(m_id, 0, 0, uint16_t(m_width), uint16_t(m_height));
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
     bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
-    //        bgfx::touch(m_id);
+            bgfx::touch(m_id);
 
     const float ratio = float(m_width) / m_height;
     entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
+    assert(bgfx::isValid(Program::m_programs[NORMAL]));
+    bgfx::submit(m_id, Program::m_programs[Shading::NORMAL]);
 }
 
 void WindowState::renderAllWindow()
 {
-    //    if (m_id != 0)
-    //        return;
+    if (! m_init)
+        return;
+//        if (m_id != 0)
+//            return;
+        bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
+        bgfx::touch(0);
+//bgfx::touch(0);
 
     const auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -239,16 +255,17 @@ void WindowState::renderAllWindow()
     }
 
     //    if (m_id == 0) {
-    entry::s_scene.setLightUniforms();
-    entry::s_scene.updateLightShadowMaps();
+//    entry::s_scene.setLightUniforms();
+//    entry::s_scene.updateLightShadowMaps();
     //    bgfx::frame();
 
     //    int iWindow = 0;
-    for (const WindowState* window : s_windows) {
-        entry::s_scene.setLightShadowSamplers();
-        window->render();
-        //        ++iWindow;
-    }
+//    for (const WindowState* window : s_windows) {
+////        entry::s_scene.setLightShadowSamplers();
+//        window->render();
+//        //        ++iWindow;
+//    }
+    render();
 
     //    g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
 
@@ -524,6 +541,7 @@ void WindowState::resizeEvent(int width, int height)
     //    m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
 
     if (m_id != 0) {
+        assert(false);
         assert(bgfx::isValid(m_fbh));
         bgfx::destroy(m_fbh);
         m_fbh.idx = bgfx::kInvalidHandle;

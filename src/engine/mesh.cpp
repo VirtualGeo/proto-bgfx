@@ -65,6 +65,7 @@ void Mesh::draw(const bgfx::ViewId id, const Shading &shading, const float* mtx,
     assert(0 <= m_iMaterial && m_iMaterial < materials.size());
     const Material& material = materials[m_iMaterial];
 
+    assert(bgfx::isValid(m_ibh));
     bgfx::setIndexBuffer(m_ibh);
 
     Program::submit(id, shading, material, textures);

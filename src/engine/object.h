@@ -33,6 +33,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Object& object);
 
 private:
+//    bgfx::VertexLayout m_layout;
     bgfx::VertexBufferHandle m_vbh;
     //    std::unique_ptr<bgfx::VertexBufferHandle> m_vbh;
     std::vector<Vertex> m_vertices;

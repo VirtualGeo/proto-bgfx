@@ -46,6 +46,8 @@ void Geometry::init()
         // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
         .end();
 
+//    bgfx::frame();
+
 
     m_vbh = bgfx::createVertexBuffer(
           bgfx::makeRef(s_hplaneVertices, sizeof(s_hplaneVertices) )

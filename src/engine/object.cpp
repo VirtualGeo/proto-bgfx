@@ -140,6 +140,11 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
 {
     //    assert(bgfx::isValid(m_vbh));
     //    Vertex::init();
+//                m_layout.begin()
+//                    .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+//                    .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+//                    .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+//                    .end();
 
     m_name = shape.name;
 
@@ -193,7 +198,7 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
     //    std::map<int, std::map<int, int>> mat2idx2ind;
 
     //    }
-    assert(attrib.texcoords.size() > 0);
+//    assert(attrib.texcoords.size() > 0);
     //    m_meshes.clear();
     m_meshes.reserve(4);
 
@@ -503,16 +508,17 @@ Object::Object(const tinyobj::shape_t& shape, const tinyobj::attrib_t& attrib,
         //    std::vector<float> buffer; // pos(3float), normal(3float), color(3float)
         //        m_vbh = bgfx::createVertexBuffer(bgfx::copy(buffer.data(), sizeof(float) * buffer.size()), );
 
-        //        bgfx::VertexLayout m_layout;
-        //        m_layout.begin()
-        //            .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-        //            .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-        //            .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-        //            .end();
+//                bgfx::VertexLayout m_layout;
+//                m_layout.begin()
+//                    .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+//                    .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+//                    .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+//                    .end();
 
         m_vbh = bgfx::createVertexBuffer(
             bgfx::makeRef(m_vertices.data(), sizeof(Vertex) * m_vertices.size()),
             Geometry::m_layout);
+//            m_layout);
 
         //        printf("[Object] shape[%d] # of triangles = %d\n", static_cast<int>(iShape),
         //            m_nbTriangles);
@@ -569,6 +575,7 @@ Object::Object(std::ifstream& file, const size_t iShape)
     FileIO::read(m_bmax, 3, file);
     FileIO::read(m_name, file);
 
+
     size_t size;
     FileIO::read(size, file);
     m_meshes.reserve(size);
@@ -581,6 +588,7 @@ Object::Object(std::ifstream& file, const size_t iShape)
     m_vbh = bgfx::createVertexBuffer(
         bgfx::makeRef(m_vertices.data(), sizeof(Vertex) * m_vertices.size()),
         Geometry::m_layout);
+//        layout);
 
     //        printf("[Object] shape[%d] # of triangles = %d\n", static_cast<int>(iShape),
     //            m_nbTriangles);
@@ -607,6 +615,7 @@ void Object::save(std::ofstream& file) const
 void Object::draw(const bgfx::ViewId id, const Shading &shading, const float *mtx, const uint64_t state, const Materials &materials, const Textures &textures) const
 {
     for (const Mesh& mesh : m_meshes) {
+        assert(bgfx::isValid(m_vbh));
         bgfx::setVertexBuffer(0, m_vbh);
 
         mesh.draw(id, shading, mtx, state, materials, textures);

@@ -82,10 +82,11 @@ void Program::init(const bgfx::Caps* caps)
     m_uViewPos = bgfx::createUniform("u_viewPos", bgfx::UniformType::Vec4);
     m_uInvModel = bgfx::createUniform("u_invModel", bgfx::UniformType::Mat4);
 
-    m_sShadowMap = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
-    for (int i = 0; i < s_num_lightMax; ++i) {
-        m_sShadowMaps[i] = bgfx::createUniform((std::string("s_shadowMap_light_") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
-    }
+//    m_sShadowMap = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
+//    for (int i = 0; i < s_num_lightMax; ++i) {
+//        m_sShadowMaps[i] = bgfx::createUniform((std::string("s_shadowMap_light_") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
+//    }
+
     //    m_sShadowMap_light_0 = bgfx::createUniform("s_shadowMap_light_0", bgfx::UniformType::Sampler);
     //    m_sShadowMap_light_1 = bgfx::createUniform("s_shadowMap_light_1", bgfx::UniformType::Sampler);
     //    m_sShadowMap_light_2 = bgfx::createUniform("s_shadowMap_light_2", bgfx::UniformType::Sampler);
@@ -97,28 +98,28 @@ void Program::init(const bgfx::Caps* caps)
     m_uLightMtx = bgfx::createUniform("u_lightMtx", bgfx::UniformType::Mat4);
     m_uDepthScaleOffset = bgfx::createUniform("u_depthScaleOffset", bgfx::UniformType::Vec4);
 
-    for (int i = 0; i < s_num_lightMax; ++i) {
-        bgfx::TextureHandle fbtextures[] = {
-            bgfx::createTexture2D(
-                m_shadowMapSize,
-                m_shadowMapSize,
-                false,
-                1,
-                bgfx::TextureFormat::BGRA8,
-                BGFX_TEXTURE_RT),
+//    for (int i = 0; i < s_num_lightMax; ++i) {
+//        bgfx::TextureHandle fbtextures[] = {
+//            bgfx::createTexture2D(
+//                m_shadowMapSize,
+//                m_shadowMapSize,
+//                false,
+//                1,
+//                bgfx::TextureFormat::BGRA8,
+//                BGFX_TEXTURE_RT),
 
-            bgfx::createTexture2D(
-                m_shadowMapSize,
-                m_shadowMapSize,
-                false,
-                1,
-                bgfx::TextureFormat::D16,
-                BGFX_TEXTURE_RT_WRITE_ONLY),
-        };
-        m_shadowMapTexture[i] = fbtextures[0];
-        assert(BX_COUNTOF(fbtextures) == 2);
-        m_shadowMapFB[i] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
-    }
+//            bgfx::createTexture2D(
+//                m_shadowMapSize,
+//                m_shadowMapSize,
+//                false,
+//                1,
+//                bgfx::TextureFormat::D16,
+//                BGFX_TEXTURE_RT_WRITE_ONLY),
+//        };
+//        m_shadowMapTexture[i] = fbtextures[0];
+//        assert(BX_COUNTOF(fbtextures) == 2);
+//        m_shadowMapFB[i] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
+//    }
 
     //    bgfx::TextureHandle fbtextures[] = {
     ////    m_shadowMapTexture = {
@@ -163,8 +164,17 @@ void Program::init(const bgfx::Caps* caps)
 
     for (int i = 0; i < Shading::Count; ++i) {
         m_programs[i] = BGFX_INVALID_HANDLE;
+        if (i == Shading::RENDERED)
+            continue;
+        if (i == Shading::SHADOW)
+            continue;
         if (i == Shading::EMISSIVE)
             //                if (i != Shading::NORMAL)
+            continue;
+        if (i == Shading::DEBUG_QUAD)
+            //                if (i != Shading::NORMAL)
+            continue;
+        if (i != Shading::NORMAL)
             continue;
         //        int i= Shading::NORMAL;
         //    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
@@ -505,7 +515,9 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
 
     const bgfx::Memory* mem;
     if (!binFile) {
-        char code[fileSize];
+        constexpr size_t maxBuffSize = 99999;
+        assert(maxBuffSize > fileSize);
+        char code[maxBuffSize];
         file.read(code, fileSize);
 
         const int headerSize = 18;
