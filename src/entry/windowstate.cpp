@@ -134,7 +134,6 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
     } else {
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
         m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)m_nwh, uint16_t(m_width), uint16_t(m_height));
-        assert(false);
     }
     //    auto& window = entry::s_windows[m_id];
 
@@ -206,7 +205,6 @@ void WindowState::render() const
 {
     if (! m_init)
         return;
-    assert(m_id == 0);
     if (m_id != 0) {
         //            assert(bgfx::isValid(m_fbh));
         bgfx::setViewFrameBuffer(m_id, m_fbh);
@@ -571,7 +569,6 @@ void WindowState::resizeEvent(int width, int height)
     //    m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
 
     if (m_id != 0) {
-        assert(false);
         assert(bgfx::isValid(m_fbh));
         bgfx::destroy(m_fbh);
         m_fbh.idx = bgfx::kInvalidHandle;
