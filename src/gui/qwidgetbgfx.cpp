@@ -36,7 +36,7 @@ static std::map<int, Key::Enum> s_translateKey = {
 QWidgetBgfx::QWidgetBgfx(QWidget* parent)
     : QWidget(parent)
 //    , m_iWindow(WindowState::s_windows.size())
-    , WindowState((void*)(uintptr_t)winId(), width(), height())
+    , WindowState((void*)(uintptr_t)winId(), nullptr, width(), height())
 {
 //    void* nwh = (void*)(uintptr_t)winId();
 //    WindowState::s_windows.push_back(WindowState(nwh, width(), height()));
