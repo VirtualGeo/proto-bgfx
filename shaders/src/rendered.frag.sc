@@ -195,6 +195,7 @@ vec3 CalcPointLight(int iLight, vec3 normal, vec3 fragPos, vec3 viewDir)
 }
 #endif
 
+#if N_SPOT_LIGHT > 0
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, SpotLight light, int iLight)
 {
     // perform perspective divide
@@ -205,6 +206,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, SpotLight light, in
     //    vec3 projCoords = fragPosLightSpace.xyz;
     // transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
+
 //        if (projCoords.z > 1.0 || projCoords.z < 0.0)
 //            return 0.0;
     //    projCoords.x = 1.0 - projCoords.x;
@@ -251,11 +253,11 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, SpotLight light, in
     return shadow;
 }
 
-#if N_SPOT_LIGHT > 0
 // calculates the color when using a spot light.
 vec3 CalcSpotLight(int iLight, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fragPosLightSpace)
 {
-    SpotLight light = spotLights(iLight);
+//    SpotLight light;
+    spotLights(light, iLight);
     vec3 lightDir = normalize(light.position - fragPos);
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);

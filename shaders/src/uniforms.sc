@@ -25,7 +25,7 @@ uniform vec4 u_dirLights[N_DIR_LIGHT_VEC4 * N_DIR_LIGHT];
 
 
 // ------------------------------------ SPOT_LIGHT
-#define N_SPOT_LIGHT 2
+#define N_SPOT_LIGHT 0
 #if N_SPOT_LIGHT > 0
 struct SpotLight {
     vec3 ambient;
@@ -45,20 +45,37 @@ struct SpotLight {
 };
 #define N_SPOT_LIGHT_VEC4 9
 uniform vec4 u_spotLights[N_SPOT_LIGHT_VEC4 * N_SPOT_LIGHT];
-#define spotLights(i) SpotLight(vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4]), \
-                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1]), \
-                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2]), \
-                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3]), \
-                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4]), \
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 0].w, \
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1].w, \
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2].w, \
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3].w, \
-                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4].w, \
-                mat4(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 5], \
-                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 6], \
-                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 7], \
-                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 8]))
+//#define spotLights_position(i) u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4].xyz
+#define spotLights(varName, i) SpotLight varName; \
+varName.ambient = 		u_spotLights[i * N_SPOT_LIGHT_VEC4].xyz; \
+varName.diffuse = 		u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1].xyz; \
+varName.specular = 		u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2].xyz; \
+varName.direction = 	u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3].xyz; \
+varName.position = 		u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4].xyz; \
+varName.cutOff = 		u_spotLights[i * N_SPOT_LIGHT_VEC4 + 0].w; \
+varName.outerCutOff = 	u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1].w; \
+varName.constant = 		u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2].w; \
+varName._linear = 		u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3].w; \
+varName.quadratic = 	u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4].w; \
+varName.lightSpaceMatrix = mat4(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 5], \
+                                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 6], \
+                                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 7], \
+                                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 8])
+
+//#define spotLights(i) SpotLight(vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4]), \
+//                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1]), \
+//                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2]), \
+//                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3]), \
+//                vec3(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4]), \
+//                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 0].w, \
+//                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 1].w, \
+//                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 2].w, \
+//                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 3].w, \
+//                u_spotLights[i * N_SPOT_LIGHT_VEC4 + 4].w, \
+//                mat4(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 5], \
+//                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 6], \
+//                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 7], \
+//                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 8]))
 
 //#define nbSpotLights u_spotLights[0].x
 #endif

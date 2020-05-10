@@ -16,7 +16,7 @@ $output v_fragPosLightSpace_2
 
 #include "uniforms.sc"
 
-#define spotLights_fragPos(i) (v_fragPosLightSpace_##i)
+//#define spotLights_fragPos(i) (v_fragPosLightSpace_##i)
     //#define fragPosLightSpaces(i) (v_fragPosLightSpace_ ## i)
     //#define dirLights_fragPos(i) v_fragPosLightSpace_ ## i
 
@@ -29,16 +29,25 @@ void main()
 
     v_fragPos = mul(u_model[0], vec4(a_position, 1.0)).xyz;
     gl_Position = mul(u_viewProj, vec4(v_fragPos, 1.0));
-    v_normal = mul(mat3(u_model[0]), a_normal);
+//    v_normal = mul(mat3(u_model[0]), a_normal); // question: hlsl failed
+    v_normal = mul(u_model[0], vec4(a_normal, 1.0)).xyz;
+
     //    vec4 normal = a_normal * 2.0 - 1.0;
     //    v_normal = normalize(mul(u_modelview, vec4(normal.xyz, 0.0)).xyz)
     //    v_normal = mul(mat3(transpose(u_invModel)), a_normal);
     v_texcoord0 = a_texcoord0;
 
-    //    SpotLight spotLight_0 = spotLights(0);
+//        SpotLight spotLight_0 = spotLights(0);
     //    SpotLight spotLight_1 = spotLights(1);
-    v_fragPosLightSpace_0 = mul(spotLights(0).lightSpaceMatrix, vec4(v_fragPos, 1.0));
-    v_fragPosLightSpace_1 = mul(spotLights(1).lightSpaceMatrix, vec4(v_fragPos, 1.0));
+
+//    spotLights(spotLight0, 0);
+//    v_fragPosLightSpace_0 = mul(spotLight0.lightSpaceMatrix, vec4(v_fragPos, 1.0));
+
+//    spotLights(spotLight1, 1);
+//    v_fragPosLightSpace_1 = mul(spotLight1.lightSpaceMatrix, vec4(v_fragPos, 1.0));
+
+//    v_fragPosLightSpace_0 = mul(spotLights(0).lightSpaceMatrix, vec4(v_fragPos, 1.0));
+//    v_fragPosLightSpace_1 = mul(spotLights(1).lightSpaceMatrix, vec4(v_fragPos, 1.0));
 
     //    SpotLight spotLight_2 = spotLights(2);
     //    int nbLight = 0;

@@ -1,4 +1,7 @@
-$input a_position, a_normal
+$input a_position
+$input a_normal
+$input a_texcoord0 // vec2
+
 $output v_normal
 
 

@@ -69,6 +69,7 @@ public:
 
 private:
 //    static std::vector<WindowState*> s_windows;
+    bool m_init = false;
 
     void* m_nwh = nullptr;
     int m_width;
@@ -84,9 +85,9 @@ private:
     static double s_sum;
     static size_t s_counter;
 
-    Shading m_shading = Shading::RENDERED;
+//    Shading m_shading = Shading::RENDERED;
 //    Shading m_shading = Shading::EMISSIVE;
-//    Shading m_shading = Shading::NORMAL;
+    Shading m_shading = Shading::NORMAL;
 
     int m_iCamera;
 

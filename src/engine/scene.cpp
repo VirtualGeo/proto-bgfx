@@ -13,18 +13,19 @@
 #include <cstring>
 //#include <iostream>
 #include "camerafps.h"
+#include "geometry.h"
 
 Scene::Scene()
 //    : m_dirLight(bx::normalize(bx::Vec3(0.5f, -1.0f, 0.5f)))
 //    : m_dirLight(bx::normalize(bx::Vec3(0.0f, -1.0f, 0.5f)))
 {
     //    Vertex::init();
-    //    m_layout.begin()
-    //        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-    //        .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-    //        .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-    //        // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-    //        .end();
+//        m_layout.begin()
+//            .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+//            .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+//            .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+//            // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+//            .end();
 }
 
 //void Scene::addModel(const char* filename)
@@ -395,7 +396,7 @@ void Scene::updateLightShadowMaps()
             //        }
         }
     }
-    bgfx::frame();
+//    bgfx::frame();
 
     for (auto& spotLight : m_spotLights) {
         spotLight.drawDebug();
@@ -531,7 +532,9 @@ void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, co
         break;
     }
 
-    draw(id, shading, mtx, state);
+    Geometry::drawQuad();
+
+//    draw(id, shading, mtx, state);
 }
 
 void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx, const uint64_t state) const

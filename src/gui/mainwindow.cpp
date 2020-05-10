@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent, int nbWidget)
     ui->setupUi(this);
 
 //    QVBoxLayout * layout = new QVBoxLayout;
+//    ui->centralwidget->resize(1200, 800);
 
 
     m_splitter = new QSplitter(ui->centralwidget);
