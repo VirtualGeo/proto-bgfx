@@ -40,11 +40,11 @@ void main()
 //        SpotLight spotLight_0 = spotLights(0);
     //    SpotLight spotLight_1 = spotLights(1);
 
-//    spotLights(spotLight0, 0);
-//    v_fragPosLightSpace_0 = mul(spotLight0.lightSpaceMatrix, vec4(v_fragPos, 1.0));
+    spotLights(spotLight0, 0);
+    v_fragPosLightSpace_0 = mul(spotLight0.lightSpaceMatrix, vec4(v_fragPos, 1.0));
 
-//    spotLights(spotLight1, 1);
-//    v_fragPosLightSpace_1 = mul(spotLight1.lightSpaceMatrix, vec4(v_fragPos, 1.0));
+    spotLights(spotLight1, 1);
+    v_fragPosLightSpace_1 = mul(spotLight1.lightSpaceMatrix, vec4(v_fragPos, 1.0));
 
 //    v_fragPosLightSpace_0 = mul(spotLights(0).lightSpaceMatrix, vec4(v_fragPos, 1.0));
 //    v_fragPosLightSpace_1 = mul(spotLights(1).lightSpaceMatrix, vec4(v_fragPos, 1.0));

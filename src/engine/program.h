@@ -53,8 +53,8 @@ public:
     static constexpr unsigned int s_numPointLightMax = 20;
     static constexpr unsigned int s_pointLightSizeMax = s_num_vec4_pointLight * s_numPointLightMax * 4;
 
-//    static constexpr unsigned int s_num_lightMax = s_numDirLightMax + s_numSpotLightMax + s_numSpotLightMax;
-    static constexpr unsigned int s_num_lightMax = 1;
+    static constexpr unsigned int s_num_lightMax = s_numDirLightMax + s_numSpotLightMax + s_numSpotLightMax;
+//    static constexpr unsigned int s_num_lightMax = 2;
 
     Program() = delete;
     ~Program() = delete;

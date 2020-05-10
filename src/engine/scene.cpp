@@ -396,7 +396,7 @@ void Scene::updateLightShadowMaps()
             //        }
         }
     }
-//    bgfx::frame();
+    bgfx::frame();
 
     for (auto& spotLight : m_spotLights) {
         spotLight.drawDebug();
@@ -532,9 +532,8 @@ void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, co
         break;
     }
 
-    Geometry::drawQuad();
-
-//    draw(id, shading, mtx, state);
+//    Geometry::drawQuad();
+    draw(id, shading, mtx, state);
 }
 
 void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx, const uint64_t state) const

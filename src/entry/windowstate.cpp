@@ -107,13 +107,13 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         Geometry::init();
         Texture::init();
         // ------------------------------- LOAD MODEL
-//        entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
+        entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
 //                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
 //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-low-poly.obj");
 //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel.obj");
 //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-blend.obj");
 
-        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\CornellBox\\CornellBox-Original.obj");
+//        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\CornellBox\\CornellBox-Original.obj");
 //        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
 
         //        entry::s_scene.addLight(DirLight({ 0.0f, -1.0f, 0.5f }));
@@ -217,14 +217,14 @@ void WindowState::render() const
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
     bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
-            bgfx::touch(m_id);
+//            bgfx::touch(m_id);
 
 //    return;
     const float ratio = float(m_width) / m_height;
     entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
 
-    assert(bgfx::isValid(Program::m_programs[NORMAL]));
-    bgfx::submit(m_id, Program::m_programs[Shading::NORMAL]);
+//    assert(bgfx::isValid(Program::m_programs[NORMAL]));
+//    bgfx::submit(m_id, Program::m_programs[Shading::NORMAL]);
 
 
 //    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
@@ -257,8 +257,8 @@ void WindowState::renderAllWindow()
         return;
 //        if (m_id != 0)
 //            return;
-        bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
-        bgfx::touch(0);
+//        bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
+//        bgfx::touch(0);
 //bgfx::touch(0);
 //        if (m_id != 0)
 //            return;
@@ -285,17 +285,17 @@ void WindowState::renderAllWindow()
     }
 
     //    if (m_id == 0) {
-//    entry::s_scene.setLightUniforms();
-//    entry::s_scene.updateLightShadowMaps();
-    //    bgfx::frame();
+    entry::s_scene.setLightUniforms();
+    entry::s_scene.updateLightShadowMaps();
+//        bgfx::frame();
 
-    //    int iWindow = 0;
-//    for (const WindowState* window : s_windows) {
-////        entry::s_scene.setLightShadowSamplers();
-//        window->render();
-//        //        ++iWindow;
-//    }
-    render();
+//        int iWindow = 0;
+    for (const WindowState* window : s_windows) {
+        entry::s_scene.setLightShadowSamplers();
+        window->render();
+        //        ++iWindow;
+    }
+//    render();
 
 //        g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
 

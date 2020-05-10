@@ -35,11 +35,11 @@
 
     #if (AUTO_GENERATE_BIN_MODEL)
     add_definitions(-DAUTO_GENERATE_BIN_MODEL)
-    add_definitions(-DMODEL_LOADER_INFO)
+#    add_definitions(-DMODEL_LOADER_INFO)
     #endif()
 
     # select graphic user interface
-#    set(GUI_QT 1) #default: GLFW
+    set(GUI_QT 1) #default: GLFW
 
     # -------------------------------------------------------------------
     if (GUI_QT)

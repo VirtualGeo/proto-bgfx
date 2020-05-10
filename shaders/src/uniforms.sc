@@ -25,7 +25,7 @@ uniform vec4 u_dirLights[N_DIR_LIGHT_VEC4 * N_DIR_LIGHT];
 
 
 // ------------------------------------ SPOT_LIGHT
-#define N_SPOT_LIGHT 0
+#define N_SPOT_LIGHT 2
 #if N_SPOT_LIGHT > 0
 struct SpotLight {
     vec3 ambient;
