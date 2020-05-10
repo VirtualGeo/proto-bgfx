@@ -6,6 +6,7 @@
 #include <engine/geometry.h>
 #include <entry/entry.h>
 #include <list>
+#include "engine/geometry.h"
 
 std::list<WindowState*> s_windows;
 float WindowState::s_fps;
@@ -15,8 +16,9 @@ std::chrono::time_point<std::chrono::high_resolution_clock> WindowState::s_lastT
 double WindowState::s_sum = 0.0;
 size_t WindowState::s_counter = 0;
 
-WindowState::WindowState(void* nwh, int width, int height)
+WindowState::WindowState(void* nwh, void* ndt, int width, int height)
     : m_nwh(nwh)
+    , m_ndt(ndt)
     , m_width(width)
     , m_height(height)
     , m_id(s_windows.size())
@@ -35,8 +37,8 @@ WindowState::WindowState(void* nwh, int width, int height)
         bgfx::Init bgfxInit = {};
         //    bgfxInit.platformData.ndt = this->winId;
         //    bgfx::PlatformData pd;
-        bgfxInit.platformData.ndt = nullptr;
-        bgfxInit.platformData.nwh = nwh;
+        bgfxInit.platformData.ndt = m_ndt;
+        bgfxInit.platformData.nwh = m_nwh;
         //#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
         //        //    bgfxInit.platformData.ndt = glfwGetX11Display();
         //        bgfxInit.platformData.nwh = nwh;
@@ -60,7 +62,7 @@ WindowState::WindowState(void* nwh, int width, int height)
         //            bgfxInit.type = bgfx::RendererType::Direct3D12;
         //            bgfxInit.type = bgfx::RendererType::OpenGL;
         //    bgfxInit.type = bgfx::RendererType::OpenGLES;
-        //            bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
+//                    bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
         //    bgfxInit.type = bgfx::RendererType::Metal;
 
         bgfxInit.resolution.width = width;
@@ -76,7 +78,7 @@ WindowState::WindowState(void* nwh, int width, int height)
 
         const bgfx::Caps* caps = bgfx::getCaps();
         assert(caps->supported & BGFX_CAPS_TEXTURE_COMPARE_LEQUAL); // sampler supported
-        assert(caps->homogeneousDepth);
+//        assert(caps->homogeneousDepth);
 
         entry::g_renderer = bgfx::getRendererName(caps->rendererType);
         //        Q_ASSERT(0 != (caps->supported & BGFX_CAPS_SWAP_CHAIN)); // vulkan no swap chain
@@ -208,14 +210,39 @@ void WindowState::render() const
     bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
     //        bgfx::touch(m_id);
 
+//    return;
     const float ratio = float(m_width) / m_height;
     entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
+
+
+//    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
+//        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
+//        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
+
+//    //    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
+////    assert(0 <= iCamera && iCamera < m_cameras.size());
+//    //    const auto& camera = *entry::s_scene.m_cameras[m_iCamera];
+//    const auto& camera = entry::s_scene.m_cameras[m_iCamera];
+//    float view[16];
+//    // bx::mtxLookAt(view, eye, at);
+//    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
+
+//    float proj[16];
+//    //    const float ratio = float(m_width) / m_height;
+//    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
+//        bgfx::getCaps()->homogeneousDepth);
+//    bgfx::setViewTransform(m_id, view, proj);
+//    bgfx::setState(state);
+//    bgfx::setTransform(entry::g_mtx);
+
+//    Geometry::drawQuad();
+//    bgfx::submit(m_id, Program::m_programs[Shading::NORMAL]);
 }
 
 void WindowState::renderAllWindow()
 {
-    //    if (m_id != 0)
-    //        return;
+//        if (m_id != 0)
+//            return;
 
     const auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -249,8 +276,9 @@ void WindowState::renderAllWindow()
         window->render();
         //        ++iWindow;
     }
+//    render();
 
-    //    g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
+//        g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
 
     // Advance to next frame. Process submitted rendering primitives.
     //    if (m_id == 0) { // avoid flipping, put F1 to show (only with direct3D)
@@ -457,7 +485,7 @@ void WindowState::keyPressEvent(Key::Enum key)
         break;
     case Key::F5:
         ++m_shading;
-        //        shading = ++shading % Program::Shading::Count;
+//                shading = ++shading % Program::Shading::Count;
         break;
     case Key::Up:
         m_cameraMoveFront = 1;

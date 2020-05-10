@@ -133,7 +133,7 @@ void init()
     int width;
     int height;
     glfwGetWindowSize(g_window, &width, &height);
-    g_windowState = new WindowState(nwh, width, height);
+    g_windowState = new WindowState(nwh, ndt, width, height);
 }
 
 void update()
