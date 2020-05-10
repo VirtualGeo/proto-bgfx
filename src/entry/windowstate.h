@@ -47,7 +47,7 @@ class WindowState {
 public:
 
 public:
-    WindowState(void* nwh, int width, int height);
+    WindowState(void* nwh, void *ndt, int width, int height);
     ~WindowState();
 
     void updateCameraPos();
@@ -71,6 +71,7 @@ private:
 //    static std::vector<WindowState*> s_windows;
 
     void* m_nwh = nullptr;
+    void* m_ndt = nullptr;
     int m_width;
     int m_height;
     const int m_id;
