@@ -50,13 +50,13 @@ public:
     WindowState(void* nwh, void *ndt, int width, int height);
     ~WindowState();
 
-    void updateCameraPos();
-    void resetWindow();
 private:
     void render() const;
 public:
     void renderAllWindow(); // only first window is able to do that
     void printDebugMessage();
+    void updateCameraPos();
+    void resetWindow();
 
 public:
     void mouseMoveEvent(int x, int y);
@@ -83,12 +83,16 @@ private:
     static size_t s_epoch;
     static double s_deltaTime;
     static std::chrono::time_point<std::chrono::high_resolution_clock> s_lastTime;
+//    static double s_currentTime;
+    static size_t s_iFrame;
+//    static std::chrono::time_point<std::chrono::high_resolution_clock> s_currentTime;
     static double s_sum;
     static size_t s_counter;
 
-    Shading m_shading = Shading::RENDERED;
+//    Shading m_shading = Shading::RENDERED;
 //    Shading m_shading = Shading::EMISSIVE;
 //    Shading m_shading = Shading::NORMAL;
+    Shading m_shading = Shading::MATERIAL;
 
     int m_iCamera;
 

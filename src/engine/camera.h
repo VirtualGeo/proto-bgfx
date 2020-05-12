@@ -26,6 +26,7 @@ public:
     virtual void move(Direction direction, float distance);
     virtual void mouseMove(float xoffset, float yoffset) = 0;
     void zoom(float offset);
+    void setViewTransform(float ratio, int viewId) const;
 
 //private:
     bx::Vec3 m_pos;
