@@ -17,6 +17,9 @@ class Texture {
 public:
     enum Sample {
         CHECKER_BOARD = 0,
+        RED,
+        GREEN,
+        BLUE,
         Count
     };
 

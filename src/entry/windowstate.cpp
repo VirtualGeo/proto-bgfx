@@ -1,4 +1,5 @@
 #include "windowstate.h"
+#include "engine/geometry.h"
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 #include <cassert>
@@ -6,13 +7,15 @@
 #include <engine/geometry.h>
 #include <entry/entry.h>
 #include <list>
-#include "engine/geometry.h"
 
 std::list<WindowState*> s_windows;
 float WindowState::s_fps;
 size_t WindowState::s_epoch = 10;
 double WindowState::s_deltaTime;
 std::chrono::time_point<std::chrono::high_resolution_clock> WindowState::s_lastTime;
+//std::chrono::time_point<std::chrono::high_resolution_clock> WindowState::s_currentTime;
+//double WindowState::s_currentTime;
+size_t WindowState::s_iFrame = 0;
 double WindowState::s_sum = 0.0;
 size_t WindowState::s_counter = 0;
 
@@ -56,13 +59,13 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         bgfxInit.platformData.backBufferDS = nullptr;
         //    bgfxInit.platformData.session = nullptr;
         //    bgfx::setPlatformData(pd);
-//        bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
-//            bgfxInit.type = bgfx::RendererType::Direct3D9;
-//                    bgfxInit.type = bgfx::RendererType::Direct3D11;
-//                    bgfxInit.type = bgfx::RendererType::Direct3D12;
-                    bgfxInit.type = bgfx::RendererType::OpenGL;
+        //        bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
+        //            bgfxInit.type = bgfx::RendererType::Direct3D9;
+        //                            bgfxInit.type = bgfx::RendererType::Direct3D11;
+        //                    bgfxInit.type = bgfx::RendererType::Direct3D12;
+        //        bgfxInit.type = bgfx::RendererType::OpenGL;
         //    bgfxInit.type = bgfx::RendererType::OpenGLES;
-//                    bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
+        //                            bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
         //    bgfxInit.type = bgfx::RendererType::Metal;
 
         bgfxInit.resolution.width = width;
@@ -78,7 +81,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
 
         const bgfx::Caps* caps = bgfx::getCaps();
         assert(caps->supported & BGFX_CAPS_TEXTURE_COMPARE_LEQUAL); // sampler supported
-//        assert(caps->homogeneousDepth);
+        //        assert(caps->homogeneousDepth);
 
         entry::g_renderer = bgfx::getRendererName(caps->rendererType);
         //        Q_ASSERT(0 != (caps->supported & BGFX_CAPS_SWAP_CHAIN)); // vulkan no swap chain
@@ -107,14 +110,15 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         Geometry::init();
         Texture::init();
         // ------------------------------- LOAD MODEL
-        entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
-//                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
-//                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-low-poly.obj");
-//                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel.obj");
-//                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-blend.obj");
+        //                entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
 
-//        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\CornellBox\\CornellBox-Original.obj");
-//        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
+        //                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+        //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-low-poly.obj");
+        //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel.obj");
+        //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-blend.obj");
+
+        //        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\CornellBox\\CornellBox-Original.obj");
+        //        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
 
         //        entry::s_scene.addLight(DirLight({ 0.0f, -1.0f, 0.5f }));
         //        entry::s_scene.addSpotLight(SpotLight({ 1.0f, 0.0f, 0.0f }, { -5.0f, 1.0f, 0.0f }));
@@ -129,7 +133,8 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
 
         //        Q_ASSERT(m_iWindow == 0);
         bx::mtxIdentity(entry::g_mtx);
-        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
+        //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
+        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 300.0f }); // question : push_back ?
         s_lastTime = std::chrono::high_resolution_clock::now();
     } else {
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
@@ -175,93 +180,63 @@ WindowState::~WindowState()
 //    bgfx::destroy(m_fbh);
 //}
 
-void WindowState::updateCameraPos()
-{
-    //    auto& window = entry::s_windows[m_iWindow];
-
-    float cameraSpeed = m_slowMotion ? 1.0f : 5.0f;
-    cameraSpeed *= s_deltaTime;
-
-    //    auto& camera = *entry::s_scene.m_cameras[m_iCamera];
-    auto& camera = entry::s_scene.m_cameras[m_iCamera];
-    if (m_cameraMoveFront) {
-        camera.move(Camera::Direction::FRONT, cameraSpeed * m_cameraMoveFront);
-    }
-    if (m_cameraMoveUp) {
-        camera.move(Camera::Direction::UP, cameraSpeed * m_cameraMoveUp);
-    }
-    if (m_cameraMoveRight) {
-        camera.move(Camera::Direction::RIGHT, cameraSpeed * m_cameraMoveRight);
-    }
-}
-
-void WindowState::resetWindow()
-{
-    assert(m_id == 0);
-    bgfx::reset(m_width, m_height, entry::getResetFlags());
-}
-
 void WindowState::render() const
 {
-    if (! m_init)
+    if (!m_init)
         return;
     if (m_id != 0) {
         //            assert(bgfx::isValid(m_fbh));
         bgfx::setViewFrameBuffer(m_id, m_fbh);
     }
-//    bgfx::setViewFrameBuffer(m_id, m_fbh);
+    //    bgfx::setViewFrameBuffer(m_id, m_fbh);
     // Set view 0 default viewport.
     bgfx::setViewRect(m_id, 0, 0, uint16_t(m_width), uint16_t(m_height));
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
     bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
-//            bgfx::touch(m_id);
+    //            bgfx::touch(m_id);
 
-//    return;
+    //    return;
     const float ratio = float(m_width) / m_height;
-    entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
+    //        entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
 
-//    assert(bgfx::isValid(Program::m_programs[NORMAL]));
-//    bgfx::submit(m_id, Program::m_programs[Shading::NORMAL]);
+    const auto& camera = entry::s_scene.m_cameras[m_iCamera];
+    camera.setViewTransform(ratio, m_id);
+
+    //    Geometry::drawQuad();
+    //    Geometry::drawCube();
+    //    bgfx::submit(m_id, Program::m_programs[m_shading]);
 
 
-//    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
-//        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
-//        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
+    //    bgfx::setTexture(0, Program::m_sDiffuse, Texture::m_sampleTextures[Texture::BLUE].textureHandle(), Texture::s_textureSamplerFlags);
+    const uint nbCube = 100;
+    for (uint i = 0; i < nbCube; ++i) {
+        for (uint j = 0; j < nbCube; ++j) {
+            float mtx[16];
+            bgfx::setTexture(0, Program::m_sDiffuse,
+                Texture::m_sampleTextures[Texture::Sample((i + j) % 3 + Texture::RED)].textureHandle(), Texture::s_textureSamplerFlags);
+            //            bx::mtxIdentity(mtx);
+            bx::mtxRotateXY(mtx, s_iFrame * 0.021f, s_iFrame * 0.037f);
+            mtx[12] = -(float)nbCube / 2.0f * 3.0f + float(i) * 3.0f;
+            mtx[13] = -(float)nbCube / 2.0f * 3.0f + float(j) * 3.0f;
+            mtx[14] = 0.0f;
 
-//    //    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
-////    assert(0 <= iCamera && iCamera < m_cameras.size());
-//    //    const auto& camera = *entry::s_scene.m_cameras[m_iCamera];
-//    const auto& camera = entry::s_scene.m_cameras[m_iCamera];
-//    float view[16];
-//    // bx::mtxLookAt(view, eye, at);
-//    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
-
-//    float proj[16];
-//    //    const float ratio = float(m_width) / m_height;
-//    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
-//        bgfx::getCaps()->homogeneousDepth);
-//    bgfx::setViewTransform(m_id, view, proj);
-//    bgfx::setState(state);
-//    bgfx::setTransform(entry::g_mtx);
-
-//    Geometry::drawQuad();
-//    bgfx::submit(m_id, Program::m_programs[Shading::NORMAL]);
+            Geometry::drawCube(mtx);
+            bgfx::submit(m_id, Program::m_programs[m_shading]);
+        }
+    }
 }
 
 void WindowState::renderAllWindow()
 {
-    if (! m_init)
+    if (!m_init)
         return;
-//        if (m_id != 0)
-//            return;
-//        bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
-//        bgfx::touch(0);
-//bgfx::touch(0);
-//        if (m_id != 0)
-//            return;
+    //        if (m_id != 0)
+    //            return;
 
     const auto currentTime = std::chrono::high_resolution_clock::now();
+    //    s_currentTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime).count();
+    //    s_currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch()).count() / 1000000.0;
 
     //    const auto currentTime = g_timer.now();
     s_deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_lastTime).count() / 1000000.0;
@@ -283,24 +258,26 @@ void WindowState::renderAllWindow()
     }
 
     //    if (m_id == 0) {
-    entry::s_scene.setLightUniforms();
-    entry::s_scene.updateLightShadowMaps();
-//        bgfx::frame();
 
-//        int iWindow = 0;
+    //    entry::s_scene.setLightUniforms();
+    //    entry::s_scene.updateLightShadowMaps();
+    //        bgfx::frame();
+
+    //        int iWindow = 0;
     for (const WindowState* window : s_windows) {
-        entry::s_scene.setLightShadowSamplers();
+        //        entry::s_scene.setLightShadowSamplers();
         window->render();
         //        ++iWindow;
     }
-//    render();
+    //    render();
 
-//        g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
+    //        g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
 
     // Advance to next frame. Process submitted rendering primitives.
     //    if (m_id == 0) { // avoid flipping, put F1 to show (only with direct3D)
     printDebugMessage();
     bgfx::frame();
+    ++s_iFrame;
     //        entry::s_scene.updateLightShadowMaps();
     //        entry::s_scene.setLightUniforms();
     //    }
@@ -345,6 +322,32 @@ void WindowState::printDebugMessage()
         }
         entry::s_scene.printStats(line);
     }
+}
+
+void WindowState::updateCameraPos()
+{
+    //    auto& window = entry::s_windows[m_iWindow];
+
+    float cameraSpeed = m_slowMotion ? 1.0f : 5.0f;
+    cameraSpeed *= s_deltaTime;
+
+    //    auto& camera = *entry::s_scene.m_cameras[m_iCamera];
+    auto& camera = entry::s_scene.m_cameras[m_iCamera];
+    if (m_cameraMoveFront) {
+        camera.move(Camera::Direction::FRONT, cameraSpeed * m_cameraMoveFront);
+    }
+    if (m_cameraMoveUp) {
+        camera.move(Camera::Direction::UP, cameraSpeed * m_cameraMoveUp);
+    }
+    if (m_cameraMoveRight) {
+        camera.move(Camera::Direction::RIGHT, cameraSpeed * m_cameraMoveRight);
+    }
+}
+
+void WindowState::resetWindow()
+{
+    assert(m_id == 0);
+    bgfx::reset(m_width, m_height, entry::getResetFlags());
 }
 
 // ------------------------------------------------ EVENT
@@ -502,7 +505,7 @@ void WindowState::keyPressEvent(Key::Enum key)
         break;
     case Key::F5:
         ++m_shading;
-//                shading = ++shading % Program::Shading::Count;
+        //                shading = ++shading % Program::Shading::Count;
         break;
     case Key::Up:
         m_cameraMoveFront = 1;

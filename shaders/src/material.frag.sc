@@ -11,20 +11,22 @@ $input v_fragPos, v_normal, v_texcoord0
 //     vec3 intensity;
 // };
 
-struct Material
-{
-    vec3 diffuse;
-    vec3 specular;
-    vec3 ambient;
-    float shininess;
-};
-SAMPLER2D(s_diffuse, 0);
-uniform vec4 u_material[4];
-#define material_diffuse u_material[0].xyz
-#define material_specular u_material[1].xyz
-#define material_ambient u_material[2].xyz
-#define material_shininess u_material[3].x
-#define material_hasDiffuseTexture u_material[3].y
+#include "uniforms.sc"
+
+//struct Material
+//{
+//    vec3 diffuse;
+//    vec3 specular;
+//    vec3 ambient;
+//    float shininess;
+//};
+//SAMPLER2D(s_diffuse, 0);
+//uniform vec4 u_material[4];
+//#define material_diffuse u_material[0].xyz
+//#define material_specular u_material[1].xyz
+//#define material_ambient u_material[2].xyz
+//#define material_shininess u_material[3].x
+//#define material_hasDiffuseTexture u_material[3].y
 //#define u_dir_light_0_dir   u_params[3].xyz
 //#define u_dir_light_0_color u_params[4].xyz
 //#define u_viewPos			u_params[5].xyz

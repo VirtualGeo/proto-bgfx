@@ -500,7 +500,7 @@ void Scene::setLightShadowSamplers()
     }
 }
 
-void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, const Shading& shading, const float* mtx) const
+void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId viewId, const Shading& shading, const float* mtx) const
 {
     // --------------------------------- DRAW SCENE
     //    if (m_id == 0) {
@@ -512,15 +512,16 @@ void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, co
     assert(0 <= iCamera && iCamera < m_cameras.size());
     //    const auto& camera = *entry::s_scene.m_cameras[m_iCamera];
     const auto& camera = m_cameras[iCamera];
-    float view[16];
-    // bx::mtxLookAt(view, eye, at);
-    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
+//    float view[16];
+//    // bx::mtxLookAt(view, eye, at);
+//    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
 
-    float proj[16];
-    //    const float ratio = float(m_width) / m_height;
-    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
-        bgfx::getCaps()->homogeneousDepth);
-    bgfx::setViewTransform(id, view, proj);
+//    float proj[16];
+//    //    const float ratio = float(m_width) / m_height;
+//    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
+//        bgfx::getCaps()->homogeneousDepth);
+//    bgfx::setViewTransform(viewId, view, proj);
+    camera.setViewTransform(ratio, viewId);
 
     switch (shading) {
     case RENDERED:
@@ -533,7 +534,7 @@ void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, co
     }
 
 //    Geometry::drawQuad();
-    draw(id, shading, mtx, state);
+    draw(viewId, shading, mtx, state);
 }
 
 void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx, const uint64_t state) const

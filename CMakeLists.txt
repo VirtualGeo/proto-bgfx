@@ -39,7 +39,7 @@
     #endif()
 
     # select graphic user interface
-    set(GUI_QT 1) #default: GLFW
+#    set(GUI_QT 1) #default: GLFW
 
     # -------------------------------------------------------------------
     if (GUI_QT)
