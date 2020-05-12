@@ -42,6 +42,7 @@ public:
     static void init();
     static void clear();
     static Texture m_sampleTextures[Count];
+    static bgfx::TextureHandle getSampleTexture(Sample sample);
 
     friend std::ostream& operator<<(std::ostream& os, const Texture& texture);
 

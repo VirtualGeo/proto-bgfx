@@ -116,7 +116,7 @@ void Geometry::drawQuad()
     bgfx::setState(state);
 }
 
-void Geometry::drawCube(float mtx[])
+void Geometry::drawCube(const float mtx[])
 {
     assert(g_isInit);
     bgfx::setTransform(mtx);

@@ -41,6 +41,13 @@ bgfx::TextureHandle Program::m_shadowMapTexture[s_num_lightMax];
 bgfx::UniformHandle Program::m_uDirLights;
 bgfx::UniformHandle Program::m_uSpotLights;
 bgfx::UniformHandle Program::m_uPointLights;
+
+bgfx::UniformHandle Program::m_hasDiffuseTexture;
+bgfx::UniformHandle Program::m_hasSpecularTexture;
+bgfx::UniformHandle Program::m_diffuseTexture;
+bgfx::UniformHandle Program::m_diffuseColor;
+bgfx::UniformHandle Program::m_specularTexture;
+
 //bgfx::ShaderHandle loadShader(const char* filename);
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType);
 bgfx::ProgramHandle loadProgram(const std::string& shaderName);
@@ -162,20 +169,26 @@ void Program::init(const bgfx::Caps* caps)
     //    m_shadowMapTexture = fbtextures[0];
     //    m_shadowMapFB = bgfx::createFrameBuffer(1, &m_shadowMapTexture, false);
 
+    m_hasDiffuseTexture = bgfx::createUniform("hasDiffuseTexture", bgfx::UniformType::Vec4);
+    m_hasSpecularTexture = bgfx::createUniform("hasSpecularTexture", bgfx::UniformType::Vec4);
+    m_diffuseTexture = bgfx::createUniform("diffuseTexture", bgfx::UniformType::Sampler);
+    m_diffuseColor = bgfx::createUniform("diffuseColor", bgfx::UniformType::Vec4);
+    m_specularTexture = bgfx::createUniform("specularTexture", bgfx::UniformType::Sampler);
+
     for (int i = 0; i < Shading::Count; ++i) {
         m_programs[i] = BGFX_INVALID_HANDLE;
-//        if (i == Shading::RENDERED)
-//            continue;
-//        if (i == Shading::SHADOW)
-//            continue;
+        //        if (i == Shading::RENDERED)
+        //            continue;
+        //        if (i == Shading::SHADOW)
+        //            continue;
         if (i == Shading::EMISSIVE)
-//            //                if (i != Shading::NORMAL)
+            //            //                if (i != Shading::NORMAL)
             continue;
-//        if (i == Shading::DEBUG_QUAD)
-//            //                if (i != Shading::NORMAL)
-//            continue;
-//        if (i != Shading::NORMAL)
-//            continue;
+        //        if (i == Shading::DEBUG_QUAD)
+        //            //                if (i != Shading::NORMAL)
+        //            continue;
+        //        if (i != Shading::NORMAL)
+        //            continue;
         //        int i= Shading::NORMAL;
         //    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
         //        const std::string& shadingFileName = "shading/" + shadingFileNames[i];
@@ -262,6 +275,11 @@ void Program::clear()
     //        bgfx::destroy(m_uDirLights[i][0]);
     //        bgfx::destroy(m_uDirLights[i][1]);
     //    }
+    bgfx::destroy(m_hasDiffuseTexture);
+    bgfx::destroy(m_hasSpecularTexture);
+    bgfx::destroy(m_diffuseTexture);
+    bgfx::destroy(m_diffuseColor);
+    bgfx::destroy(m_specularTexture);
 }
 
 void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material, const Textures& textures)
@@ -301,7 +319,7 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
 
         //    		if (group.m_texture != nullptr) {
         //        const int iTexDiffuse = material.iTexDiffuse();
-//        static const int iTexDiffuse = material.m_iTexDiffuse; // question: why not work ?
+        //        static const int iTexDiffuse = material.m_iTexDiffuse; // question: why not work ?
         iTexDiffuse = material.m_iTexDiffuse;
         if (iTexDiffuse >= 0) {
 
@@ -375,7 +393,7 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
         break;
     }
 
-    bgfx::submit(id, m_programs[shading], 1.0 );
+    bgfx::submit(id, m_programs[shading], 1.0);
     //    bgfx::submit(id, m_programs[shading], 0, BGFX_DISCARD_NONE | BGFX_CLEAR_DISCARD_COLOR_0);
 }
 

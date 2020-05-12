@@ -107,6 +107,15 @@ private:
 
     bool m_ctrlPressed = false;
 
+    struct Cube {
+        float mtx[16];
+        bool hasDiffuseTexture;
+        bool hasSpecularTexture;
+        float diffuseColor[4];
+
+    };
+    std::vector<Cube> m_cubes;
+
 };
 
 #endif // WINDOWSTATE_H
