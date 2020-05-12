@@ -115,6 +115,15 @@ public:
     static bgfx::UniformHandle m_uLightMtx;
     static bgfx::UniformHandle m_uDepthScaleOffset;
 
+
+    static bgfx::UniformHandle m_hasDiffuseTexture;
+    static bgfx::UniformHandle m_hasSpecularTexture;
+    static bgfx::UniformHandle m_diffuseTexture;
+    static bgfx::UniformHandle m_diffuseColor;
+    static bgfx::UniformHandle m_specularTexture;
+
+
+
 //    uint16_t m_shadowMapSize = 512;
 //    static bgfx::ProgramHandle m_progShadow;
 

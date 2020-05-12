@@ -350,6 +350,11 @@ void Texture::clear()
     }
 }
 
+bgfx::TextureHandle Texture::getSampleTexture(Texture::Sample sample)
+{
+    return m_sampleTextures[sample].textureHandle();
+}
+
 //u_int64_t Texture::get_textureSamplerFlags()
 //{
 //    return s_textureFlags | s_samplerFlags;

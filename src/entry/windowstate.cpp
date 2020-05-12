@@ -8,6 +8,10 @@
 #include <entry/entry.h>
 #include <list>
 
+#include <cstring>
+#include <random>
+#include <algorithm>
+
 std::list<WindowState*> s_windows;
 float WindowState::s_fps;
 size_t WindowState::s_epoch = 10;
@@ -136,6 +140,39 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 300.0f }); // question : push_back ?
         s_lastTime = std::chrono::high_resolution_clock::now();
+
+        const uint nbCube = 100;
+        for (uint i = 0; i < nbCube; ++i) {
+            for (uint j = 0; j < nbCube; ++j) {
+                float mtx[16];
+                //                bgfx::setTexture(0, Program::m_sDiffuse,
+                //                    Texture::m_sampleTextures[Texture::Sample((i + j) % 3 + Texture::RED)].textureHandle(), Texture::s_textureSamplerFlags);
+                //            bx::mtxIdentity(mtx);
+                bx::mtxIdentity(mtx);
+                //                bx::mtxRotateXY(mtx, s_iFrame * 0.021f, s_iFrame * 0.037f);
+                mtx[12] = -(float)nbCube / 2.0f * 3.0f + float(i) * 3.0f;
+                mtx[13] = -(float)nbCube / 2.0f * 3.0f + float(j) * 3.0f;
+                mtx[14] = 0.0f;
+
+                const float color[] {0.5f, 0.5f, 0.5f, 0.0f};
+                Cube cube;
+                memcpy(cube.mtx, mtx, 16 * sizeof(float));
+                cube.hasDiffuseTexture = i > nbCube / 2;
+                cube.hasSpecularTexture = j > nbCube / 2;
+                memcpy(cube.diffuseColor, color, 4 * sizeof(float));
+
+                m_cubes.push_back(cube);
+                //                Geometry::drawCube(mtx);
+                //                bgfx::submit(m_id, Program::m_programs[m_shading]);
+            }
+        }
+
+        std::random_device rd;
+        std::mt19937 g(rd());
+
+        std::shuffle(m_cubes.begin(), m_cubes.end(), g);
+
+
     } else {
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
         m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)m_nwh, uint16_t(m_width), uint16_t(m_height));
@@ -207,23 +244,43 @@ void WindowState::render() const
     //    Geometry::drawCube();
     //    bgfx::submit(m_id, Program::m_programs[m_shading]);
 
-
     //    bgfx::setTexture(0, Program::m_sDiffuse, Texture::m_sampleTextures[Texture::BLUE].textureHandle(), Texture::s_textureSamplerFlags);
-    const uint nbCube = 100;
-    for (uint i = 0; i < nbCube; ++i) {
-        for (uint j = 0; j < nbCube; ++j) {
-            float mtx[16];
-            bgfx::setTexture(0, Program::m_sDiffuse,
-                Texture::m_sampleTextures[Texture::Sample((i + j) % 3 + Texture::RED)].textureHandle(), Texture::s_textureSamplerFlags);
-            //            bx::mtxIdentity(mtx);
-            bx::mtxRotateXY(mtx, s_iFrame * 0.021f, s_iFrame * 0.037f);
-            mtx[12] = -(float)nbCube / 2.0f * 3.0f + float(i) * 3.0f;
-            mtx[13] = -(float)nbCube / 2.0f * 3.0f + float(j) * 3.0f;
-            mtx[14] = 0.0f;
+    //    const uint nbCube = 100;
+    //    for (uint i = 0; i < nbCube; ++i) {
+    //        for (uint j = 0; j < nbCube; ++j) {
+    //            float mtx[16];
+    //            bgfx::setTexture(0, Program::m_sDiffuse,
+    //                Texture::m_sampleTextures[Texture::Sample((i + j) % 3 + Texture::RED)].textureHandle(), Texture::s_textureSamplerFlags);
+    //            //            bx::mtxIdentity(mtx);
+    //            bx::mtxRotateXY(mtx, s_iFrame * 0.021f, s_iFrame * 0.037f);
+    //            mtx[12] = -(float)nbCube / 2.0f * 3.0f + float(i) * 3.0f;
+    //            mtx[13] = -(float)nbCube / 2.0f * 3.0f + float(j) * 3.0f;
+    //            mtx[14] = 0.0f;
 
-            Geometry::drawCube(mtx);
-            bgfx::submit(m_id, Program::m_programs[m_shading]);
+    //            Geometry::drawCube(mtx);
+    //            bgfx::submit(m_id, Program::m_programs[m_shading]);
+    //        }
+    //    }
+    for (const auto& cube : m_cubes) {
+        float ones[] = { 1.0f };
+        float zeros[] = { 0.0f };
+        if (cube.hasDiffuseTexture) {
+            //            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::m_sampleTextures[Texture::RED].textureHandle());
+            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::RED));
+            bgfx::setUniform(Program::m_hasDiffuseTexture, ones);
+        } else {
+            bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
+            bgfx::setUniform(Program::m_hasDiffuseTexture, zeros);
         }
+        if (cube.hasSpecularTexture) {
+            //            bgfx::setTexture(1, Program::m_specularTexture, Texture::m_sampleTextures[Texture::GREEN].textureHandle());
+            bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::GREEN));
+            bgfx::setUniform(Program::m_hasSpecularTexture, ones);
+        } else {
+            bgfx::setUniform(Program::m_hasSpecularTexture, zeros);
+        }
+        Geometry::drawCube(cube.mtx);
+        bgfx::submit(m_id, Program::m_programs[m_shading]);
     }
 }
 
