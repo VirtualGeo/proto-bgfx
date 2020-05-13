@@ -50,7 +50,7 @@ bgfx::UniformHandle Program::m_specularTexture;
 
 //bgfx::ShaderHandle loadShader(const char* filename);
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType);
-bgfx::ProgramHandle loadProgram(const std::string& shaderName);
+//bgfx::ProgramHandle loadProgram(const std::string& shaderName);
 
 //Program::Program()
 //{
@@ -452,7 +452,7 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
 //    }
 //}
 
-bgfx::ProgramHandle loadProgram(const std::string& shaderName)
+bgfx::ProgramHandle Program::loadProgram(const std::string &shaderName)
 {
     bgfx::ShaderHandle vsh = loadShader(shaderName, ShaderType::Vertex);
     assert(bgfx::isValid(vsh));

@@ -20,8 +20,11 @@ public:
         RED,
         GREEN,
         BLUE,
+        WHITE,
+        BLACK,
         Count
     };
+
 
     static uint64_t s_textureSamplerFlags;
 

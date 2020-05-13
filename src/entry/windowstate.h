@@ -116,6 +116,9 @@ private:
     };
     std::vector<Cube> m_cubes;
 
+    bgfx::ProgramHandle m_branchingTests[3];
+    uint m_iBranchingTest = 1;
+
 };
 
 #endif // WINDOWSTATE_H
