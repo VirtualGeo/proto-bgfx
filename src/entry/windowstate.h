@@ -6,6 +6,7 @@
 #include <chrono>
 #include <engine/program.h>
 //#include <entry/entry.h>
+//#include <shaderc/shaderc.h>
 
 struct MouseButton {
     enum Enum {
@@ -117,7 +118,7 @@ private:
     std::vector<Cube> m_cubes;
 
     bgfx::ProgramHandle m_branchingTests[3];
-    uint m_iBranchingTest = 1;
+    uint m_iBranchingTest = 2;
 
 };
 

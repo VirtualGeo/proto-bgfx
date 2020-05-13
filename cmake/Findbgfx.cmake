@@ -102,6 +102,25 @@ find_library(ASTCCODEC_LIBRARY_RELEASE NAMES astc-codec
     PATH_SUFFIXES
     lib
     )
+find_library(SHADERC_LIBRARY_DEBUG NAMES shaderclibd
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+find_library(SHADERC_LIBRARY_RELEASE NAMES shaderclib
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+
 
 find_package_handle_standard_args(bgfx
     REQUIRED_VARS
@@ -129,10 +148,12 @@ if(BGFX_FOUND)
             $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
+            $<$<CONFIG:Debug>:${SHADERC_LIBRARY_DEBUG}>
             $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>)
+            $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
+            $<$<CONFIG:Release>:${SHADERC_LIBRARY_RELEASE}>)
         set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_COMPILE_DEFINITIONS
             $<$<CXX_COMPILER_ID:MSVC>:__STDC_LIMIT_MACROS>
             $<$<CXX_COMPILER_ID:MSVC>:__STDC_FORMAT_MACROS>

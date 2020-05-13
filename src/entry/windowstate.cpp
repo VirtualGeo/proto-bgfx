@@ -11,6 +11,15 @@
 #include <algorithm>
 #include <cstring>
 #include <random>
+//#include <shaderc/shaderc.h>
+//#include <shaderc/shaderc.h>
+
+#include <bgfx/bgfx.h>
+//#include <tools/shaderc/shaderc.h>
+//#include <shaderc/shaderc.h>
+//#include "tools/shaderc/shaderc.h"
+//#include <shaderc/shaderc.h>
+
 
 std::list<WindowState*> s_windows;
 float WindowState::s_fps;
@@ -34,6 +43,8 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
 
     m_fbh.idx = bgfx::kInvalidHandle;
     assert(!bgfx::isValid(m_fbh));
+
+//    shaderc::compileShader(5, );
 
     if (m_id == 0) {
         //        s_bgfxInit = true;
@@ -268,8 +279,8 @@ void WindowState::render() const
         float ones[] = { 1.0f };
         float zeros[] = { 0.0f };
 
-        if (m_iBranchingTest == 0) {
                 bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
+        if (m_iBranchingTest == 0) {
             if (cube.hasDiffuseTexture) {
                 //            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::m_sampleTextures[Texture::RED].textureHandle());
                 bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::RED));
@@ -286,7 +297,7 @@ void WindowState::render() const
             }
 
         } else if (m_iBranchingTest == 1) {
-                bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
+//                bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
             if (cube.hasDiffuseTexture) {
                 //            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::m_sampleTextures[Texture::RED].textureHandle());
                 bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::RED));
@@ -306,6 +317,23 @@ void WindowState::render() const
             }
 
         } else if (m_iBranchingTest == 2) {
+            if (cube.hasDiffuseTexture) {
+                //            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::m_sampleTextures[Texture::RED].textureHandle());
+                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::RED));
+//                bgfx::setUniform(Program::m_hasDiffuseTexture, ones);
+//            } else {
+//                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::WHITE));
+//                bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
+//                bgfx::setUniform(Program::m_hasDiffuseTexture, zeros);
+            }
+            if (cube.hasSpecularTexture) {
+                //            bgfx::setTexture(1, Program::m_specularTexture, Texture::m_sampleTextures[Texture::GREEN].textureHandle());
+                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::GREEN));
+//                bgfx::setUniform(Program::m_hasSpecularTexture, ones);
+//            } else {
+//                bgfx::setUniform(Program::m_hasSpecularTexture, zeros);
+//                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::BLACK));
+            }
         }
         Geometry::drawCube(cube.mtx);
         //        bgfx::submit(m_id, Program::m_programs[m_shading]);

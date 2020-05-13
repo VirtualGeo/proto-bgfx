@@ -8,6 +8,9 @@
 #include <bx/file.h>
 #include <cstring>
 
+//#include <tools/shaderc/shaderc.h>
+
+
 enum ShaderType {
     Vertex,
     Fragment
@@ -50,6 +53,49 @@ bgfx::UniformHandle Program::m_specularTexture;
 
 //bgfx::ShaderHandle loadShader(const char* filename);
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType);
+
+
+//bool compileShader(const char* pFilename, const char* pOutput, bgfx::RendererType::Enum pType, const char* pDefines = nullptr)
+//{
+
+//    bool bVertex = !bx::strFind(pFilename, ".vert.sc").isEmpty();
+//    bool bFragment = !bx::strFind(pFilename, ".frag.sc").isEmpty();
+//    if (bVertex || bFragment)
+//    {
+//        // PATH should be bgfx\examples\runtime
+//        const char* argv[] =
+//        {
+//            "shaderc.exe",
+//            "-f",
+//            pFilename,
+//            "-i",
+//            "../../src",
+//            "-o",
+//            pOutput,
+//            "--platform",
+//            pType == bgfx::RendererType::Direct3D11 ? "windows" : "linux",
+//            "--type",
+//            bVertex ? "vertex" : "fragment",
+//            "--profile",
+
+//            pType == bgfx::RendererType::Direct3D11
+//            ? bVertex
+//                ? "vs_5_0"
+//                : "ps_5_0"
+//            : "120",
+
+//            "-O",
+//            "3",
+//            "--define",
+//            pDefines ? pDefines : ""
+//        };
+//        int error_code = shaderc::compileShader(BX_COUNTOF(argv), argv);
+//        return error_code == 0;
+//    }
+
+//    return false;
+//}
+
 //bgfx::ProgramHandle loadProgram(const std::string& shaderName);
 
 //Program::Program()
