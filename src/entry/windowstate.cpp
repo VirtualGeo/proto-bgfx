@@ -152,9 +152,9 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 300.0f }); // question : push_back ?
         s_lastTime = std::chrono::high_resolution_clock::now();
 
-        const uint nbCube = 100;
-        for (uint i = 0; i < nbCube; ++i) {
-            for (uint j = 0; j < nbCube; ++j) {
+        const uint32_t nbCube = 100;
+        for (uint32_t i = 0; i < nbCube; ++i) {
+            for (uint32_t j = 0; j < nbCube; ++j) {
                 float mtx[16];
                 //                bgfx::setTexture(0, Program::m_sDiffuse,
                 //                    Texture::m_sampleTextures[Texture::Sample((i + j) % 3 + Texture::RED)].textureHandle(), Texture::s_textureSamplerFlags);
@@ -259,9 +259,9 @@ void WindowState::render() const
     //    bgfx::submit(m_id, Program::m_programs[m_shading]);
 
     //    bgfx::setTexture(0, Program::m_sDiffuse, Texture::m_sampleTextures[Texture::BLUE].textureHandle(), Texture::s_textureSamplerFlags);
-    //    const uint nbCube = 100;
-    //    for (uint i = 0; i < nbCube; ++i) {
-    //        for (uint j = 0; j < nbCube; ++j) {
+    //    const uint32_t nbCube = 100;
+    //    for (uint32_t i = 0; i < nbCube; ++i) {
+    //        for (uint32_t j = 0; j < nbCube; ++j) {
     //            float mtx[16];
     //            bgfx::setTexture(0, Program::m_sDiffuse,
     //                Texture::m_sampleTextures[Texture::Sample((i + j) % 3 + Texture::RED)].textureHandle(), Texture::s_textureSamplerFlags);
