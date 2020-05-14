@@ -122,6 +122,100 @@ find_library(SHADERC_LIBRARY_RELEASE NAMES shaderclib
     lib
 #    shaderc
     )
+find_library(FCPP_LIBRARY_DEBUG NAMES fcppd
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+find_library(FCPP_LIBRARY_RELEASE NAMES fcpp
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+find_library(GLSLANG_LIBRARY_DEBUG NAMES glslangd
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+find_library(GLSLANG_LIBRARY_RELEASE NAMES glslang
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+find_library(GLSL_OPTIMIZER_LIBRARY_DEBUG NAMES glsl-optimizerd
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+find_library(GLSL_OPTIMIZER_LIBRARY_RELEASE NAMES glsl-optimizer
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+find_library(SPIRV_CROSS_LIBRARY_DEBUG NAMES spirv-crossd
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+find_library(SPIRV_CROSS_LIBRARY_RELEASE NAMES spirv-cross
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+find_library(SPIRV_TOOLS_LIBRARY_DEBUG NAMES spirv-toolsd
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+find_library(SPIRV_TOOLS_LIBRARY_RELEASE NAMES spirv-tools
+    PATHS
+    /usr
+    /usr/local
+    ${BGFX_ROOT}
+
+    PATH_SUFFIXES
+    lib
+    )
+
+
+
+
 
 
 find_package_handle_standard_args(bgfx
@@ -151,11 +245,22 @@ if(BGFX_FOUND)
             $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${SHADERC_LIBRARY_DEBUG}>
+            $<$<CONFIG:Debug>:${FCPP_LIBRARY_DEBUG}>
+            $<$<CONFIG:Debug>:${GLSLANG_LIBRARY_DEBUG}>
+            $<$<CONFIG:Debug>:${GLSL_OPTIMIZER_LIBRARY_DEBUG}>
+            $<$<CONFIG:Debug>:${SPIRV_CROSS_LIBRARY_DEBUG}>
+            $<$<CONFIG:Debug>:${SPIRV_TOOLS_LIBRARY_DEBUG}>
             $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${SHADERC_LIBRARY_RELEASE}>)
+            $<$<CONFIG:Release>:${SHADERC_LIBRARY_RELEASE}>
+            $<$<CONFIG:Release>:${FCPP_LIBRARY_RELEASE}>
+            $<$<CONFIG:Release>:${GLSLANG_LIBRARY_RELEASE}>
+            $<$<CONFIG:Release>:${GLSL_OPTIMIZER_LIBRARY_RELEASE}>
+            $<$<CONFIG:Release>:${SPIRV_CROSS_LIBRARY_RELEASE}>
+            $<$<CONFIG:Release>:${SPIRV_TOOLS_LIBRARY_RELEASE}>
+            )
 
         set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_COMPILE_DEFINITIONS
             $<$<CXX_COMPILER_ID:MSVC>:__STDC_LIMIT_MACROS>
