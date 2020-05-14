@@ -27,196 +27,26 @@ elseif(MSVC)
     set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIR} ${BGFX_INCLUDE_DIR}/compat/msvc)
 endif()
 
-find_library(BGFX_LIBRARY_DEBUG NAMES bgfxd
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(BGFX_LIBRARY_RELEASE NAMES bgfx
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-
-find_library(BIMG_LIBRARY_DEBUG NAMES bimgd
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(BIMG_LIBRARY_RELEASE NAMES bimg
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-
-find_library(BX_LIBRARY_DEBUG NAMES bxd
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(BX_LIBRARY_RELEASE NAMES bx
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-
-find_library(ASTCCODEC_LIBRARY_DEBUG NAMES astc-codecd
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(ASTCCODEC_LIBRARY_RELEASE NAMES astc-codec
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(SHADERC_LIBRARY_DEBUG NAMES shaderclibd
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-#    shaderc
-    )
-find_library(SHADERC_LIBRARY_RELEASE NAMES shaderclib
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-#    shaderc
-    )
-find_library(FCPP_LIBRARY_DEBUG NAMES fcppd
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(FCPP_LIBRARY_RELEASE NAMES fcpp
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(GLSLANG_LIBRARY_DEBUG NAMES glslangd
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(GLSLANG_LIBRARY_RELEASE NAMES glslang
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(GLSL_OPTIMIZER_LIBRARY_DEBUG NAMES glsl-optimizerd
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(GLSL_OPTIMIZER_LIBRARY_RELEASE NAMES glsl-optimizer
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(SPIRV_CROSS_LIBRARY_DEBUG NAMES spirv-crossd
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(SPIRV_CROSS_LIBRARY_RELEASE NAMES spirv-cross
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(SPIRV_TOOLS_LIBRARY_DEBUG NAMES spirv-toolsd
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-find_library(SPIRV_TOOLS_LIBRARY_RELEASE NAMES spirv-tools
-    PATHS
-    /usr
-    /usr/local
-    ${BGFX_ROOT}
-
-    PATH_SUFFIXES
-    lib
-    )
-
-
-
-
-
+find_library(BGFX_LIBRARY_DEBUG NAMES bgfxd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(BGFX_LIBRARY_RELEASE NAMES bgfx PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(BIMG_LIBRARY_DEBUG NAMES bimgd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(BIMG_LIBRARY_RELEASE NAMES bimg PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(BX_LIBRARY_DEBUG NAMES bxd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(BX_LIBRARY_RELEASE NAMES bx PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(ASTCCODEC_LIBRARY_DEBUG NAMES astc-codecd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(ASTCCODEC_LIBRARY_RELEASE NAMES astc-codec PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(SHADERC_LIBRARY_DEBUG NAMES shaderclibd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(SHADERC_LIBRARY_RELEASE NAMES shaderclib PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(FCPP_LIBRARY_DEBUG NAMES fcppd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(FCPP_LIBRARY_RELEASE NAMES fcpp PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(GLSLANG_LIBRARY_DEBUG NAMES glslangd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(GLSLANG_LIBRARY_RELEASE NAMES glslang PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(GLSL_OPTIMIZER_LIBRARY_DEBUG NAMES glsl-optimizerd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(GLSL_OPTIMIZER_LIBRARY_RELEASE NAMES glsl-optimizer PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(SPIRV_CROSS_LIBRARY_DEBUG NAMES spirv-crossd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(SPIRV_CROSS_LIBRARY_RELEASE NAMES spirv-cross PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(SPIRV_TOOLS_LIBRARY_DEBUG NAMES spirv-toolsd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+find_library(SPIRV_TOOLS_LIBRARY_RELEASE NAMES spirv-tools PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 
 find_package_handle_standard_args(bgfx
     REQUIRED_VARS
