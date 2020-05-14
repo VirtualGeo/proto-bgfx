@@ -10,6 +10,7 @@
 
 //#include <tools/shaderc/shaderc.h>
 
+//#include <shaderc/shaderc.h>
 
 enum ShaderType {
     Vertex,
@@ -113,6 +114,9 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
 void Program::init(const bgfx::Caps* caps)
 {
     m_caps = caps;
+
+    const char * buff[256];
+//    shaderc::compileShader(5, buff);
 
     m_sDiffuse = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
     m_sOpacity = bgfx::createUniform("s_opacity", bgfx::UniformType::Sampler);

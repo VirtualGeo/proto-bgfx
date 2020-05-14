@@ -42,6 +42,16 @@
 #    set(GUI_QT 1) #default: GLFW
 
     # -------------------------------------------------------------------
+    # import bgfx.cmake libraries from bgfx-install
+#    set(_IMPORT_PREFIX ${BGFX_ROOT})
+#    include(${BGFX_ROOT}/lib/cmake/bgfx/bgfx-config.cmake)
+#    set(_IMPORT_PREFIX ${BGFX_ROOT}) # reset because bgfx-config cleanup variable
+#    if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+#        include(${BGFX_ROOT}/lib/cmake/bgfx/bgfx-config-debug.cmake)
+#    elseif(CMAKE_BUILD_TYPE EQUAL "RELEASE")
+#        include(${BGFX_ROOT}/lib/cmake/bgfx/bgfx-config-release.cmake)
+#    endif()
+
     if (GUI_QT)
         add_definitions(-DGUI_QT)
     else()

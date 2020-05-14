@@ -110,6 +110,7 @@ find_library(SHADERC_LIBRARY_DEBUG NAMES shaderclibd
 
     PATH_SUFFIXES
     lib
+#    shaderc
     )
 find_library(SHADERC_LIBRARY_RELEASE NAMES shaderclib
     PATHS
@@ -119,6 +120,7 @@ find_library(SHADERC_LIBRARY_RELEASE NAMES shaderclib
 
     PATH_SUFFIXES
     lib
+#    shaderc
     )
 
 
@@ -154,6 +156,7 @@ if(BGFX_FOUND)
             $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${SHADERC_LIBRARY_RELEASE}>)
+
         set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_COMPILE_DEFINITIONS
             $<$<CXX_COMPILER_ID:MSVC>:__STDC_LIMIT_MACROS>
             $<$<CXX_COMPILER_ID:MSVC>:__STDC_FORMAT_MACROS>
