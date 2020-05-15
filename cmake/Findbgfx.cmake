@@ -82,21 +82,22 @@ if(BGFX_FOUND)
         add_library(BGFX::BGFX INTERFACE IMPORTED)
         set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${BGFX_INCLUDE_DIR} $<$<CXX_COMPILER_ID:MSVC>:${BGFX_INCLUDE_DIR}/compat/msvc>)
         set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_LINK_LIBRARIES
+            $<$<CONFIG:Debug>:${SHADERC_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
-            $<$<CONFIG:Debug>:${SHADERC_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${FCPP_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${GLSLANG_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${GLSL_OPTIMIZER_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${SPIRV_CROSS_LIBRARY_DEBUG}>
             $<$<CONFIG:Debug>:${SPIRV_TOOLS_LIBRARY_DEBUG}>
+
+            $<$<CONFIG:Release>:${SHADERC_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${SHADERC_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${FCPP_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${GLSLANG_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${GLSL_OPTIMIZER_LIBRARY_RELEASE}>
