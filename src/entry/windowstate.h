@@ -118,6 +118,7 @@ private:
     std::vector<Cube> m_cubes;
 
     bgfx::ProgramHandle m_branchingTests[3];
+    bgfx::ProgramHandle m_branching3Tests[4];
     uint32_t  m_iBranchingTest = 2;
 
 };
