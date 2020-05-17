@@ -27,6 +27,9 @@ elseif(MSVC)
     set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIR} ${BGFX_INCLUDE_DIR}/compat/msvc)
 endif()
 
+
+#set(CMAKE_FIND_USE_CMAKE_SYSTEM_PATH False)
+set(CMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY False) # not include /usr/lib/libglslang.so
 find_library(BGFX_LIBRARY_DEBUG NAMES bgfxd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(BGFX_LIBRARY_RELEASE NAMES bgfx PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(BIMG_LIBRARY_DEBUG NAMES bimgd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
@@ -47,6 +50,7 @@ find_library(SPIRV_CROSS_LIBRARY_DEBUG NAMES spirv-crossd PATHS /usr/local ${BGF
 find_library(SPIRV_CROSS_LIBRARY_RELEASE NAMES spirv-cross PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(SPIRV_TOOLS_LIBRARY_DEBUG NAMES spirv-toolsd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(SPIRV_TOOLS_LIBRARY_RELEASE NAMES spirv-tools PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+
 
 find_package_handle_standard_args(bgfx
     REQUIRED_VARS
@@ -148,7 +152,7 @@ endfunction(GET_SHADER_INFOS)
 
 macro(COMPILE_SHADER_INTERNAL SHADER_IN SHADER_OUT PLATFORM PROFILE)
 #    set(DEPENDS)
-#    list(APPEND DEPENDS ${SHADER_IN} ${VARYING_DEF_SHADER})
+#    list(APPEND DEPENDS ${SHADER_IN} ${SHADER_VARYING_DEF})
 
     add_custom_command(
         OUTPUT ${SHADER_OUT}
@@ -161,14 +165,14 @@ macro(COMPILE_SHADER_INTERNAL SHADER_IN SHADER_OUT PLATFORM PROFILE)
         --type ${SHADER_TYPE}
         ${PROFILE}
         -i ${SHADER_INCLUDE_DIR}
-        --varyingdef ${VARYING_DEF_SHADER}
+        --varyingdef ${SHADER_VARYING_DEF}
         MAIN_DEPENDENCY ${SHADER_IN}
         DEPENDS ${SHADER_DEPENDS}
         COMMENT "Compiling ${SHADER_IN} to ${SHADER_OUT}"
     )
 endmacro()
 
-function(COMPILE_SHADER SHADER SHADER_SRC_DIR SHADER_BIN_DIR SHADER_INCLUDE_DIR OUT_SHADERS)
+function(COMPILE_SHADER SHADER SHADER_SRC_DIR SHADER_BIN_DIR OUT_SHADERS)
 #    get_filename_component(SHADER_FILENAME ${SHADER} NAME)
     file(RELATIVE_PATH SHADER_RELATIVE ${SHADER_SRC_DIR} ${SHADER})
 #    message("RELATIVE_PATH: " ${SHADER_RELATIVE})

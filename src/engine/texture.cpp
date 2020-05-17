@@ -1,7 +1,7 @@
 #include "texture.h"
 #include <bx/readerwriter.h>
 #include <cassert>
-#include <iostream>
+//#include <iostream>
 
 #include "fileIO.h"
 #include "system.h"
@@ -9,6 +9,7 @@
 
 //#include "bgfx_utils.h"
 #include <cstring>
+#include <utility.h>
 
 //#include <bimg/decode.h>
 //#include <bimg/encode.h>
@@ -163,6 +164,7 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
 //    m_image = nullptr;
 #ifdef MODEL_LOADER_INFO
     std::cout << "    [Material] Load texture : '" << m_name << "', width=" << m_width << ", height=" << m_height << ", nbChannel=" << m_nChannels << ", textureSize=" << m_textureSize << ", bitPerPixel=" << m_nChannels << std::endl;
+//    PRINT_MSG("    [Material] Load texture : '", m_name, "', width=", m_width, ", height=", m_height, ", nbChannel=", m_nChannels, ", textureSize=", m_textureSize, ", bitPerPixel=", m_nChannels);
 #endif
 }
 

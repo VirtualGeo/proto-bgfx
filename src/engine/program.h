@@ -38,7 +38,7 @@ inline Shading& operator++(Shading& shading)
 class Program {
 public:
 
-    static bgfx::ProgramHandle loadProgram(const std::string& shaderName);
+    static bgfx::ProgramHandle loadProgram(const std::string& shaderName, const char * pShaderDefines);
     //    static const std::string shadingFileNames[Program::Shading::Count];
 //    static constexpr unsigned int s_num_vec4_uniforms = 6;
     static constexpr unsigned int s_num_vec4_material = 4;
