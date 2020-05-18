@@ -507,6 +507,7 @@ void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId viewId
     const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
         | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
         | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
+//        | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA;
 
     //    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
     assert(0 <= iCamera && iCamera < m_cameras.size());

@@ -119,7 +119,7 @@ private:
 
     bgfx::ProgramHandle m_branchingTests[3];
     bgfx::ProgramHandle m_branching3Tests[4];
-    uint32_t  m_iBranchingTest = 2;
+    uint32_t  m_iBranchingTest = 1;
 
 };
 

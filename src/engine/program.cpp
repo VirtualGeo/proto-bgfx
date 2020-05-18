@@ -8,10 +8,13 @@
 #include <bx/file.h>
 #include <bx/hash.h>
 #include <cstring>
+#include <sstream>
 
 //#include <tools/shaderc/shaderc.h>
 
+#ifndef USE_SHADERC_EXECUTABLE
 #include <shaderc/shaderc.h>
+#endif
 
 enum ShaderType {
     Vertex,
@@ -502,9 +505,9 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
 //    }
 //}
 
-bgfx::ProgramHandle Program::loadProgram(const std::string& shaderName, const char * pShaderDefines)
+bgfx::ProgramHandle Program::loadProgram(const std::string& shaderName, const char* pShaderDefines)
 {
-    bgfx::ShaderHandle vsh = loadShader(shaderName, ShaderType::Vertex,  pShaderDefines);
+    bgfx::ShaderHandle vsh = loadShader(shaderName, ShaderType::Vertex, pShaderDefines);
     assert(bgfx::isValid(vsh));
     bgfx::setName(vsh, shaderName.c_str());
 
@@ -517,12 +520,18 @@ bgfx::ProgramHandle Program::loadProgram(const std::string& shaderName, const ch
 
 bool callShaderc(const char* pFilename, const char* pOutput, bgfx::RendererType::Enum pRendererType, ShaderType pShaderType, const char* pDefines)
 {
+#ifdef DEBUG
+    std::cout << "\033[35m";
+    std::cout << "[program] Compiling '" << pFilename << "' to '" << pOutput << "'" << std::endl;
+    std::cout << "\033[0m";
+#endif
     //    bool bVertex = !bx::strFind(pFilename, ".vert.sc").isEmpty();
     //    bool bFragment = !bx::strFind(pFilename, ".frag.sc").isEmpty();
     //    if (bVertex || bFragment)
     //    {
     // PATH should be bgfx\examples\runtime
-    const char* argv[] = {
+    constexpr int argvSize = 15;
+    const char* argv[argvSize] = {
         "shaderc.exe",
         "-f",
         pFilename,
@@ -540,18 +549,31 @@ bool callShaderc(const char* pFilename, const char* pOutput, bgfx::RendererType:
             : "120",
         "-i",
         SHADER_INCLUDE_DIR,
-//        "-O", // DX9, DX11 only
-//        "3", // DX9, DX11 only
+        //        "-O", // DX9, DX11 only
+        //        "3", // DX9, DX11 only
         "--define",
         pDefines ? pDefines : ""
     };
-#ifdef DEBUG
-    std::cout << "\033[35m";
-    std::cout << "[program] Compiling '" << pFilename << "' to '" << pOutput << "'" << std::endl;
-    std::cout << "\033[0m";
+    //    const int lenArgv = BX_COUNTOF(argv);
+
+#ifdef USE_SHADERC_EXECUTABLE
+    std::string shadercCmd = BGFX_ROOT "/bin/shaderc";
+    for (int i = 1; i < argvSize; ++i) {
+        if (i == argvSize - 1) {
+            shadercCmd += std::string(" \"") + argv[i] + "\"";
+
+        } else {
+            shadercCmd += std::string(" ") + argv[i];
+        }
+    }
+    std::cout << "EXECUTE: '" << shadercCmd << "'" << std::endl;
+    int error_code = system(shadercCmd.c_str());
+#else
+        int error_code = shaderc::compileShader(BX_COUNTOF(argv), argv);
+
 #endif
-    int error_code = shaderc::compileShader(BX_COUNTOF(argv), argv);
     return error_code == 0;
+
     //    }
 
     //    return false;
@@ -562,7 +584,7 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
 {
     //    const char* shaderPath = "???";
     std::string shaderBinDirPath;
-    const std::string shaderSrcDirPath = "shaders/src/";
+    //    const std::string shaderSrcDirPath = "shaders/src/";
 
     const auto& rendererType = bgfx::getRendererType();
     //    switch (bgfx::getRendererType()) {
@@ -570,59 +592,74 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
     case bgfx::RendererType::Noop:
     case bgfx::RendererType::Direct3D9:
         shaderBinDirPath = "shaders/bin/dx9/";
-//        shaderSrcDirPath = "shaders/src/dx9/";
+        //        shaderSrcDirPath = "shaders/src/dx9/";
         break;
     case bgfx::RendererType::Direct3D11:
     case bgfx::RendererType::Direct3D12:
         shaderBinDirPath = "shaders/bin/dx11/";
-//        shaderSrcDirPath = "shaders/src/dx11/";
+        //        shaderSrcDirPath = "shaders/src/dx11/";
         break;
     case bgfx::RendererType::Gnm:
         shaderBinDirPath = "shaders/bin/pssl/";
-//        shaderSrcDirPath = "shaders/src/pssl/";
+        //        shaderSrcDirPath = "shaders/src/pssl/";
         break;
     case bgfx::RendererType::Metal:
         shaderBinDirPath = "shaders/bin/metal/";
-//        shaderSrcDirPath = "shaders/src/metal/";
+        //        shaderSrcDirPath = "shaders/src/metal/";
         break;
     case bgfx::RendererType::OpenGL:
         shaderBinDirPath = "shaders/bin/glsl/";
-//        shaderSrcDirPath = "shaders/src/glsl/";
+        //        shaderSrcDirPath = "shaders/src/glsl/";
         break;
     case bgfx::RendererType::OpenGLES:
         shaderBinDirPath = "shaders/bin/essl/";
-//        shaderSrcDirPath = "shaders/src/essl/";
+        //        shaderSrcDirPath = "shaders/src/essl/";
         break;
     case bgfx::RendererType::Vulkan:
         shaderBinDirPath = "shaders/bin/spirv/";
-//        shaderSrcDirPath = "shaders/src/spirv/";
+        //        shaderSrcDirPath = "shaders/src/spirv/";
         break;
     }
 
-    uint32_t hashCode = bx::hash<bx::HashMurmur2A>(pShaderDefines);
     //    std::string filePath = PROJECT_DIR + shaderBinDirPath + filename + ".bin";
     //    const bgfx::Memory* mem;
+    //    const std::string srcShaderName = filename
+    //        + (shaderType == ShaderType::Vertex ? ".vert" : ".frag");
+    //    const std::string srcFilePath = PROJECT_DIR + shaderSrcDirPath + srcShaderName + ".sc";
+    const std::string srcFilePath = PROJECT_DIR "shaders/src/"
+        + filename + (shaderType == ShaderType::Vertex ? ".vert" : ".frag") + ".sc";
+    std::ifstream file;
+    file.open(srcFilePath);
+    if (!file.is_open()) {
+        std::cout << "[program] failed to load '" << srcFilePath << "'" << std::endl;
+        exit(1);
+    }
+    std::stringstream strStream;
+    strStream << file.rdbuf();
+    file.close();
+    //    const uint32_t srcShaderNameHash = bx::hash<bx::HashMurmur2A>(srcShaderName);
+    const uint32_t srcShaderHash = bx::hash<bx::HashMurmur2A>(strStream.str().c_str());
     //    std::ifstream file;
     //    std::string typeStr = ShaderType::Vertex ? ".vert" : ".frag";
-    std::string binShaderName = filename + "." + std::to_string(hashCode)
-        + (shaderType == ShaderType::Vertex ? ".vert" : ".frag");
-    std::string srcShaderName = filename
+    const uint32_t shaderDefinesHash = bx::hash<bx::HashMurmur2A>(pShaderDefines);
+    const std::string binShaderName = filename
+        + "." + std::to_string(srcShaderHash)
+        + "." + std::to_string(shaderDefinesHash)
         + (shaderType == ShaderType::Vertex ? ".vert" : ".frag");
 
     //    std::string typeStr = "";
 
     bool binFile = false;
     std::string binFilePath = PROJECT_DIR + shaderBinDirPath + binShaderName + ".glsl";
-    std::ifstream file = std::ifstream(binFilePath, std::ios::binary);
+    file = std::ifstream(binFilePath, std::ios::binary);
     if (!file.is_open()) {
         //        file.close();
 
         binFilePath = PROJECT_DIR + shaderBinDirPath + binShaderName + ".bin";
-//        file = std::ifstream(binFilePath, std::ios::binary);
-//        if (!file.is_open()) {
+        file = std::ifstream(binFilePath, std::ios::binary);
+        if (!file.is_open()) {
             //            std::cout << "[main] Failed to load '" << filePath << "' '" << shaderName << "'"
             //                      << std::endl;
-            std::string srcFilePath = PROJECT_DIR + shaderSrcDirPath + srcShaderName + ".sc";
             bool ret = callShaderc(srcFilePath.c_str(), binFilePath.c_str(), rendererType, shaderType, pShaderDefines);
             assert(ret);
 
@@ -635,7 +672,7 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
             //            file.close();
             //            exit(1);
             //            return BGFX_INVALID_HANDLE;
-//        }
+        }
         binFile = true;
     }
     long begin = file.tellg();

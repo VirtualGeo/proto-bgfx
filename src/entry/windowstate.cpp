@@ -182,7 +182,6 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
 
         std::random_device rd;
         std::mt19937 g(rd());
-
         std::shuffle(m_cubes.begin(), m_cubes.end(), g);
 
         m_branchingTests[0] = Program::loadProgram("branchingTest1", "");
@@ -453,6 +452,7 @@ void WindowState::printDebugMessage()
             ++i;
         }
         entry::s_scene.printStats(line);
+
     }
 }
 

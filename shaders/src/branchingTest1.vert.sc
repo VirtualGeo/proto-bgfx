@@ -11,3 +11,4 @@ void main()
     v_normal = mul(u_model[0], vec4(a_normal, 0.0)).xyz;
     v_texcoord0 = a_texcoord0;
 }
+

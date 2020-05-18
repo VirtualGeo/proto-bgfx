@@ -17,6 +17,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
 set(SHADER_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src)
 add_definitions(-DSHADER_INCLUDE_DIR=\"${SHADER_INCLUDE_DIR}\")
+add_definitions(-DBGFX_ROOT=\"${BGFX_ROOT}\")
 # ------------------------ USER CONFIGURATIONS ----------------------
 #set(BGFX_ROOT <PATH_IN_YOUR_SYSTEM>/bgfx-install) // YOU MUST SET BGFX_ROOT TO COMPILE <----- ATTENTION
 # vscode: settings.json
@@ -36,7 +37,8 @@ add_definitions(-DSHADER_INCLUDE_DIR=\"${SHADER_INCLUDE_DIR}\")
 
 #if (AUTO_GENERATE_BIN_MODEL)
 add_definitions(-DAUTO_GENERATE_BIN_MODEL)
-    add_definitions(-DMODEL_LOADER_INFO)
+add_definitions(-DMODEL_LOADER_INFO)
+add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long linkage on build, shaderclib is too big on DEBUG)
 #endif()
 
 # select graphic user interface
