@@ -56,6 +56,10 @@ bgfx::UniformHandle Program::m_diffuseTexture;
 bgfx::UniformHandle Program::m_diffuseColor;
 bgfx::UniformHandle Program::m_specularTexture;
 
+bgfx::UniformHandle Program::m_hasAdditionalTexture;
+bgfx::UniformHandle Program::m_additionalTexture[s_nAditionalTexture];
+bgfx::UniformHandle Program::m_nAdditionalTexture;
+
 //bgfx::ShaderHandle loadShader(const char* filename);
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType, const char* pShaderDefines);
 
@@ -228,6 +232,13 @@ void Program::init(const bgfx::Caps* caps)
     m_diffuseColor = bgfx::createUniform("diffuseColor", bgfx::UniformType::Vec4);
     m_specularTexture = bgfx::createUniform("specularTexture", bgfx::UniformType::Sampler);
 
+    m_hasAdditionalTexture = bgfx::createUniform("hasAdditionalTexture", bgfx::UniformType::Vec4, s_nAditionalTexture);
+    for (int i =0; i <s_nAditionalTexture; ++i) {
+        m_additionalTexture[i] = bgfx::createUniform((std::string("additionalTexture") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
+    }
+    m_nAdditionalTexture = bgfx::createUniform("nAdditionalTexture", bgfx::UniformType::Vec4);
+
+
     for (int i = 0; i < Shading::Count; ++i) {
         m_programs[i] = BGFX_INVALID_HANDLE;
         //        if (i == Shading::RENDERED)
@@ -333,6 +344,12 @@ void Program::clear()
     bgfx::destroy(m_diffuseTexture);
     bgfx::destroy(m_diffuseColor);
     bgfx::destroy(m_specularTexture);
+
+    bgfx::destroy(m_hasAdditionalTexture);
+    for (int i =0; i <s_nAditionalTexture; ++i) {
+        bgfx::destroy(m_additionalTexture[i]);
+    }
+    bgfx::destroy(m_nAdditionalTexture);
 }
 
 void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material, const Textures& textures)
