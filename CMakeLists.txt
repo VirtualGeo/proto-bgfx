@@ -38,7 +38,7 @@ add_definitions(-DBGFX_ROOT=\"${BGFX_ROOT}\")
 #if (AUTO_GENERATE_BIN_MODEL)
 add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 add_definitions(-DMODEL_LOADER_INFO)
-add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long linkage on build, shaderclib is too big on DEBUG)
+add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long linkage on build, shaderclibd.a is too big)
 #endif()
 
 # select graphic user interface

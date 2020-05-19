@@ -114,12 +114,13 @@ private:
         bool hasSpecularTexture;
         float diffuseColor[4];
 
+        bool hasAdditionalTexture[Program::s_nAditionalTexture];
     };
     std::vector<Cube> m_cubes;
 
     bgfx::ProgramHandle m_branchingTests[3];
-    bgfx::ProgramHandle m_branching3Tests[4];
-    uint32_t  m_iBranchingTest = 1;
+    bgfx::ProgramHandle m_branching3Tests[128];
+    uint32_t  m_iBranchingTest = 2;
 
 };
 

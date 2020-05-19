@@ -26,18 +26,36 @@
 uint64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_ANISOTROPIC;
 
 static const uint8_t s_checkerBoardImage[12] = {0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF};
-static const uint8_t s_redImage[3] = {0xFF, 0x00, 0x00};
-static const uint8_t s_blueImage[3] = {0x00, 0x00, 0xFF};
-static const uint8_t s_greenImage[3] = {0x00, 0xFF, 0x00};
 static const uint8_t s_whiteImage[3] = {0xFF, 0xFF, 0xFF};
 static const uint8_t s_blackImage[3] = {0x00, 0x00, 0x00};
+static const uint8_t s_redImage[3] = {0xFF, 0x00, 0x00};
+static const uint8_t s_greenImage[3] = {0x00, 0xFF, 0x00};
+static const uint8_t s_blueImage[3] = {0x00, 0x00, 0xFF};
+static const uint8_t s_cyanImage[3] = {0x00, 0xFF, 0xFF};
+static const uint8_t s_magentaImage[3] = {0xFF, 0x00, 0xFF};
+static const uint8_t s_yellowImage[3] = {0xFF, 0xFF, 0x00};
+static const uint8_t s_azureImage[3] = {0x00, 0x77, 0xFF};
+static const uint8_t s_purpleImage[3] = {0x77, 0x00, 0xFF};
+static const uint8_t s_pinkImage[3] = {0xFF, 0x00, 0x77};
+static const uint8_t s_orangeImage[3] = {0xFF, 0x77, 0x00};
+static const uint8_t s_chartreuseImage[3] = {0x77, 0xFF, 0x00};
+static const uint8_t s_springGreenImage[3] = {0x00, 0xFF, 0x77};
 Texture Texture::m_sampleTextures[Count] {
     Texture{2, 2, 3, sizeof (s_checkerBoardImage), s_checkerBoardImage, 1},
+    Texture{1, 1, 3, sizeof (s_whiteImage), s_whiteImage, 1},
+    Texture{1, 1, 3, sizeof (s_blackImage), s_blackImage, 1},
     Texture{1, 1, 3, sizeof (s_redImage), s_redImage, 1},
     Texture{1, 1, 3, sizeof (s_greenImage), s_greenImage, 1},
     Texture{1, 1, 3, sizeof (s_blueImage), s_blueImage, 1},
-    Texture{1, 1, 3, sizeof (s_whiteImage), s_whiteImage, 1},
-    Texture{1, 1, 3, sizeof (s_blackImage), s_blackImage, 1},
+    Texture{1, 1, 3, sizeof (s_cyanImage), s_cyanImage, 1},
+    Texture{1, 1, 3, sizeof (s_magentaImage), s_magentaImage, 1},
+    Texture{1, 1, 3, sizeof (s_yellowImage), s_yellowImage, 1},
+    Texture{1, 1, 3, sizeof (s_azureImage), s_azureImage, 1},
+    Texture{1, 1, 3, sizeof (s_purpleImage), s_purpleImage, 1},
+    Texture{1, 1, 3, sizeof (s_pinkImage), s_pinkImage, 1},
+    Texture{1, 1, 3, sizeof (s_orangeImage), s_orangeImage, 1},
+    Texture{1, 1, 3, sizeof (s_chartreuseImage), s_chartreuseImage, 1},
+    Texture{1, 1, 3, sizeof (s_springGreenImage), s_springGreenImage, 1},
 
 };
 // Texture::Texture(const char *filename) {

@@ -17,11 +17,20 @@ class Texture {
 public:
     enum Sample {
         CHECKER_BOARD = 0,
+        WHITE,
+        BLACK,
         RED,
         GREEN,
         BLUE,
-        WHITE,
-        BLACK,
+        CYAN,
+        MAGENTA,
+        YELLOW,
+        AZURE,
+        PURPLE,
+        PINK,
+        ORANGE,
+        CHARTREUSE,
+        SPRING_GREEN,
         Count
     };
 

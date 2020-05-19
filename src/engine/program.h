@@ -124,6 +124,10 @@ public:
     static bgfx::UniformHandle m_diffuseColor;
     static bgfx::UniformHandle m_specularTexture;
 
+    static constexpr unsigned int s_nAditionalTexture = 2;
+    static bgfx::UniformHandle m_hasAdditionalTexture;
+    static bgfx::UniformHandle m_additionalTexture[];
+    static bgfx::UniformHandle m_nAdditionalTexture;
 
 
 //    uint16_t m_shadowMapSize = 512;
