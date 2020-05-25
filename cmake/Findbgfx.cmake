@@ -29,7 +29,7 @@ endif()
 
 
 #set(CMAKE_FIND_USE_CMAKE_SYSTEM_PATH False)
-set(CMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY False) # not include /usr/lib/libglslang.so
+set(CMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY False) # not include /usr/lib/libglslang.so on linux
 find_library(BGFX_LIBRARY_DEBUG NAMES bgfxd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(BGFX_LIBRARY_RELEASE NAMES bgfx PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(BIMG_LIBRARY_DEBUG NAMES bimgd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
@@ -44,6 +44,7 @@ find_library(FCPP_LIBRARY_DEBUG NAMES fcppd PATHS /usr/local ${BGFX_ROOT} PATH_S
 find_library(FCPP_LIBRARY_RELEASE NAMES fcpp PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(GLSLANG_LIBRARY_DEBUG NAMES glslangd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(GLSLANG_LIBRARY_RELEASE NAMES glslang PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+#find_library(GLSLANG_LIBRARY_RELWITHDEBINFO NAMES glslang PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib NO_DEFAULT_PATH)
 find_library(GLSL_OPTIMIZER_LIBRARY_DEBUG NAMES glsl-optimizerd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(GLSL_OPTIMIZER_LIBRARY_RELEASE NAMES glsl-optimizer PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(SPIRV_CROSS_LIBRARY_DEBUG NAMES spirv-crossd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
@@ -107,6 +108,18 @@ if(BGFX_FOUND)
             $<$<CONFIG:Release>:${GLSL_OPTIMIZER_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${SPIRV_CROSS_LIBRARY_RELEASE}>
             $<$<CONFIG:Release>:${SPIRV_TOOLS_LIBRARY_RELEASE}>
+
+#            $<$<CONFIG:RelWithDebInfo>:${SHADERC_LIBRARY_RELEASE}>
+#            $<$<CONFIG:RelWithDebInfo>:${BGFX_LIBRARY_RELEASE}>
+#            $<$<CONFIG:RelWithDebInfo>:${BIMG_LIBRARY_RELEASE}>
+#            $<$<CONFIG:RelWithDebInfo>:${BX_LIBRARY_RELEASE}>
+#            $<$<CONFIG:RelWithDebInfo>:${ASTCCODEC_LIBRARY_RELEASE}>
+#            $<$<CONFIG:RelWithDebInfo>:${FCPP_LIBRARY_RELEASE}>
+#            $<$<CONFIG:RelWithDebInfo>:${GLSLANG_LIBRARY_RELEASE}>
+##            $<$<CONFIG:RelWithDebInfo>:${GLSLANG_LIBRARY_RELWITHDEBINFO}>
+#            $<$<CONFIG:RelWithDebInfo>:${GLSL_OPTIMIZER_LIBRARY_RELEASE}>
+#            $<$<CONFIG:RelWithDebInfo>:${SPIRV_CROSS_LIBRARY_RELEASE}>
+#            $<$<CONFIG:RelWithDebInfo>:${SPIRV_TOOLS_LIBRARY_RELEASE}>
             )
 
         set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_COMPILE_DEFINITIONS
@@ -118,6 +131,7 @@ else()
     message(FATAL_ERROR "could not find bgfx, make sure you have set BGFX_ROOT")
 endif()
 
+# ----------------------------------------------- SHADER COMPILATION
 # Shader compile utils
 function(GET_SHADER_TYPE IN_TYPE OUT_TYPE)
     if("${IN_TYPE}" STREQUAL "vert")
