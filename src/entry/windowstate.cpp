@@ -153,10 +153,24 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 300.0f }); // question : push_back ?
         s_lastTime = std::chrono::high_resolution_clock::now();
 
-        const uint32_t nbCube = 100;
-        const int nArea = 2 + Program::s_nAditionalTexture / 2;
+//        const uint32_t nbCube = 16;
+//        const uint32_t nbCube = 32;
+        const uint32_t nbCube = 64;
+//        const uint32_t nbCube = 128;
+//        const uint32_t nbCube = 256;
+
+
+        //        const int nArea = 2 + Program::s_nAditionalTexture / 2;
+        //        const int nArea = std::ceil(std::sqrt(Program::s_nTexture));
+        //        const int nArea = 1 + std::ceil(Program::s_nTexture / 2.0);
+        //        const int nArea = 2;
+        //        const int nArea = 1 + std::ceil(Program::s_nTexture / 2.0f);
+        //        const int nArea = std::ceil(std::sqrt(std::pow(2, Program::s_nTexture)));
+        const int nArea = std::pow(2, Program::s_nTexture / 2.0f);
+        int iShader = 0;
         for (int iArea = 0; iArea < nArea; ++iArea) {
             for (int jArea = 0; jArea < nArea; ++jArea) {
+                std::string hasAdditional = "N_TEXTURE=" + (std::to_string(Program::s_nTexture));
                 for (uint32_t iCube = 0; iCube < nbCube / nArea; ++iCube) {
                     int i = iCube + (nbCube / nArea) * iArea;
                     for (uint32_t jCube = 0; jCube < nbCube / nArea; ++jCube) {
@@ -171,25 +185,43 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
                         mtx[13] = -(float)nbCube / 2.0f * 3.0f + float(j) * 3.0f;
                         mtx[14] = 0.0f;
 
-                        const float color[] { 0.5f, 0.5f, 0.5f, 0.0f };
+                        //                        const float color[] { 0.5f, 0.5f, 0.5f, 0.0f };
                         Cube cube;
                         memcpy(cube.mtx, mtx, 16 * sizeof(float));
-                        cube.hasDiffuseTexture = i > nbCube / nArea;
-                        cube.hasSpecularTexture = j > nbCube / nArea;
-                        memcpy(cube.diffuseColor, color, 4 * sizeof(float));
+                        //                        cube.hasDiffuseTexture = i > nbCube / nArea;
+                        //                        cube.hasSpecularTexture = j > nbCube / nArea;
+                        //                        memcpy(cube.diffuseColor, color, 4 * sizeof(float));
 
-                        for (int iTex = 0; iTex < Program::s_nAditionalTexture / 2; ++iTex) {
-                            cube.hasAdditionalTexture[iTex * 2] = i > ((2 + iTex) * nbCube / nArea);
-                            cube.hasAdditionalTexture[iTex * 2 + 1] = j > ((2 + iTex) * nbCube / nArea);
-                            //                        cube.hasAdditionalTexture[0] = true;
-                            //                        cube.hasAdditionalTexture[1] = true;
+                        if (iShader < std::pow(2, Program::s_nTexture)) {
+                            int temp = iShader;
+                            for (int k = 0; k < Program::s_nTexture; ++k) {
+                                int bit = temp % 2;
+
+                                cube.hasTexture[k] = bit;
+                                //                                cube.hasTexture[k] = 0;
+                                if (iCube == 0 && jCube == 0 && bit) {
+                                    hasAdditional += ";HAS_TEXTURE_" + std::to_string(k);
+                                }
+                                //                            temp >>= 1;
+                                temp /= 2;
+                                //                            cube.hasTexture[iTex * 2] = i > ((2 + iTex) * nbCube / nArea);
+                                //                            cube.hasTexture[iTex * 2 + 1] = j > ((2 + iTex) * nbCube / nArea);
+                                //                        cube.hasAdditionalTexture[0] = true;
+                                //                        cube.hasAdditionalTexture[1] = true;
+                            }
                         }
+                        cube.iShader = iShader;
 
                         m_cubes.push_back(cube);
                         //                Geometry::drawCube(mtx);
                         //                bgfx::submit(m_id, Program::m_programs[m_shading]);
                     }
                 }
+
+                //                ++iTex;
+                m_branching3Tests[iShader] = Program::loadProgram("branchingTest3", (hasAdditional).c_str());
+                bgfx::frame();
+                ++iShader;
             }
         }
 
@@ -197,37 +229,39 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         //        std::mt19937 g(rd());
         //        std::shuffle(m_cubes.begin(), m_cubes.end(), g);
 
-        m_branchingTests[0] = Program::loadProgram("branchingTest1", "");
-        m_branchingTests[1] = Program::loadProgram("branchingTest2", "");
+        m_branchingTests[0] = Program::loadProgram("branchingTest1", ("N_TEXTURE=" + std::to_string(Program::s_nTexture)).c_str());
+        m_branchingTests[1] = Program::loadProgram("branchingTest2", ("N_TEXTURE=" + std::to_string(Program::s_nTexture)).c_str());
+        //        m_branchingTests[1] = Program::loadProgram("branchingTest2", "");
         m_branchingTests[2] = Program::loadProgram("branchingTest3", "");
 
-//        m_branching3Tests[0] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + std::to_string(Program::s_nAditionalTexture)).c_str());
-//        m_branching3Tests[1] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_DIFFUSE_TEXTURE").c_str());
-//        m_branching3Tests[2] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_SPECULAR_TEXTURE").c_str());
-//        m_branching3Tests[3] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_DIFFUSE_TEXTURE;HAS_SPECULAR_TEXTURE").c_str());
+        //        m_branching3Tests[0] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + std::to_string(Program::s_nAditionalTexture)).c_str());
+        //        m_branching3Tests[1] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_DIFFUSE_TEXTURE").c_str());
+        //        m_branching3Tests[2] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_SPECULAR_TEXTURE").c_str());
+        //        m_branching3Tests[3] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_DIFFUSE_TEXTURE;HAS_SPECULAR_TEXTURE").c_str());
 
+        //        for (int i = 0; i < std::pow(2, 2 + Program::s_nAditionalTexture); ++i) {
+        //                        if (iShader < std::pow(2, Program::s_nTexture)) {
 
-        for (int i = 0; i < std::pow(2, 2 + Program::s_nAditionalTexture); ++i) {
-            std::string hasAdditional = "N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture));
-            int iTemp = i;
-            for (int j = 0; j < 8; ++j) {
-                int bit = iTemp % 2;
+        //        for (int i = 0; i < std::pow(2, Program::s_nTexture); ++i) {
+        //            std::string hasAdditional = "N_TEXTURE=" + (std::to_string(Program::s_nTexture));
+        //            int iTemp = i;
+        //            for (int j = 0; j < Program::s_nTexture; ++j) {
+        //                int bit = iTemp % 2;
 
-                hasAdditional += ";HAS_ADDITIONAL_TEXTURE_" + std::to_string(j) + "=" + std::to_string(bit);
+        //                hasAdditional += ";HAS_TEXTURE_" + std::to_string(j) + "=" + std::to_string(bit);
 
-                iTemp /= 2;
-            }
-            m_branching3Tests[i] = Program::loadProgram("branchingTest3", (hasAdditional).c_str());
-        }
+        //                iTemp /= 2;
+        //            }
+        //            m_branching3Tests[i] = Program::loadProgram("branchingTest3", (hasAdditional).c_str());
+        //        }
 
+        //            for (int j =0; j < std::pow(2, i); ++j) {
+        //            m_branching3Tests[4] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_DIFFUSE_TEXTURE;HAS_SPECULAR_TEXTURE;HAS_ADDITIONAL_TEXTURE_" + std::to_string(0)).c_str());
 
-//            for (int j =0; j < std::pow(2, i); ++j) {
-//            m_branching3Tests[4] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_DIFFUSE_TEXTURE;HAS_SPECULAR_TEXTURE;HAS_ADDITIONAL_TEXTURE_" + std::to_string(0)).c_str());
-
-//            m_branching3Tests[5] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_DIFFUSE_TEXTURE;HAS_SPECULAR_TEXTURE;HAS_ADDITIONAL_TEXTURE_" + std::to_string(1)).c_str());
-//            m_branching3Tests[5] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_DIFFUSE_TEXTURE;HAS_SPECULAR_TEXTURE;HAS_ADDITIONAL_TEXTURE_" + std::to_string(0) + ";HAS_ADDITIONAL_TEXTURE_" + std::to_string(1)).c_str());
-//            }
-//        }
+        //            m_branching3Tests[5] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_DIFFUSE_TEXTURE;HAS_SPECULAR_TEXTURE;HAS_ADDITIONAL_TEXTURE_" + std::to_string(1)).c_str());
+        //            m_branching3Tests[5] = Program::loadProgram("branchingTest3", ("N_ADDITIONAL_TEXTURE=" + (std::to_string(Program::s_nAditionalTexture)) + ";HAS_DIFFUSE_TEXTURE;HAS_SPECULAR_TEXTURE;HAS_ADDITIONAL_TEXTURE_" + std::to_string(0) + ";HAS_ADDITIONAL_TEXTURE_" + std::to_string(1)).c_str());
+        //            }
+        //        }
 
     } else {
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
@@ -319,114 +353,114 @@ void WindowState::render() const
     //        }
     //    }
     for (const auto& cube : m_cubes) {
-        float ones[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        float zeros[] = { 0.0f };
+        //        float ones[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        //        float zeros[] = { 0.0f };
 
-        bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
+        //        bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
 
         if (m_iBranchingTest == 0) {
-            float additionalTexture[4] = { Program::s_nAditionalTexture };
-            bgfx::setUniform(Program::m_nAdditionalTexture, additionalTexture);
+            //            float additionalTexture[4] = { Program::s_nTexture - 2 };
+            //            bgfx::setUniform(Program::m_nAdditionalTexture, additionalTexture);
 
-            if (cube.hasDiffuseTexture) {
-                //            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::m_sampleTextures[Texture::RED].textureHandle());
-                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::RED));
-                bgfx::setUniform(Program::m_hasDiffuseTexture, ones);
-            } else {
-                bgfx::setUniform(Program::m_hasDiffuseTexture, zeros);
-            }
-            if (cube.hasSpecularTexture) {
-                //            bgfx::setTexture(1, Program::m_specularTexture, Texture::m_sampleTextures[Texture::GREEN].textureHandle());
-                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::GREEN));
-                bgfx::setUniform(Program::m_hasSpecularTexture, ones);
-            } else {
-                bgfx::setUniform(Program::m_hasSpecularTexture, zeros);
-            }
+            //            if (cube.hasTexture[0]) {
+            //                //            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::m_sampleTextures[Texture::RED].textureHandle());
+            //                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::RED));
+            //                bgfx::setUniform(Program::m_hasDiffuseTexture, ones);
+            //            } else {
+            //                bgfx::setUniform(Program::m_hasDiffuseTexture, zeros);
+            //            }
+            //            if (cube.hasTexture[1]) {
+            //                //            bgfx::setTexture(1, Program::m_specularTexture, Texture::m_sampleTextures[Texture::GREEN].textureHandle());
+            //                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::GREEN));
+            //                bgfx::setUniform(Program::m_hasSpecularTexture, ones);
+            //            } else {
+            //                bgfx::setUniform(Program::m_hasSpecularTexture, zeros);
+            //            }
 
-            float buffer[Program::s_nAditionalTexture * 4] = { 0.0f };
-            for (int i = 0; i < Program::s_nAditionalTexture; ++i) {
-                if (cube.hasAdditionalTexture[i]) {
-                    bgfx::setTexture(2 + i, Program::m_additionalTexture[i], Texture::getSampleTexture(Texture::Sample(i + Texture::BLUE)));
+            float buffer[(Program::s_nTexture)*4] = { 0.0f };
+            for (int i = 0; i < (Program::s_nTexture); ++i) {
+                if (cube.hasTexture[i]) {
+                    bgfx::setTexture(i, Program::m_texture[i], Texture::getSampleTexture(Texture::Sample(i + Texture::RED)));
                     //                    bgfx::setTexture(2 + i, Program::m_additionalTexture[i], Texture::getSampleTexture(Texture::BLUE));
                     buffer[4 * i] = 1.0f;
                 } else {
 
                     buffer[4 * i] = 0.0f;
                 }
-
+                //                    buffer[4 * i] = 1.0f;
                 //                buffer[4 * i] = cube.hasAdditionalTexture[i];
             }
             //            buffer[1] = Program::s_nAditionalTexture;
-            bgfx::setUniform(Program::m_hasAdditionalTexture, buffer, Program::s_nAditionalTexture);
+            bgfx::setUniform(Program::m_hasTexture, buffer, Program::s_nTexture);
 
         } else if (m_iBranchingTest == 1) {
-            float additionalTexture[4] = { Program::s_nAditionalTexture };
-            bgfx::setUniform(Program::m_nAdditionalTexture, additionalTexture);
+            //            float additionalTexture[4] = { Program::s_nTexture };
+            //            bgfx::setUniform(Program::m_nAdditionalTexture, additionalTexture);
             //                bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
-            if (cube.hasDiffuseTexture) {
-                //            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::m_sampleTextures[Texture::RED].textureHandle());
-                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::RED));
-                //                bgfx::setUniform(Program::m_hasDiffuseTexture, ones);
-            } else {
-                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::WHITE));
-                //                bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
-                //                bgfx::setUniform(Program::m_hasDiffuseTexture, zeros);
-            }
-            if (cube.hasSpecularTexture) {
-                //            bgfx::setTexture(1, Program::m_specularTexture, Texture::m_sampleTextures[Texture::GREEN].textureHandle());
-                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::GREEN));
-                //                bgfx::setUniform(Program::m_hasSpecularTexture, ones);
-            } else {
-                //                bgfx::setUniform(Program::m_hasSpecularTexture, zeros);
-                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::BLACK));
-            }
+            //            if (cube.hasTexture[0]) {
+            //                //            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::m_sampleTextures[Texture::RED].textureHandle());
+            //                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::RED));
+            //                //                bgfx::setUniform(Program::m_hasDiffuseTexture, ones);
+            //            } else {
+            //                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::WHITE));
+            //                //                bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
+            //                //                bgfx::setUniform(Program::m_hasDiffuseTexture, zeros);
+            //            }
+            //            if (cube.hasTexture[1]) {
+            //                //            bgfx::setTexture(1, Program::m_specularTexture, Texture::m_sampleTextures[Texture::GREEN].textureHandle());
+            //                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::GREEN));
+            //                //                bgfx::setUniform(Program::m_hasSpecularTexture, ones);
+            //            } else {
+            //                //                bgfx::setUniform(Program::m_hasSpecularTexture, zeros);
+            //                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::BLACK));
+            //            }
 
-            for (int i = 0; i < Program::s_nAditionalTexture; ++i) {
-                if (cube.hasAdditionalTexture[i]) {
-                    bgfx::setTexture(2 + i, Program::m_additionalTexture[i], Texture::getSampleTexture(Texture::Sample(i + Texture::BLUE)));
+            for (int i = 0; i < Program::s_nTexture; ++i) {
+                if (cube.hasTexture[i]) {
+                    bgfx::setTexture(i, Program::m_texture[i], Texture::getSampleTexture(Texture::Sample(i + Texture::RED)));
                 } else {
-                    bgfx::setTexture(2 + i, Program::m_additionalTexture[i], Texture::getSampleTexture(Texture::Sample::BLACK));
+                    bgfx::setTexture(i, Program::m_texture[i], Texture::getSampleTexture(Texture::Sample::BLACK));
                 }
             }
 
         } else if (m_iBranchingTest == 2) {
-//            float additionalTexture[4] = { Program::s_nAditionalTexture };
-//            bgfx::setUniform(Program::m_nAdditionalTexture, additionalTexture);
+            //            float additionalTexture[4] = { Program::s_nAditionalTexture };
+            //            bgfx::setUniform(Program::m_nAdditionalTexture, additionalTexture);
 
-            int iShader = 0;
-            if (cube.hasDiffuseTexture) {
-                //            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::m_sampleTextures[Texture::RED].textureHandle());
-                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::RED));
-                ++iShader;
-                //                bgfx::setUniform(Program::m_hasDiffuseTexture, ones);
-                //            } else {
-                //                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::WHITE));
-                //                bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
-                //                bgfx::setUniform(Program::m_hasDiffuseTexture, zeros);
-            }
-            if (cube.hasSpecularTexture) {
-                //            bgfx::setTexture(1, Program::m_specularTexture, Texture::m_sampleTextures[Texture::GREEN].textureHandle());
-                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::GREEN));
-                //                bgfx::setUniform(Program::m_hasSpecularTexture, ones);
-                iShader += 2;
-                //            } else {
-                //                bgfx::setUniform(Program::m_hasSpecularTexture, zeros);
-                //                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::BLACK));
-            }
+            //            int iShader = 0;
+            //            if (cube.hasTexture[0]) {
+            //                //            bgfx::setTexture(0, Program::m_diffuseTexture, Texture::m_sampleTextures[Texture::RED].textureHandle());
+            //                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::RED));
+            ////                ++iShader;
+            //                //                bgfx::setUniform(Program::m_hasDiffuseTexture, ones);
+            //                //            } else {
+            //                //                bgfx::setTexture(0, Program::m_diffuseTexture, Texture::getSampleTexture(Texture::WHITE));
+            //                //                bgfx::setUniform(Program::m_diffuseColor, cube.diffuseColor);
+            //                //                bgfx::setUniform(Program::m_hasDiffuseTexture, zeros);
+            //            }
+            //            if (cube.hasTexture[1]) {
+            //                //            bgfx::setTexture(1, Program::m_specularTexture, Texture::m_sampleTextures[Texture::GREEN].textureHandle());
+            //                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::GREEN));
+            //                //                bgfx::setUniform(Program::m_hasSpecularTexture, ones);
+            ////                iShader += 2;
+            //                //            } else {
+            //                //                bgfx::setUniform(Program::m_hasSpecularTexture, zeros);
+            //                //                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::BLACK));
+            //            }
 
-            int jump = 4;
-            for (int i = 0; i < Program::s_nAditionalTexture; ++i) {
-                if (cube.hasAdditionalTexture[i]) {
-                    bgfx::setTexture(2 + i, Program::m_additionalTexture[i], Texture::getSampleTexture(Texture::Sample(i + Texture::BLUE)));
-                    iShader += jump;
-                } else {
-                    bgfx::setTexture(2 + i, Program::m_additionalTexture[i], Texture::getSampleTexture(Texture::Sample::BLACK));
+            //            int jump = 4;
+            for (int i = 0; i < Program::s_nTexture; ++i) {
+                if (cube.hasTexture[i]) {
+                    bgfx::setTexture(i, Program::m_texture[i], Texture::getSampleTexture(Texture::Sample(i + Texture::RED)));
+                    //                    iShader += jump;
+                    //                } else {
+                    //                    bgfx::setTexture(2 + i, Program::m_texture[i], Texture::getSampleTexture(Texture::Sample::BLACK));
                 }
-                jump *= 2;
+                //                jump *= 2;
             }
             Geometry::drawCube(cube.mtx);
-//            assert(iShader < 4)
-            bgfx::submit(m_id, m_branching3Tests[iShader]);
+            //            assert(iShader < 4)
+            bgfx::submit(m_id, m_branching3Tests[cube.iShader]);
             continue;
         }
         Geometry::drawCube(cube.mtx);
@@ -489,7 +523,7 @@ void WindowState::renderAllWindow()
     ++s_iFrame;
     //        entry::s_scene.updateLightShadowMaps();
     //        entry::s_scene.setLightUniforms();
-//                    m_iBranchingTest = (m_iBranchingTest + 1) % 3;
+    //                        m_iBranchingTest = (m_iBranchingTest + 1) % 3;
     //    }
     //    return;
 }

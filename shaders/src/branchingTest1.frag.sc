@@ -23,50 +23,74 @@ $input v_fragPos, v_normal, v_texcoord0
 //    gl_FragColor.w = 1.0;
 //}
 
-uniform vec4 hasDiffuseTexture;
-uniform vec4 hasSpecularTexture;
+//uniform vec4 hasDiffuseTexture;
+//uniform vec4 hasSpecularTexture;
 
 
-SAMPLER2D(diffuseTexture, 0);
-SAMPLER2D(specularTexture, 1);
+//SAMPLER2D(diffuseTexture, 0);
+//SAMPLER2D(specularTexture, 1);
 
-uniform vec4 diffuseColor;
+//uniform vec4 diffuseColor;
 
 //#define N_ADDITIONAL_TEXTURE 2
-SAMPLER2D(additionalTexture0, 2);
-SAMPLER2D(additionalTexture1, 3);
-SAMPLER2D(additionalTexture2, 4);
-SAMPLER2D(additionalTexture3, 5);
-SAMPLER2D(additionalTexture4, 6);
-SAMPLER2D(additionalTexture5, 7);
-SAMPLER2D(additionalTexture6, 8);
-SAMPLER2D(additionalTexture7, 9);
+#if N_TEXTURE > 0
+SAMPLER2D(texture0, 0);
+#endif
+#if N_TEXTURE > 1
+SAMPLER2D(texture1, 1);
+#endif
+#if N_TEXTURE > 2
+SAMPLER2D(texture2, 2);
+#endif
+#if N_TEXTURE > 3
+SAMPLER2D(texture3, 3);
+#endif
+#if N_TEXTURE > 4
+SAMPLER2D(texture4, 4);
+#endif
+#if N_TEXTURE > 5
+SAMPLER2D(texture5, 5);
+#endif
+#if N_TEXTURE > 6
+SAMPLER2D(texture6, 6);
+#endif
+#if N_TEXTURE > 7
+SAMPLER2D(texture7, 7);
+#endif
+#if N_TEXTURE > 8
+SAMPLER2D(texture8, 8);
+#endif
+#if N_TEXTURE > 9
+SAMPLER2D(texture9, 9);
+#endif
 //SAMPLER2D(additionalTexture3, 5);
 //SAMPLER2D(additionalTexture4, 6);
-uniform vec4 hasAdditionalTexture[8];
-uniform vec4 nAdditionalTexture;
-#define N_ADDITIONAL_TEXTURE nAdditionalTexture.x
+#ifdef N_TEXTURE
+uniform vec4 hasTexture[N_TEXTURE];
+#endif
+//uniform vec4 nTexture;
+//#define N_TEXTURE nTexture.x
 //#define has_additional_texture(i)
 
 void main() {
 
-    vec4 diffColor = vec4_splat(0.0);
-    vec4 specColor = vec4_splat(0.0);
+//    vec4 diffColor = vec4_splat(0.0);
+//    vec4 specColor = vec4_splat(0.0);
 
-    if (hasDiffuseTexture.x > 0.5) {
-//        diffColor = texture2D(diffuseTexture, v_texcoord0);
-        diffColor = texture2D(diffuseTexture, v_texcoord0) * vec4(diffuseColor.xyz, 1.0);
-    }
-    else {
-        diffColor = vec4(diffuseColor.xyz, 1.0);
-    }
+//    if (hasDiffuseTexture.x > 0.5) {
+////        diffColor = texture2D(diffuseTexture, v_texcoord0);
+//        diffColor = texture2D(diffuseTexture, v_texcoord0) * vec4(diffuseColor.xyz, 1.0);
+//    }
+//    else {
+//        diffColor = vec4(diffuseColor.xyz, 1.0);
+//    }
 
-    if (hasSpecularTexture.x > 0.5) {
-        specColor = texture2D(specularTexture, v_texcoord0);
-    }
-    else {
-        specColor = vec4(0.0, 0.0, 0.0, 1.0);
-    }
+//    if (hasSpecularTexture.x > 0.5) {
+//        specColor = texture2D(specularTexture, v_texcoord0);
+//    }
+//    else {
+//        specColor = vec4(0.0, 0.0, 0.0, 1.0);
+//    }
 
 //    specColor /= 2.0;
 //    diffColor /= 2.0;
@@ -77,41 +101,67 @@ void main() {
 //            specColor += vec4(0.0, 0.0, 0.0, 1.0);
 //        }
 //    }
-    int i =-1;
-    if (++i < N_ADDITIONAL_TEXTURE) {
-        if (hasAdditionalTexture[i].x > 0.5) {
-            specColor = (texture2D(additionalTexture0, v_texcoord0) + specColor);
+//    int i =-1;
+    vec4 color = vec4_splat(0.0);
+//    if (++i < N_TEXTURE) {
+#if N_TEXTURE > 0
+        if (hasTexture[0].x > 0.5) {
+            color += texture2D(texture0, v_texcoord0);
         }
-    }
-    if (++i < N_ADDITIONAL_TEXTURE) {
-        if (hasAdditionalTexture[i].x > 0.5) {
-            specColor = (texture2D(additionalTexture1, v_texcoord0) + specColor);
+#endif
+#if N_TEXTURE > 1
+        if (hasTexture[1].x > 0.5) {
+            color += texture2D(texture1, v_texcoord0);
         }
-    }
-    if (++i < N_ADDITIONAL_TEXTURE) {
-        if (hasAdditionalTexture[i].x > 0.5) {
-            specColor = (texture2D(additionalTexture2, v_texcoord0) + specColor);
+#endif
+#if N_TEXTURE > 2
+        if (hasTexture[2].x > 0.5) {
+            color += texture2D(texture2, v_texcoord0);
         }
-    }
-    if (++i < N_ADDITIONAL_TEXTURE) {
-        if (hasAdditionalTexture[i].x > 0.5) {
-            specColor = (texture2D(additionalTexture3, v_texcoord0) + specColor);
+#endif
+#if N_TEXTURE > 3
+        if (hasTexture[3].x > 0.5) {
+            color += texture2D(texture3, v_texcoord0);
         }
-    }
-    if (++i < N_ADDITIONAL_TEXTURE) {
-        if (hasAdditionalTexture[i].x > 0.5) {
-            specColor = (texture2D(additionalTexture4, v_texcoord0) + specColor);
+#endif
+#if N_TEXTURE > 4
+        if (hasTexture[4].x > 0.5) {
+            color += texture2D(texture4, v_texcoord0);
         }
-    }
-    if (++i < N_ADDITIONAL_TEXTURE) {
-        if (hasAdditionalTexture[i].x > 0.5) {
-            specColor = (texture2D(additionalTexture5, v_texcoord0) + specColor);
+#endif
+#if N_TEXTURE > 5
+        if (hasTexture[5].x > 0.5) {
+            color += texture2D(texture5, v_texcoord0);
         }
-    }
+#endif
+#if N_TEXTURE > 6
+        if (hasTexture[6].x > 0.5) {
+            color += texture2D(texture6, v_texcoord0);
+        }
+#endif
+#if N_TEXTURE > 7
+        if (hasTexture[7].x > 0.5) {
+            color += texture2D(texture7, v_texcoord0);
+        }
+#endif
+#if N_TEXTURE > 8
+        if (hasTexture[8].x > 0.5) {
+            color += texture2D(texture8, v_texcoord0);
+        }
+#endif
+#if N_TEXTURE > 9
+        if (hasTexture[9].x > 0.5) {
+            color += texture2D(texture9, v_texcoord0);
+        }
+#endif
 
 
-    specColor /= N_ADDITIONAL_TEXTURE;
+#ifdef N_TEXTURE
+    color /= N_TEXTURE;
+#endif
 
-    gl_FragColor = diffColor + specColor;
+//    gl_FragColor = diffColor + specColor;
+    gl_FragColor = color;
     gl_FragColor.w = 1.0;
+    gl_FragColor = toGamma(gl_FragColor);
 }

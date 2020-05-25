@@ -50,15 +50,15 @@ bgfx::UniformHandle Program::m_uDirLights;
 bgfx::UniformHandle Program::m_uSpotLights;
 bgfx::UniformHandle Program::m_uPointLights;
 
-bgfx::UniformHandle Program::m_hasDiffuseTexture;
-bgfx::UniformHandle Program::m_hasSpecularTexture;
-bgfx::UniformHandle Program::m_diffuseTexture;
-bgfx::UniformHandle Program::m_diffuseColor;
-bgfx::UniformHandle Program::m_specularTexture;
+//bgfx::UniformHandle Program::m_hasDiffuseTexture;
+//bgfx::UniformHandle Program::m_hasSpecularTexture;
+//bgfx::UniformHandle Program::m_diffuseTexture;
+//bgfx::UniformHandle Program::m_diffuseColor;
+//bgfx::UniformHandle Program::m_specularTexture;
 
-bgfx::UniformHandle Program::m_hasAdditionalTexture;
-bgfx::UniformHandle Program::m_additionalTexture[s_nAditionalTexture];
-bgfx::UniformHandle Program::m_nAdditionalTexture;
+bgfx::UniformHandle Program::m_hasTexture;
+bgfx::UniformHandle Program::m_texture[s_nTexture];
+//bgfx::UniformHandle Program::m_nAdditionalTexture;
 
 //bgfx::ShaderHandle loadShader(const char* filename);
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType, const char* pShaderDefines);
@@ -226,17 +226,17 @@ void Program::init(const bgfx::Caps* caps)
     //    m_shadowMapTexture = fbtextures[0];
     //    m_shadowMapFB = bgfx::createFrameBuffer(1, &m_shadowMapTexture, false);
 
-    m_hasDiffuseTexture = bgfx::createUniform("hasDiffuseTexture", bgfx::UniformType::Vec4);
-    m_hasSpecularTexture = bgfx::createUniform("hasSpecularTexture", bgfx::UniformType::Vec4);
-    m_diffuseTexture = bgfx::createUniform("diffuseTexture", bgfx::UniformType::Sampler);
-    m_diffuseColor = bgfx::createUniform("diffuseColor", bgfx::UniformType::Vec4);
-    m_specularTexture = bgfx::createUniform("specularTexture", bgfx::UniformType::Sampler);
+//    m_hasDiffuseTexture = bgfx::createUniform("hasDiffuseTexture", bgfx::UniformType::Vec4);
+//    m_hasSpecularTexture = bgfx::createUniform("hasSpecularTexture", bgfx::UniformType::Vec4);
+//    m_diffuseTexture = bgfx::createUniform("diffuseTexture", bgfx::UniformType::Sampler);
+//    m_diffuseColor = bgfx::createUniform("diffuseColor", bgfx::UniformType::Vec4);
+//    m_specularTexture = bgfx::createUniform("specularTexture", bgfx::UniformType::Sampler);
 
-    m_hasAdditionalTexture = bgfx::createUniform("hasAdditionalTexture", bgfx::UniformType::Vec4, s_nAditionalTexture);
-    for (int i =0; i <s_nAditionalTexture; ++i) {
-        m_additionalTexture[i] = bgfx::createUniform((std::string("additionalTexture") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
+    m_hasTexture = bgfx::createUniform("hasTexture", bgfx::UniformType::Vec4, s_nTexture);
+    for (int i =0; i <s_nTexture; ++i) {
+        m_texture[i] = bgfx::createUniform((std::string("texture") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
     }
-    m_nAdditionalTexture = bgfx::createUniform("nAdditionalTexture", bgfx::UniformType::Vec4);
+//    m_nAdditionalTexture = bgfx::createUniform("nAdditionalTexture", bgfx::UniformType::Vec4);
 
 
     for (int i = 0; i < Shading::Count; ++i) {
@@ -339,17 +339,17 @@ void Program::clear()
     //        bgfx::destroy(m_uDirLights[i][0]);
     //        bgfx::destroy(m_uDirLights[i][1]);
     //    }
-    bgfx::destroy(m_hasDiffuseTexture);
-    bgfx::destroy(m_hasSpecularTexture);
-    bgfx::destroy(m_diffuseTexture);
-    bgfx::destroy(m_diffuseColor);
-    bgfx::destroy(m_specularTexture);
+//    bgfx::destroy(m_hasDiffuseTexture);
+//    bgfx::destroy(m_hasSpecularTexture);
+//    bgfx::destroy(m_diffuseTexture);
+//    bgfx::destroy(m_diffuseColor);
+//    bgfx::destroy(m_specularTexture);
 
-    bgfx::destroy(m_hasAdditionalTexture);
-    for (int i =0; i <s_nAditionalTexture; ++i) {
-        bgfx::destroy(m_additionalTexture[i]);
+    bgfx::destroy(m_hasTexture);
+    for (int i =0; i <s_nTexture; ++i) {
+        bgfx::destroy(m_texture[i]);
     }
-    bgfx::destroy(m_nAdditionalTexture);
+//    bgfx::destroy(m_nAdditionalTexture);
 }
 
 void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material, const Textures& textures)
@@ -583,7 +583,9 @@ bool callShaderc(const char* pFilename, const char* pOutput, bgfx::RendererType:
             shadercCmd += std::string(" ") + argv[i];
         }
     }
+#ifdef DEBUG
     std::cout << "EXECUTE: '" << shadercCmd << "'" << std::endl;
+#endif
     int error_code = system(shadercCmd.c_str());
 #else
         int error_code = shaderc::compileShader(BX_COUNTOF(argv), argv);

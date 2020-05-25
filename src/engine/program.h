@@ -118,16 +118,17 @@ public:
     static bgfx::UniformHandle m_uDepthScaleOffset;
 
 
-    static bgfx::UniformHandle m_hasDiffuseTexture;
-    static bgfx::UniformHandle m_hasSpecularTexture;
-    static bgfx::UniformHandle m_diffuseTexture;
-    static bgfx::UniformHandle m_diffuseColor;
-    static bgfx::UniformHandle m_specularTexture;
+//    static bgfx::UniformHandle m_hasDiffuseTexture;
+//    static bgfx::UniformHandle m_hasSpecularTexture;
+//    static bgfx::UniformHandle m_diffuseTexture;
+//    static bgfx::UniformHandle m_diffuseColor;
+//    static bgfx::UniformHandle m_specularTexture;
 
-    static constexpr unsigned int s_nAditionalTexture = 2;
-    static bgfx::UniformHandle m_hasAdditionalTexture;
-    static bgfx::UniformHandle m_additionalTexture[];
-    static bgfx::UniformHandle m_nAdditionalTexture;
+//    static constexpr int s_nArea = 2;
+    static constexpr unsigned int s_nTexture = 4;
+    static bgfx::UniformHandle m_hasTexture;
+    static bgfx::UniformHandle m_texture[];
+//    static bgfx::UniformHandle m_nAdditionalTexture;
 
 
 //    uint16_t m_shadowMapSize = 512;
