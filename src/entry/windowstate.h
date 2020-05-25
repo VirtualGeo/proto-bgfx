@@ -110,18 +110,18 @@ private:
 
     struct Cube {
         float mtx[16];
-        bool hasDiffuseTexture;
-        bool hasSpecularTexture;
+//        bool hasDiffuseTexture;
+//        bool hasSpecularTexture;
         float diffuseColor[4];
 
-        bool hasAdditionalTexture[Program::s_nAditionalTexture];
+        bool hasTexture[Program::s_nTexture] = {0};
+        int iShader;
     };
     std::vector<Cube> m_cubes;
 
     bgfx::ProgramHandle m_branchingTests[3];
-    bgfx::ProgramHandle m_branching3Tests[128];
+    bgfx::ProgramHandle m_branching3Tests[2048];
     uint32_t  m_iBranchingTest = 2;
-
 };
 
 #endif // WINDOWSTATE_H
