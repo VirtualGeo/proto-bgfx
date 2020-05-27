@@ -91,6 +91,15 @@ SAMPLER2D(texture8, 8);
 #ifdef HAS_TEXTURE_9
 SAMPLER2D(texture9, 9);
 #endif
+//#ifdef HAS_TEXTURE_10
+//SAMPLER2D(texture10, 10);
+//#endif
+//#ifdef HAS_TEXTURE_11
+//SAMPLER2D(texture11, 11);
+//#endif
+//#ifdef HAS_TEXTURE_12
+//SAMPLER2D(texture12, 12);
+//#endif
 //SAMPLER2D(additionalTexture3, 5);
 
 //uniform vec4 nAdditionalTexture;
@@ -156,6 +165,15 @@ void main()
 #ifdef HAS_TEXTURE_9
     color += texture2D(texture9, v_texcoord0);
 #endif
+//#ifdef HAS_TEXTURE_10
+//    color += texture2D(texture10, v_texcoord0);
+//#endif
+//#ifdef HAS_TEXTURE_11
+//    color += texture2D(texture11, v_texcoord0);
+//#endif
+//#ifdef HAS_TEXTURE_12
+//    color += texture2D(texture12, v_texcoord0);
+//#endif
 
 #ifdef N_TEXTURE
     color /= N_TEXTURE;

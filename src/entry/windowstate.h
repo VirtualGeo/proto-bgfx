@@ -113,6 +113,7 @@ private:
 //        bool hasDiffuseTexture;
 //        bool hasSpecularTexture;
         float diffuseColor[4];
+        bx::Vec3 velocity = {0.0f, 0.0f, 0.0f};
 
         bool hasTexture[Program::s_nTexture] = {0};
         int iShader;
