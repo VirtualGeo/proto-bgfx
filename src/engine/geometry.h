@@ -14,6 +14,7 @@ public:
     static void clear();
     static void drawQuad();
     static void drawCube(const float mtx[16]);
+    static void drawUVSphere(const float mtx[16]);
 
     static bgfx::VertexLayout m_layout;
 
@@ -27,6 +28,13 @@ public:
     static bgfx::VertexBufferHandle m_cubeVbh;
     static bgfx::IndexBufferHandle m_cubeIbh;
 
+//    static Vertex s_uvSphereVertices[];
+//    static const uint16_t s_uvSphereIndices[];
+    static bgfx::VertexBufferHandle m_uvSphereVbh;
+    static bgfx::IndexBufferHandle m_uvSphereIbh;
+
+private:
+    static void initUVSphere();
 
 };
 

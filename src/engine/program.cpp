@@ -526,11 +526,11 @@ bgfx::ProgramHandle Program::loadProgram(const std::string& shaderName, const ch
 {
     bgfx::ShaderHandle vsh = loadShader(shaderName, ShaderType::Vertex, pShaderDefines);
     assert(bgfx::isValid(vsh));
-    bgfx::setName(vsh, shaderName.c_str());
+//    bgfx::setName(vsh, (shaderName + ".vert" + pShaderDefines).c_str());
 
     bgfx::ShaderHandle fsh = loadShader(shaderName, ShaderType::Fragment, pShaderDefines);
     assert(bgfx::isValid(fsh));
-    bgfx::setName(fsh, shaderName.c_str());
+//    bgfx::setName(fsh, (shaderName + ".frag" + pShaderDefines).c_str());
 
     return bgfx::createProgram(vsh, fsh, true);
 }
@@ -597,6 +597,8 @@ bool callShaderc(const char* pFilename, const char* pOutput, bgfx::RendererType:
 
     //    return false;
 }
+
+std::set<std::string> g_binShaderLoaded;
 
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType, const char* pShaderDefines)
 //bgfx::ShaderHandle loadShader(const char* filename)
@@ -675,8 +677,13 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
         //        file.close();
 
         binFilePath = PROJECT_DIR + shaderBinDirPath + binShaderName + ".bin";
+//        assert(g_binShaderLoaded.find(binFilePath) == g_binShaderLoaded.end());
+        g_binShaderLoaded.insert(binFilePath);
+
         file = std::ifstream(binFilePath, std::ios::binary);
         if (!file.is_open()) {
+            std::cout << "[PROGRAM] no system bin file : " << binFilePath << std::endl;
+
             //            std::cout << "[main] Failed to load '" << filePath << "' '" << shaderName << "'"
             //                      << std::endl;
             bool ret = callShaderc(srcFilePath.c_str(), binFilePath.c_str(), rendererType, shaderType, pShaderDefines);
@@ -700,8 +707,10 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
     long fileSize = end - begin;
     file.seekg(0, std::ios::beg);
 
-    const bgfx::Memory* mem;
+//    const bgfx::Memory* mem = nullptr;
+    uint8_t * data = nullptr;
     if (!binFile) {
+        assert(false);
         constexpr size_t maxBuffSize = 99999;
         assert(maxBuffSize > fileSize);
         char code[maxBuffSize];
@@ -741,29 +750,42 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
         //        std::cout << std::endl;
         //        std::cout << "file size = " << fileSize << std::endl;
 
-        mem = bgfx::alloc(headerSize + fileSize + 1);
+//        mem = bgfx::alloc(headerSize + fileSize + 1);
+        data = (uint8_t*)malloc(headerSize + fileSize + 1);
         //    fread(mem->data, 1, fileSize, file);
         //        mem->data[0] = 1;
-        memcpy((char*)&mem->data[0], header, headerSize);
+//        memcpy((char*)&mem->data[0], header, headerSize);
+        memcpy((char*)&data[0], header, headerSize);
+
 
         //                file.read((char*)&mem->data[headerSize], fileSize);
-        memcpy((char*)&mem->data[headerSize], code, fileSize);
+//        memcpy((char*)&mem->data[headerSize], code, fileSize);
+        memcpy((char*)data[headerSize], code, fileSize);
     } else {
 
-        mem = bgfx::alloc(fileSize + 1);
+//        mem = bgfx::alloc(fileSize + 1);
+        data = (uint8_t*)malloc(fileSize + 1);
         //    fread(mem->data, 1, fileSize, file);
         //        memcpy((char*)mem->data, header, sizeof(header));
+//        assert(mem != nullptr);
+        assert(data != nullptr);
 
-        file.read((char*)&mem->data[0], fileSize);
+//        file.read((char*)&mem->data[0], fileSize);
+        file.read((char*)&data[0], fileSize);
         //        mem->data[0] = 0;
     }
     file.close();
     //    mem->data[mem->size - 1] = '\0';
-    mem->data[mem->size - 1] = 0;
+//    mem->data[mem->size - 1] = 0;
+    data[fileSize] = 0;
     //    fclose(file);
     //    free(filePath);
-    bgfx::ShaderHandle handle = bgfx::createShader(mem);
-    bgfx::setName(handle, binShaderName.c_str());
+//    bgfx::ShaderHandle handle = bgfx::createShader(mem);
+    bgfx::ShaderHandle handle = bgfx::createShader(bgfx::copy(data, fileSize + 1));
+    std::cout << "handle : " << handle.idx << std::endl;
+    free(data);
+    assert(bgfx::isValid(handle));
+//    bgfx::setName(handle, binShaderName.c_str());
     //    std::cout << "[program] createShader " << filename << std::endl;
 
     return handle;

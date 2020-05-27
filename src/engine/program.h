@@ -9,6 +9,7 @@
 #include <bgfx/bgfx.h>
 #include <iostream>
 //#include "spotlight.h"
+#include <set>
 
 //#define RENDERVIEW_0_ID 0
 #define VIEWID_CAMERA 0
@@ -125,7 +126,7 @@ public:
 //    static bgfx::UniformHandle m_specularTexture;
 
 //    static constexpr int s_nArea = 2;
-    static constexpr unsigned int s_nTexture = 4;
+    static constexpr unsigned int s_nTexture = 8;
     static bgfx::UniformHandle m_hasTexture;
     static bgfx::UniformHandle m_texture[];
 //    static bgfx::UniformHandle m_nAdditionalTexture;

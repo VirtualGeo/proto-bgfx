@@ -43,6 +43,7 @@ add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long l
 
 # select graphic user interface
 #    set(GUI_QT 1) #default: GLFW
+#add_definitions(-D BGFX_CONFIG_MAX_SHADERS=1024)
 
 # -------------------------------------------------------------------
 # import bgfx.cmake libraries from bgfx-install
@@ -81,6 +82,8 @@ endif()
 # -------------------------------- EXTERNAL LIBS
 set(EXTERNAL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external)
 add_subdirectory(modules/tinyobjloader)
+#add_subdirectory(modules/optick)
+
 # add_subdirectory(Modules/glm)
 
 # add_subdirectory(Modules/stb)
