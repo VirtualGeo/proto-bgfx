@@ -50,6 +50,8 @@ bgfx::UniformHandle Program::m_uDirLights;
 bgfx::UniformHandle Program::m_uSpotLights;
 bgfx::UniformHandle Program::m_uPointLights;
 
+unsigned int Program::s_nTexture = 1;
+
 //bgfx::UniformHandle Program::m_hasDiffuseTexture;
 //bgfx::UniformHandle Program::m_hasSpecularTexture;
 //bgfx::UniformHandle Program::m_diffuseTexture;
@@ -57,7 +59,7 @@ bgfx::UniformHandle Program::m_uPointLights;
 //bgfx::UniformHandle Program::m_specularTexture;
 
 bgfx::UniformHandle Program::m_hasTexture;
-bgfx::UniformHandle Program::m_texture[s_nTexture];
+bgfx::UniformHandle Program::m_texture[s_nMaxTexture];
 //bgfx::UniformHandle Program::m_nAdditionalTexture;
 
 //bgfx::ShaderHandle loadShader(const char* filename);
@@ -232,8 +234,8 @@ void Program::init(const bgfx::Caps* caps)
 //    m_diffuseColor = bgfx::createUniform("diffuseColor", bgfx::UniformType::Vec4);
 //    m_specularTexture = bgfx::createUniform("specularTexture", bgfx::UniformType::Sampler);
 
-    m_hasTexture = bgfx::createUniform("hasTexture", bgfx::UniformType::Vec4, s_nTexture);
-    for (int i =0; i <s_nTexture; ++i) {
+    m_hasTexture = bgfx::createUniform("hasTexture", bgfx::UniformType::Vec4, s_nMaxTexture);
+    for (int i =0; i <s_nMaxTexture; ++i) {
         m_texture[i] = bgfx::createUniform((std::string("texture") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
     }
 //    m_nAdditionalTexture = bgfx::createUniform("nAdditionalTexture", bgfx::UniformType::Vec4);
@@ -346,7 +348,7 @@ void Program::clear()
 //    bgfx::destroy(m_specularTexture);
 
     bgfx::destroy(m_hasTexture);
-    for (int i =0; i <s_nTexture; ++i) {
+    for (int i =0; i <s_nMaxTexture; ++i) {
         bgfx::destroy(m_texture[i]);
     }
 //    bgfx::destroy(m_nAdditionalTexture);
@@ -782,7 +784,7 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
     //    free(filePath);
 //    bgfx::ShaderHandle handle = bgfx::createShader(mem);
     bgfx::ShaderHandle handle = bgfx::createShader(bgfx::copy(data, fileSize + 1));
-    std::cout << "handle : " << handle.idx << std::endl;
+//    std::cout << "handle : " << handle.idx << std::endl;
     free(data);
     assert(bgfx::isValid(handle));
 //    bgfx::setName(handle, binShaderName.c_str());
