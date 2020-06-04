@@ -59,6 +59,9 @@ public:
     void updateCameraPos();
     void resetWindow();
 
+    void initCubeScene();
+    void clearCubeScene();
+
 public:
     void mouseMoveEvent(int x, int y);
     void mouseReleaseEvent(MouseButton::Enum mouseButton);
@@ -90,6 +93,9 @@ private:
     static double s_sum;
     static size_t s_counter;
 
+    static std::chrono::time_point<std::chrono::high_resolution_clock> s_testStart;
+    static const int s_nbTestFrame = 100;
+
 //    Shading m_shading = Shading::RENDERED;
 //    Shading m_shading = Shading::EMISSIVE;
 //    Shading m_shading = Shading::NORMAL;
@@ -115,14 +121,14 @@ private:
         float diffuseColor[4];
         bx::Vec3 velocity = {0.0f, 0.0f, 0.0f};
 
-        bool hasTexture[Program::s_nTexture] = {0};
+        bool hasTexture[Program::s_nMaxTexture] = {0};
         int iShader;
     };
     std::vector<Cube> m_cubes;
 
     bgfx::ProgramHandle m_branchingTests[3];
     bgfx::ProgramHandle m_branching3Tests[2048];
-    uint32_t  m_iBranchingTest = 2;
+    uint32_t  m_iBranchingTest = 0;
 };
 
 #endif // WINDOWSTATE_H

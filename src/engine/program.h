@@ -126,7 +126,8 @@ public:
 //    static bgfx::UniformHandle m_specularTexture;
 
 //    static constexpr int s_nArea = 2;
-    static constexpr unsigned int s_nTexture = 8;
+    static unsigned int s_nTexture;
+    static constexpr unsigned int s_nMaxTexture = 6;
     static bgfx::UniformHandle m_hasTexture;
     static bgfx::UniformHandle m_texture[];
 //    static bgfx::UniformHandle m_nAdditionalTexture;
