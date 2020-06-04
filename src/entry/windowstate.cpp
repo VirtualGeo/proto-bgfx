@@ -24,6 +24,7 @@
 #include <utility.h>
 
 //#include <optick.h>
+//#define SMART
 
 std::list<WindowState*> s_windows;
 float WindowState::s_fps;
@@ -254,7 +255,9 @@ void WindowState::render() const
     //            bgfx::submit(m_id, Program::m_programs[m_shading]);
     //        }
     //    }
+#ifdef SMART
     int iShader = -1;
+#endif
     //    bgfx::ProgramHandle programHandle;
     //        float ones[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     //        float zeros[] = { 0.0f };
@@ -281,8 +284,10 @@ void WindowState::render() const
             //                bgfx::setUniform(Program::m_hasSpecularTexture, zeros);
             //            }
 
+#ifdef SMART
             if (iShader != cube.iShader) {
-                float buffer[(Program::s_nTexture)*4] = { 0.0f };
+#endif
+                float buffer[(Program::s_nMaxTexture)*4] = { 0.0f };
                 for (int i = 0; i < (Program::s_nTexture); ++i) {
                     if (cube.hasTexture[i]) {
                         bgfx::setTexture(i, Program::m_texture[i], Texture::getSampleTexture(Texture::Sample(i + Texture::RED)));
@@ -296,8 +301,10 @@ void WindowState::render() const
                     //                buffer[4 * i] = cube.hasAdditionalTexture[i];
                 }
                 bgfx::setUniform(Program::m_hasTexture, buffer, Program::s_nTexture);
+#ifdef SMART
                 iShader = cube.iShader;
             }
+#endif
             //            buffer[1] = Program::s_nAditionalTexture;
 
             Geometry::drawCube(cube.mtx);
@@ -328,7 +335,9 @@ void WindowState::render() const
             //                bgfx::setTexture(1, Program::m_specularTexture, Texture::getSampleTexture(Texture::BLACK));
             //            }
 
+#ifdef SMART
             if (iShader != cube.iShader) {
+#endif
                 //                for (int i = 0; i < Program::s_nTexture; ++i) {
                 //                        bgfx::setTexture(i, Program::m_texture[i], Texture::getSampleTexture(Texture::Sample(Texture::CHARTREUSE)));
                 //                }
@@ -349,8 +358,10 @@ void WindowState::render() const
                         bgfx::setTexture(i, Program::m_texture[i], Texture::getSampleTexture(Texture::Sample::BLACK));
                     }
                 }
+#ifdef SMART
                 iShader = cube.iShader;
             }
+#endif
             Geometry::drawCube(cube.mtx);
             //            Geometry::drawUVSphere(cube.mtx);
             //            bgfx::submit(m_id, m_branchingTests[m_iBranchingTest]);
@@ -384,7 +395,9 @@ void WindowState::render() const
             //            }
 
             //            int jump = 4;
+#ifdef SMART
             if (iShader != cube.iShader) {
+#endif
                 for (int i = 0; i < Program::s_nTexture; ++i) {
                     if (cube.hasTexture[i]) {
                         bgfx::setTexture(i, Program::m_texture[i], Texture::getSampleTexture(Texture::Sample(i + Texture::RED)));
@@ -395,8 +408,10 @@ void WindowState::render() const
                     }
                     //                jump *= 2;
                 }
+#ifdef SMART
                 iShader = cube.iShader;
             }
+#endif
             Geometry::drawCube(cube.mtx);
             //            Geometry::drawUVSphere(cube.mtx);
             //            assert(iShader < 4)
@@ -417,6 +432,7 @@ void WindowState::renderAllWindow()
 
     if (s_iFrame == 0) {
         initCubeScene();
+        bgfx::frame();
         s_testStart = std::chrono::high_resolution_clock::now();
         std::cout << "num texture\t| 1\t| 2\t| 3\t| 4\t| 5\t| 6" << std::endl;
         std::cout << "test 0";
@@ -429,7 +445,7 @@ void WindowState::renderAllWindow()
     if (s_iFrame != 0 && s_iFrame % s_nbTestFrame == 0) {
         const auto deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_testStart).count() / 1000000.0;
         //        std::cout << "test " << m_iBranchingTest << ", num texture: " << Program::s_nTexture << ", mean fps: " << s_nbTestFrame / deltaTime << std::endl;
-        std::cout << "\t" << s_nbTestFrame / deltaTime;
+        std::cout << "\t" << (s_nbTestFrame - 50) / deltaTime;
         clearCubeScene();
 
         ++Program::s_nTexture;
@@ -443,6 +459,12 @@ void WindowState::renderAllWindow()
             std::cout << std::endl << "test " << m_iBranchingTest;
         }
         initCubeScene();
+//        bgfx::frame();
+//        s_testStart = std::chrono::high_resolution_clock::now();
+    }
+    if (s_iFrame % s_nbTestFrame == 50) {
+//        initCubeScene();
+//        bgfx::frame();
         s_testStart = std::chrono::high_resolution_clock::now();
     }
     //    s_currentTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime).count();
@@ -583,6 +605,7 @@ void WindowState::resetWindow()
 void WindowState::initCubeScene()
 {
 
+//    const uint32_t nbCube = 64;
     const uint32_t nbCube = 128;
     //        const uint32_t nbCube = 256;
     //                const uint32_t nbCube = Program::s_nTexture * 4;
@@ -658,9 +681,9 @@ void WindowState::initCubeScene()
         }
     }
 
-    //                std::random_device rd;
-    //                std::mt19937 g(rd());
-    //                std::shuffle(m_cubes.begin(), m_cubes.end(), g);
+//                    std::random_device rd;
+//                    std::mt19937 g(rd());
+//                    std::shuffle(m_cubes.begin(), m_cubes.end(), g);
 
     m_branchingTests[0] = Program::loadProgram("branchingTest1", ("N_TEXTURE=" + std::to_string(Program::s_nTexture)).c_str());
     m_branchingTests[1] = Program::loadProgram("branchingTest2", ("N_TEXTURE=" + std::to_string(Program::s_nTexture)).c_str());

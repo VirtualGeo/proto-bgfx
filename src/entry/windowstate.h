@@ -94,7 +94,9 @@ private:
     static size_t s_counter;
 
     static std::chrono::time_point<std::chrono::high_resolution_clock> s_testStart;
-    static const int s_nbTestFrame = 100;
+//    static const int s_nbTestFrame = 100;
+    static const int s_nbTestFrame = 500;
+//    static const int s_nbTestFrame = 1000;
 
 //    Shading m_shading = Shading::RENDERED;
 //    Shading m_shading = Shading::EMISSIVE;
