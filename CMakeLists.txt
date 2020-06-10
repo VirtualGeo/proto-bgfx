@@ -38,7 +38,7 @@ add_definitions(-DBGFX_ROOT=\"${BGFX_ROOT}\")
 #if (AUTO_GENERATE_BIN_MODEL)
 add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 add_definitions(-DMODEL_LOADER_INFO)
-add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long linkage on build, shaderclibd.a is too big)
+set(USE_SHADERC_EXECUTABLE 1)
 #endif()
 
 # select graphic user interface
@@ -46,6 +46,9 @@ add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long l
 #add_definitions(-D BGFX_CONFIG_MAX_SHADERS=1024)
 
 # -------------------------------------------------------------------
+if (USE_SHADERC_EXECUTABLE)
+    add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long linkage on build, shaderclibd.a is too big)
+endif()
 # import bgfx.cmake libraries from bgfx-install
 #    set(_IMPORT_PREFIX ${BGFX_ROOT})
 #    include(${BGFX_ROOT}/lib/cmake/bgfx/bgfx-config.cmake)
