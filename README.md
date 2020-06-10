@@ -33,6 +33,7 @@ git clone git://github.com/bkaradzic/bgfx.git
 
 ### Add line in root CMakeLists.txt
 set(CMAKE_DEBUG_POSTFIX "d")
+
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/bgfx-install)
 
 
