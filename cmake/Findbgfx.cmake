@@ -38,23 +38,58 @@ find_library(BX_LIBRARY_DEBUG NAMES bxd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFI
 find_library(BX_LIBRARY_RELEASE NAMES bx PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(ASTCCODEC_LIBRARY_DEBUG NAMES astc-codecd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(ASTCCODEC_LIBRARY_RELEASE NAMES astc-codec PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(SHADERC_LIBRARY_DEBUG NAMES shaderclibd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(SHADERC_LIBRARY_RELEASE NAMES shaderclib PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(FCPP_LIBRARY_DEBUG NAMES fcppd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(FCPP_LIBRARY_RELEASE NAMES fcpp PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(GLSLANG_LIBRARY_DEBUG NAMES glslangd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(GLSLANG_LIBRARY_RELEASE NAMES glslang PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-#find_library(GLSLANG_LIBRARY_RELWITHDEBINFO NAMES glslang PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib NO_DEFAULT_PATH)
-find_library(GLSL_OPTIMIZER_LIBRARY_DEBUG NAMES glsl-optimizerd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(GLSL_OPTIMIZER_LIBRARY_RELEASE NAMES glsl-optimizer PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(SPIRV_CROSS_LIBRARY_DEBUG NAMES spirv-crossd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(SPIRV_CROSS_LIBRARY_RELEASE NAMES spirv-cross PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(SPIRV_TOOLS_LIBRARY_DEBUG NAMES spirv-toolsd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
-find_library(SPIRV_TOOLS_LIBRARY_RELEASE NAMES spirv-tools PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 
+if(NOT USE_SHADERC_EXECUTABLE)
+    find_library(SHADERC_LIBRARY_DEBUG NAMES shaderclibd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    find_library(SHADERC_LIBRARY_RELEASE NAMES shaderclib PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    find_library(FCPP_LIBRARY_DEBUG NAMES fcppd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    find_library(FCPP_LIBRARY_RELEASE NAMES fcpp PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    find_library(GLSLANG_LIBRARY_DEBUG NAMES glslangd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    find_library(GLSLANG_LIBRARY_RELEASE NAMES glslang PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    #find_library(GLSLANG_LIBRARY_RELWITHDEBINFO NAMES glslang PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib NO_DEFAULT_PATH)
+    find_library(GLSL_OPTIMIZER_LIBRARY_DEBUG NAMES glsl-optimizerd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    find_library(GLSL_OPTIMIZER_LIBRARY_RELEASE NAMES glsl-optimizer PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    find_library(SPIRV_CROSS_LIBRARY_DEBUG NAMES spirv-crossd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    find_library(SPIRV_CROSS_LIBRARY_RELEASE NAMES spirv-cross PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    find_library(SPIRV_TOOLS_LIBRARY_DEBUG NAMES spirv-toolsd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+    find_library(SPIRV_TOOLS_LIBRARY_RELEASE NAMES spirv-tools PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
+endif()
 
-find_package_handle_standard_args(bgfx
-    REQUIRED_VARS
+if (USE_SHADERC_EXECUTABLE)
+    find_package_handle_standard_args(bgfx
+        REQUIRED_VARS
+            BGFX_INCLUDE_DIR
+            BX_LIBRARY_RELEASE BX_LIBRARY_DEBUG
+            BIMG_LIBRARY_RELEASE BIMG_LIBRARY_DEBUG
+            BGFX_LIBRARY_RELEASE BGFX_LIBRARY_DEBUG
+        FAIL_MESSAGE
+            "Could not find all bgfx libraries. Please check BGFX_ROOT has been properly set, and both debug and release versions of bgfx have been compiled."
+    )
+
+    mark_as_advanced(BGFX_FOUND
+        BGFX_INCLUDE_DIR
+        BX_LIBRARY_RELEASE BX_LIBRARY_DEBUG
+        BIMG_LIBRARY_RELEASE BIMG_LIBRARY_DEBUG
+        BGFX_LIBRARY_RELEASE BGFX_LIBRARY_DEBUG
+    )
+else()
+    find_package_handle_standard_args(bgfx
+        REQUIRED_VARS
+            BGFX_INCLUDE_DIR
+            BX_LIBRARY_RELEASE BX_LIBRARY_DEBUG
+            BIMG_LIBRARY_RELEASE BIMG_LIBRARY_DEBUG
+            BGFX_LIBRARY_RELEASE BGFX_LIBRARY_DEBUG
+            SHADERC_LIBRARY_RELEASE SHADERC_LIBRARY_DEBUG
+            FCPP_LIBRARY_DEBUG FCPP_LIBRARY_RELEASE
+            GLSLANG_LIBRARY_DEBUG GLSLANG_LIBRARY_RELEASE
+            GLSL_OPTIMIZER_LIBRARY_DEBUG GLSL_OPTIMIZER_LIBRARY_RELEASE
+            SPIRV_CROSS_LIBRARY_DEBUG SPIRV_CROSS_LIBRARY_RELEASE
+            SPIRV_TOOLS_LIBRARY_DEBUG SPIRV_TOOLS_LIBRARY_RELEASE
+        FAIL_MESSAGE
+            "Could not find all bgfx libraries. Please check BGFX_ROOT has been properly set, and both debug and release versions of bgfx have been compiled."
+    )
+
+    mark_as_advanced(BGFX_FOUND
         BGFX_INCLUDE_DIR
         BX_LIBRARY_RELEASE BX_LIBRARY_DEBUG
         BIMG_LIBRARY_RELEASE BIMG_LIBRARY_DEBUG
@@ -65,62 +100,74 @@ find_package_handle_standard_args(bgfx
         GLSL_OPTIMIZER_LIBRARY_DEBUG GLSL_OPTIMIZER_LIBRARY_RELEASE
         SPIRV_CROSS_LIBRARY_DEBUG SPIRV_CROSS_LIBRARY_RELEASE
         SPIRV_TOOLS_LIBRARY_DEBUG SPIRV_TOOLS_LIBRARY_RELEASE
-    FAIL_MESSAGE
-        "Could not find all bgfx libraries. Please check BGFX_ROOT has been properly set, and both debug and release versions of bgfx have been compiled."
-)
+    )
+endif()
 
-mark_as_advanced(BGFX_FOUND
-    BGFX_INCLUDE_DIR
-    BX_LIBRARY_RELEASE BX_LIBRARY_DEBUG
-    BIMG_LIBRARY_RELEASE BIMG_LIBRARY_DEBUG
-    BGFX_LIBRARY_RELEASE BGFX_LIBRARY_DEBUG
-    SHADERC_LIBRARY_RELEASE SHADERC_LIBRARY_DEBUG
-    FCPP_LIBRARY_DEBUG FCPP_LIBRARY_RELEASE
-    GLSLANG_LIBRARY_DEBUG GLSLANG_LIBRARY_RELEASE
-    GLSL_OPTIMIZER_LIBRARY_DEBUG GLSL_OPTIMIZER_LIBRARY_RELEASE
-    SPIRV_CROSS_LIBRARY_DEBUG SPIRV_CROSS_LIBRARY_RELEASE
-    SPIRV_TOOLS_LIBRARY_DEBUG SPIRV_TOOLS_LIBRARY_RELEASE
-)
 
 if(BGFX_FOUND)
     if(NOT TARGET BGFX::BGFX)
         add_library(BGFX::BGFX INTERFACE IMPORTED)
         set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${BGFX_INCLUDE_DIR} $<$<CXX_COMPILER_ID:MSVC>:${BGFX_INCLUDE_DIR}/compat/msvc>)
-        set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_LINK_LIBRARIES
-            $<$<CONFIG:Debug>:${SHADERC_LIBRARY_DEBUG}>
-            $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
-            $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
-            $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
-            $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
-            $<$<CONFIG:Debug>:${FCPP_LIBRARY_DEBUG}>
-            $<$<CONFIG:Debug>:${GLSLANG_LIBRARY_DEBUG}>
-            $<$<CONFIG:Debug>:${GLSL_OPTIMIZER_LIBRARY_DEBUG}>
-            $<$<CONFIG:Debug>:${SPIRV_CROSS_LIBRARY_DEBUG}>
-            $<$<CONFIG:Debug>:${SPIRV_TOOLS_LIBRARY_DEBUG}>
+        if (USE_SHADERC_EXECUTABLE)
+            set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_LINK_LIBRARIES
+                $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
+                $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
 
-            $<$<CONFIG:Release>:${SHADERC_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${FCPP_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${GLSLANG_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${GLSL_OPTIMIZER_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${SPIRV_CROSS_LIBRARY_RELEASE}>
-            $<$<CONFIG:Release>:${SPIRV_TOOLS_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${SHADERC_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${BGFX_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${BIMG_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${BX_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${ASTCCODEC_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${FCPP_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${GLSLANG_LIBRARY_RELEASE}>
+    ##            $<$<CONFIG:RelWithDebInfo>:${GLSLANG_LIBRARY_RELWITHDEBINFO}>
+    #            $<$<CONFIG:RelWithDebInfo>:${GLSL_OPTIMIZER_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${SPIRV_CROSS_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${SPIRV_TOOLS_LIBRARY_RELEASE}>
+                )
+        else()
+            set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_LINK_LIBRARIES
+                $<$<CONFIG:Debug>:${SHADERC_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${BX_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${ASTCCODEC_LIBRARY_DEBUG}>
+                $<$<CONFIG:Release>:${SHADERC_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${BGFX_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${BIMG_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${BX_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${ASTCCODEC_LIBRARY_RELEASE}>
 
-#            $<$<CONFIG:RelWithDebInfo>:${SHADERC_LIBRARY_RELEASE}>
-#            $<$<CONFIG:RelWithDebInfo>:${BGFX_LIBRARY_RELEASE}>
-#            $<$<CONFIG:RelWithDebInfo>:${BIMG_LIBRARY_RELEASE}>
-#            $<$<CONFIG:RelWithDebInfo>:${BX_LIBRARY_RELEASE}>
-#            $<$<CONFIG:RelWithDebInfo>:${ASTCCODEC_LIBRARY_RELEASE}>
-#            $<$<CONFIG:RelWithDebInfo>:${FCPP_LIBRARY_RELEASE}>
-#            $<$<CONFIG:RelWithDebInfo>:${GLSLANG_LIBRARY_RELEASE}>
-##            $<$<CONFIG:RelWithDebInfo>:${GLSLANG_LIBRARY_RELWITHDEBINFO}>
-#            $<$<CONFIG:RelWithDebInfo>:${GLSL_OPTIMIZER_LIBRARY_RELEASE}>
-#            $<$<CONFIG:RelWithDebInfo>:${SPIRV_CROSS_LIBRARY_RELEASE}>
-#            $<$<CONFIG:RelWithDebInfo>:${SPIRV_TOOLS_LIBRARY_RELEASE}>
-            )
+                $<$<CONFIG:Debug>:${FCPP_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${GLSLANG_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${GLSL_OPTIMIZER_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${SPIRV_CROSS_LIBRARY_DEBUG}>
+                $<$<CONFIG:Debug>:${SPIRV_TOOLS_LIBRARY_DEBUG}>
+                $<$<CONFIG:Release>:${FCPP_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${GLSLANG_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${GLSL_OPTIMIZER_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${SPIRV_CROSS_LIBRARY_RELEASE}>
+                $<$<CONFIG:Release>:${SPIRV_TOOLS_LIBRARY_RELEASE}>
+
+    #            $<$<CONFIG:RelWithDebInfo>:${SHADERC_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${BGFX_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${BIMG_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${BX_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${ASTCCODEC_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${FCPP_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${GLSLANG_LIBRARY_RELEASE}>
+    ##            $<$<CONFIG:RelWithDebInfo>:${GLSLANG_LIBRARY_RELWITHDEBINFO}>
+    #            $<$<CONFIG:RelWithDebInfo>:${GLSL_OPTIMIZER_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${SPIRV_CROSS_LIBRARY_RELEASE}>
+    #            $<$<CONFIG:RelWithDebInfo>:${SPIRV_TOOLS_LIBRARY_RELEASE}>
+                )
+        endif()
 
         set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_COMPILE_DEFINITIONS
             $<$<CXX_COMPILER_ID:MSVC>:__STDC_LIMIT_MACROS>
