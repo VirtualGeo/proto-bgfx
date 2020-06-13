@@ -10,8 +10,6 @@
 #include <cstring>
 #include <sstream>
 
-//#include <tools/shaderc/shaderc.h>
-
 #ifndef USE_SHADERC_EXECUTABLE
 #include <shaderc/shaderc.h>
 #endif
@@ -52,11 +50,6 @@ bgfx::UniformHandle Program::m_uPointLights;
 
 unsigned int Program::s_nTexture = 1;
 
-//bgfx::UniformHandle Program::m_hasDiffuseTexture;
-//bgfx::UniformHandle Program::m_hasSpecularTexture;
-//bgfx::UniformHandle Program::m_diffuseTexture;
-//bgfx::UniformHandle Program::m_diffuseColor;
-//bgfx::UniformHandle Program::m_specularTexture;
 
 bgfx::UniformHandle Program::m_hasTexture;
 bgfx::UniformHandle Program::m_texture[s_nMaxTexture];
@@ -65,61 +58,6 @@ bgfx::UniformHandle Program::m_texture[s_nMaxTexture];
 //bgfx::ShaderHandle loadShader(const char* filename);
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType, const char* pShaderDefines);
 
-//bool compileShader(const char* pFilename, const char* pOutput, bgfx::RendererType::Enum pType, const char* pDefines = nullptr)
-//{
-
-//    bool bVertex = !bx::strFind(pFilename, ".vert.sc").isEmpty();
-//    bool bFragment = !bx::strFind(pFilename, ".frag.sc").isEmpty();
-//    if (bVertex || bFragment)
-//    {
-//        // PATH should be bgfx\examples\runtime
-//        const char* argv[] =
-//        {
-//            "shaderc.exe",
-//            "-f",
-//            pFilename,
-//            "-i",
-//            "../../src",
-//            "-o",
-//            pOutput,
-//            "--platform",
-//            pType == bgfx::RendererType::Direct3D11 ? "windows" : "linux",
-//            "--type",
-//            bVertex ? "vertex" : "fragment",
-//            "--profile",
-
-//            pType == bgfx::RendererType::Direct3D11
-//            ? bVertex
-//                ? "vs_5_0"
-//                : "ps_5_0"
-//            : "120",
-
-//            "-O",
-//            "3",
-//            "--define",
-//            pDefines ? pDefines : ""
-//        };
-//        int error_code = shaderc::compileShader(BX_COUNTOF(argv), argv);
-//        return error_code == 0;
-//    }
-
-//    return false;
-//}
-
-//bgfx::ProgramHandle loadProgram(const std::string& shaderName);
-
-//Program::Program()
-//{
-//}
-
-//Program::~Program()
-//{
-//    //    bgfx::destroy(m_handle);
-//    //    bgfx::destroy(m_uDiffuse);
-//    //    bgfx::destroy(m_sDiffuse);
-//}
-
-//void Program::init(const char *shaderName)
 void Program::init(const bgfx::Caps* caps)
 {
     m_caps = caps;
@@ -187,52 +125,6 @@ void Program::init(const bgfx::Caps* caps)
         m_shadowMapFB[i] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
     }
 
-    //    bgfx::TextureHandle fbtextures[] = {
-    ////    m_shadowMapTexture = {
-    //        bgfx::createTexture2D(
-    //            m_shadowMapSize, m_shadowMapSize,
-    //            false, 1, bgfx::TextureFormat::D16,
-    //            BGFX_TEXTURE_RT | BGFX_SAMPLER_COMPARE_LEQUAL),
-    ////    };
-    //    };
-    //    bgfx::TextureHandle fbtextures[] =
-    //    {
-    //        bgfx::createTexture2D(
-    //              m_shadowMapSize
-    //            , m_shadowMapSize
-    //            , false
-    //            , 1
-    //            , bgfx::TextureFormat::BGRA8
-    //            , BGFX_TEXTURE_RT
-    //            ),
-    //        bgfx::createTexture2D(
-    //              m_shadowMapSize
-    //            , m_shadowMapSize
-    //            , false
-    //            , 1
-    //            , bgfx::TextureFormat::D16
-    //            , BGFX_TEXTURE_RT_WRITE_ONLY
-    //            ),
-    //    };
-    //    m_shadowMapTexture = fbtextures[0];
-    //    m_shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
-
-    //    m_shadowMapTexture = fbtextures[0];
-    //    m_shadowMapFB = bgfx::createFrameBuffer(1, &m_shadowMapTexture, false);
-    //    m_shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
-
-    //    assert(bgfx::isValid(m_shadowMapFB));
-    //    assert(bgfx::isValid(m_shadowMapTexture));
-
-    //    m_shadowMapFB.idx = bgfx::kInvalidHandle;
-    //    m_shadowMapTexture = fbtextures[0];
-    //    m_shadowMapFB = bgfx::createFrameBuffer(1, &m_shadowMapTexture, false);
-
-//    m_hasDiffuseTexture = bgfx::createUniform("hasDiffuseTexture", bgfx::UniformType::Vec4);
-//    m_hasSpecularTexture = bgfx::createUniform("hasSpecularTexture", bgfx::UniformType::Vec4);
-//    m_diffuseTexture = bgfx::createUniform("diffuseTexture", bgfx::UniformType::Sampler);
-//    m_diffuseColor = bgfx::createUniform("diffuseColor", bgfx::UniformType::Vec4);
-//    m_specularTexture = bgfx::createUniform("specularTexture", bgfx::UniformType::Sampler);
 
     m_hasTexture = bgfx::createUniform("hasTexture", bgfx::UniformType::Vec4, s_nMaxTexture);
     for (int i =0; i <s_nMaxTexture; ++i) {
@@ -248,46 +140,13 @@ void Program::init(const bgfx::Caps* caps)
         //        if (i == Shading::SHADOW)
         //            continue;
         if (i == Shading::EMISSIVE)
-            //            //                if (i != Shading::NORMAL)
             continue;
-        //        if (i == Shading::DEBUG_QUAD)
-        //            //                if (i != Shading::NORMAL)
-        //            continue;
-        //        if (i != Shading::NORMAL)
-        //            continue;
-        //        int i= Shading::NORMAL;
-        //    bgfx::ShaderHandle vsh = loadShader("cubes.vert");
-        //        const std::string& shadingFileName = "shading/" + shadingFileNames[i];
+
         const std::string& shadingFileName = shadingFileNames[i];
 
         m_programs[i] = loadProgram(shadingFileName, "");
-        //        continue;
-        //        std::cout << "[program] load vertex shader " << i << std::endl;
-        //        const bgfx::ShaderHandle vsh = loadShader(shadingFileName, Vertex);
-        //        if (!bgfx::isValid(vsh))
-        //            continue;
-
-        //        bgfx::setName(vsh, shadingFileName.c_str());
-
-        //        //    bgfx::ShaderHandle fsh = loadShader("cubes.frag");
-        //        //        std::cout << "[program] load fragment shader " << i << std::endl;
-        //        bgfx::ShaderHandle fsh = loadShader(shadingFileName, Fragment);
-        //        bgfx::setName(fsh, shadingFileName.c_str());
-        //        // bgfx::ShaderHandle vsh = loadShader("mesh.vert");
-        //        // bgfx::ShaderHandle fsh = loadShader("mesh.frag");
-        //        //        std::cout << "[program] create program " << i << std::endl;
-        //        m_programs[i] = bgfx::createProgram(vsh, fsh, true);
-        //        bgfx::frame();
-        //        bgfx::setName(m_programs[i], shadingFileName.c_str());
     }
 
-    //    m_progShadow = loadProgram("shadow");
-    //    bgfx::frame();
-
-    //        m_uDiffuse = bgfx::createUniform("u_diffuse", bgfx::UniformType::Vec4);
-
-    //    m_uHasDiffuseTexture = bgfx::createUniform("u_hasDiffuseTexture", bgfx::UniformType::Vec4);
-    //        m_uTexturesEnable = bgfx::createUniform("u_texturesEnable", bgfx::UniformType::Vec4);
 
     float depthScaleOffset[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
     if (m_caps->homogeneousDepth) {
@@ -363,24 +222,6 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
     case Shading::NORMAL:
         //        break;
     case Shading::EMISSIVE:
-        // question : why static ?
-        //        static const float buffer2[4][4] = {
-        //            { material.m_ambient[0], material.m_ambient[1], material.m_ambient[2], material.m_texturesEnable[0] }, // question how do smaller, without glm::vec4
-        //            { material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3] }, // question how do smaller, without glm::vec4
-        //            //            {material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_specular[3]}, // question how do smaller, without glm::vec4
-        //            { material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_shininess }, // question how do smaller, without glm::vec4
-        //            { material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3] }, // question how do smaller, without glm::vec4
-        //            //            {material.m_texturesEnable[0]},
-        //            //            {dirLight.m_diffuse.x, dirLight.m_diffuse.y, dirLight.m_diffuse.z},
-        //            //            {dirLight.m_specular.x, dirLight.m_specular.y, dirLight.m_specular.z},
-        //            //            {}
-        //        };
-        //        //        buffer[0] = material.m_diffuse;
-        //        bgfx::setUniform(m_vrMaterialParameters, buffer2, 4);
-        //        float vec4[4] = {0.0, 1.0, 1.0, 1.0};
-        //        static float vec4[4] = {material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], 1.0f};
-        //        bgfx::setUniform(m_diffuse, material.m_diffuse);
-        //        bgfx::setUniform(handle, buffer2, 4);
         break;
 
     case Shading::MATERIAL:
@@ -469,60 +310,6 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
     //    bgfx::submit(id, m_programs[shading], 0, BGFX_DISCARD_NONE | BGFX_CLEAR_DISCARD_COLOR_0);
 }
 
-//bgfx::ProgramHandle Program::program() const
-//{
-//    return m_program;
-//}
-
-//const char* s_uniformTypeName[] = {
-//    "int",
-//    "int",
-//    NULL,
-//    NULL,
-//    "vec4",
-//    "float4",
-//    "mat3",
-//    "float3x3",
-//    "mat4",
-//    "float4x4",
-//};
-//BX_STATIC_ASSERT(BX_COUNTOF(s_uniformTypeName) == bgfx::UniformType::Count * 2);
-
-//bx::StringView nextWord(bx::StringView& _parse)
-//{
-//    bx::StringView word = bx::strWord(bx::strLTrimSpace(_parse));
-//    _parse = bx::strLTrimSpace(bx::StringView(word.getTerm(), _parse.getTerm()));
-//    return word;
-//}
-
-//bgfx::UniformType::Enum nameToUniformTypeEnum(const char* _name)
-//{
-//    for (uint32_t ii = 0; ii < bgfx::UniformType::Count * 2; ++ii) {
-//        if (NULL != s_uniformTypeName[ii]
-//            && 0 == bx::strCmp(_name, s_uniformTypeName[ii])) {
-//            return bgfx::UniformType::Enum(ii / 2);
-//        }
-//    }
-
-//    return bgfx::UniformType::Count;
-//}
-
-//void strReplace(char* _str, const char* _find, const char* _replace)
-//{
-//    const int32_t len = bx::strLen(_find);
-
-//    char* replace = (char*)alloca(len + 1);
-//    bx::strCopy(replace, len + 1, _replace);
-//    for (int32_t ii = bx::strLen(replace); ii < len; ++ii) {
-//        replace[ii] = ' ';
-//    }
-//    replace[len] = '\0';
-
-//    BX_CHECK(len >= bx::strLen(_replace), "");
-//    for (bx::StringView ptr = bx::strFind(_str, _find); !ptr.isEmpty(); ptr = bx::strFind(ptr.getPtr() + len, _find)) {
-//        bx::memCopy(const_cast<char*>(ptr.getPtr()), replace, len);
-//    }
-//}
 
 bgfx::ProgramHandle Program::loadProgram(const std::string& shaderName, const char* pShaderDefines)
 {

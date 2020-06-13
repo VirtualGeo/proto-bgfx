@@ -5,27 +5,15 @@
 #include <iostream>
 
 #include "system.h"
-//#include <cassert>
 #include "fileIO.h"
 #include <fstream>
-//#include <bimg/bimg.h>
 #include <chrono>
 #include <cstring>
-//#include <iostream>
 #include "camerafps.h"
 #include "geometry.h"
 
 Scene::Scene()
-//    : m_dirLight(bx::normalize(bx::Vec3(0.5f, -1.0f, 0.5f)))
-//    : m_dirLight(bx::normalize(bx::Vec3(0.0f, -1.0f, 0.5f)))
 {
-    //    Vertex::init();
-//        m_layout.begin()
-//            .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-//            .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-//            .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-//            // .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-//            .end();
 }
 
 //void Scene::addModel(const char* filename)

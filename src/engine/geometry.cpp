@@ -20,14 +20,6 @@ bgfx::VertexBufferHandle Geometry::m_uvSphereVbh;
 bgfx::IndexBufferHandle Geometry::m_uvSphereIbh;
 
 Vertex Geometry::s_planeVertices[] = {
-    //        { -1.0f, 0.0f,  1.0f, 0.0f, 1.0f, 0.0f,  0.0f, 0.0f},
-    //        {  1.0f, 0.0f,  1.0f, 0.0f, 1.0f, 0.0f,  0.0f, 1.0f},
-    //        { -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,  1.0f, 0.0f},
-    //        {  1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,  1.0f, 1.0f},
-    //        {-1.0f, 1.0f, 0.0f,  -1.0f, 1.0f, 1.0f,  0.0f, 1.0f},
-    //        { 1.0f, 1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f},
-    //        { 1.0f,-1.0f, 0.0f,  1.0f, -1.0f, 1.0f,  1.0f, 0.0f},
-    //        {-1.0f,-1.0f, 0.0f,  -1.0f, -1.0f, 1.0f,  0.0f, 0.0f},
     { -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
     { 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f },
     { 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f },
@@ -36,8 +28,6 @@ Vertex Geometry::s_planeVertices[] = {
 const uint16_t Geometry::s_planeIndices[] = {
     0, 1, 2,
     0, 2, 3,
-    //        1, 2, 3
-    //        1, 3, 2,
 };
 
 Vertex Geometry::s_cubeVertices[] {
@@ -168,38 +158,15 @@ void Geometry::initUVSphere()
   constexpr uint nbTriangle = nbRect * 2 + m_nbSlices * 2; // 20000 triangles
   constexpr uint nbVertices = nbRect + m_nbSlices + 2;
 
-  //    std::cout << "nbVertices =" << nbVertices << std::endl;
-  //    std::cout << "nbTriangles =" << nbTriangle << std::endl;
 
-//  std::vector<glm::vec3> m_vertices(nbVertices);
   Vertex uvSphereVertices[nbVertices];
-//  std::vector<glm::vec3> m_normals(nbVertices);
-//  std::vector<uint> m_indices(nbTriangle * 3);
   uint16_t uvSphereIndices[nbTriangle * 3];
-//    m_vertices.clear();
-//    m_normals.clear();
-//    m_indices.clear();
-//    m_vertices = std::vector<glm::vec3>(nbVertices);
-//    m_normals = std::vector<glm::vec3>(nbVertices);
-//    m_indices = std::vector<uint>(3 * nbTriangle);
 
   int iNorthPole = nbVertices - 2;
-//  m_vertices[iNorthPole] = glm::vec3(0, 0, m_radius);
   uvSphereVertices[iNorthPole] = {0, 0, m_radius, 0, 0, 1, 0, 0};
-  //    m_vertices[iNorthPole + 1] = m_radius;
-  //    m_vertices[iNorthPole + 2] = 0;
-//  m_normals[iNorthPole] = glm::vec3(0, 0, 1);
-  //    m_normals[iNorthPole + 1] = 1;
-  //    m_normals[iNorthPole + 2] = 0;
 
   int iSouthPole = nbVertices - 1;
-//  m_vertices[iSouthPole] = glm::vec3(0, 0, -m_radius);
   uvSphereVertices[iSouthPole] = {0, 0, -m_radius, 0, 0, -1, 0, 0};
-  //    m_vertices[iSouthPole + 1] = -m_radius;
-  //    m_vertices[iSouthPole + 2] = 0;
-//  m_normals[iSouthPole] = glm::vec3(0, 0, -1);
-  //    m_normals[iSouthPole + 1] = -1;
-  //    m_normals[iSouthPole + 2] = 0;
 
   float deltaRing = M_PI / (m_nbRings + 1.0f);
   float deltaSlice = 2.0f * M_PI / m_nbSlices;
@@ -216,18 +183,10 @@ void Geometry::initUVSphere()
           float x = sin(alpha) * sin(teta);
           float z = cos(teta);
 
-//          m_normals[iVertice] = glm::vec3(x, y, z);
-          //            m_normals[iVertice + 1] = y;
-          //            m_normals[iVertice + 2] = z;
-
           float module2 = x * x + y * y + z * z;
-          //        std::cout << "module :" << module << std::endl;
           assert(abs(module2 - 1.0) < 1e-6);
 
-//          m_vertices[iVertice] = glm::vec3(x * m_radius, y * m_radius, z * m_radius);
           uvSphereVertices[iVertice] = {x * m_radius, y * m_radius, z * m_radius, x, y, z, 0.0f, 0.0f};
-          //            m_vertices[iVertice + 1] = y * m_radius;
-          //            m_vertices[iVertice + 2] = z * m_radius;
 
           int topLeft = iRing * m_nbSlices + iSlice;
           int topRight = (iSlice == m_nbSlices - 1) ? (iRing * m_nbSlices) : (topLeft + 1);
@@ -259,19 +218,10 @@ void Geometry::initUVSphere()
   }
 
   assert(i == nbTriangle * 3);
-  //  glDeleteBuffers(1, &_vbo);
-  //  glDeleteBuffers(1, &_nbo);
-  //  glDeleteBuffers(1, &_ebo);
-//  assert(uvSphereVertices.size() == m_normals.size());
-//  assert(uvSphereIndices.size() == 3 * nbTriangle);
-
-//  size_t m_nbIndices = 3 * nbTriangle;
 
     m_uvSphereVbh = bgfx::createVertexBuffer(
         bgfx::copy(uvSphereVertices, sizeof(uvSphereVertices)), m_layout);
     m_uvSphereIbh = bgfx::createIndexBuffer(
         bgfx::copy(uvSphereIndices, sizeof(uvSphereIndices)));
-
-
 }
 

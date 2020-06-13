@@ -2,13 +2,10 @@
 
 #include <map>
 
-//#include <bx/bx.h>
 #include <bx/file.h>
 #include <cassert>
 #include <iostream>
 #include <limits>
-//#include "Vertex.h"
-//#include "Mesh.h"
 #include "fileIO.h"
 #include <algorithm>
 #include "geometry.h"
