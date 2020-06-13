@@ -7,6 +7,6 @@ CmakeSettings.json
 build/
 CMakeLists.txt.user
 
-assets/**/*.bin
 shaders/bin
 shaders/**/*.glsl
+*.bin

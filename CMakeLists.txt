@@ -67,3 +67,5 @@ add_subdirectory(modules/tinyobjloader)
 #target_include_directories(stb SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/)
 set (SRC_DIR ${PROJECT_SOURCE_DIR}/src/)
 add_subdirectory(src)
+
+include( cmake/examples.cmake )
