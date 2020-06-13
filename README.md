@@ -23,7 +23,7 @@ src/proto-bgfx
 
 ## How to install bgfx, bx, bimg libraries
 ```bash
-git clone https://github.com/JoshuaBrookover/bgfx.cmake.git
+git clone https://github.com/widberg/bgfx.cmake.git
 cd bgfx.cmake
 rm -rf bgfx bimg bx
 git clone git://github.com/bkaradzic/bx.git
@@ -32,10 +32,10 @@ git clone git://github.com/bkaradzic/bgfx.git
 ```
 
 ### Add line in root CMakeLists.txt
+```cmake
+set(CMAKE_DEBUG_POSTFIX "d")
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/bgfx-install)
-
-### Add line in cmake/3rdparty/astc-codec.cmake
-set_target_properties( astc-codec PROPERTIES DEBUG_POSTFIX d)
+```
 
 ### Run these commands to generate all the bgfx-install library in the bgfx.cmake repository
 ```bash
