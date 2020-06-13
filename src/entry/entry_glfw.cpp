@@ -25,7 +25,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action,
     int mods);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void error_callback(int error, const char* description);
-// void focus_callback(GLFWwindow *window, int focused);
 
 void init();
 void shutdown();
@@ -35,17 +34,14 @@ void update();
 const int g_width = 800;
 const int g_height = 600;
 GLFWwindow* g_window = nullptr;
-//bool g_ctrlPressed = false;
 
 WindowState* g_windowState = nullptr;
 
-//static const std::map<int, MouseButton::Enum> s_translateMouseKey = {
 static std::map<int, MouseButton::Enum> s_translateMouseKey = {
     { GLFW_MOUSE_BUTTON_LEFT, MouseButton::Left },
     { GLFW_MOUSE_BUTTON_RIGHT, MouseButton::Right },
     { GLFW_MOUSE_BUTTON_MIDDLE, MouseButton::Middle },
 };
-//static const std::map<int, Key::Enum> s_translateKey = {
 static std::map<int, Key::Enum> s_translateKey = {
     { GLFW_KEY_UP, Key::Up },
     { GLFW_KEY_DOWN, Key::Down },
@@ -85,12 +81,10 @@ int main(int argc, char const* argv[])
 
         // glfwSwapBuffers(g_window); question : why not use ?
         glfwPollEvents();
-        // glfwSetMousePos(100, 100);
     }
 
     shutdown();
     // bgfx::shutdown(); // question : after or before glfwTerminate ?
-    // glfwTerminate();
 
     return 0;
 }
@@ -146,10 +140,6 @@ void shutdown()
 //    g_windowState->clear();
     delete g_windowState;
 
-    //    bgfx::shutdown();
-
-    // glfwMakeContextCurrent(nullptr);
-    // glfwMakeContextCurrent(g_window);
     glfwDestroyWindow(g_window);
     // window = nullptr; // question : necessary ?
     glfwTerminate();
@@ -179,23 +169,14 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-//    std::cout << key << std::endl;
     switch (action) {
     case GLFW_PRESS:
 
-//        g_windowState->keyPressEvent(s_translateKey.at(key));
         g_windowState->keyPressEvent(s_translateKey[key]);
-//        if (key == GLFW_KEY_RIGHT_CONTROL) {
-//            g_ctrlPressed = true;
-//        }
         break;
 
     case GLFW_RELEASE:
-//        g_windowState->keyReleaseEvent(s_translateKey.at(key));
         g_windowState->keyReleaseEvent(s_translateKey[key]);
-//        if (key == GLFW_KEY_RIGHT_CONTROL) {
-//            g_ctrlPressed = false;
-//        }
         break;
     }
 }
@@ -213,14 +194,11 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 void mouse_button_callback(GLFWwindow* window, int button, int action,
     int mods)
 {
-    //    if (action == GLFW_PRESS) {
     switch (action) {
     case GLFW_PRESS:
-//        g_windowState->mousePressEvent(s_translateMouseKey.at(button));
         g_windowState->mousePressEvent(s_translateMouseKey[button]);
         break;
     case GLFW_RELEASE:
-//        g_windowState->mouseReleaseEvent(s_translateMouseKey.at(button));
         g_windowState->mouseReleaseEvent(s_translateMouseKey[button]);
         break;
     }

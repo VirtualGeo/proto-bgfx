@@ -11,15 +11,8 @@
 #include <algorithm>
 #include <cstring>
 #include <random>
-//#include <shaderc/shaderc.h>
-//#include <shaderc/shaderc.h>
 
 #include <bgfx/bgfx.h>
-//#include <tools/shaderc/shaderc.h>
-//#include <shaderc/shaderc.h>
-//#include "tools/shaderc/shaderc.h"
-//#include <shaderc/shaderc.h>
-
 #include <unistd.h>
 #include <utility.h>
 
@@ -31,8 +24,6 @@ float WindowState::s_fps;
 size_t WindowState::s_epoch = 10;
 double WindowState::s_deltaTime;
 std::chrono::time_point<std::chrono::high_resolution_clock> WindowState::s_lastTime;
-//std::chrono::time_point<std::chrono::high_resolution_clock> WindowState::s_currentTime;
-//double WindowState::s_currentTime;
 size_t WindowState::s_iFrame = 0;
 double WindowState::s_sum = 0.0;
 size_t WindowState::s_counter = 0;
@@ -51,44 +42,27 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
     m_fbh.idx = bgfx::kInvalidHandle;
     assert(!bgfx::isValid(m_fbh));
 
-    //    shaderc::compileShader(5, );
-
     if (m_id == 0) {
-        //        s_bgfxInit = true;
         // Call bgfx::renderFrame before bgfx::init to signal to bgfx not to create a render thread.
         // Most graphics APIs must be used on the same thread that created the window.
         bgfx::renderFrame();
 
         bgfx::Init bgfxInit = {};
-        //    bgfxInit.platformData.ndt = this->winId;
-        //    bgfx::PlatformData pd;
         bgfxInit.platformData.ndt = m_ndt;
         bgfxInit.platformData.nwh = m_nwh;
-        //#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-        //        //    bgfxInit.platformData.ndt = glfwGetX11Display();
-        //        bgfxInit.platformData.nwh = nwh;
-        //#elif BX_PLATFORM_OSX
-        //        //    bgfxInit.platformData.nwh = glfwGetCocoaWindow(g_window);
-        //        bgfxInit.platformData.nwh = nwh;
-        //#elif BX_PLATFORM_WINDOWS
-        //        //    bgfxInit.platformData.nwh = (void*)(uintptr_t)glfwGetX11Window(g_window);
-        //        bgfxInit.platformData.nwh = nwh;
-        //#endif
-        //    bgfxInit.platformData.nwh = nullptr;
-        //    bgfxInit.platformData.nwh = (void*)(uintptr_t)this->effectiveWinId();
         bgfxInit.platformData.context = nullptr;
         bgfxInit.platformData.backBuffer = nullptr;
         bgfxInit.platformData.backBufferDS = nullptr;
         //    bgfxInit.platformData.session = nullptr;
         //    bgfx::setPlatformData(pd);
         bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
-        //            bgfxInit.type = bgfx::RendererType::Direct3D9;
-        //                            bgfxInit.type = bgfx::RendererType::Direct3D11;
-        //                    bgfxInit.type = bgfx::RendererType::Direct3D12;
-        //        bgfxInit.type = bgfx::RendererType::OpenGL;
-        //    bgfxInit.type = bgfx::RendererType::OpenGLES;
-        //                            bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
-        //    bgfxInit.type = bgfx::RendererType::Metal;
+//        bgfxInit.type = bgfx::RendererType::Direct3D9;
+//        bgfxInit.type = bgfx::RendererType::Direct3D11;
+//        bgfxInit.type = bgfx::RendererType::Direct3D12;
+//        bgfxInit.type = bgfx::RendererType::OpenGL;
+//        bgfxInit.type = bgfx::RendererType::OpenGLES;
+//        bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
+//        bgfxInit.type = bgfx::RendererType::Metal;
 
         bgfxInit.resolution.width = width;
         bgfxInit.resolution.height = height;
@@ -99,7 +73,6 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
             assert(false);
         }
 
-        //         g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
 
         const bgfx::Caps* caps = bgfx::getCaps();
         assert(caps->supported & BGFX_CAPS_TEXTURE_COMPARE_LEQUAL); // sampler supported
@@ -132,6 +105,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         Geometry::init();
         Texture::init();
         // ------------------------------- LOAD MODEL
+        //         g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
         //                entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
 
         //                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
@@ -170,7 +144,6 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
         m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)m_nwh, uint16_t(m_width), uint16_t(m_height));
     }
-    //    auto& window = entry::s_windows[m_id];
 
     s_windows.emplace_back(this);
     m_init = true;
@@ -456,15 +429,16 @@ void WindowState::renderAllWindow()
                 std::cout << std::endl;
                 exit(0);
             }
-            std::cout << std::endl << "test " << m_iBranchingTest;
+            std::cout << std::endl
+                      << "test " << m_iBranchingTest;
         }
         initCubeScene();
-//        bgfx::frame();
-//        s_testStart = std::chrono::high_resolution_clock::now();
+        //        bgfx::frame();
+        //        s_testStart = std::chrono::high_resolution_clock::now();
     }
     if (s_iFrame % s_nbTestFrame == 50) {
-//        initCubeScene();
-//        bgfx::frame();
+        //        initCubeScene();
+        //        bgfx::frame();
         s_testStart = std::chrono::high_resolution_clock::now();
     }
     //    s_currentTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime).count();
@@ -605,7 +579,7 @@ void WindowState::resetWindow()
 void WindowState::initCubeScene()
 {
 
-//    const uint32_t nbCube = 64;
+    //    const uint32_t nbCube = 64;
     const uint32_t nbCube = 128;
     //        const uint32_t nbCube = 256;
     //                const uint32_t nbCube = Program::s_nTexture * 4;
@@ -681,9 +655,9 @@ void WindowState::initCubeScene()
         }
     }
 
-//                    std::random_device rd;
-//                    std::mt19937 g(rd());
-//                    std::shuffle(m_cubes.begin(), m_cubes.end(), g);
+    //                    std::random_device rd;
+    //                    std::mt19937 g(rd());
+    //                    std::shuffle(m_cubes.begin(), m_cubes.end(), g);
 
     m_branchingTests[0] = Program::loadProgram("branchingTest1", ("N_TEXTURE=" + std::to_string(Program::s_nTexture)).c_str());
     m_branchingTests[1] = Program::loadProgram("branchingTest2", ("N_TEXTURE=" + std::to_string(Program::s_nTexture)).c_str());

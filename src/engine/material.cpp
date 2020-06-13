@@ -3,11 +3,6 @@
 #include "fileIO.h"
 #include "system.h"
 #include <cassert>
-//#include <iostream>
-//#include <stdio.h>
-//#include <string>
-//#include <iostream>
-//#include <cstdint>
 #include <cstring>
 
 bool hasLoaded(const std::string& texName, const Textures& textures, int& iTex)
@@ -26,26 +21,13 @@ bool hasLoaded(const std::string& texName, const Textures& textures, int& iTex)
 
 Material::Material(const tinyobj::material_t& material, Textures& textures, const std::string& baseDir)
 {
-    //    for (int i =0; i <4; ++i) {
-    //        m_activeTextures[i] = 0.0f;
-    //    }
     m_name = material.name;
 
-    //        float diffuse[3];
-    //    for (size_t i = 0; i < 3; i++) {
-    //        m_diffuse[i] = material.diffuse[i];
-    //    }
     memcpy(m_diffuse, material.diffuse, 3 * sizeof(float));
     memcpy(m_specular, material.specular, 3 * sizeof(float));
     memcpy(m_ambient, material.ambient, 3 * sizeof(float));
     m_shininess = material.shininess;
 
-    //    m_diffuse = material.diffuse;
-    //    std::memcpy();
-    //    std::cout << m_diffuse[0] << m_diffuse[1] << m_diffuse[2] << std::endl;
-    //    m_diffuse[0] = 0.0f;
-    //    m_diffuse[1] = 1.0f;
-    //    m_diffuse[2] = 1.0f;
 
     const std::string& diffuseTexName = material.diffuse_texname;
     //    material.diffuse_texopt.;
