@@ -1,3 +1,4 @@
+#project(src VERSION 1.0 LANGUAGES CXX)
 
 find_package(bgfx REQUIRED)
 
@@ -49,9 +50,11 @@ endif()
 
 file(GLOB_RECURSE LIB_SHADER ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src/*.sh)
 file(GLOB_RECURSE SHADER_FILES ${SHADER_DIR}/*)
-add_executable(${PROJECT_NAME}
-    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${UI_SOURCE} ${SHADER_FILES}
-)
+#add_executable(${PROJECT_NAME}
+#    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${UI_SOURCE} ${SHADER_FILES}
+#)
+add_library(${PROJECT_NAME} STATIC ${SOURCE})
+#add_library(${PROJECT_NAME} SHARED ${SOURCE})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${EXTERNAL_INCLUDE_DIRS}
