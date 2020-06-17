@@ -4,12 +4,7 @@ project(proto-bgfx VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14) # need by std::make_unique
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
-set(SHADER_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src)
-add_definitions(-DSHADER_INCLUDE_DIR=\"${SHADER_INCLUDE_DIR}\")
-add_definitions(-DBGFX_ROOT=\"${BGFX_ROOT}\")
-
-
+set(BGFX_ROOT "" CACHE PATH "Path of bgfx-install (bgfx library) in the system")
 # ------------------------ USER CONFIGURATIONS ----------------------
 #set(BGFX_ROOT <PATH_IN_YOUR_SYSTEM>/bgfx-install) // YOU MUST SET BGFX_ROOT TO COMPILE <----- ATTENTION
 # vscode: settings.json
@@ -36,6 +31,11 @@ set(USE_SHADERC_EXECUTABLE 1)
 
 
 # -------------------------------------------------------------------
+add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
+set(SHADER_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src)
+add_definitions(-DSHADER_INCLUDE_DIR=\"${SHADER_INCLUDE_DIR}\")
+add_definitions(-DBGFX_ROOT=\"${BGFX_ROOT}\")
+
 if (USE_SHADERC_EXECUTABLE)
     add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long linkage on build, shaderclibd.a is too big)
 endif()
