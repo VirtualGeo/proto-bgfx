@@ -44,17 +44,19 @@ cmake --build <BGFX_CMAKE_BUILD_DEBUG_DIR> --target install
 cmake --build <BGFX_CMAKE_BUILD_RELEASE_DIR> --target install
 ```
 #### With Visual Studio
-Build -> install (Release and Debug project)
+Build -> Install bgfx (Release and Debug project)
 
 ---
 
 ## How to include bgfx, bx, bimg library into proto-bgfx project
 You must set the environment variable BGFX_ROOT as the path of bgfx-install on your system
 
-### With Visual Studio
+### Set BGFX_ROOT CMake cache path variable
+#### With Visual Studio
 Project -> CMake Settings
+#### With Qt Creator
+Projects -> Add Directory
 
-set BGFX_ROOT CMake cache path variable
 
 ### Visual Studio Code example
 in .vscode/settings.json of proto-bgfx project add these lines
