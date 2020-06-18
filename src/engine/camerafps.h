@@ -1,7 +1,6 @@
 #ifndef CAMERAFPS_H
 #define CAMERAFPS_H
 
-//#include <bx/file.h>
 #include "camera.h"
 #include "spotlight.h"
 

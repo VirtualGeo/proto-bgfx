@@ -1,23 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 project(proto-bgfx VERSION 1.0 LANGUAGES CXX)
 
-# set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-#set(CMAKE_AUTOUIC ON)
-#set(CMAKE_AUTOMOC ON)
-#set(CMAKE_AUTORCC ON)
-
 set(CMAKE_CXX_STANDARD 14) # need by std::make_unique
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#option(AUTO_GENERATE_BIN_MODEL "Generate bin file of model for fast loading" ON)
-
-#message("CMAKE_SOURCE_DIR = " ${CMAKE_SOURCE_DIR})
-#set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
-add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
-set(SHADER_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src)
-add_definitions(-DSHADER_INCLUDE_DIR=\"${SHADER_INCLUDE_DIR}\")
-add_definitions(-DBGFX_ROOT=\"${BGFX_ROOT}\")
+set(BGFX_ROOT "" CACHE PATH "Path of bgfx-install (bgfx library) in the system")
 # ------------------------ USER CONFIGURATIONS ----------------------
 #set(BGFX_ROOT <PATH_IN_YOUR_SYSTEM>/bgfx-install) // YOU MUST SET BGFX_ROOT TO COMPILE <----- ATTENTION
 # vscode: settings.json
@@ -35,26 +22,23 @@ add_definitions(-DBGFX_ROOT=\"${BGFX_ROOT}\")
 #        }
 #      ]
 
-#if (AUTO_GENERATE_BIN_MODEL)
 add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 add_definitions(-DMODEL_LOADER_INFO)
-add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long linkage on build, shaderclibd.a is too big)
-#endif()
+set(USE_SHADERC_EXECUTABLE 1)
 
 # select graphic user interface
 #    set(GUI_QT 1) #default: GLFW
-#add_definitions(-D BGFX_CONFIG_MAX_SHADERS=1024)
+
 
 # -------------------------------------------------------------------
-# import bgfx.cmake libraries from bgfx-install
-#    set(_IMPORT_PREFIX ${BGFX_ROOT})
-#    include(${BGFX_ROOT}/lib/cmake/bgfx/bgfx-config.cmake)
-#    set(_IMPORT_PREFIX ${BGFX_ROOT}) # reset because bgfx-config cleanup variable
-#    if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
-#        include(${BGFX_ROOT}/lib/cmake/bgfx/bgfx-config-debug.cmake)
-#    elseif(CMAKE_BUILD_TYPE EQUAL "RELEASE")
-#        include(${BGFX_ROOT}/lib/cmake/bgfx/bgfx-config-release.cmake)
-#    endif()
+add_definitions(-DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}/\")
+set(SHADER_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src)
+add_definitions(-DSHADER_INCLUDE_DIR=\"${SHADER_INCLUDE_DIR}\")
+add_definitions(-DBGFX_ROOT=\"${BGFX_ROOT}\")
+
+if (USE_SHADERC_EXECUTABLE)
+    add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long linkage on build, shaderclibd.a is too big)
+endif()
 
 if (GUI_QT)
     add_definitions(-DGUI_QT)
@@ -63,13 +47,10 @@ else()
     set(GUI_GLFW 1)
 endif()
 
-
-# message("BGFX_ROOT = " ${BGFX_ROOT})
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-# set(BGFX_ROOT /home/gauthier/tmp/bgfx.cmake/bgfx-install)
 
-# find_package(glfw3 3.3 REQUIRED)
-# ------------------------------ GLFW
+
+# -------------------------------- EXTERNAL LIBS
 if (GUI_GLFW)
     set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -77,21 +58,14 @@ if (GUI_GLFW)
     add_subdirectory(modules/glfw)
     #    target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 endif()
-
-
-# -------------------------------- EXTERNAL LIBS
 set(EXTERNAL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external)
 add_subdirectory(modules/tinyobjloader)
 #add_subdirectory(modules/optick)
 
-# add_subdirectory(Modules/glm)
-
 # add_subdirectory(Modules/stb)
 #add_library(stb STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/stb.cpp)
 #target_include_directories(stb SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/)
-#    set(SHADER_SOURCES)
-
-#    set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
-#    add_subdirectory(shaders)
 set (SRC_DIR ${PROJECT_SOURCE_DIR}/src/)
 add_subdirectory(src)
+
+include( cmake/examples.cmake )
