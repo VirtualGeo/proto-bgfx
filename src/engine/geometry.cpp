@@ -8,7 +8,9 @@
 #include <bx/file.h>
 #include <cassert>
 //#include <vector>
-#include <math.h>
+//#include <math.h> // not work on win
+#define _USE_MATH_DEFINES
+#include <cmath>
 bool g_isInit = false;
 
 bgfx::VertexLayout Geometry::m_layout;
@@ -164,9 +166,9 @@ void Geometry::initUVSphere()
     constexpr float m_radius = 1.0f;
   // -----------------------------------------------------------------
 
-  constexpr uint nbRect = m_nbSlices * (m_nbRings - 1);
-  constexpr uint nbTriangle = nbRect * 2 + m_nbSlices * 2; // 20000 triangles
-  constexpr uint nbVertices = nbRect + m_nbSlices + 2;
+  constexpr int nbRect = m_nbSlices * (m_nbRings - 1);
+  constexpr int nbTriangle = nbRect * 2 + m_nbSlices * 2; // 20000 triangles
+  constexpr int nbVertices = nbRect + m_nbSlices + 2;
 
   //    std::cout << "nbVertices =" << nbVertices << std::endl;
   //    std::cout << "nbTriangles =" << nbTriangle << std::endl;
