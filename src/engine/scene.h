@@ -84,10 +84,10 @@ private:
     size_t m_nbMeshes;
     float m_texturesSize;
     size_t m_nbTextures;
-    int m_parsingTime;
-    int m_loadingMaterialsTime;
-    int m_loadingObjectsTime;
-    int m_totalLoadingTime;
+    long long m_parsingTime; // ms
+    long long m_loadingMaterialsTime; // ms
+    long long m_loadingObjectsTime; // ms
+    long long m_totalLoadingTime; // ms
     size_t m_nbVertexBuffer;
     size_t m_nbIndexBuffer;
 

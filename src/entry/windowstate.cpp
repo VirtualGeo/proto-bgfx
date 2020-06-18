@@ -13,7 +13,6 @@
 #include <random>
 
 #include <bgfx/bgfx.h>
-#include <unistd.h>
 #include <utility.h>
 
 //#include <optick.h>
