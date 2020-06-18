@@ -170,8 +170,8 @@ void Geometry::initUVSphere()
   int iSouthPole = nbVertices - 1;
   uvSphereVertices[iSouthPole] = {0, 0, -m_radius, 0, 0, -1, 0, 0};
 
-  float deltaRing = M_PI / (m_nbRings + 1.0f);
-  float deltaSlice = 2.0f * M_PI / m_nbSlices;
+  float deltaRing = static_cast<float>(M_PI) / (m_nbRings + 1.0f);
+  float deltaSlice = 2.0f * static_cast<float>(M_PI) / m_nbSlices;
 
   int i = 0;
 

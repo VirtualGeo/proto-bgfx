@@ -10,7 +10,6 @@
 //namespace { // question : why without build failed ?
 
 struct Vertex {
-
     float x;
     float y;
     float z;
