@@ -4,6 +4,7 @@
 #include "./ui_mainwindow.h"
 
 #include "qwidgetbgfx.h"
+#include "qopenglwidgetbgfx.h"
 #include <QLayout>
 #include <QSurface>
 
@@ -37,7 +38,9 @@ MainWindow::MainWindow(QWidget *parent, int nbWidget)
 //    QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
 //    m_splitter->addWidget(widgetBgfx);
     for (int i =0; i <nbWidget; ++i) {
-        QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
+//        QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
+        QOpenGLWidgetBgfx * widgetBgfx = new QOpenGLWidgetBgfx;
+
         m_splitter->addWidget(widgetBgfx);
     }
 

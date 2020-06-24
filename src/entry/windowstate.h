@@ -48,7 +48,7 @@ class WindowState {
 public:
 
 public:
-    WindowState(void* nwh, void *ndt, int width, int height);
+    WindowState(void* nwh, void *ndt, int width, int height, void * context = nullptr);
     ~WindowState();
 
 private:
@@ -79,6 +79,7 @@ private:
     void* m_ndt = nullptr;
     int m_width;
     int m_height;
+    void* m_context = nullptr;
     const int m_id;
 
     bgfx::FrameBufferHandle m_fbh;

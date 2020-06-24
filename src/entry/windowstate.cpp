@@ -29,11 +29,12 @@ size_t WindowState::s_counter = 0;
 
 std::chrono::time_point<std::chrono::high_resolution_clock> WindowState::s_testStart;
 
-WindowState::WindowState(void* nwh, void* ndt, int width, int height)
+WindowState::WindowState(void* nwh, void* ndt, int width, int height, void *context)
     : m_nwh(nwh)
     , m_ndt(ndt)
     , m_width(width)
     , m_height(height)
+    , m_context(context)
     , m_id(s_windows.size())
     , m_iCamera(entry::s_scene.m_cameras.size())
 {
@@ -49,7 +50,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         bgfx::Init bgfxInit = {};
         bgfxInit.platformData.ndt = m_ndt;
         bgfxInit.platformData.nwh = m_nwh;
-        bgfxInit.platformData.context = nullptr;
+        bgfxInit.platformData.context = m_context;
         bgfxInit.platformData.backBuffer = nullptr;
         bgfxInit.platformData.backBufferDS = nullptr;
         //    bgfxInit.platformData.session = nullptr;
@@ -58,7 +59,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
 //        bgfxInit.type = bgfx::RendererType::Direct3D9;
 //        bgfxInit.type = bgfx::RendererType::Direct3D11;
 //        bgfxInit.type = bgfx::RendererType::Direct3D12;
-//        bgfxInit.type = bgfx::RendererType::OpenGL;
+        bgfxInit.type = bgfx::RendererType::OpenGL;
 //        bgfxInit.type = bgfx::RendererType::OpenGLES;
 //        bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
 //        bgfxInit.type = bgfx::RendererType::Metal;
@@ -100,9 +101,10 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height)
         bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF0000FF, 1.0f, 0);
         bgfx::touch(0);
 
-        Program::init(caps);
-        Geometry::init();
-        Texture::init();
+//        Program::init(caps);
+//        Geometry::init();
+//        Texture::init();
+
         // ------------------------------- LOAD MODEL
         //         g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
         //                entry::s_scene.addModel(std::string(PROJECT_DIR) + "assets/sponza/sponza.obj");
@@ -191,12 +193,15 @@ void WindowState::render() const
         //            assert(bgfx::isValid(m_fbh));
         bgfx::setViewFrameBuffer(m_id, m_fbh);
     }
-    //    bgfx::setViewFrameBuffer(m_id, m_fbh);
+//        bgfx::setViewFrameBuffer(m_id, m_fbh);
+//    bgfx::setViewFrameBuffer(0, BGFX_INVALID_HANDLE);
     // Set view 0 default viewport.
     bgfx::setViewRect(m_id, 0, 0, uint16_t(m_width), uint16_t(m_height));
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
+//    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
     bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+    bgfx::touch(m_id);
     //            bgfx::touch(m_id);
 
     //    return;
@@ -206,8 +211,10 @@ void WindowState::render() const
     const auto& camera = entry::s_scene.m_cameras[m_iCamera];
     camera.setViewTransform(ratio, m_id);
 
+    return;
     //    Geometry::drawQuad();
-    //    Geometry::drawCube();
+//    Geometry::drawCube();
+//        return;
     //    bgfx::submit(m_id, Program::m_programs[m_shading]);
 
     //    bgfx::setTexture(0, Program::m_sDiffuse, Texture::m_sampleTextures[Texture::BLUE].textureHandle(), Texture::s_textureSamplerFlags);
@@ -402,51 +409,51 @@ void WindowState::renderAllWindow()
     if (!m_init)
         return;
 
-    if (s_iFrame == 0) {
-        initCubeScene();
-        bgfx::frame();
-        s_testStart = std::chrono::high_resolution_clock::now();
-        std::cout << "num texture\t| 1\t| 2\t| 3\t| 4\t| 5\t| 6" << std::endl;
-        std::cout << "test 0";
-    }
-    //        if (m_id != 0)
-    //            return;
-    //    OPTICK_FRAME("MainThread");
+//    if (s_iFrame == 0) {
+//        initCubeScene();
+//        bgfx::frame();
+//        s_testStart = std::chrono::high_resolution_clock::now();
+//        std::cout << "num texture\t| 1\t| 2\t| 3\t| 4\t| 5\t| 6" << std::endl;
+//        std::cout << "test 0";
+//    }
+//    //        if (m_id != 0)
+//    //            return;
+//    //    OPTICK_FRAME("MainThread");
 
-    const auto currentTime = std::chrono::high_resolution_clock::now();
-    if (s_iFrame != 0 && s_iFrame % s_nbTestFrame == 0) {
-        const auto deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_testStart).count() / 1000000.0;
-        //        std::cout << "test " << m_iBranchingTest << ", num texture: " << Program::s_nTexture << ", mean fps: " << s_nbTestFrame / deltaTime << std::endl;
-        std::cout << "\t" << (s_nbTestFrame - 50) / deltaTime;
-        clearCubeScene();
+//    const auto currentTime = std::chrono::high_resolution_clock::now();
+//    if (s_iFrame != 0 && s_iFrame % s_nbTestFrame == 0) {
+//        const auto deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_testStart).count() / 1000000.0;
+//        //        std::cout << "test " << m_iBranchingTest << ", num texture: " << Program::s_nTexture << ", mean fps: " << s_nbTestFrame / deltaTime << std::endl;
+//        std::cout << "\t" << (s_nbTestFrame - 50) / deltaTime;
+//        clearCubeScene();
 
-        ++Program::s_nTexture;
-        if (Program::s_nTexture == Program::s_nMaxTexture + 1) {
-            Program::s_nTexture = 1;
-            ++m_iBranchingTest;
-            if (m_iBranchingTest == 3) {
-                std::cout << std::endl;
-                exit(0);
-            }
-            std::cout << std::endl
-                      << "test " << m_iBranchingTest;
-        }
-        initCubeScene();
-        //        bgfx::frame();
-        //        s_testStart = std::chrono::high_resolution_clock::now();
-    }
-    if (s_iFrame % s_nbTestFrame == 50) {
-        //        initCubeScene();
-        //        bgfx::frame();
-        s_testStart = std::chrono::high_resolution_clock::now();
-    }
-    //    s_currentTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime).count();
-    //    s_currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch()).count() / 1000000.0;
+//        ++Program::s_nTexture;
+//        if (Program::s_nTexture == Program::s_nMaxTexture + 1) {
+//            Program::s_nTexture = 1;
+//            ++m_iBranchingTest;
+//            if (m_iBranchingTest == 3) {
+//                std::cout << std::endl;
+//                exit(0);
+//            }
+//            std::cout << std::endl
+//                      << "test " << m_iBranchingTest;
+//        }
+//        initCubeScene();
+//        //        bgfx::frame();
+//        //        s_testStart = std::chrono::high_resolution_clock::now();
+//    }
+//    if (s_iFrame % s_nbTestFrame == 50) {
+//        //        initCubeScene();
+//        //        bgfx::frame();
+//        s_testStart = std::chrono::high_resolution_clock::now();
+//    }
+//    //    s_currentTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime).count();
+//    //    s_currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch()).count() / 1000000.0;
 
-    //    const auto currentTime = g_timer.now();
-    s_deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_lastTime).count() / 1000000.0;
-    s_lastTime = currentTime;
-    s_sum += s_deltaTime;
+//    //    const auto currentTime = g_timer.now();
+//    s_deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_lastTime).count() / 1000000.0;
+//    s_lastTime = currentTime;
+//    s_sum += s_deltaTime;
 
     //    qDebug() << g_epoch << m_sum << g_fps;
     if (s_counter >= s_epoch) {
