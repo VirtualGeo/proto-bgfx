@@ -27,7 +27,7 @@ add_definitions(-DMODEL_LOADER_INFO)
 set(USE_SHADERC_EXECUTABLE 1)
 
 # select graphic user interface
-#    set(GUI_QT 1) #default: GLFW
+    set(GUI_QT 1) #default: GLFW
 
 
 # -------------------------------------------------------------------
@@ -68,4 +68,4 @@ add_subdirectory(modules/tinyobjloader)
 set (SRC_DIR ${PROJECT_SOURCE_DIR}/src/)
 add_subdirectory(src)
 
-include( cmake/examples.cmake )
+#include( cmake/examples.cmake )
