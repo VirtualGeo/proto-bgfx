@@ -4,13 +4,13 @@
 #include <cassert>
 #include <iostream>
 
-#include "system.h"
+#include "camerafps.h"
 #include "fileIO.h"
-#include <fstream>
+#include "geometry.h"
+#include "system.h"
 #include <chrono>
 #include <cstring>
-#include "camerafps.h"
-#include "geometry.h"
+#include <fstream>
 
 Scene::Scene()
 {
@@ -365,7 +365,7 @@ void Scene::updateLightShadowMaps()
     for (auto& spotLight : m_spotLights) {
         spotLight.updateLightShadowMaps(viewId);
         draw(viewId, Shading::SHADOW, mtx, state);
-//        spotLight.drawDebug();
+        //        spotLight.drawDebug();
         ++viewId;
 
         //        bgfx::touch(1);
@@ -376,7 +376,7 @@ void Scene::updateLightShadowMaps()
         if (camera.m_spotLightEnable) {
             camera.m_spotLight.updateLightShadowMaps(viewId);
             draw(viewId, Shading::SHADOW, mtx, state);
-//            camera.m_spotLight.drawDebug();
+            //            camera.m_spotLight.drawDebug();
             ++viewId;
             //        if (camera->m_type == Camera::FPS) {
             //            static_cast<CameraFps&>(camera)
@@ -413,7 +413,7 @@ void Scene::setLightUniforms()
         for (const auto& dirLight : m_dirLights) {
             memcpy(&buffer[i], dirLight.m_data, 4 * Program::s_num_vec4_dirLight * sizeof(float));
             i += 4 * Program::s_num_vec4_dirLight;
-//            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
             ++nLight;
         }
         //            buffer[3] = m_dirLights.size();
@@ -426,7 +426,7 @@ void Scene::setLightUniforms()
         for (const auto& pointLight : m_pointLights) {
             memcpy(&buffer[i], pointLight.m_data, 4 * Program::s_num_vec4_pointLight * sizeof(float));
             i += 4 * Program::s_num_vec4_pointLight;
-//            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
             ++nLight;
         }
         //            buffer[3] = m_pointLights.size();
@@ -440,7 +440,7 @@ void Scene::setLightUniforms()
         for (const auto& spotLight : m_spotLights) {
             memcpy(&buffer[i], spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
             i += 4 * Program::s_num_vec4_spotLight;
-//            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
             ++nLight;
         }
     }
@@ -450,7 +450,7 @@ void Scene::setLightUniforms()
             memcpy(&buffer[i], camera.m_spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
             i += 4 * Program::s_num_vec4_spotLight;
             ++nSpotLightCameraEnable;
-//            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
             ++nLight;
         }
     }
@@ -495,21 +495,21 @@ void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId viewId
     const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
         | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
         | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
-//        | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA;
+    //        | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA;
 
     //    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
     assert(0 <= iCamera && iCamera < m_cameras.size());
     //    const auto& camera = *entry::s_scene.m_cameras[m_iCamera];
     const auto& camera = m_cameras[iCamera];
-//    float view[16];
-//    // bx::mtxLookAt(view, eye, at);
-//    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
+    //    float view[16];
+    //    // bx::mtxLookAt(view, eye, at);
+    //    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
 
-//    float proj[16];
-//    //    const float ratio = float(m_width) / m_height;
-//    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
-//        bgfx::getCaps()->homogeneousDepth);
-//    bgfx::setViewTransform(viewId, view, proj);
+    //    float proj[16];
+    //    //    const float ratio = float(m_width) / m_height;
+    //    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
+    //        bgfx::getCaps()->homogeneousDepth);
+    //    bgfx::setViewTransform(viewId, view, proj);
     camera.setViewTransform(ratio, viewId);
 
     switch (shading) {
@@ -522,8 +522,44 @@ void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId viewId
         break;
     }
 
-//    Geometry::drawQuad();
+    //    Geometry::drawQuad();
     draw(viewId, shading, mtx, state);
+}
+
+void Scene::renderView(const View& view, const float mtx[16])
+{
+    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
+        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
+        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
+    //        | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA;
+
+    //    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
+    assert(0 <= view.iCamera && view.iCamera < m_cameras.size());
+    //    const auto& camera = *entry::s_scene.m_cameras[m_iCamera];
+    const auto& camera = m_cameras[view.iCamera];
+    //    float view[16];
+    //    // bx::mtxLookAt(view, eye, at);
+    //    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
+
+    //    float proj[16];
+    //    //    const float ratio = float(m_width) / m_height;
+    //    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
+    //        bgfx::getCaps()->homogeneousDepth);
+    //    bgfx::setViewTransform(viewId, view, proj);
+    camera.setViewTransform(view.ratio, view.id);
+
+    switch (view.shading) {
+    case RENDERED:
+        const float viewPos[4] = { camera.m_pos.x, camera.m_pos.y, camera.m_pos.z, 0.0f };
+        bgfx::setUniform(Program::m_uViewPos, viewPos);
+        float invModel[16];
+        bx::mtxInverse(invModel, mtx);
+        bgfx::setUniform(Program::m_uInvModel, invModel);
+        break;
+    }
+
+    //    Geometry::drawQuad();
+    draw(view.id, view.shading, mtx, state);
 }
 
 void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx, const uint64_t state) const

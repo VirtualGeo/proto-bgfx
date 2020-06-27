@@ -37,16 +37,22 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
     , m_width(width)
     , m_height(height)
     , m_context(context)
-    , m_id(s_windows.size())
+//    , m_id(s_windows.size())
     , m_backBuffer(backBuffer)
     , m_backBufferDS(backBufferDS)
-    , m_iCamera(entry::s_scene.m_cameras.size())
+//    , m_view({entry::s_scene.m_cameras.size(), float(m_width) / m_height, s_windows.size(), Shading::MATERIAL}) // question: how to do that
+//    , m_iCamera(entry::s_scene.m_cameras.size())
+//    const float ratio = float(m_width) / m_height;
 {
+    m_view.iCamera = entry::s_scene.m_cameras.size();
+    m_view.ratio = float(m_width) / m_height;
+    m_view.id = s_windows.size();
+    m_view.shading = Shading::MATERIAL;
 
     m_fbh.idx = bgfx::kInvalidHandle;
     assert(!bgfx::isValid(m_fbh));
 
-    if (m_id == 0) {
+    if (m_view.id == 0) {
         // Call bgfx::renderFrame before bgfx::init to signal to bgfx not to create a render thread.
         // Most graphics APIs must be used on the same thread that created the window.
         bgfx::renderFrame();
@@ -90,18 +96,18 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         assert(caps->supported & BGFX_CAPS_TEXTURE_COMPARE_LEQUAL); // sampler supported
         //        assert(caps->homogeneousDepth);
 
-        entry::g_renderer = bgfx::getRendererName(caps->rendererType);
+        entryFake::g_renderer = bgfx::getRendererName(caps->rendererType);
         //        Q_ASSERT(0 != (caps->supported & BGFX_CAPS_SWAP_CHAIN)); // vulkan no swap chain
 
         switch (caps->vendorId) {
         case BGFX_PCI_ID_AMD:
-            entry::g_vendorID = "AMD";
+            entryFake::g_vendorID = "AMD";
             break;
         case BGFX_PCI_ID_INTEL:
-            entry::g_vendorID = "INTEL";
+            entryFake::g_vendorID = "INTEL";
             break;
         case BGFX_PCI_ID_NVIDIA:
-            entry::g_vendorID = "NVIDIA";
+            entryFake::g_vendorID = "NVIDIA";
             break;
 
         default:
@@ -118,31 +124,8 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         Texture::init();
 //        bgfx::frame();
 
-        // ------------------------------- LOAD MODEL
-        //                 g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
-        //                        entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/sponza/sponza.obj");
-
-        //                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
-        //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-low-poly.obj");
-        //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel.obj");
-        //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-blend.obj");
-
-        //        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\CornellBox\\CornellBox-Original.obj");
-        //        entry::s_scene.addModel("C:\\Users\\gauthier.bouyjou\\Downloads\\export\\cougar.obj");
-
-        //        entry::s_scene.addLight(DirLight({ 0.0f, -1.0f, 0.5f }));
-        //        entry::s_scene.addSpotLight(SpotLight({ 1.0f, 0.0f, 0.0f }, { -5.0f, 1.0f, 0.0f }));
-        //        entry::s_scene.addLight({ 1.0f, 0.0f, 0.0f }, { -5.0f, 1.0f, 0.0f });
-        //        entry::s_scene.addLight(bx::Vec3(1.0f, 0.0f, 0.0f), bx::Vec3(-5.0f, 1.0f, 0.0f));
-        //        entry::s_scene.addSpotLight(bx::Vec3(1.0f, -0.1f, 0.1f), bx::Vec3(-3.0f, 1.0f, 0.0f));
-
-        //        entry::s_scene.addSpotLight(bx::Vec3(0.0f, 0.0f, 1.0f), bx::Vec3(0.0f, 1.0f, 0.0f));
-        //        entry::s_scene.addLight<SpotLight>({});
-
-        //        entry::s_scene.addLight(PointLight({ 0.0f, 1.0f, 0.0f }));
-
         //        Q_ASSERT(m_iWindow == 0);
-        bx::mtxIdentity(entry::g_mtx);
+        bx::mtxIdentity(entry::s_worldTransform);
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
         //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 200.0f }); // question : push_back ?
         //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 3.0f }); // question : push_back ?
@@ -153,6 +136,8 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         //                        const uint32_t nbCube = 32;
         //                const uint32_t nbCube = 64;
         //        initCubeScene();
+
+        entry::init();
 
     } else {
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
@@ -166,7 +151,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
 WindowState::~WindowState()
 {
 
-    if (m_id == 0) {
+    if (m_view.id == 0) {
         entry::s_scene.clear();
         //        s_program.clear();
         Program::clear();
@@ -175,6 +160,7 @@ WindowState::~WindowState()
         //        for (auto & window : s_windows) {
         //            window.clear();
         //        }
+        entry::shutdown();
 
         bgfx::shutdown();
     } else {
@@ -202,9 +188,9 @@ void WindowState::render() const
     if (!m_init)
         return;
 
-    if (m_id != 0) {
+    if (m_view.id != 0) {
         //            assert(bgfx::isValid(m_fbh));
-        bgfx::setViewFrameBuffer(m_id, m_fbh);
+        bgfx::setViewFrameBuffer(m_view.id, m_fbh);
     }
     //    bgfx::PlatformData pdata;
     //    pdata.context = const_cast<void*>(m_context);
@@ -212,29 +198,26 @@ void WindowState::render() const
     //        bgfx::setViewFrameBuffer(m_id, m_fbh);
     //    bgfx::setViewFrameBuffer(0, BGFX_INVALID_HANDLE); // default back buffer
     // Set view 0 default viewport.
-    bgfx::setViewRect(m_id, 0, 0, uint16_t(m_width), uint16_t(m_height));
+    bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
     //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
-    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
-    bgfx::touch(m_id);
+    bgfx::setViewClear(m_view.id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+    bgfx::touch(m_view.id);
     //            bgfx::touch(m_id);
 
     //    return;
-    const float ratio = float(m_width) / m_height;
 
-    Geometry::drawQuad();
-    float vec4[4] = { 1.0f };
-    bgfx::setUniform(Program::m_hasDiffuseTexture, vec4);
-    bgfx::setTexture(0, Program::m_sDiffuse,
-        Texture::m_sampleTextures[Texture::Sample(Texture::CHECKER_BOARD)].textureHandle(), Texture::s_textureSamplerFlags);
-    bgfx::submit(m_id, Program::m_programs[Shading::MATERIAL]);
 
+    entry::update(m_view);
     //    entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
     return;
 
-    const auto& camera = entry::s_scene.m_cameras[m_iCamera];
-    camera.setViewTransform(ratio, m_id);
+//    const float ratio = float(m_width) / m_height;
+//    const auto& camera = entry::s_scene.m_cameras[m_iCamera];
+//    camera.setViewTransform(ratio, m_id);
+
+
 
     //    Geometry::drawQuad();
     //    Geometry::drawCube();
@@ -313,7 +296,7 @@ void WindowState::render() const
             //            Geometry::drawCube(cube.mtx);
             Geometry::drawCube(cube.mtx);
             //            Geometry::drawUVSphere(cube.mtx);
-            bgfx::submit(m_id, m_branchingTests[m_iBranchingTest]);
+            bgfx::submit(m_view.id, m_branchingTests[m_iBranchingTest]);
         }
 
     } else if (m_iBranchingTest == 1) {
@@ -369,7 +352,7 @@ void WindowState::render() const
             Geometry::drawCube(cube.mtx);
             //            Geometry::drawUVSphere(cube.mtx);
             //            bgfx::submit(m_id, m_branchingTests[m_iBranchingTest]);
-            bgfx::submit(m_id, m_branchingTests[m_iBranchingTest]);
+            bgfx::submit(m_view.id, m_branchingTests[m_iBranchingTest]);
         }
 
     } else if (m_iBranchingTest == 2) {
@@ -419,7 +402,7 @@ void WindowState::render() const
             Geometry::drawCube(cube.mtx);
             //            Geometry::drawUVSphere(cube.mtx);
             //            assert(iShader < 4)
-            bgfx::submit(m_id, m_branching3Tests[cube.iShader]);
+            bgfx::submit(m_view.id, m_branching3Tests[cube.iShader]);
             //            continue;
         }
         //        bgfx::submit(m_id, Program::m_programs[m_shading]);
@@ -490,6 +473,7 @@ uintptr_t WindowState::renderAllWindow()
         s_counter = 0;
     }
     ++s_counter;
+    printDebugMessage();
 
     //    updateCameraPos();
     for (WindowState* window : s_windows) {
@@ -535,7 +519,6 @@ uintptr_t WindowState::renderAllWindow()
 
     // Advance to next frame. Process submitted rendering primitives.
     //    if (m_id == 0) { // avoid flipping, put F1 to show (only with direct3D)
-    printDebugMessage();
     bgfx::frame();
     //    usleep(10000);
     ++s_iFrame;
@@ -557,7 +540,7 @@ void WindowState::printDebugMessage()
 {
     //    bgfx::setDebug(BGFX_DEBUG_NONE);
     //    return;
-    if (entry::g_showStats) {
+    if (entryFake::g_showStats) {
         bgfx::setDebug(BGFX_DEBUG_STATS);
     } else {
         bgfx::setDebug(BGFX_DEBUG_TEXT);
@@ -570,8 +553,8 @@ void WindowState::printDebugMessage()
         //        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.2f", g_fps);
         //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Viewport shading: %s", g_viewportShading.c_str());
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Arch: " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ");
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Renderer: %s", entry::g_renderer.c_str());
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Graphic Vendor: %s Corporation", entry::g_vendorID.c_str());
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Renderer: %s", entryFake::g_renderer.c_str());
+        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Graphic Vendor: %s Corporation", entryFake::g_vendorID.c_str());
         //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.1f", g_fps);
         //        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", g_fps, stats->width, stats->height, g_viewportShading.c_str());
         //        for (int i = 0; i < s_windows.size(); ++i) {
@@ -583,7 +566,7 @@ void WindowState::printDebugMessage()
         int i = 0;
         for (const auto& window : s_windows) {
             //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window->m_fps, window->m_width, window->m_height, Program::filename(window->m_shading));
-            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Backbuffer: %dx%d, Viewport shading: %s", i, window->m_width, window->m_height, Program::filename(window->m_shading));
+            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Backbuffer: %dx%d, Viewport shading: %s", i, window->m_width, window->m_height, Program::filename(window->m_view.shading));
             ++i;
         }
         entry::s_scene.printStats(line);
@@ -598,7 +581,7 @@ void WindowState::updateCameraPos()
     cameraSpeed *= s_deltaTime;
 
     //    auto& camera = *entry::s_scene.m_cameras[m_iCamera];
-    auto& camera = entry::s_scene.m_cameras[m_iCamera];
+    auto& camera = entry::s_scene.m_cameras[m_view.iCamera];
     if (m_cameraMoveFront) {
         camera.move(Camera::Direction::FRONT, cameraSpeed * m_cameraMoveFront);
     }
@@ -612,8 +595,8 @@ void WindowState::updateCameraPos()
 
 void WindowState::resetWindow()
 {
-    assert(m_id == 0);
-    bgfx::reset(m_width, m_height, entry::getResetFlags());
+    assert(m_view.id == 0);
+    bgfx::reset(m_width, m_height, entryFake::getResetFlags());
 }
 
 void WindowState::initCubeScene()
@@ -782,8 +765,8 @@ void WindowState::mouseMoveEvent(int x, int y)
         xoffset *= sensitivity;
         yoffset *= sensitivity;
 
-        //        auto& camera = *entry::s_scene.m_cameras[m_iCamera];
-        auto& camera = entry::s_scene.m_cameras[m_iCamera];
+        //        auto& camera = *entry::s_scene.m_cameras[m_view.iCamera];
+        auto& camera = entry::s_scene.m_cameras[m_view.iCamera];
         camera.mouseMove(xoffset, yoffset);
         //        camera.rotate(xoffset, yoffset);
     }
@@ -871,10 +854,10 @@ void WindowState::keyPressEvent(Key::Enum key)
     //    qDebug() << "QWidgetBgfx::keyPressEvent(" << event << ")";
     switch (key) {
     case Key::F1:
-        entry::g_showStats = !entry::g_showStats;
+        entryFake::g_showStats = !entryFake::g_showStats;
         break;
     case Key::F2:
-        entry::g_vsyncEnable = !entry::g_vsyncEnable;
+        entryFake::g_vsyncEnable = !entryFake::g_vsyncEnable;
         //        for (int i = 0; i < s_windows.size(); ++i) {
         //            s_windows[i]->m_epoch = 10;
         //        }
@@ -886,12 +869,12 @@ void WindowState::keyPressEvent(Key::Enum key)
         resetWindow();
         break;
     case Key::F3:
-        entry::g_mssaLevel = ++entry::g_mssaLevel % 5;
+        entryFake::g_mssaLevel = ++entryFake::g_mssaLevel % 5;
         resetWindow();
         break;
     case Key::F4:
-        entry::g_textureSamplerFlags = ++entry::g_textureSamplerFlags % 5;
-        switch (entry::g_textureSamplerFlags) {
+        entryFake::g_textureSamplerFlags = ++entryFake::g_textureSamplerFlags % 5;
+        switch (entryFake::g_textureSamplerFlags) {
         case 0:
             Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE;
             break;
@@ -910,7 +893,7 @@ void WindowState::keyPressEvent(Key::Enum key)
         }
         break;
     case Key::F5:
-        ++m_shading;
+        ++m_view.shading;
         //                shading = ++shading % Program::Shading::Count;
         break;
     case Key::Up:
@@ -932,16 +915,16 @@ void WindowState::keyPressEvent(Key::Enum key)
         m_cameraMoveUp = -1;
         break;
     case Key::N:
-        m_shading = Shading::NORMAL;
+        m_view.shading = Shading::NORMAL;
         break;
     case Key::M:
-        m_shading = Shading::MATERIAL;
+        m_view.shading = Shading::MATERIAL;
         break;
     case Key::R:
-        m_shading = Shading::RENDERED;
+        m_view.shading = Shading::RENDERED;
         break;
     case Key::E:
-        m_shading = Shading::EMISSIVE;
+        m_view.shading = Shading::EMISSIVE;
         break;
 
         //    case Key::Q:
@@ -980,7 +963,7 @@ void WindowState::resizeEvent(int width, int height)
 
     //    m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
 
-    if (m_id != 0) {
+    if (m_view.id != 0) {
         assert(bgfx::isValid(m_fbh));
         bgfx::destroy(m_fbh);
         m_fbh.idx = bgfx::kInvalidHandle;
@@ -1016,7 +999,7 @@ void WindowState::resizeOffscreenFB()
 
 void WindowState::mouseScrollEvent(int offset)
 {
-    //    auto& camera = *entry::s_scene.m_cameras[m_iCamera];
-    auto& camera = entry::s_scene.m_cameras[m_iCamera];
+    //    auto& camera = *entry::s_scene.m_cameras[m_view.iCamera];
+    auto& camera = entry::s_scene.m_cameras[m_view.iCamera];
     camera.zoom(offset);
 }
