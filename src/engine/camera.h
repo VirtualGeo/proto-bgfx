@@ -4,6 +4,7 @@
 #include <bx/file.h>
 #include <vector>
 #include <memory>
+#include <entry/windowstate.h>
 
 class Camera
 {
@@ -26,7 +27,8 @@ public:
     virtual void move(Direction direction, float distance);
     virtual void mouseMove(float xoffset, float yoffset) = 0;
     void zoom(float offset);
-    void setViewTransform(float ratio, int viewId) const;
+//    void setViewTransform(float ratio, int viewId) const;
+    void setViewTransform(const View &view) const;
 
 //private:
     bx::Vec3 m_pos;

@@ -43,12 +43,19 @@ struct Key {
     };
 };
 
+enum Projection {
+    NONE,
+    PERSPECTIVE,
+    ORTHOGRAPHIC,
+};
+
 struct View {
 public:
     int iCamera;
     float ratio;
     int id;
-    Shading shading;
+    Shading shading = Shading::MATERIAL;
+    Projection projection = PERSPECTIVE;
 };
 
 class WindowState {
@@ -91,31 +98,24 @@ private:
     int m_width;
     int m_height;
     const void* m_context = nullptr;
-//    const int m_id;
     const void* m_backBuffer = nullptr;
     const void* m_backBufferDS = nullptr;
 
     View m_view;
 
-    bgfx::FrameBufferHandle m_fbh;
+    bgfx::FrameBufferHandle m_fbh = BGFX_INVALID_HANDLE;
     //    bgfx::FrameBufferHandle m_offscreenFB = BGFX_INVALID_HANDLE;
     //    bgfx::TextureHandle m_backBuffer = BGFX_INVALID_HANDLE;
     //    bgfx::TextureHandle m_depthBuffer = BGFX_INVALID_HANDLE;
 
-    static float s_fps;
-    static size_t s_epoch;
-    static double s_deltaTime;
-    static std::chrono::time_point<std::chrono::high_resolution_clock> s_lastTime;
+//    static size_t s_epoch;
+//    static double s_deltaTime;
     //    static double s_currentTime;
-    static size_t s_iFrame;
+//    static size_t s_iFrame;
     //    static std::chrono::time_point<std::chrono::high_resolution_clock> s_currentTime;
-    static double s_sum;
-    static size_t s_counter;
+//    static double s_sum;
+//    static size_t s_counter;
 
-    static std::chrono::time_point<std::chrono::high_resolution_clock> s_testStart;
-    //    static const int s_nbTestFrame = 100;
-    static const int s_nbTestFrame = 500;
-    //    static const int s_nbTestFrame = 1000;
 
     //    Shading m_shading = Shading::RENDERED;
     //    Shading m_shading = Shading::EMISSIVE;
@@ -135,21 +135,6 @@ private:
 
     bool m_ctrlPressed = false;
 
-    struct Cube {
-        float mtx[16];
-        //        bool hasDiffuseTexture;
-        //        bool hasSpecularTexture;
-        float diffuseColor[4];
-        bx::Vec3 velocity = { 0.0f, 0.0f, 0.0f };
-
-        bool hasTexture[Program::s_nMaxTexture] = { 0 };
-        int iShader;
-    };
-    std::vector<Cube> m_cubes;
-
-    bgfx::ProgramHandle m_branchingTests[3];
-    bgfx::ProgramHandle m_branching3Tests[2048];
-    uint32_t m_iBranchingTest = 0;
 };
 
 #endif // WINDOWSTATE_H

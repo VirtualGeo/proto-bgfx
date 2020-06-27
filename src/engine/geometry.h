@@ -13,7 +13,9 @@ public:
     static void init();
     static void clear();
     static void drawQuad();
+    static void drawCube();
     static void drawCube(const float mtx[16]);
+    static void drawUVSphere();
     static void drawUVSphere(const float mtx[16]);
 
     static bgfx::VertexLayout m_layout;

@@ -488,43 +488,6 @@ void Scene::setLightShadowSamplers()
     }
 }
 
-void Scene::renderFromCamera(int iCamera, float ratio, const bgfx::ViewId viewId, const Shading& shading, const float* mtx) const
-{
-    // --------------------------------- DRAW SCENE
-    //    if (m_id == 0) {
-    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
-        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
-        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
-    //        | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA;
-
-    //    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
-    assert(0 <= iCamera && iCamera < m_cameras.size());
-    //    const auto& camera = *entry::s_scene.m_cameras[m_iCamera];
-    const auto& camera = m_cameras[iCamera];
-    //    float view[16];
-    //    // bx::mtxLookAt(view, eye, at);
-    //    bx::mtxLookAt(view, camera.m_pos, bx::add(camera.m_pos, camera.m_front), camera.m_up);
-
-    //    float proj[16];
-    //    //    const float ratio = float(m_width) / m_height;
-    //    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
-    //        bgfx::getCaps()->homogeneousDepth);
-    //    bgfx::setViewTransform(viewId, view, proj);
-    camera.setViewTransform(ratio, viewId);
-
-    switch (shading) {
-    case RENDERED:
-        const float viewPos[4] = { camera.m_pos.x, camera.m_pos.y, camera.m_pos.z, 0.0f };
-        bgfx::setUniform(Program::m_uViewPos, viewPos);
-        float invModel[16];
-        bx::mtxInverse(invModel, mtx);
-        bgfx::setUniform(Program::m_uInvModel, invModel);
-        break;
-    }
-
-    //    Geometry::drawQuad();
-    draw(viewId, shading, mtx, state);
-}
 
 void Scene::renderView(const View& view, const float mtx[16])
 {
@@ -546,7 +509,8 @@ void Scene::renderView(const View& view, const float mtx[16])
     //    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
     //        bgfx::getCaps()->homogeneousDepth);
     //    bgfx::setViewTransform(viewId, view, proj);
-    camera.setViewTransform(view.ratio, view.id);
+//    camera.setViewTransform(view.ratio, view.id);
+    camera.setViewTransform(view);
 
     switch (view.shading) {
     case RENDERED:

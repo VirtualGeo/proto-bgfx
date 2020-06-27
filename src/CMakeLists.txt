@@ -53,7 +53,9 @@ file(GLOB_RECURSE SHADER_FILES ${SHADER_DIR}/*)
 #add_executable(${PROJECT_NAME}
 #    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${UI_SOURCE} ${SHADER_FILES}
 #)
-add_library(${PROJECT_NAME} STATIC ${SOURCE})
+add_library(${PROJECT_NAME} STATIC
+    ${SOURCE} ${OUT_SHADERS} ${LIB_SHADER} ${UI_SOURCE} ${SHADER_FILES}
+    )
 #add_library(${PROJECT_NAME} SHARED ${SOURCE})
 
 target_include_directories(${PROJECT_NAME} PUBLIC

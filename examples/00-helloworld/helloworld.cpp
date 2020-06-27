@@ -6,7 +6,7 @@
 //public:
 namespace entry {
 
-void init()
+void init(View & view)
 {
 }
 

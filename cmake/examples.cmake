@@ -23,6 +23,7 @@ set(
     00-helloworld
     01-drawQuad
     02-sponza
+    03-branchingTests
     )
 
 foreach(EXAMPLE ${EXAMPLES})

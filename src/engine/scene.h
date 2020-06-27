@@ -46,7 +46,6 @@ public:
     void setLightUniforms();
     void setLightShadowSamplers();
 
-    void renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, const Shading &shading, const float *mtx) const;
     void renderView(const View & view, const float * mtx);
 
 private:

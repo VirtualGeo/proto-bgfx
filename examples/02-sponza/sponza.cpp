@@ -6,7 +6,7 @@
 //public:
 namespace entry {
 
-void init()
+void init(View & view)
 {
     // ------------------------------- LOAD MODEL
     //                 g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");

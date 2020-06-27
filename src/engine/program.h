@@ -1,7 +1,7 @@
 #ifndef PROGRAM_H
 #define PROGRAM_H
 
-#include "camera.h"
+//#include "camera.h"
 #include "dirLight.h"
 #include "light.h"
 #include "material.h"
