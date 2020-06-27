@@ -53,22 +53,18 @@ uint32_t entryFake::getResetFlags()
 }
 
 namespace entry {
-    Scene s_scene;
-    float s_worldTransform[16];
+
+Scene s_scene;
+float s_worldTransform[16];
+float s_fps;
+size_t s_iFrame = 0;
+double s_sum = 0.0;
+size_t s_counter = 0;
+size_t s_epoch = 10;
+double s_deltaTime;
+std::chrono::time_point<std::chrono::high_resolution_clock> s_lastTime;
+
 //    static uint32_t s_debug = BGFX_DEBUG_NONE;
 //    static uint32_t s_reset = BGFX_RESET_NONE;
-//    static uint32_t s_width = 800;
-//    static uint32_t s_height = 600;
-
-
-//    static Scene s_scene;
-
-//int runApp(AppI* app)
-//{
-//    app->init(s_width, s_height);
-//    bgfx::frame();
-
-//    return 0;
-//}
 
 } // entry

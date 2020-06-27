@@ -48,7 +48,7 @@ bgfx::UniformHandle Program::m_uDirLights;
 bgfx::UniformHandle Program::m_uSpotLights;
 bgfx::UniformHandle Program::m_uPointLights;
 
-unsigned int Program::s_nTexture = 1;
+unsigned int Program::s_nTexture = 4;
 
 
 bgfx::UniformHandle Program::m_hasTexture;

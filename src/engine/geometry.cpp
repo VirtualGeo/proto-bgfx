@@ -116,6 +116,15 @@ void Geometry::drawQuad()
     bgfx::setState(state);
 }
 
+void Geometry::drawCube()
+{
+    assert(g_isInit);
+    float mtx[16];
+    bx::mtxIdentity(mtx);
+    drawCube(mtx);
+}
+
+
 void Geometry::drawCube(const float mtx[])
 {
     assert(g_isInit);
@@ -131,6 +140,15 @@ void Geometry::drawCube(const float mtx[])
     bgfx::setState(state);
 
 }
+
+void Geometry::drawUVSphere()
+{
+    assert(g_isInit);
+    float mtx[16];
+    bx::mtxIdentity(mtx);
+    drawUVSphere(mtx);
+}
+
 
 void Geometry::drawUVSphere(const float mtx[])
 {
