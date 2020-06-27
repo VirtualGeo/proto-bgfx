@@ -16,6 +16,7 @@
 //    }
 //}
 //#include <QThread>
+#include "entry.h"
 
 
 

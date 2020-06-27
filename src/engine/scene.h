@@ -15,6 +15,7 @@
 #include "spotlight.h"
 #include "pointlight.h"
 #include "camerafps.h"
+#include <entry/windowstate.h>
 
 class Scene
 {
@@ -46,6 +47,7 @@ public:
     void setLightShadowSamplers();
 
     void renderFromCamera(int iCamera, float ratio, const bgfx::ViewId id, const Shading &shading, const float *mtx) const;
+    void renderView(const View & view, const float * mtx);
 
 private:
     void draw(const bgfx::ViewId id, const Shading &shading, const float *mtx,

@@ -68,4 +68,4 @@ add_subdirectory(modules/tinyobjloader)
 set (SRC_DIR ${PROJECT_SOURCE_DIR}/src/)
 add_subdirectory(src)
 
-#include( cmake/examples.cmake )
+include( cmake/examples.cmake )

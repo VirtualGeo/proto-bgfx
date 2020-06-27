@@ -43,6 +43,14 @@ struct Key {
     };
 };
 
+struct View {
+public:
+    int iCamera;
+    float ratio;
+    int id;
+    Shading shading;
+};
+
 class WindowState {
 public:
 public:
@@ -83,14 +91,16 @@ private:
     int m_width;
     int m_height;
     const void* m_context = nullptr;
-    const int m_id;
+//    const int m_id;
     const void* m_backBuffer = nullptr;
     const void* m_backBufferDS = nullptr;
 
+    View m_view;
+
     bgfx::FrameBufferHandle m_fbh;
-//    bgfx::FrameBufferHandle m_offscreenFB = BGFX_INVALID_HANDLE;
-//    bgfx::TextureHandle m_backBuffer = BGFX_INVALID_HANDLE;
-//    bgfx::TextureHandle m_depthBuffer = BGFX_INVALID_HANDLE;
+    //    bgfx::FrameBufferHandle m_offscreenFB = BGFX_INVALID_HANDLE;
+    //    bgfx::TextureHandle m_backBuffer = BGFX_INVALID_HANDLE;
+    //    bgfx::TextureHandle m_depthBuffer = BGFX_INVALID_HANDLE;
 
     static float s_fps;
     static size_t s_epoch;
@@ -110,9 +120,9 @@ private:
     //    Shading m_shading = Shading::RENDERED;
     //    Shading m_shading = Shading::EMISSIVE;
     //    Shading m_shading = Shading::NORMAL;
-    Shading m_shading = Shading::MATERIAL;
+//    Shading m_shading = Shading::MATERIAL;
 
-    int m_iCamera;
+    //    int m_iCamera;
 
     int m_cameraMoveFront = 0;
     int m_cameraMoveRight = 0;
