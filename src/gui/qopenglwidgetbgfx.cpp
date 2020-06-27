@@ -6,15 +6,21 @@
 #include <QOpenGLContext>
 #include <QCoreApplication>
 //#include <QWGLNativeContext>
+
+#if BX_PLATFORM_WINDOWS
 #include <QtPlatformHeaders/QWGLNativeContext>
+using NativeContext = QWGLNativeContext;
+#elif BX_PLATFORM_LINUX
+#include <QtPlatformHeaders/QGLXNativeContext>
+using NativeContext = QGLXNativeContext;
+#endif
+
 //#include <QtPlatformHeaders/QGLXNativeContext>
 //#include <QtPlatformHeaders/QNativ
 #include <thread>
 //#include <QGLContext>
 #include <QOpenGLFunctions>
 
-//using NativeContext = QWGLNativeContext;
-//using NativeContext = QGLXNativeContext;
 
 QOpenGLWidgetBgfx::QOpenGLWidgetBgfx(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -40,14 +46,22 @@ void QOpenGLWidgetBgfx::initializeGL()
 {
     std::cout << "[THREAD] initializeGL: " << std::this_thread::get_id() << std::endl;
     QOpenGLContext * qGLContext = QOpenGLContext::currentContext();
-    bool success = qGLContext->nativeHandle().canConvert<QWGLNativeContext>();
+    bool success = qGLContext->nativeHandle().canConvert<NativeContext>();
     Q_ASSERT(success);
-    QWGLNativeContext native = qGLContext->nativeHandle().value<QWGLNativeContext>();
+    NativeContext native = qGLContext->nativeHandle().value<NativeContext>();
 //    void * native = qGLContext->nativeHandle().value<void *>();
     void * context = (void*)native.context();
 //    void * context = (void*)native;
 
+//    void * context = qGLContext->nativeHandle().data();
+//    void * context = (void*)5555;
+    context = (void*)5555;
     std::cout << "[CONTEXT] initializeGL: " << context << std::endl;
+    GLint framebufferId = -1;
+    QOpenGLFunctions * gl = qGLContext->functions();
+    gl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebufferId);
+
+    void * backBuffer = (void*)framebufferId;
 
 //    m_windowState = new WindowState((void*)(uintptr_t)winId(), nullptr, width(), height(), context);
     m_windowState = new WindowState(nullptr, nullptr, width(), height(), context);
