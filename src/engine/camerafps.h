@@ -12,10 +12,13 @@ public:
 //    CameraFps(CameraFps && camera) noexcept = default;
 
     void updateCameraFront();
+    void setTarget(bx::Vec3 target = bx::Vec3(0.0f));
 
 //protected:
     void mouseMove(float xoffset, float yoffset) override;
     void move(Direction direction, float distance) override;
+    void setPos(const bx::Vec3 &&pos) override;
+
 
 public:
     SpotLight m_spotLight;

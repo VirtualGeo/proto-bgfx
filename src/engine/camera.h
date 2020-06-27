@@ -38,6 +38,10 @@ public:
     bx::Vec3 m_up = {0.0f, 1.0f, 0.0f}; // Euler camera
 
     Type m_type;
+
+//public:
+protected:
+    virtual void setPos(const bx::Vec3 &&pos);
 };
 
 using Cameras = std::vector<std::unique_ptr<Camera>>; // question : Camera* ?

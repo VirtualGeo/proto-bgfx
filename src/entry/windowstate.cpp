@@ -115,7 +115,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
 
         //        Q_ASSERT(m_iWindow == 0);
         bx::mtxIdentity(entry::s_worldTransform);
-//        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
+        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
 //                entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 200.0f }); // question : push_back ?
         //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 3.0f }); // question : push_back ?
         entry::s_lastTime = std::chrono::high_resolution_clock::now();
@@ -129,7 +129,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         entry::init(m_view);
 
     } else {
-//        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
+        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
         m_fbh = bgfx::createFrameBuffer((void*)(uintptr_t)m_nwh, uint16_t(m_width), uint16_t(m_height));
         entry::init(m_view);
     }
@@ -226,8 +226,8 @@ uintptr_t WindowState::renderAllWindow()
     //    qDebug() << g_epoch << m_sum << g_fps;
     if (entry::s_counter >= entry::s_epoch) {
         //        entry::s_epoch = (s_fps = entry::s_epoch / s_sum) / 2; // update g_fps each 0.5 sec
-        //        entry::s_epoch = (s_fps = entry::s_epoch / s_sum); // update g_fps each sec
-        entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum) * 2;
+        entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum);
+//        entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum) * 2;
         entry::s_sum = 0.0f;
         entry::s_counter = 0;
     }

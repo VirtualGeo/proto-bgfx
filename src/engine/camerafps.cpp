@@ -8,15 +8,35 @@ CameraFps::CameraFps(bx::Vec3 pos, bx::Vec3 target)
 {
     m_type = FPS;
 
+    setTarget(target);
+
+    updateCameraFront();
+}
+
+void CameraFps::updateCameraFront()
+{
+
+    bx::Vec3 front;
+    front.x = bx::cos(bx::toRad(m_yaw)) * bx::cos(bx::toRad(m_pitch));
+    front.y = bx::sin(bx::toRad(m_pitch));
+    front.z = bx::sin(bx::toRad(m_yaw)) * bx::cos(bx::toRad(m_pitch));
+    m_front = bx::normalize(front);
+    m_right = bx::normalize(bx::cross(m_up, m_front));
+
+    m_spotLight.updateDirection(m_front);
+}
+
+void CameraFps::setTarget(bx::Vec3 target)
+{
     float view[16];
-    bx::mtxLookAt(view, pos, target);
+    bx::mtxLookAt(view, m_pos, target);
     bx::Vec3 dof = bx::Vec3{view[2], view[6], view[10]};
     m_yaw = bx::toDeg(bx::atan2(dof.z, dof.x));
     m_pitch = bx::toDeg(bx::asin(dof.y));
 //    m_pitch = bx::toDeg(bx::asin(dof.z));
 
-
     updateCameraFront();
+
 }
 
 void CameraFps::mouseMove(float xoffset, float yoffset)
@@ -44,15 +64,10 @@ void CameraFps::move(Camera::Direction direction, float distance)
     m_spotLight.updatePos(m_pos);
 }
 
-void CameraFps::updateCameraFront()
+void CameraFps::setPos(const bx::Vec3 &&pos)
 {
+    Camera::setPos(std::move(pos));
+//     m_pos = std::move(pos);
 
-    bx::Vec3 front;
-    front.x = bx::cos(bx::toRad(m_yaw)) * bx::cos(bx::toRad(m_pitch));
-    front.y = bx::sin(bx::toRad(m_pitch));
-    front.z = bx::sin(bx::toRad(m_yaw)) * bx::cos(bx::toRad(m_pitch));
-    m_front = bx::normalize(front);
-    m_right = bx::normalize(bx::cross(m_up, m_front));
-
-    m_spotLight.updateDirection(m_front);
+     updateCameraFront();
 }

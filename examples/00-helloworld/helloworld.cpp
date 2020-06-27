@@ -1,12 +1,12 @@
 
-#include <entry/entry.h>
 #include <engine/geometry.h>
+#include <entry/entry.h>
 
 //class ExampleHelloWorld : public entry::AppI {
 //public:
 namespace entry {
 
-void init(View & view)
+void init(View& view)
 {
 }
 
@@ -14,9 +14,9 @@ int shutdown()
 {
 }
 
-bool update(const View & view)
+bool update(const View& view)
 {
-//    bgfx::dbgTextClear();
+    //    bgfx::dbgTextClear();
     bgfx::dbgTextPrintf(40, 30, 0x0f, "Hello world");
 }
 
