@@ -7,6 +7,14 @@
 #include <QCoreApplication>
 //#include <QWGLNativeContext>
 #include <QtPlatformHeaders/QWGLNativeContext>
+//#include <QtPlatformHeaders/QGLXNativeContext>
+//#include <QtPlatformHeaders/QNativ
+#include <thread>
+//#include <QGLContext>
+#include <QOpenGLFunctions>
+
+//using NativeContext = QWGLNativeContext;
+//using NativeContext = QGLXNativeContext;
 
 QOpenGLWidgetBgfx::QOpenGLWidgetBgfx(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -30,14 +38,19 @@ QOpenGLWidgetBgfx::QOpenGLWidgetBgfx(QWidget *parent)
 
 void QOpenGLWidgetBgfx::initializeGL()
 {
+    std::cout << "[THREAD] initializeGL: " << std::this_thread::get_id() << std::endl;
     QOpenGLContext * qGLContext = QOpenGLContext::currentContext();
     bool success = qGLContext->nativeHandle().canConvert<QWGLNativeContext>();
     Q_ASSERT(success);
     QWGLNativeContext native = qGLContext->nativeHandle().value<QWGLNativeContext>();
 //    void * native = qGLContext->nativeHandle().value<void *>();
     void * context = (void*)native.context();
+//    void * context = (void*)native;
 
-    m_windowState = new WindowState((void*)(uintptr_t)winId(), nullptr, width(), height(), context);
+    std::cout << "[CONTEXT] initializeGL: " << context << std::endl;
+
+//    m_windowState = new WindowState((void*)(uintptr_t)winId(), nullptr, width(), height(), context);
+    m_windowState = new WindowState(nullptr, nullptr, width(), height(), context);
 
 }
 
@@ -68,8 +81,18 @@ void QOpenGLWidgetBgfx::resizeGL(int w, int h)
 
 void QOpenGLWidgetBgfx::paintGL()
 {
-    assert(m_windowState != nullptr);
+    QOpenGLContext * currentContext = QOpenGLContext::currentContext();
+    GLint framebufferId = -1;
+    QOpenGLFunctions * gl = currentContext->functions();
+    gl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebufferId);
+
+    GLint renderbufferId = -1;
+//    QOpenGLContext * context = this->context();
+//    std::cout << "[paintGL] context: " << context << std::endl;
+//    QOpenGLFramebufferObject * fbo =
+//    assert(m_windowState != nullptr);
     m_windowState->renderAllWindow();
+//    makeCurrent();
     update();
 }
 

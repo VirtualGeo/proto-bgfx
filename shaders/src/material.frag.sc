@@ -44,14 +44,15 @@ void main() {
         diffColor = vec4(diffuseColor.xyz, 1.0);
     }
 
-    if (hasSpecularTexture.x > 0.5) {
-        specColor = texture2D(specularTexture, v_texcoord0);
-    }
-    else {
-        specColor = vec4(0.0, 0.0, 0.0, 1.0);
-    }
+//    if (hasSpecularTexture.x > 0.5) {
+//        specColor = texture2D(specularTexture, v_texcoord0);
+//    }
+//    else {
+//        specColor = vec4(0.0, 0.0, 0.0, 1.0);
+//    }
 
 
-    gl_FragColor = diffColor + specColor;
+//    gl_FragColor = diffColor + specColor;
+    gl_FragColor = diffColor;
     gl_FragColor.w = 1.0;
 }

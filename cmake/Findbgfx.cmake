@@ -39,7 +39,8 @@ find_library(BX_LIBRARY_RELEASE NAMES bx PATHS /usr/local ${BGFX_ROOT} PATH_SUFF
 find_library(ASTCCODEC_LIBRARY_DEBUG NAMES astc-codecd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 find_library(ASTCCODEC_LIBRARY_RELEASE NAMES astc-codec PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 
-if(NOT USE_SHADERC_EXECUTABLE)
+set(USE_SHADERC_LIBRARY False)
+if(USE_SHADERC_LIBRARY)
     find_library(SHADERC_LIBRARY_DEBUG NAMES shaderclibd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
     find_library(SHADERC_LIBRARY_RELEASE NAMES shaderclib PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
     find_library(FCPP_LIBRARY_DEBUG NAMES fcppd PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
@@ -55,7 +56,7 @@ if(NOT USE_SHADERC_EXECUTABLE)
     find_library(SPIRV_TOOLS_LIBRARY_RELEASE NAMES spirv-tools PATHS /usr/local ${BGFX_ROOT} PATH_SUFFIXES lib)
 endif()
 
-if (USE_SHADERC_EXECUTABLE)
+if (NOT USE_SHADERC_LIBRARY)
     find_package_handle_standard_args(bgfx
         REQUIRED_VARS
             BGFX_INCLUDE_DIR
@@ -108,7 +109,7 @@ if(BGFX_FOUND)
     if(NOT TARGET BGFX::BGFX)
         add_library(BGFX::BGFX INTERFACE IMPORTED)
         set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${BGFX_INCLUDE_DIR} $<$<CXX_COMPILER_ID:MSVC>:${BGFX_INCLUDE_DIR}/compat/msvc>)
-        if (USE_SHADERC_EXECUTABLE)
+        if (NOT USE_SHADERC_LIBRARY)
             set_property(TARGET BGFX::BGFX PROPERTY INTERFACE_LINK_LIBRARIES
                 $<$<CONFIG:Debug>:${BGFX_LIBRARY_DEBUG}>
                 $<$<CONFIG:Debug>:${BIMG_LIBRARY_DEBUG}>

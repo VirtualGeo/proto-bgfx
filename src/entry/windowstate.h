@@ -54,13 +54,14 @@ public:
 private:
     void render() const;
 public:
-    void renderAllWindow(); // only first window is able to do that
+    uintptr_t renderAllWindow(); // only first window is able to do that
     void printDebugMessage();
     void updateCameraPos();
     void resetWindow();
 
     void initCubeScene();
     void clearCubeScene();
+
 
 public:
     void mouseMoveEvent(int x, int y);
@@ -71,18 +72,24 @@ public:
     void resizeEvent(int width, int height);
     void mouseScrollEvent(int offset);
 
+    void resizeOffscreenFB();
+
 private:
 //    static std::vector<WindowState*> s_windows;
     bool m_init = false;
 
-    void* m_nwh = nullptr;
-    void* m_ndt = nullptr;
+    const void* m_nwh = nullptr;
+    const void* m_ndt = nullptr;
     int m_width;
     int m_height;
-    void* m_context = nullptr;
+    const void* m_context = nullptr;
     const int m_id;
 
     bgfx::FrameBufferHandle m_fbh;
+    bgfx::FrameBufferHandle m_offscreenFB = BGFX_INVALID_HANDLE;
+    bgfx::TextureHandle m_backBuffer = BGFX_INVALID_HANDLE;
+    bgfx::TextureHandle m_depthBuffer = BGFX_INVALID_HANDLE;
+
 
     static float s_fps;
     static size_t s_epoch;

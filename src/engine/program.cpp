@@ -52,7 +52,9 @@ unsigned int Program::s_nTexture = 1;
 
 
 bgfx::UniformHandle Program::m_hasTexture;
+bgfx::UniformHandle Program::m_hasDiffuseTexture;
 bgfx::UniformHandle Program::m_texture[s_nMaxTexture];
+bgfx::UniformHandle Program::m_diffuseTexture;
 //bgfx::UniformHandle Program::m_nAdditionalTexture;
 
 //bgfx::ShaderHandle loadShader(const char* filename);
@@ -130,6 +132,8 @@ void Program::init(const bgfx::Caps* caps)
     for (int i =0; i <s_nMaxTexture; ++i) {
         m_texture[i] = bgfx::createUniform((std::string("texture") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
     }
+    m_diffuseTexture = bgfx::createUniform("diffuseTexture", bgfx::UniformType::Sampler);
+    m_hasDiffuseTexture = bgfx::createUniform("hasDiffuseTexture", bgfx::UniformType::Vec4);
 //    m_nAdditionalTexture = bgfx::createUniform("nAdditionalTexture", bgfx::UniformType::Vec4);
 
 
@@ -137,6 +141,8 @@ void Program::init(const bgfx::Caps* caps)
         m_programs[i] = BGFX_INVALID_HANDLE;
         //        if (i == Shading::RENDERED)
         //            continue;
+//        if (i != Shading::MATERIAL)
+//            continue;
         //        if (i == Shading::SHADOW)
         //            continue;
         if (i == Shading::EMISSIVE)
@@ -202,7 +208,7 @@ void Program::clear()
     //    }
 //    bgfx::destroy(m_hasDiffuseTexture);
 //    bgfx::destroy(m_hasSpecularTexture);
-//    bgfx::destroy(m_diffuseTexture);
+    bgfx::destroy(m_diffuseTexture);
 //    bgfx::destroy(m_diffuseColor);
 //    bgfx::destroy(m_specularTexture);
 
@@ -210,6 +216,8 @@ void Program::clear()
     for (int i =0; i <s_nMaxTexture; ++i) {
         bgfx::destroy(m_texture[i]);
     }
+    bgfx::destroy(m_diffuseTexture);
+    bgfx::destroy(m_hasDiffuseTexture);
 //    bgfx::destroy(m_nAdditionalTexture);
 }
 
@@ -247,6 +255,10 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
             // const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
             //        const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MAG_ANISOTROPIC | BGFX_SAMPLER_MIN_ANISOTROPIC;
             // const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
+            float vec4[4] = {1.0f};
+            bgfx::setUniform(m_hasDiffuseTexture, vec4);
+            bgfx::setTexture(0, m_diffuseTexture, texture.textureHandle(), Texture::s_textureSamplerFlags);
+
             bgfx::setTexture(0, m_sDiffuse,
                 texture.textureHandle(), Texture::s_textureSamplerFlags);
 
@@ -257,7 +269,11 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
             //        bgfx::setUniform(m_uHasDiffuseTexture, temp);
             //                 bgfx::setUniform(m_uHasDiffuseTexture);
         } else {
+            float vec4[4] = {0.0f};
+            bgfx::setUniform(m_hasDiffuseTexture, vec4);
             //            bgfx::setTexture(0, m_sDiffuse, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+            bgfx::setTexture(0, m_diffuseTexture, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
+
             bgfx::setTexture(0, m_sDiffuse, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
         }
 

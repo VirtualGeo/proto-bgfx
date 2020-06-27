@@ -129,7 +129,9 @@ public:
     static unsigned int s_nTexture;
     static constexpr unsigned int s_nMaxTexture = 6;
     static bgfx::UniformHandle m_hasTexture;
+    static bgfx::UniformHandle m_hasDiffuseTexture;
     static bgfx::UniformHandle m_texture[];
+    static bgfx::UniformHandle Program::m_diffuseTexture;
 //    static bgfx::UniformHandle m_nAdditionalTexture;
 
 
