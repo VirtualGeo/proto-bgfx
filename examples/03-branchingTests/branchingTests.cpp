@@ -35,7 +35,10 @@ void clearCubeScene();
 void init(View& view)
 {
     initCubeScene();
-    entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 200.0f }); // question : push_back ?
+//    assert(entry::s_scene.m_cameras.size() != 0);
+    entry::s_scene.m_cameras[0].setPos(bx::Vec3 { 0.0f, 0.0f, 200.0f }); // question : push_back ?
+    entry::s_scene.m_cameras[0].setTarget();
+
     view.projection = Projection::ORTHOGRAPHIC;
 }
 

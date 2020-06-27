@@ -82,3 +82,9 @@ void Camera::setViewTransform(const View& view) const
 
     bgfx::setViewTransform(view.id, viewMtx, projMtx);
 }
+
+void Camera::setPos(const bx::Vec3 &&pos)
+{
+    m_pos = std::move(pos);
+//    m_pos = pos;
+}
