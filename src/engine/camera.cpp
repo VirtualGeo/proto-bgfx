@@ -47,11 +47,11 @@ void Camera::setViewTransform(float ratio, int viewId) const
     float proj[16];
     //    const float ratio = float(m_width) / m_height;
 
-//    bx::mtxProj(proj, m_fov, ratio, 0.01f, 500.0f,
-//        bgfx::getCaps()->homogeneousDepth);
+    bx::mtxProj(proj, m_fov, ratio, 0.01f, 500.0f,
+        bgfx::getCaps()->homogeneousDepth);
 
-    const float side = 230.0f;
-    bx::mtxOrtho(proj, -side, side, -side, side, 0.01f, 500.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
+//    const float side = 230.0f;
+//    bx::mtxOrtho(proj, -side, side, -side, side, 0.01f, 500.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
 
     bgfx::setViewTransform(viewId, view, proj);
 
