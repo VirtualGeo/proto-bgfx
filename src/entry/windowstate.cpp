@@ -30,13 +30,16 @@ size_t WindowState::s_counter = 0;
 
 std::chrono::time_point<std::chrono::high_resolution_clock> WindowState::s_testStart;
 
-WindowState::WindowState(void* nwh, void* ndt, int width, int height, void *context)
+WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* context,
+    void* backBuffer, void* backBufferDS)
     : m_nwh(nwh)
     , m_ndt(ndt)
     , m_width(width)
     , m_height(height)
     , m_context(context)
     , m_id(s_windows.size())
+    , m_backBuffer(backBuffer)
+    , m_backBufferDS(backBufferDS)
     , m_iCamera(entry::s_scene.m_cameras.size())
 {
 
@@ -50,39 +53,38 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void *cont
         std::cout << "[THREAD] bgfx init: " << std::this_thread::get_id() << std::endl;
 
         bgfx::Init bgfxInit = {};
-        bgfxInit.platformData.ndt = const_cast<void *>(m_ndt);
-        bgfxInit.platformData.nwh = const_cast<void *>(m_nwh);
-//        bgfxInit.platformData.nwh = nullptr;
-        bgfxInit.platformData.context = const_cast<void *>(m_context);
-        bgfxInit.platformData.backBuffer = nullptr;
-        bgfxInit.platformData.backBufferDS = nullptr;
+        bgfxInit.platformData.ndt = const_cast<void*>(m_ndt);
+        bgfxInit.platformData.nwh = const_cast<void*>(m_nwh);
+        //        bgfxInit.platformData.nwh = nullptr;
+        bgfxInit.platformData.context = const_cast<void*>(m_context);
+        bgfxInit.platformData.backBuffer = const_cast<void*>(m_backBuffer);
+        bgfxInit.platformData.backBufferDS = const_cast<void*>(m_backBufferDS);
         //    bgfxInit.platformData.session = nullptr;
         //    bgfx::setPlatformData(pd);
         bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
-//        bgfxInit.type = bgfx::RendererType::Direct3D9;
-//        bgfxInit.type = bgfx::RendererType::Direct3D11;
-//        bgfxInit.type = bgfx::RendererType::Direct3D12;
+        //        bgfxInit.type = bgfx::RendererType::Direct3D9;
+        //        bgfxInit.type = bgfx::RendererType::Direct3D11;
+        //        bgfxInit.type = bgfx::RendererType::Direct3D12;
         bgfxInit.type = bgfx::RendererType::OpenGL;
-//        bgfxInit.type = bgfx::RendererType::OpenGLES;
-//        bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
-//        bgfxInit.type = bgfx::RendererType::Metal;
+        //        bgfxInit.type = bgfx::RendererType::OpenGLES;
+        //        bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
+        //        bgfxInit.type = bgfx::RendererType::Metal;
 
         bgfxInit.resolution.width = width;
         bgfxInit.resolution.height = height;
         bgfxInit.resolution.reset = BGFX_RESET_NONE;
         //        bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
         bgfxInit.vendorId = BGFX_PCI_ID_NONE;
-//        bgfxInit.deviceId;
+        //        bgfxInit.deviceId;
         if (!bgfx::init(bgfxInit)) {
             assert(false);
         }
 
-        const bgfx::InternalData * internalData = bgfx::getInternalData();
+        const bgfx::InternalData* internalData = bgfx::getInternalData();
         std::cout << "[CONTEXT] bgfx init: " << internalData->context << std::endl;
-//        if (m_context != nullptr) {
-//            assert(internalData->context == m_context);
-//        }
-
+        if (m_context != nullptr) {
+            assert(internalData->context == m_context);
+        }
 
         const bgfx::Caps* caps = bgfx::getCaps();
         assert(caps->supported & BGFX_CAPS_TEXTURE_COMPARE_LEQUAL); // sampler supported
@@ -114,10 +116,11 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void *cont
         Program::init(caps);
         Geometry::init();
         Texture::init();
+//        bgfx::frame();
 
         // ------------------------------- LOAD MODEL
-//                 g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
-//                        entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/sponza/sponza.obj");
+        //                 g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
+        //                        entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/sponza/sponza.obj");
 
         //                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
         //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-low-poly.obj");
@@ -140,8 +143,8 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void *cont
 
         //        Q_ASSERT(m_iWindow == 0);
         bx::mtxIdentity(entry::g_mtx);
-                entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
-//        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 200.0f }); // question : push_back ?
+        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
+        //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 200.0f }); // question : push_back ?
         //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 3.0f }); // question : push_back ?
         s_lastTime = std::chrono::high_resolution_clock::now();
 
@@ -203,16 +206,16 @@ void WindowState::render() const
         //            assert(bgfx::isValid(m_fbh));
         bgfx::setViewFrameBuffer(m_id, m_fbh);
     }
-//    bgfx::PlatformData pdata;
-//    pdata.context = const_cast<void*>(m_context);
-//    bgfx::setPlatformData(pdata);
-//        bgfx::setViewFrameBuffer(m_id, m_fbh);
-//    bgfx::setViewFrameBuffer(0, BGFX_INVALID_HANDLE); // default back buffer
+    //    bgfx::PlatformData pdata;
+    //    pdata.context = const_cast<void*>(m_context);
+    //    bgfx::setPlatformData(pdata);
+    //        bgfx::setViewFrameBuffer(m_id, m_fbh);
+    //    bgfx::setViewFrameBuffer(0, BGFX_INVALID_HANDLE); // default back buffer
     // Set view 0 default viewport.
     bgfx::setViewRect(m_id, 0, 0, uint16_t(m_width), uint16_t(m_height));
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
-//    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+    //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
     bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
     bgfx::touch(m_id);
     //            bgfx::touch(m_id);
@@ -221,21 +224,21 @@ void WindowState::render() const
     const float ratio = float(m_width) / m_height;
 
     Geometry::drawQuad();
-            float vec4[4] = {1.0f};
-            bgfx::setUniform(Program::m_hasDiffuseTexture, vec4);
-                bgfx::setTexture(0, Program::m_sDiffuse,
-                             Texture::m_sampleTextures[Texture::Sample(Texture::CHECKER_BOARD)].textureHandle(), Texture::s_textureSamplerFlags);
+    float vec4[4] = { 1.0f };
+    bgfx::setUniform(Program::m_hasDiffuseTexture, vec4);
+    bgfx::setTexture(0, Program::m_sDiffuse,
+        Texture::m_sampleTextures[Texture::Sample(Texture::CHECKER_BOARD)].textureHandle(), Texture::s_textureSamplerFlags);
     bgfx::submit(m_id, Program::m_programs[Shading::MATERIAL]);
 
-//    entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
+    //    entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
     return;
 
     const auto& camera = entry::s_scene.m_cameras[m_iCamera];
     camera.setViewTransform(ratio, m_id);
 
     //    Geometry::drawQuad();
-//    Geometry::drawCube();
-//        return;
+    //    Geometry::drawCube();
+    //        return;
     //    bgfx::submit(m_id, Program::m_programs[m_shading]);
 
     //    bgfx::setTexture(0, Program::m_sDiffuse, Texture::m_sampleTextures[Texture::BLUE].textureHandle(), Texture::s_textureSamplerFlags);
@@ -307,7 +310,7 @@ void WindowState::render() const
 #endif
             //            buffer[1] = Program::s_nAditionalTexture;
 
-//            Geometry::drawCube(cube.mtx);
+            //            Geometry::drawCube(cube.mtx);
             Geometry::drawCube(cube.mtx);
             //            Geometry::drawUVSphere(cube.mtx);
             bgfx::submit(m_id, m_branchingTests[m_iBranchingTest]);
@@ -431,49 +434,47 @@ uintptr_t WindowState::renderAllWindow()
     if (!m_init)
         return 0;
 
-
-
-//    if (s_iFrame == 0) {
-//        initCubeScene();
-//        bgfx::frame();
-//        s_testStart = std::chrono::high_resolution_clock::now();
-//        std::cout << "num texture\t| 1\t| 2\t| 3\t| 4\t| 5\t| 6" << std::endl;
-//        std::cout << "test 0";
-//    }
+    //    if (s_iFrame == 0) {
+    //        initCubeScene();
+    //        bgfx::frame();
+    //        s_testStart = std::chrono::high_resolution_clock::now();
+    //        std::cout << "num texture\t| 1\t| 2\t| 3\t| 4\t| 5\t| 6" << std::endl;
+    //        std::cout << "test 0";
+    //    }
     //        if (m_id != 0)
     //            return;
     //    OPTICK_FRAME("MainThread");
 
     const auto currentTime = std::chrono::high_resolution_clock::now();
 
-//    if (s_iFrame != 0 && s_iFrame % s_nbTestFrame == 0) {
-//        const auto deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_testStart).count() / 1000000.0;
-//        //        std::cout << "test " << m_iBranchingTest << ", num texture: " << Program::s_nTexture << ", mean fps: " << s_nbTestFrame / deltaTime << std::endl;
-//        std::cout << "\t" << (s_nbTestFrame - 50) / deltaTime;
-//        clearCubeScene();
+    //    if (s_iFrame != 0 && s_iFrame % s_nbTestFrame == 0) {
+    //        const auto deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_testStart).count() / 1000000.0;
+    //        //        std::cout << "test " << m_iBranchingTest << ", num texture: " << Program::s_nTexture << ", mean fps: " << s_nbTestFrame / deltaTime << std::endl;
+    //        std::cout << "\t" << (s_nbTestFrame - 50) / deltaTime;
+    //        clearCubeScene();
 
-//        ++Program::s_nTexture;
-//        if (Program::s_nTexture == Program::s_nMaxTexture + 1) {
-//            Program::s_nTexture = 1;
-//            ++m_iBranchingTest;
-//            if (m_iBranchingTest == 3) {
-//                std::cout << std::endl;
-//                exit(0);
-//            }
-//            std::cout << std::endl
-//                      << "test " << m_iBranchingTest;
-//        }
-//        initCubeScene();
-//        //        bgfx::frame();
-//        //        s_testStart = std::chrono::high_resolution_clock::now();
-//    }
-//    if (s_iFrame % s_nbTestFrame == 50) {
-//        //        initCubeScene();
-//        //        bgfx::frame();
-//        s_testStart = std::chrono::high_resolution_clock::now();
-//    }
-//    //    s_currentTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime).count();
-//    //    s_currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch()).count() / 1000000.0;
+    //        ++Program::s_nTexture;
+    //        if (Program::s_nTexture == Program::s_nMaxTexture + 1) {
+    //            Program::s_nTexture = 1;
+    //            ++m_iBranchingTest;
+    //            if (m_iBranchingTest == 3) {
+    //                std::cout << std::endl;
+    //                exit(0);
+    //            }
+    //            std::cout << std::endl
+    //                      << "test " << m_iBranchingTest;
+    //        }
+    //        initCubeScene();
+    //        //        bgfx::frame();
+    //        //        s_testStart = std::chrono::high_resolution_clock::now();
+    //    }
+    //    if (s_iFrame % s_nbTestFrame == 50) {
+    //        //        initCubeScene();
+    //        //        bgfx::frame();
+    //        s_testStart = std::chrono::high_resolution_clock::now();
+    //    }
+    //    //    s_currentTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime).count();
+    //    //    s_currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch()).count() / 1000000.0;
 
     //    const auto currentTime = g_timer.now();
     s_deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_lastTime).count() / 1000000.0;
@@ -519,19 +520,18 @@ uintptr_t WindowState::renderAllWindow()
     ////    }
 
     //        int iWindow = 0;
-//    bgfx::setViewFrameBuffer(0, m_offscreenFB);
+    //    bgfx::setViewFrameBuffer(0, m_offscreenFB);
     for (const WindowState* window : s_windows) {
         //        entry::s_scene.setLightShadowSamplers();
         window->render();
         //        ++iWindow;
     }
-//    bgfx::frame();
-//    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X00FF00FF);
-//    bgfx::setViewFrameBuffer(0, BGFX_INVALID_HANDLE);
+    //    bgfx::frame();
+    //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X00FF00FF);
+    //    bgfx::setViewFrameBuffer(0, BGFX_INVALID_HANDLE);
     //    render();
 
     //        g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
-
 
     // Advance to next frame. Process submitted rendering primitives.
     //    if (m_id == 0) { // avoid flipping, put F1 to show (only with direct3D)
@@ -544,7 +544,7 @@ uintptr_t WindowState::renderAllWindow()
     //                                m_iBranchingTest = (m_iBranchingTest + 1) % 3;
     //    }
     //    return;
-//    return bgfx::getInternal(m_backBuffer);
+    //    return bgfx::getInternal(m_backBuffer);
     return 0;
 }
 
@@ -555,8 +555,8 @@ uintptr_t WindowState::renderAllWindow()
 
 void WindowState::printDebugMessage()
 {
-//    bgfx::setDebug(BGFX_DEBUG_NONE);
-//    return;
+    //    bgfx::setDebug(BGFX_DEBUG_NONE);
+    //    return;
     if (entry::g_showStats) {
         bgfx::setDebug(BGFX_DEBUG_STATS);
     } else {
@@ -970,7 +970,7 @@ void WindowState::keyPressEvent(Key::Enum key)
 
 void WindowState::resizeEvent(int width, int height)
 {
-    const bgfx::InternalData * internalData = bgfx::getInternalData();
+    const bgfx::InternalData* internalData = bgfx::getInternalData();
     std::cout << "[CONTEXT] bgfx resizeEvent: " << internalData->context << std::endl;
 
     //    g_width = size.width();
@@ -985,35 +985,33 @@ void WindowState::resizeEvent(int width, int height)
         bgfx::destroy(m_fbh);
         m_fbh.idx = bgfx::kInvalidHandle;
         assert(m_nwh != nullptr);
-        m_fbh = bgfx::createFrameBuffer(const_cast<void *>(m_nwh), uint16_t(m_width), uint16_t(m_height));
+        m_fbh = bgfx::createFrameBuffer(const_cast<void*>(m_nwh), uint16_t(m_width), uint16_t(m_height));
     } else {
         resetWindow();
     }
-
 
     resizeOffscreenFB();
 }
 
 void WindowState::resizeOffscreenFB()
 {
-    if (bgfx::isValid(m_offscreenFB)) {
-        bgfx::destroy(m_offscreenFB);
-        m_offscreenFB = BGFX_INVALID_HANDLE;
-    }
-    if (bgfx::isValid(m_backBuffer)) {
-        bgfx::destroy(m_backBuffer);
-        m_backBuffer = BGFX_INVALID_HANDLE;
-    }
-    if (bgfx::isValid(m_depthBuffer)) {
-        bgfx::destroy(m_depthBuffer);
-        m_depthBuffer = BGFX_INVALID_HANDLE;
-    }
+//    if (bgfx::isValid(m_offscreenFB)) {
+//        bgfx::destroy(m_offscreenFB);
+//        m_offscreenFB = BGFX_INVALID_HANDLE;
+//    }
+//    if (bgfx::isValid(m_backBuffer)) {
+//        bgfx::destroy(m_backBuffer);
+//        m_backBuffer = BGFX_INVALID_HANDLE;
+//    }
+//    if (bgfx::isValid(m_depthBuffer)) {
+//        bgfx::destroy(m_depthBuffer);
+//        m_depthBuffer = BGFX_INVALID_HANDLE;
+//    }
 
-    m_backBuffer = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT, NULL);
-    m_depthBuffer = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT, NULL);
-    bgfx::TextureHandle fbtextures[2] = { m_backBuffer, m_depthBuffer };
-    m_offscreenFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, false);
-
+//    m_backBuffer = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT, NULL);
+//    m_depthBuffer = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT, NULL);
+//    bgfx::TextureHandle fbtextures[2] = { m_backBuffer, m_depthBuffer };
+//    m_offscreenFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, false);
 }
 
 void WindowState::mouseScrollEvent(int offset)
@@ -1022,4 +1020,3 @@ void WindowState::mouseScrollEvent(int offset)
     auto& camera = entry::s_scene.m_cameras[m_iCamera];
     camera.zoom(offset);
 }
-

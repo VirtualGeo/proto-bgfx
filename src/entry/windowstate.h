@@ -36,23 +36,24 @@ struct Key {
         M,
         R,
         E,
-//        Q,
+        //        Q,
         Control,
 
         Count
     };
 };
 
-
 class WindowState {
 public:
-
 public:
-    WindowState(void* nwh, void *ndt, int width, int height, void * context = nullptr);
+    WindowState(void* nwh, void* ndt, int width, int height,
+        void* context = nullptr, void* backBuffer = nullptr,
+        void* backBufferDS = nullptr);
     ~WindowState();
 
 private:
     void render() const;
+
 public:
     uintptr_t renderAllWindow(); // only first window is able to do that
     void printDebugMessage();
@@ -61,7 +62,6 @@ public:
 
     void initCubeScene();
     void clearCubeScene();
-
 
 public:
     void mouseMoveEvent(int x, int y);
@@ -75,7 +75,7 @@ public:
     void resizeOffscreenFB();
 
 private:
-//    static std::vector<WindowState*> s_windows;
+    //    static std::vector<WindowState*> s_windows;
     bool m_init = false;
 
     const void* m_nwh = nullptr;
@@ -84,31 +84,32 @@ private:
     int m_height;
     const void* m_context = nullptr;
     const int m_id;
+    const void* m_backBuffer = nullptr;
+    const void* m_backBufferDS = nullptr;
 
     bgfx::FrameBufferHandle m_fbh;
-    bgfx::FrameBufferHandle m_offscreenFB = BGFX_INVALID_HANDLE;
-    bgfx::TextureHandle m_backBuffer = BGFX_INVALID_HANDLE;
-    bgfx::TextureHandle m_depthBuffer = BGFX_INVALID_HANDLE;
-
+//    bgfx::FrameBufferHandle m_offscreenFB = BGFX_INVALID_HANDLE;
+//    bgfx::TextureHandle m_backBuffer = BGFX_INVALID_HANDLE;
+//    bgfx::TextureHandle m_depthBuffer = BGFX_INVALID_HANDLE;
 
     static float s_fps;
     static size_t s_epoch;
     static double s_deltaTime;
     static std::chrono::time_point<std::chrono::high_resolution_clock> s_lastTime;
-//    static double s_currentTime;
+    //    static double s_currentTime;
     static size_t s_iFrame;
-//    static std::chrono::time_point<std::chrono::high_resolution_clock> s_currentTime;
+    //    static std::chrono::time_point<std::chrono::high_resolution_clock> s_currentTime;
     static double s_sum;
     static size_t s_counter;
 
     static std::chrono::time_point<std::chrono::high_resolution_clock> s_testStart;
-//    static const int s_nbTestFrame = 100;
+    //    static const int s_nbTestFrame = 100;
     static const int s_nbTestFrame = 500;
-//    static const int s_nbTestFrame = 1000;
+    //    static const int s_nbTestFrame = 1000;
 
-//    Shading m_shading = Shading::RENDERED;
-//    Shading m_shading = Shading::EMISSIVE;
-//    Shading m_shading = Shading::NORMAL;
+    //    Shading m_shading = Shading::RENDERED;
+    //    Shading m_shading = Shading::EMISSIVE;
+    //    Shading m_shading = Shading::NORMAL;
     Shading m_shading = Shading::MATERIAL;
 
     int m_iCamera;
@@ -126,19 +127,19 @@ private:
 
     struct Cube {
         float mtx[16];
-//        bool hasDiffuseTexture;
-//        bool hasSpecularTexture;
+        //        bool hasDiffuseTexture;
+        //        bool hasSpecularTexture;
         float diffuseColor[4];
-        bx::Vec3 velocity = {0.0f, 0.0f, 0.0f};
+        bx::Vec3 velocity = { 0.0f, 0.0f, 0.0f };
 
-        bool hasTexture[Program::s_nMaxTexture] = {0};
+        bool hasTexture[Program::s_nMaxTexture] = { 0 };
         int iShader;
     };
     std::vector<Cube> m_cubes;
 
     bgfx::ProgramHandle m_branchingTests[3];
     bgfx::ProgramHandle m_branching3Tests[2048];
-    uint32_t  m_iBranchingTest = 0;
+    uint32_t m_iBranchingTest = 0;
 };
 
 #endif // WINDOWSTATE_H
