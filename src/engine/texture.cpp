@@ -278,7 +278,7 @@ void Texture::init()
 
 }
 
-void Texture::clear()
+void Texture::shutdown()
 {
     for (int i =0; i <Sample::Count; ++i) {
 //        delete m_sampleTextures[i];

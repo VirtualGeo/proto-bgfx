@@ -8,11 +8,14 @@ namespace entry {
 
 void init(View & view)
 {
+    Geometry::init();
+    Texture::init();
+    Program::init();
     // ------------------------------- LOAD MODEL
     //                 g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/sponza/sponza.obj");
-//    entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
-    entry::s_scene.m_cameras[0].setPos(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
+    entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
+//    entry::s_scene.m_cameras[0].setPos(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
 
     //                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-low-poly.obj");
@@ -34,11 +37,14 @@ void init(View & view)
     //        entry::s_scene.addLight(PointLight({ 0.0f, 1.0f, 0.0f }));
 }
 
-int shutdown()
+void shutdown()
 {
+    Geometry::shutdown();
+    Texture::shutdown();
+    Program::shutdown();
 }
 
-bool update(const View & view)
+void update(const View & view)
 {
     entry::s_scene.renderView(view, entry::s_worldTransform);
 //    entry::s_scene.renderFromCamera(m_view.iCamera, ratio, m_id, m_shading, entry::g_mtx);

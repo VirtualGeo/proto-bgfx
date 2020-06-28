@@ -73,21 +73,19 @@ public:
     uintptr_t renderAllWindow(); // only first window is able to do that
     void printDebugMessage();
     void updateCameraPos();
+
+    void resizeOffscreenFB();
     void resetWindow();
 
-    void initCubeScene();
-    void clearCubeScene();
-
 public:
+    void resizeEvent(int width, int height);
     void mouseMoveEvent(int x, int y);
     void mouseReleaseEvent(MouseButton::Enum mouseButton);
     void mousePressEvent(MouseButton::Enum mouseButton);
     void keyReleaseEvent(Key::Enum key);
     void keyPressEvent(Key::Enum key);
-    void resizeEvent(int width, int height);
     void mouseScrollEvent(int offset);
 
-    void resizeOffscreenFB();
 
 private:
     //    static std::vector<WindowState*> s_windows;
@@ -103,7 +101,7 @@ private:
 
     View m_view;
 
-    bgfx::FrameBufferHandle m_fbh = BGFX_INVALID_HANDLE;
+    bgfx::FrameBufferHandle m_backBufferFBH = BGFX_INVALID_HANDLE; // default fbh created by bgfx init
     //    bgfx::FrameBufferHandle m_offscreenFB = BGFX_INVALID_HANDLE;
     //    bgfx::TextureHandle m_backBuffer = BGFX_INVALID_HANDLE;
     //    bgfx::TextureHandle m_depthBuffer = BGFX_INVALID_HANDLE;

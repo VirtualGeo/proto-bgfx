@@ -4,7 +4,8 @@ project(proto-bgfx VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14) # need by std::make_unique
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(BGFX_ROOT "" CACHE PATH "Path of bgfx-install (bgfx library) in the system")
+set(BGFX_ROOT "" CACHE PATH "Path of bgfx-install (bgfx library) on your system")
+set(BGFX_ROOT "/home/gauthier/tmp/bgfx.cmake/bgfx-install")
 # ------------------------ USER CONFIGURATIONS ----------------------
 #set(BGFX_ROOT <PATH_IN_YOUR_SYSTEM>/bgfx-install) // YOU MUST SET BGFX_ROOT TO COMPILE <----- ATTENTION
 # vscode: settings.json
@@ -24,10 +25,10 @@ set(BGFX_ROOT "" CACHE PATH "Path of bgfx-install (bgfx library) in the system")
 
 add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 add_definitions(-DMODEL_LOADER_INFO)
-set(USE_SHADERC_EXECUTABLE 1)
+set(USE_SHADERC_LIBRARY False)
 
 # select graphic user interface
-    set(GUI_QT 1) #default: GLFW
+set(GUI_QT 1) #default: GLFW
 
 
 # -------------------------------------------------------------------
@@ -36,8 +37,8 @@ set(SHADER_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/bgfx/shaders/src)
 add_definitions(-DSHADER_INCLUDE_DIR=\"${SHADER_INCLUDE_DIR}\")
 add_definitions(-DBGFX_ROOT=\"${BGFX_ROOT}\")
 
-if (USE_SHADERC_EXECUTABLE)
-    add_definitions(-DUSE_SHADERC_EXECUTABLE) #avoid depend of shaderclib (to long linkage on build, shaderclibd.a is too big)
+if (USE_SHADERC_LIBRARY)
+    add_definitions(-DUSE_SHADERC_LIBRARY) #avoid depend of shaderclib (to long linkage on build, shaderclibd.a is too big)
 endif()
 
 if (GUI_QT)

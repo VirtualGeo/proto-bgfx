@@ -1,31 +1,42 @@
 #include "entry.h"
 
-//std::vector<WindowState> entry::s_windows;
-//std::vector<std::unique_ptr<Camera>> entry::s_cameras; // question : Camera* ?
-//Scene entryFake::s_scene;
+namespace entry {
 
-bool entryFake::g_showStats = false;
-//float entryFake::g_mtx[16];
+Scene s_scene;
+float s_worldTransform[16];
+float s_fps;
+size_t s_iFrame = 0;
+double s_sum = 0.0;
+size_t s_counter = 0;
+size_t s_epoch = 10;
+double s_deltaTime;
+std::chrono::time_point<std::chrono::high_resolution_clock> s_lastTime;
+bool s_showStats = false;
+std::string s_renderer;
+std::string s_vendorID;
+bool s_vsyncEnable = false;
+int s_mssaLevel = 0;
+int s_textureSamplerFlags = 0;
 
-std::string entryFake::g_renderer;
-std::string entryFake::g_vendorID;
+bool s_bgfxInitialized = false;
 
-bool entryFake::g_vsyncEnable = false;
-int entryFake::g_mssaLevel = 0;
-int entryFake::g_textureSamplerFlags = 0;
-bool entryFake::s_bgfxInit = false;
+//void init(View&) {};
+//int shutdown() {
+//    return 0;
+//};
+//bool update(const View&) {
+//    return true;
+//};
 
-//std::map<int, MouseButton> entry::g_translateMouseKey;
 
-uint32_t entryFake::getResetFlags()
+uint32_t getResetFlags()
 {
-
     uint32_t flags = 0 | BGFX_RESET_NONE;
-    if (entryFake::g_vsyncEnable) {
+    if (entry::s_vsyncEnable) {
         flags |= BGFX_RESET_VSYNC;
     }
 
-    switch (entryFake::g_mssaLevel) {
+    switch (entry::s_mssaLevel) {
     case 0:
         break;
     case 1:
@@ -51,20 +62,5 @@ uint32_t entryFake::getResetFlags()
 
     return flags;
 }
-
-namespace entry {
-
-Scene s_scene;
-float s_worldTransform[16];
-float s_fps;
-size_t s_iFrame = 0;
-double s_sum = 0.0;
-size_t s_counter = 0;
-size_t s_epoch = 10;
-double s_deltaTime;
-std::chrono::time_point<std::chrono::high_resolution_clock> s_lastTime;
-
-//    static uint32_t s_debug = BGFX_DEBUG_NONE;
-//    static uint32_t s_reset = BGFX_RESET_NONE;
 
 } // entry

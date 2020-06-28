@@ -88,7 +88,7 @@ void Geometry::init()
     g_isInit = true;
 }
 
-void Geometry::clear()
+void Geometry::shutdown()
 {
     //    bgfx::destroy(m_layout);
 
