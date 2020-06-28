@@ -63,8 +63,8 @@ public:
     ~Program() = delete;
 
     //    void init(const char* shaderName);
-    static void init(const bgfx::Caps * caps);
-    static void clear();
+    static void init();
+    static void shutdown();
     static void submit(const bgfx::ViewId id, const Shading & shading, const Material& material, const Textures& textures);
 //    static bgfx::ProgramHandle handleProgram(const Shading &shading);
     static const char *filename(const Shading & shading) ;
@@ -75,7 +75,7 @@ public:
     //    bgfx::ProgramHandle m_handle;
     //    bgfx::ShaderHandle m_vsh;
     //    bgfx::ShaderHandle m_fsh;
-    static const bgfx::Caps * m_caps;
+//    static const bgfx::Caps * m_caps;
 
 
     //    bgfx::UniformHandle m_uDiffuse;
@@ -124,15 +124,8 @@ public:
 //    static bgfx::UniformHandle m_diffuseTexture;
 //    static bgfx::UniformHandle m_diffuseColor;
 //    static bgfx::UniformHandle m_specularTexture;
-
-//    static constexpr int s_nArea = 2;
-    static unsigned int s_nTexture;
-    static constexpr unsigned int s_nMaxTexture = 6;
-    static bgfx::UniformHandle m_hasTexture;
     static bgfx::UniformHandle m_hasDiffuseTexture;
-    static bgfx::UniformHandle m_texture[];
     static bgfx::UniformHandle m_diffuseTexture;
-//    static bgfx::UniformHandle m_nAdditionalTexture;
 
 
 //    uint16_t m_shadowMapSize = 512;

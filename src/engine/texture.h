@@ -52,7 +52,7 @@ public:
     //    void setSamplerAnisotropic();
     //    void setSamplerPoint();
     static void init();
-    static void clear();
+    static void shutdown();
     static Texture m_sampleTextures[Count];
     static bgfx::TextureHandle getSampleTexture(Sample sample);
 

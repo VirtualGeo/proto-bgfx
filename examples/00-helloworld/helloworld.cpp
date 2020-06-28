@@ -10,11 +10,11 @@ void init(View& view)
 {
 }
 
-int shutdown()
+void shutdown()
 {
 }
 
-bool update(const View& view)
+void update(const View& view)
 {
     //    bgfx::dbgTextClear();
     bgfx::dbgTextPrintf(40, 30, 0x0f, "Hello world");

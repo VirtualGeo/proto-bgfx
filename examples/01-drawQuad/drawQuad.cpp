@@ -8,13 +8,19 @@ namespace entry {
 
 void init(View & view)
 {
+    Geometry::init();
+    Texture::init();
+    Program::init();
 }
 
-int shutdown()
+void shutdown()
 {
+    Geometry::shutdown();
+    Texture::shutdown();
+    Program::shutdown();
 }
 
-bool update(const View & view)
+void update(const View & view)
 {
 //    const Camera & camera = entry::s_scene.m_cameras[view.iCamera];
 //    camera.setViewTransform(view.ratio, view.id);

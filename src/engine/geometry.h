@@ -11,7 +11,7 @@ public:
     ~Geometry() = delete;
 
     static void init();
-    static void clear();
+    static void shutdown();
     static void drawQuad();
     static void drawCube();
     static void drawCube(const float mtx[16]);

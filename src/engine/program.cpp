@@ -10,7 +10,7 @@
 #include <cstring>
 #include <sstream>
 
-#ifndef USE_SHADERC_EXECUTABLE
+#ifdef USE_SHADERC_LIBRARY
 #include <shaderc/shaderc.h>
 #endif
 
@@ -38,7 +38,7 @@ bgfx::UniformHandle Program::m_uLightSpaceMatrix;
 bgfx::UniformHandle Program::m_uLightPos;
 bgfx::UniformHandle Program::m_uLightMtx;
 bgfx::UniformHandle Program::m_uDepthScaleOffset;
-const bgfx::Caps* Program::m_caps = nullptr;
+//const bgfx::Caps* Program::m_caps = nullptr;
 //bgfx::ProgramHandle Program::m_progShadow;
 bgfx::FrameBufferHandle Program::m_shadowMapFB[s_num_lightMax];
 bgfx::TextureHandle Program::m_shadowMapTexture[s_num_lightMax];
@@ -48,21 +48,17 @@ bgfx::UniformHandle Program::m_uDirLights;
 bgfx::UniformHandle Program::m_uSpotLights;
 bgfx::UniformHandle Program::m_uPointLights;
 
-unsigned int Program::s_nTexture = 4;
 
-
-bgfx::UniformHandle Program::m_hasTexture;
 bgfx::UniformHandle Program::m_hasDiffuseTexture;
-bgfx::UniformHandle Program::m_texture[s_nMaxTexture];
 bgfx::UniformHandle Program::m_diffuseTexture;
 //bgfx::UniformHandle Program::m_nAdditionalTexture;
 
 //bgfx::ShaderHandle loadShader(const char* filename);
 bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType, const char* pShaderDefines);
 
-void Program::init(const bgfx::Caps* caps)
+void Program::init()
 {
-    m_caps = caps;
+//    m_caps = caps;
 
     //    const char * buff[256];
     //    shaderc::compileShader(5, buff);
@@ -128,10 +124,6 @@ void Program::init(const bgfx::Caps* caps)
     }
 
 
-    m_hasTexture = bgfx::createUniform("hasTexture", bgfx::UniformType::Vec4, s_nMaxTexture);
-    for (int i =0; i <s_nMaxTexture; ++i) {
-        m_texture[i] = bgfx::createUniform((std::string("texture") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
-    }
     m_diffuseTexture = bgfx::createUniform("diffuseTexture", bgfx::UniformType::Sampler);
     m_hasDiffuseTexture = bgfx::createUniform("hasDiffuseTexture", bgfx::UniformType::Vec4);
 //    m_nAdditionalTexture = bgfx::createUniform("nAdditionalTexture", bgfx::UniformType::Vec4);
@@ -155,14 +147,15 @@ void Program::init(const bgfx::Caps* caps)
 
 
     float depthScaleOffset[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
-    if (m_caps->homogeneousDepth) {
+    const bgfx::Caps * caps = bgfx::getCaps();
+    if (caps->homogeneousDepth) {
         depthScaleOffset[0] = depthScaleOffset[1] = 0.5f;
     }
     bgfx::setUniform(m_uDepthScaleOffset, depthScaleOffset);
     bgfx::touch(0);
 }
 
-void Program::clear()
+void Program::shutdown()
 {
     //        int i= Shading::NORMAL;
     for (int i = 0; i < Shading::Count; ++i) {
@@ -208,14 +201,10 @@ void Program::clear()
     //    }
 //    bgfx::destroy(m_hasDiffuseTexture);
 //    bgfx::destroy(m_hasSpecularTexture);
-    bgfx::destroy(m_diffuseTexture);
+//    bgfx::destroy(m_diffuseTexture);
 //    bgfx::destroy(m_diffuseColor);
 //    bgfx::destroy(m_specularTexture);
 
-    bgfx::destroy(m_hasTexture);
-    for (int i =0; i <s_nMaxTexture; ++i) {
-        bgfx::destroy(m_texture[i]);
-    }
     bgfx::destroy(m_diffuseTexture);
     bgfx::destroy(m_hasDiffuseTexture);
 //    bgfx::destroy(m_nAdditionalTexture);
@@ -378,7 +367,7 @@ bool callShaderc(const char* pFilename, const char* pOutput, bgfx::RendererType:
     };
     //    const int lenArgv = BX_COUNTOF(argv);
 
-#ifdef USE_SHADERC_EXECUTABLE
+#ifndef USE_SHADERC_LIBRARY
     std::string shadercCmd = BGFX_ROOT "/bin/shaderc";
     for (int i = 1; i < argvSize; ++i) {
         if (i == argvSize - 1) {

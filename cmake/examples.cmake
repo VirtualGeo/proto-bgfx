@@ -24,6 +24,7 @@ set(
     01-drawQuad
     02-sponza
     03-branchingTests
+    04-nothingToDo
     )
 
 foreach(EXAMPLE ${EXAMPLES})
