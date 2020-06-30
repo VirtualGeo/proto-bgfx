@@ -36,8 +36,8 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
     m_view.id = s_windows.size();
     //    m_view.shading = Shading::MATERIAL;
 
-    m_backBufferFBH.idx = bgfx::kInvalidHandle;
-    assert(!bgfx::isValid(m_backBufferFBH));
+    m_offScreenFBH.idx = bgfx::kInvalidHandle;
+    assert(!bgfx::isValid(m_offScreenFBH));
 
     // first created view call bgfx::init()
     if (m_view.id == 0) { // Call bgfx::renderFrame before bgfx::init to signal to bgfx not to create a render thread.
@@ -75,9 +75,10 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
 
         const bgfx::InternalData* internalData = bgfx::getInternalData();
         std::cout << "[CONTEXT] bgfx init: " << internalData->context << std::endl;
-        if (m_context != nullptr) {
-            assert(internalData->context == m_context);
-        }
+//        if (m_context != nullptr) {
+//        assert(m_context == nullptr || bgfx::getInternalData()->context == m_context);
+//        assert(m_context == nullptr || bgfx::getInternalData()->context == nullptr);
+//        }
 
         const bgfx::Caps* caps = bgfx::getCaps();
         assert(caps->supported & BGFX_CAPS_TEXTURE_COMPARE_LEQUAL); // sampler supported
@@ -127,7 +128,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
 
     } else {
         //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
-        m_backBufferFBH = bgfx::createFrameBuffer((void*)(uintptr_t)m_nwh, uint16_t(m_width), uint16_t(m_height));
+        m_offScreenFBH = bgfx::createFrameBuffer((void*)(uintptr_t)m_nwh, uint16_t(m_width), uint16_t(m_height));
     }
 
     entry::init(m_view);
@@ -155,9 +156,9 @@ WindowState::~WindowState()
 
         bgfx::shutdown();
     } else {
-        assert(bgfx::isValid(m_backBufferFBH));
-        bgfx::destroy(m_backBufferFBH);
-        m_backBufferFBH.idx = bgfx::kInvalidHandle;
+        assert(bgfx::isValid(m_offScreenFBH));
+        bgfx::destroy(m_offScreenFBH);
+        m_offScreenFBH.idx = bgfx::kInvalidHandle;
     }
 
     s_windows.remove(this);
@@ -165,13 +166,13 @@ WindowState::~WindowState()
 
 //WindowState::~WindowState()
 //{
-////    bgfx::destroy(m_backBufferFBH);
+////    bgfx::destroy(m_offScreenFBH);
 
 //}
 
 //void WindowState::clear()
 //{
-//    bgfx::destroy(m_backBufferFBH);
+//    bgfx::destroy(m_offScreenFBH);
 //}
 
 void WindowState::render() const
@@ -181,15 +182,15 @@ void WindowState::render() const
     //        return;
 
     //    if (m_view.id != 0) {
-    //        //            assert(bgfx::isValid(m_backBufferFBH));
-    //        bgfx::setViewFrameBuffer(m_view.id, m_backBufferFBH);
+    //        //            assert(bgfx::isValid(m_offScreenFBH));
+    //        bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
     //    }
-    bgfx::setViewFrameBuffer(m_view.id, m_backBufferFBH);
+    bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
 
     //    bgfx::PlatformData pdata;
     //    pdata.context = const_cast<void*>(m_context);
     //    bgfx::setPlatformData(pdata);
-    //        bgfx::setViewFrameBuffer(m_id, m_backBufferFBH);
+    //        bgfx::setViewFrameBuffer(m_id, m_offScreenFBH);
     //    bgfx::setViewFrameBuffer(0, BGFX_INVALID_HANDLE); // default back buffer
     // Set view 0 default viewport.
     bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
@@ -217,6 +218,7 @@ uintptr_t WindowState::renderAllWindow()
 {
     assert(m_init);
     assert(entry::s_bgfxInitialized);
+//    assert(m_context == nullptr || bgfx::getInternalData()->context == m_context);
     //    if (!m_init)
     //        return 0;
 
@@ -273,7 +275,7 @@ uintptr_t WindowState::renderAllWindow()
     //        entry::s_scene.updateLightShadowMaps();
     //        entry::s_scene.setLightUniforms();
     //    }
-    //    return bgfx::getInternal(m_backBufferFBH);
+    //    return bgfx::getInternal(m_offScreenFBH);
     return 0;
 }
 
@@ -343,18 +345,18 @@ void WindowState::resizeOffscreenFB()
     //        bgfx::destroy(m_offscreenFB);
     //        m_offscreenFB = BGFX_INVALID_HANDLE;
     //    }
-    //    if (bgfx::isValid(m_backBufferFBH)) {
-    //        bgfx::destroy(m_backBufferFBH);
-    //        m_backBufferFBH = BGFX_INVALID_HANDLE;
+    //    if (bgfx::isValid(m_offScreenFBH)) {
+    //        bgfx::destroy(m_offScreenFBH);
+    //        m_offScreenFBH = BGFX_INVALID_HANDLE;
     //    }
     //    if (bgfx::isValid(m_depthBuffer)) {
     //        bgfx::destroy(m_depthBuffer);
     //        m_depthBuffer = BGFX_INVALID_HANDLE;
     //    }
 
-    //    m_backBufferFBH = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT, NULL);
+    //    m_offScreenFBH = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT, NULL);
     //    m_depthBuffer = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT, NULL);
-    //    bgfx::TextureHandle fbtextures[2] = { m_backBufferFBH, m_depthBuffer };
+    //    bgfx::TextureHandle fbtextures[2] = { m_offScreenFBH, m_depthBuffer };
     //    m_offscreenFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, false);
 }
 
@@ -375,14 +377,14 @@ void WindowState::resizeEvent(int width, int height)
     //    g_height = size.height();
     m_height = height;
 
-    //    m_backBufferFBH = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
+    //    m_offScreenFBH = bgfx::createFrameBuffer((void*)(uintptr_t)winId(), uint16_t(width()), uint16_t(height()));
 
     if (m_view.id != 0) {
-        assert(bgfx::isValid(m_backBufferFBH));
-        bgfx::destroy(m_backBufferFBH);
-        m_backBufferFBH.idx = bgfx::kInvalidHandle;
+        assert(bgfx::isValid(m_offScreenFBH));
+        bgfx::destroy(m_offScreenFBH);
+        m_offScreenFBH.idx = bgfx::kInvalidHandle;
         assert(m_nwh != nullptr);
-        m_backBufferFBH = bgfx::createFrameBuffer(const_cast<void*>(m_nwh), uint16_t(m_width), uint16_t(m_height));
+        m_offScreenFBH = bgfx::createFrameBuffer(const_cast<void*>(m_nwh), uint16_t(m_width), uint16_t(m_height));
     } else {
         resetWindow();
     }

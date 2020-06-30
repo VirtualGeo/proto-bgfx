@@ -5,9 +5,11 @@ set(CMAKE_CXX_STANDARD 14) # need by std::make_unique
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(BGFX_ROOT "" CACHE PATH "Path of bgfx-install (bgfx library) on your system")
-#set(BGFX_ROOT "/home/gauthier/tmp/bgfx.cmake/bgfx-install")
 # ------------------------ USER CONFIGURATIONS ----------------------
 #set(BGFX_ROOT <PATH_IN_YOUR_SYSTEM>/bgfx-install) // YOU MUST SET BGFX_ROOT TO COMPILE <----- ATTENTION
+#set(BGFX_ROOT "/home/gauthier/tmp/bgfx.cmake/bgfx-install")
+set(BGFX_ROOT "E:/bgfx/bgfx.cmake/bgfx-install")
+#set(BGFX_ROOT "E:/bgfx/temp/bgfx.cmake/bgfx-install")
 # vscode: settings.json
 #{
 #   "cmake.configureSettings": {

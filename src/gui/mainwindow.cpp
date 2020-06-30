@@ -38,8 +38,8 @@ MainWindow::MainWindow(QWidget *parent, int nbWidget)
 //    QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
 //    m_splitter->addWidget(widgetBgfx);
     for (int i =0; i <nbWidget; ++i) {
-        QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
-//        QOpenGLWidgetBgfx * widgetBgfx = new QOpenGLWidgetBgfx;
+//        QWidgetBgfx * widgetBgfx = new QWidgetBgfx;
+        QOpenGLWidgetBgfx * widgetBgfx = new QOpenGLWidgetBgfx;
 
         m_splitter->addWidget(widgetBgfx);
     }
