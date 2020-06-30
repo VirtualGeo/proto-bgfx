@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QOpenGLWidget>
 #include <entry/windowstate.h>
+#include <QWidget>
 
 class QOpenGLWidgetBgfx : public QOpenGLWidget
 {
@@ -18,6 +19,12 @@ protected: // QOpenglWidget
     void resizeGL(int w, int h) override;
     void paintGL() override;
 
+    void keyPressEvent(QKeyEvent* event) override;
+    void keyReleaseEvent(QKeyEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+
 protected: // Widget
 //    void paintEvent(QPaintEvent *e) override;
 //    void resizeEvent(QResizeEvent *e) override;
@@ -25,6 +32,9 @@ protected: // Widget
 
 private:
     WindowState * m_windowState = nullptr;
+    bgfx::TextureHandle m_backBuffer = BGFX_INVALID_HANDLE;
+    bgfx::TextureHandle m_depthBuffer = BGFX_INVALID_HANDLE;
+
 };
 
 #endif // QOPENGLWIDGETBGFX_H

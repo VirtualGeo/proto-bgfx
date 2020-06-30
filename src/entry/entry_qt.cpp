@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 //    lDefault.setSwapInterval(0);
 //    QSurfaceFormat::setDefaultFormat(lDefault);
 
-    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+//    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
     QApplication a(argc, argv);
     MainWindow w(nullptr, 1);

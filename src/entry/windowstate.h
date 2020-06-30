@@ -87,6 +87,7 @@ public:
     void mouseScrollEvent(int offset);
 
 
+    bgfx::FrameBufferHandle m_offScreenFBH = BGFX_INVALID_HANDLE; // default fbh created by bgfx init
 private:
     //    static std::vector<WindowState*> s_windows;
     bool m_init = false;
@@ -101,7 +102,6 @@ private:
 
     View m_view;
 
-    bgfx::FrameBufferHandle m_backBufferFBH = BGFX_INVALID_HANDLE; // default fbh created by bgfx init
     //    bgfx::FrameBufferHandle m_offscreenFB = BGFX_INVALID_HANDLE;
     //    bgfx::TextureHandle m_backBuffer = BGFX_INVALID_HANDLE;
     //    bgfx::TextureHandle m_depthBuffer = BGFX_INVALID_HANDLE;
