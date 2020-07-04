@@ -4,12 +4,18 @@ project(proto-bgfx VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14) # need by std::make_unique
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_DEBUG_POSTFIX "d")
+set(CMAKE_RELWITHDEBINFO_POSTFIX "rd")
+if(CMAKE_BUILD_TYPE STREQUAL "")
+    set(CMAKE_BUILD_TYPE "Debug")
+endif()
 set(BGFX_ROOT "" CACHE PATH "Path of bgfx-install (bgfx library) on your system")
+#set(BGFX_ROOT "/home/gauthier/tmp/bgfx.cmake/bgfx-install")
+set(BGFX_ROOT "/home/gauthier/tmp3/bgfx.cmake/bgfx-install")
+#set(BGFX_ROOT "E:/bgfx/bgfx.cmake/bgfx-install")
+#set(BGFX_ROOT "E:/bgfx/temp/bgfx.cmake/bgfx-install")
 # ------------------------ USER CONFIGURATIONS ----------------------
 #set(BGFX_ROOT <PATH_IN_YOUR_SYSTEM>/bgfx-install) // YOU MUST SET BGFX_ROOT TO COMPILE <----- ATTENTION
-#set(BGFX_ROOT "/home/gauthier/tmp/bgfx.cmake/bgfx-install")
-set(BGFX_ROOT "E:/bgfx/bgfx.cmake/bgfx-install")
-#set(BGFX_ROOT "E:/bgfx/temp/bgfx.cmake/bgfx-install")
 # vscode: settings.json
 #{
 #   "cmake.configureSettings": {
@@ -27,7 +33,7 @@ set(BGFX_ROOT "E:/bgfx/bgfx.cmake/bgfx-install")
 
 add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 add_definitions(-DMODEL_LOADER_INFO)
-set(USE_SHADERC_LIBRARY False)
+set(USE_SHADERC_LIBRARY True)
 
 # select graphic user interface
 set(GUI_QT 1) #default: GLFW
