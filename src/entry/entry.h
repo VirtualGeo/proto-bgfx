@@ -25,12 +25,14 @@ extern int s_mssaLevel;
 extern int s_textureSamplerFlags;
 
 extern bool s_bgfxInitialized;
+extern int s_nWindow;
 
 uint32_t getResetFlags();
 
 void init(View& view);
 void shutdown();
-void update(const View& view);
+void preRender();
+void render(const View& view);
 
 } // entry
 

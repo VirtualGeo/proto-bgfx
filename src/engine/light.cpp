@@ -44,6 +44,7 @@ void Light::drawDebug()
     bgfx::setViewRect(viewId, 50 + m_id *210, 200, 200, 200);
     bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
     bgfx::setTexture(3, Program::m_sShadowMap, Program::m_shadowMapTexture[m_id]);
+//    bgfx::setTexture(3, Program::m_sShadowMap, Texture::getSampleTexture(Texture::CHECKER_BOARD));
     Geometry::drawQuad();
 
     bgfx::submit(viewId, Program::m_programs[DEBUG_QUAD]);

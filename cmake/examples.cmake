@@ -25,6 +25,7 @@ set(
     02-sponza
     03-branchingTests
     04-nothingToDo
+    05-shadow
     )
 
 foreach(EXAMPLE ${EXAMPLES})

@@ -6,7 +6,11 @@
 #include <cstring>
 #include <math.h>
 
+//#include <algorithm>
+//#include <random>
+
 namespace entry {
+    int s_nWindow = 1;
 
 //    static constexpr int s_nArea = 2;
 //static unsigned int s_nTexture;
@@ -73,7 +77,11 @@ void shutdown()
     }
 }
 
-void update(const View& view)
+void preRender()
+{
+}
+
+void render(const View& view)
 {
     assert(0 <= view.iCamera && view.iCamera < entry::s_scene.m_cameras.size());
     const Camera& camera = entry::s_scene.m_cameras[view.iCamera];

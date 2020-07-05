@@ -375,16 +375,24 @@ void Scene::updateLightShadowMaps()
     for (auto& camera : m_cameras) {
         if (camera.m_spotLightEnable) {
             camera.m_spotLight.updateLightShadowMaps(viewId);
+//            const float ratio = 1.0f;
+//            camera.setViewTransform(ratio, viewId);
             draw(viewId, Shading::SHADOW, mtx, state);
-            //            camera.m_spotLight.drawDebug();
+//            bgfx::setViewRect(viewId, 50 + (viewId - 3) *210, 200, 200, 200);
+//            bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
+//            draw(viewId, Shading::MATERIAL, mtx, state);
+//            //            camera.m_spotLight.drawDebug();
             ++viewId;
+//            bgfx::frame();
             //        if (camera->m_type == Camera::FPS) {
             //            static_cast<CameraFps&>(camera)
 
             //        }
+
         }
     }
-    bgfx::frame();
+//    bgfx::frame();
+    return;
 
     for (auto& spotLight : m_spotLights) {
         spotLight.drawDebug();

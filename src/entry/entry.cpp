@@ -19,6 +19,7 @@ int s_mssaLevel = 0;
 int s_textureSamplerFlags = 0;
 
 bool s_bgfxInitialized = false;
+//int s_nWindow = 1;
 
 //void init(View&) {};
 //int shutdown() {

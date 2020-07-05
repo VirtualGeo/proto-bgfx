@@ -22,6 +22,9 @@ $input v_texcoord0
 
 void main()
 {
+//    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+//    gl_FragColor = packFloatToRgba(0.0);
+//    return;
     if (material_hasOpacityTexture > -0.5) {
         float opacity = texture2D(s_opacity, v_texcoord0).r;
         if (opacity < 0.1) {
@@ -32,7 +35,6 @@ void main()
 
 //    gl_FragColor = vec4_splat(0.0);
 //    return;
-//    gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
 //    gl_FragColor.xyz = vec3_splat(gl_FragCoord.z);
 //    return;
 //    gl_FragColor.w = 1.0;
@@ -47,6 +49,7 @@ void main()
     float depth = v_position.z / v_position.w * 0.5 + 0.5;
 //    float depth = v_position.z / v_position.w;
     gl_FragColor = packFloatToRgba(depth);
+//    gl_FragColor = packFloatToRgba(0.0);
 //    float depth = v_position.z;
 //    depth = 1.1;
 //    float depth = LinearizeDepth(v_position.z);

@@ -74,7 +74,7 @@ public:
     void printDebugMessage();
     void updateCameraPos();
 
-    void resizeOffscreenFB();
+//    void resizeOffscreenFB();
     void resetWindow();
 
 public:
@@ -90,7 +90,7 @@ public:
     bgfx::FrameBufferHandle m_offScreenFBH = BGFX_INVALID_HANDLE; // default fbh created by bgfx init
 private:
     //    static std::vector<WindowState*> s_windows;
-    bool m_init = false;
+//    bool m_init = false;
 
     const void* m_nwh = nullptr;
     const void* m_ndt = nullptr;

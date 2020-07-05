@@ -110,7 +110,9 @@ public:
 //    static bgfx::TextureHandle m_shadowMapTexture;
 
     static bgfx::TextureHandle m_shadowMapTexture[];
-    static const int m_shadowMapSize = 1024;
+//    static const int m_shadowMapSize = 1024;
+    static const int m_shadowMapSize = 2048;
+//    static const int m_shadowMapSize = 4096;
     static bgfx::FrameBufferHandle m_shadowMapFB[];
 
 

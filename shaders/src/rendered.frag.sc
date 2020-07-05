@@ -231,9 +231,9 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, SpotLight light, in
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
     //    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
-    float bias = 0.0001;
+//    float bias = 0.0001;
 //        float bias = max(0.00001 * (1.0 - dot(normal, light.direction)), 0.00005);
-//        float bias = 0.00005 * (1.0 - dot(normal, light.direction));
+        float bias = 0.00001 * (1.0 - dot(normal, light.direction));
     float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
     // PCF

@@ -1,21 +1,17 @@
 #include "windowstate.h"
-#include "engine/geometry.h"
+
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 #include <cassert>
-#include <engine/camerafps.h>
+//#include <engine/camerafps.h>
 #include <engine/geometry.h>
 #include <entry/entry.h>
 #include <list>
 
-#include <algorithm>
 #include <cstring>
-#include <random>
 
-#include <bgfx/bgfx.h>
-#include <utility.h>
-
-#include <thread>
+//#include <utility.h>
+//#include <thread>
 
 std::list<WindowState*> s_windows;
 
@@ -43,7 +39,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
     if (m_view.id == 0) { // Call bgfx::renderFrame before bgfx::init to signal to bgfx not to create a render thread.
         // Most graphics APIs must be used on the same thread that created the window.
         bgfx::renderFrame();
-        std::cout << "[THREAD] bgfx init: " << std::this_thread::get_id() << std::endl;
+//        std::cout << "[THREAD] bgfx init: " << std::this_thread::get_id() << std::endl;
 
         bgfx::Init bgfxInit = {};
         bgfxInit.platformData.ndt = const_cast<void*>(m_ndt);
@@ -75,10 +71,10 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
 
         const bgfx::InternalData* internalData = bgfx::getInternalData();
         std::cout << "[CONTEXT] bgfx init: " << internalData->context << std::endl;
-//        if (m_context != nullptr) {
-//        assert(m_context == nullptr || bgfx::getInternalData()->context == m_context);
-//        assert(m_context == nullptr || bgfx::getInternalData()->context == nullptr);
-//        }
+        //        if (m_context != nullptr) {
+        //        assert(m_context == nullptr || bgfx::getInternalData()->context == m_context);
+        //        assert(m_context == nullptr || bgfx::getInternalData()->context == nullptr);
+        //        }
 
         const bgfx::Caps* caps = bgfx::getCaps();
         assert(caps->supported & BGFX_CAPS_TEXTURE_COMPARE_LEQUAL); // sampler supported
@@ -107,27 +103,14 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF, 1.0f, 0);
         bgfx::touch(0);
 
-        //        Program::init();
-        //        Geometry::init();
-        //        Texture::init();
-
         //        bgfx::frame();
 
         //        Q_ASSERT(m_iWindow == 0);
         bx::mtxIdentity(entry::s_worldTransform);
-        //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
-        //                entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 200.0f }); // question : push_back ?
-        //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 3.0f }); // question : push_back ?
 
-        //                const uint32_t nbCube = 2;
-        //                const uint32_t nbCube = 16;
-        //                        const uint32_t nbCube = 32;
-        //                const uint32_t nbCube = 64;
-        //        initCubeScene();
         entry::s_bgfxInitialized = true;
 
     } else {
-        //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
         m_offScreenFBH = bgfx::createFrameBuffer((void*)(uintptr_t)m_nwh, uint16_t(m_width), uint16_t(m_height));
     }
 
@@ -137,7 +120,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
 
     s_windows.emplace_back(this);
     entry::s_lastTime = std::chrono::high_resolution_clock::now();
-    m_init = true;
+//    m_init = true;
 }
 
 WindowState::~WindowState()
@@ -164,35 +147,11 @@ WindowState::~WindowState()
     s_windows.remove(this);
 }
 
-//WindowState::~WindowState()
-//{
-////    bgfx::destroy(m_offScreenFBH);
-
-//}
-
-//void WindowState::clear()
-//{
-//    bgfx::destroy(m_offScreenFBH);
-//}
 
 void WindowState::render() const
 {
-    //    assert(m_init);
-    //    if (!m_init)
-    //        return;
-
-    //    if (m_view.id != 0) {
-    //        //            assert(bgfx::isValid(m_offScreenFBH));
-    //        bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
-    //    }
     bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
 
-    //    bgfx::PlatformData pdata;
-    //    pdata.context = const_cast<void*>(m_context);
-    //    bgfx::setPlatformData(pdata);
-    //        bgfx::setViewFrameBuffer(m_id, m_offScreenFBH);
-    //    bgfx::setViewFrameBuffer(0, BGFX_INVALID_HANDLE); // default back buffer
-    // Set view 0 default viewport.
     bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
@@ -201,29 +160,18 @@ void WindowState::render() const
     bgfx::setViewClear(m_view.id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
     bgfx::touch(m_view.id);
 
-    //            bgfx::touch(m_id);
-
-    //    return;
-
     //    const float ratio = float(m_width) / m_height;
-    entry::update(m_view);
+    entry::render(m_view);
     //    entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
     return;
-
-    //    const auto& camera = entry::s_scene.m_cameras[m_iCamera];
-    //    camera.setViewTransform(ratio, m_id);
 }
 
 uintptr_t WindowState::renderAllWindow()
 {
-    assert(m_init);
+//    assert(m_init);
     assert(entry::s_bgfxInitialized);
-//    assert(m_context == nullptr || bgfx::getInternalData()->context == m_context);
-    //    if (!m_init)
-    //        return 0;
 
     const auto currentTime = std::chrono::high_resolution_clock::now();
-
     //    //    s_currentTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime).count();
     //    //    s_currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch()).count() / 1000000.0;
 
@@ -231,7 +179,6 @@ uintptr_t WindowState::renderAllWindow()
     entry::s_lastTime = currentTime;
     entry::s_sum += entry::s_deltaTime;
 
-    //    qDebug() << g_epoch << m_sum << g_fps;
     if (entry::s_counter >= entry::s_epoch) {
         //        entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum) / 2; // update g_fps each 0.5 sec
         entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum);
@@ -242,39 +189,20 @@ uintptr_t WindowState::renderAllWindow()
     ++entry::s_counter;
     printDebugMessage();
 
-    //    updateCameraPos();
     for (WindowState* window : s_windows) {
         window->updateCameraPos();
     }
 
-    //    if (m_id == 0) {
+    entry::preRender();
 
-    //    entry::s_scene.setLightUniforms();
-    //    entry::s_scene.updateLightShadowMaps();
-    //        bgfx::frame();
-
-    //        int iWindow = 0;
-    //    bgfx::setViewFrameBuffer(0, m_offscreenFB);
     for (const WindowState* window : s_windows) {
-        //        entry::s_scene.setLightShadowSamplers();
         window->render();
-        //        ++iWindow;
     }
-    //    bgfx::frame();
-    //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X00FF00FF);
-    //    bgfx::setViewFrameBuffer(0, BGFX_INVALID_HANDLE);
-    //    render();
-
-    //        g_scene.draw(1, g_program, g_mtx, state, g_cameraPos);
 
     // Advance to next frame. Process submitted rendering primitives.
-    //    if (m_id == 0) { // avoid flipping, put F1 to show (only with direct3D)
     bgfx::frame();
     //    usleep(10000);
     ++entry::s_iFrame;
-    //        entry::s_scene.updateLightShadowMaps();
-    //        entry::s_scene.setLightUniforms();
-    //    }
     //    return bgfx::getInternal(m_offScreenFBH);
     return 0;
 }
@@ -339,8 +267,8 @@ void WindowState::updateCameraPos()
     }
 }
 
-void WindowState::resizeOffscreenFB()
-{
+//void WindowState::resizeOffscreenFB()
+//{
     //    if (bgfx::isValid(m_offscreenFB)) {
     //        bgfx::destroy(m_offscreenFB);
     //        m_offscreenFB = BGFX_INVALID_HANDLE;
@@ -358,7 +286,7 @@ void WindowState::resizeOffscreenFB()
     //    m_depthBuffer = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT, NULL);
     //    bgfx::TextureHandle fbtextures[2] = { m_offScreenFBH, m_depthBuffer };
     //    m_offscreenFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, false);
-}
+//}
 
 void WindowState::resetWindow()
 {
@@ -389,7 +317,7 @@ void WindowState::resizeEvent(int width, int height)
         resetWindow();
     }
 
-    resizeOffscreenFB();
+//    resizeOffscreenFB();
 
     const float ratio = float(m_width) / m_height;
     m_view.ratio = ratio;
