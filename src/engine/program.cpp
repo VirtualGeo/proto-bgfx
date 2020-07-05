@@ -107,7 +107,8 @@ void Program::init()
                 m_shadowMapSize,
                 false,
                 1,
-                bgfx::TextureFormat::BGRA8,
+//                bgfx::TextureFormat::BGRA32,
+                bgfx::TextureFormat::RGBA16,
                 BGFX_TEXTURE_RT),
 
             bgfx::createTexture2D(
@@ -116,6 +117,7 @@ void Program::init()
                 false,
                 1,
                 bgfx::TextureFormat::D16,
+//                bgfx::TextureFormat::D32F,
                 BGFX_TEXTURE_RT_WRITE_ONLY),
         };
         m_shadowMapTexture[i] = fbtextures[0];
@@ -311,7 +313,8 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
         break;
     }
 
-    bgfx::submit(id, m_programs[shading], 1.0);
+//    bgfx::submit(id, m_programs[shading], 1.0);
+    bgfx::submit(id, m_programs[shading]);
     //    bgfx::submit(id, m_programs[shading], 0, BGFX_DISCARD_NONE | BGFX_CLEAR_DISCARD_COLOR_0);
 }
 

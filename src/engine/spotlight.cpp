@@ -5,6 +5,8 @@
 #include <iostream>
 #include <cstring>
 
+//#include <entry/entry.h>
+
 bx::Vec3 g_up = {0.0, 1.0, 0.0};
 
 SpotLight::SpotLight(bx::Vec3 direction, bx::Vec3 position, float cutOff, float outerCutOff, float constant, float linear, float quadratic)
@@ -21,9 +23,11 @@ SpotLight::SpotLight(bx::Vec3 direction, bx::Vec3 position, float cutOff, float 
 
 void SpotLight::updateLightShadowMaps(int viewId)
 {
-    bgfx::setViewRect(viewId, 0, 0, m_shadowMapSize, m_shadowMapSize);
+//    bgfx::setViewRect(viewId, 0, 0, m_shadowMapSize, m_shadowMapSize);
+    bgfx::setViewRect(viewId, 0, 0, Program::m_shadowMapSize, Program::m_shadowMapSize);
     bgfx::setViewFrameBuffer(viewId, Program::m_shadowMapFB[m_id]);
 
+//    bx::mtxRotateXY(m_lightSpaceMatrix, entry::s_iFrame, entry::s_iFrame);
 
     bgfx::setUniform(Program::m_uLightSpaceMatrix, m_lightSpaceMatrix);
 

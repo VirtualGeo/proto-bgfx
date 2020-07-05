@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 //    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
     QApplication a(argc, argv);
-    MainWindow w(nullptr, 1);
+    MainWindow w(nullptr, entry::s_nWindow);
     w.show();
 //    MainWindow w2(nullptr, 2);
 //    w2.show();

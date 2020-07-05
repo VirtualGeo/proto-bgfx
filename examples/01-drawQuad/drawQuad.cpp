@@ -5,6 +5,7 @@
 //class ExampleHelloWorld : public entry::AppI {
 //public:
 namespace entry {
+    int s_nWindow = 1;
 
 void init(View & view)
 {
@@ -20,7 +21,12 @@ void shutdown()
     Program::shutdown();
 }
 
-void update(const View & view)
+void preRender()
+{
+}
+
+
+void render(const View & view)
 {
 //    const Camera & camera = entry::s_scene.m_cameras[view.iCamera];
 //    camera.setViewTransform(view.ratio, view.id);

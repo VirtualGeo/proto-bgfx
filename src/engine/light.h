@@ -28,7 +28,7 @@ public:
 
 //    bgfx::FrameBufferHandle m_shadowMapFB;
 //    bgfx::TextureHandle m_shadowMapTexture;
-    const int m_shadowMapSize = 1024;
+//    const int m_shadowMapSize = 1024;
 
 //    bgfx::UniformHandle m_sShadowMap;
 
