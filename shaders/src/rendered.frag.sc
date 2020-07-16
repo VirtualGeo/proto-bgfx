@@ -1,15 +1,15 @@
-$input v_fragPos // vec3
+$input v_pos // vec3
 $input v_normal // vec3
 $input v_texcoord0 // vec2
 //$input v_view // vec3
-//$input v_fragPosLightSpace
+//$input v_posLightSpace
 
 //#if N_SPOT_LIGHT > 0
-$input v_fragPosLightSpace_0
-$input v_fragPosLightSpace_1
+$input v_posLightSpace_0
+$input v_posLightSpace_1
 //#endif
 
-//$input v_fragPosLightSpace_2
+//$input v_posLightSpace_2
 //$input v_shadowCoord
 
 #include <bgfx_shader.sh>
@@ -36,7 +36,7 @@ void main()
     //        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
     //        return;
     //    }
-    //    gl_FragColor =  vec4(v_fragPosLightSpace.xyz, 1.0);
+    //    gl_FragColor =  vec4(v_posLightSpace.xyz, 1.0);
     //    return;
 
     if (material_hasOpacityTexture > -0.5) {
@@ -90,7 +90,7 @@ void main()
 
     // properties
     vec3 norm = normalize(v_normal);
-    vec3 viewDir = normalize(viewPos - v_fragPos);
+    vec3 viewDir = normalize(viewPos - v_pos);
 
     // == =====================================================
     // Our lighting is set up in 3 phases: directional, point lights and an optional flashlight
@@ -108,18 +108,18 @@ void main()
         // phase 2: point lights
 #if N_POINT_LIGHT > 0
     for (int i = 0; i < N_POINT_LIGHT; i++)
-        result += CalcPointLight(i, norm, v_fragPos, viewDir);
+        result += CalcPointLight(i, norm, v_pos, viewDir);
 #endif
         // phase 3: spot light
 #if N_SPOT_LIGHT > 0
     for (int i = 0; i < N_SPOT_LIGHT; i++) {
         if (i == 0) {
-            result += CalcSpotLight(i, norm, v_fragPos, viewDir, v_fragPosLightSpace_0);
+            result += CalcSpotLight(i, norm, v_pos, viewDir, v_posLightSpace_0);
 
         } else if (i == 1) {
-            result += CalcSpotLight(i, norm, v_fragPos, viewDir, v_fragPosLightSpace_1);
+            result += CalcSpotLight(i, norm, v_pos, viewDir, v_posLightSpace_1);
 //        } else {
-//            result += CalcSpotLight(i, norm, v_fragPos, viewDir, v_fragPosLightSpace_2);
+//            result += CalcSpotLight(i, norm, v_pos, viewDir, v_posLightSpace_2);
         }
     }
 #endif
@@ -289,7 +289,7 @@ vec3 CalcSpotLight(int iLight, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fra
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
 
-    //    float shadow = ShadowCalculation(v_fragPosLightSpace);
+    //    float shadow = ShadowCalculation(v_posLightSpace);
     float shadow = 0.0;
 //    if (distance > 10.0)
         shadow = ShadowCalculation(fragPosLightSpace, normal, light, iLight);

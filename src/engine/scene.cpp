@@ -375,23 +375,22 @@ void Scene::updateLightShadowMaps()
     for (auto& camera : m_cameras) {
         if (camera.m_spotLightEnable) {
             camera.m_spotLight.updateLightShadowMaps(viewId);
-//            const float ratio = 1.0f;
-//            camera.setViewTransform(ratio, viewId);
+            //            const float ratio = 1.0f;
+            //            camera.setViewTransform(ratio, viewId);
             draw(viewId, Shading::SHADOW, mtx, state);
-//            bgfx::setViewRect(viewId, 50 + (viewId - 3) *210, 200, 200, 200);
-//            bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
-//            draw(viewId, Shading::MATERIAL, mtx, state);
-//            //            camera.m_spotLight.drawDebug();
+            //            bgfx::setViewRect(viewId, 50 + (viewId - 3) *210, 200, 200, 200);
+            //            bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
+            //            draw(viewId, Shading::MATERIAL, mtx, state);
+            //            //            camera.m_spotLight.drawDebug();
             ++viewId;
-//            bgfx::frame();
+            //            bgfx::frame();
             //        if (camera->m_type == Camera::FPS) {
             //            static_cast<CameraFps&>(camera)
 
             //        }
-
         }
     }
-//    bgfx::frame();
+    //    bgfx::frame();
     return;
 
     for (auto& spotLight : m_spotLights) {
@@ -496,7 +495,6 @@ void Scene::setLightShadowSamplers()
     }
 }
 
-
 void Scene::renderView(const View& view, const float mtx[16])
 {
     const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
@@ -517,7 +515,7 @@ void Scene::renderView(const View& view, const float mtx[16])
     //    bx::mtxProj(proj, camera.m_fov, ratio, 0.01f, 100.0f,
     //        bgfx::getCaps()->homogeneousDepth);
     //    bgfx::setViewTransform(viewId, view, proj);
-//    camera.setViewTransform(view.ratio, view.id);
+    //    camera.setViewTransform(view.ratio, view.id);
     camera.setViewTransform(view);
 
     switch (view.shading) {
@@ -537,16 +535,23 @@ void Scene::renderView(const View& view, const float mtx[16])
 void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx, const uint64_t state) const
 {
     for (const Object& object : m_objects) {
-        //    const uint nbObjects = m_objects.size();
-        //            bgfx::setTransform(mtx);
-        //            bgfx::setState(state);
-        //        for (int i =0; i <nbObjects; ++i) {
-        //            const Object & object = m_objects[i];
-
         object.draw(id, shading, mtx, state, m_materials, m_textures);
-
-        //             bgfx::submit(id, program, 0, i != nbObjects - 1);
+//        bgfx::submit(id, Program::m_programs[shading]);
     }
+
+    //    const uint nbObjects = m_objects.size();
+    //            bgfx::setTransform(mtx);
+    //            bgfx::setState(state);
+    //    for (int i = 0; i < nbObjects; ++i) {
+//    for (auto it = m_objects.begin(), itEnd = m_objects.end(); it != itEnd; ++it) {
+//        //        const Object& object = m_objects[i];
+//        const Object& object = *it;
+
+//        object.draw(id, shading, mtx, state, m_materials, m_textures);
+
+//        //             bgfx::submit(id, program, 0, i != nbObjects - 1);
+//        bgfx::submit(id, Program::m_programs[shading], 0, (it == itEnd - 1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_NONE);
+//    }
 }
 
 //void Scene::addLight(Light &&light)
