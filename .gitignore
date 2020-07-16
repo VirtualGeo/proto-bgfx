@@ -9,3 +9,4 @@ CMakeLists.txt.user
 
 shaders/bin
 shaders/**/*.glsl
+*.bin
