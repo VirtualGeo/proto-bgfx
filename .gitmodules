@@ -4,3 +4,6 @@
 [submodule "modules/tinyobjloader"]
 	path = modules/tinyobjloader
 	url = https://github.com/tinyobjloader/tinyobjloader.git
+[submodule "modules/meshoptimizer"]
+	path = modules/meshoptimizer
+	url = https://github.com/zeux/meshoptimizer.git

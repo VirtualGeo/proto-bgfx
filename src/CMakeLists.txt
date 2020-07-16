@@ -95,6 +95,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     BGFX::BGFX
 #    bgfx::bgfx
     tinyobjloader
+#    meshoptimizer
 #    OptickCore
     ${CMAKE_DL_LIBS} #dlclose glibc
 )

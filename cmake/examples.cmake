@@ -13,6 +13,7 @@ function( add_example ARG_NAME )
 
     target_link_libraries(${EXAMPLE_PROJECT_NAME} PUBLIC
         src
+        bgfxUtils
     )
 
 endfunction()

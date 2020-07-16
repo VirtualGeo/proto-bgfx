@@ -333,6 +333,7 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
 
 //    bgfx::submit(id, m_programs[shading], 1.0);
     bgfx::submit(id, m_programs[shading]);
+
     //    bgfx::submit(id, m_programs[shading], 0, BGFX_DISCARD_NONE | BGFX_CLEAR_DISCARD_COLOR_0);
 }
 
