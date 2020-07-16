@@ -35,6 +35,7 @@ void init(View& view)
 //        entry::s_scene.addModel("/home/gauthier/Downloads/AmazonLumberyardBistro/exterior.obj");
 //    g_mesh = meshLoad("/home/gauthier/tmp/bgfx.cmake/bgfx/examples/runtime/meshes/sanMiguel.bin");
     g_mesh = meshLoad((std::string(PROJECT_DIR) + "examples/runtime/meshes/sanMiguel.bin").c_str());
+//    g_mesh = meshLoad("/home/gauthier/tmp/bgfx.cmake/bgfx/examples/runtime/meshes/sanMiguel.bin");
 //    g_mesh = meshLoad("/home/gauthier/tmp/bgfx.cmake/bgfx/examples/runtime/meshes/exterior.bin");
 
     g_program = loadProgram("fast.vert", "fast.frag");
