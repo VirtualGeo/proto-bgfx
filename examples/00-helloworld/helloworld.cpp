@@ -2,8 +2,6 @@
 #include <engine/geometry.h>
 #include <entry/entry.h>
 
-//class ExampleHelloWorld : public entry::AppI {
-//public:
 namespace entry {
     int s_nWindow = 1;
 
@@ -26,12 +24,3 @@ void render(const View& view)
 }
 
 } // entry
-
-//private:
-//};
-
-//int main() {
-//    ExampleHelloWorld app;
-////    return entry::runApp(&app);
-//    return 0;
-//}

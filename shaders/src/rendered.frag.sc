@@ -1,11 +1,15 @@
 $input v_fragPos // vec3
 $input v_normal // vec3
 $input v_texcoord0 // vec2
-$input v_view // vec3
+//$input v_view // vec3
 //$input v_fragPosLightSpace
+
+//#if N_SPOT_LIGHT > 0
 $input v_fragPosLightSpace_0
 $input v_fragPosLightSpace_1
-$input v_fragPosLightSpace_2
+//#endif
+
+//$input v_fragPosLightSpace_2
 //$input v_shadowCoord
 
 #include <bgfx_shader.sh>
@@ -15,8 +19,7 @@ $input v_fragPosLightSpace_2
 
 // function prototypes
 #if N_DIR_LIGHT > 0
-                            vec3
-                            CalcDirLight(int iLight, vec3 normal, vec3 viewDir);
+vec3 CalcDirLight(int iLight, vec3 normal, vec3 viewDir);
 #endif
 #if N_POINT_LIGHT > 0
 vec3 CalcPointLight(int iLight, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -115,10 +118,8 @@ void main()
 
         } else if (i == 1) {
             result += CalcSpotLight(i, norm, v_fragPos, viewDir, v_fragPosLightSpace_1);
-
-        } else {
-
-            result += CalcSpotLight(i, norm, v_fragPos, viewDir, v_fragPosLightSpace_2);
+//        } else {
+//            result += CalcSpotLight(i, norm, v_fragPos, viewDir, v_fragPosLightSpace_2);
         }
     }
 #endif
@@ -220,9 +221,8 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, SpotLight light, in
         closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_0, vec2(projCoords.x, projCoords.y)));
     } else if (iLight == 1) {
         closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_1, vec2(projCoords.x, projCoords.y)));
-
-    } else {
-        closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_2, vec2(projCoords.x, projCoords.y)));
+//    } else {
+//        closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_2, vec2(projCoords.x, projCoords.y)));
     }
     //    closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_1, vec2(projCoords.x, projCoords.y)));
     //    float closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_0, vec2(projCoords.x, projCoords.y)));

@@ -5,11 +5,18 @@ $input a_texcoord0 // vec2
 $output v_fragPos // vec3
 $output v_normal // vec3
 $output v_texcoord0 // vec2
-$output v_view // vec3
+//$output v_view // vec3
+
+
 //$output v_fragPosLightSpace
+//#if N_SPOT_LIGHT > 0
+//#if N_LIGHT > 0
 $output v_fragPosLightSpace_0
+//#if N_LIGHT > 1
 $output v_fragPosLightSpace_1
-$output v_fragPosLightSpace_2
+//#endif
+//#endif
+//$output v_fragPosLightSpace_2
 //$output v_shadowCoord
 
 #include <bgfx_shader.sh>
@@ -40,11 +47,15 @@ void main()
 //        SpotLight spotLight_0 = spotLights(0);
     //    SpotLight spotLight_1 = spotLights(1);
 
+#if N_SPOT_LIGHT > 0
     spotLights(spotLight0, 0);
     v_fragPosLightSpace_0 = mul(spotLight0.lightSpaceMatrix, vec4(v_fragPos, 1.0));
 
+#if N_SPOT_LIGHT > 1
     spotLights(spotLight1, 1);
     v_fragPosLightSpace_1 = mul(spotLight1.lightSpaceMatrix, vec4(v_fragPos, 1.0));
+#endif
+#endif
 
 //    v_fragPosLightSpace_0 = mul(spotLights(0).lightSpaceMatrix, vec4(v_fragPos, 1.0));
 //    v_fragPosLightSpace_1 = mul(spotLights(1).lightSpaceMatrix, vec4(v_fragPos, 1.0));

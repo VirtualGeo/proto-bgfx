@@ -1,29 +1,27 @@
-
 #include <engine/geometry.h>
 #include <entry/entry.h>
 
-//class ExampleHelloWorld : public entry::AppI {
-//public:
 namespace entry {
     int s_nWindow = 2;
 
 void init(View& view)
 {
-    Geometry::init();
-    Texture::init();
-    Program::init();
     // ------------------------------- LOAD MODEL
     //                 g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     if (view.id == 0) {
+        Geometry::init();
+        Texture::init();
+        Program::s_nSpotLight = 2;
+        Program::init();
+
         entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/sponza/sponza.obj");
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
     } else {
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
     }
-    view.shading = Shading::RENDERED;
     //    entry::s_scene.m_cameras[0].setPos(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
 
-    entry::s_nWindow = 2;
+//    entry::s_nWindow = 2;
     //                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel-low-poly.obj");
     //                entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel.obj");
@@ -73,12 +71,3 @@ void render(const View& view)
 }
 
 } // entry
-
-//private:
-//};
-
-//int main() {
-//    ExampleHelloWorld app;
-////    return entry::runApp(&app);
-//    return 0;
-//}

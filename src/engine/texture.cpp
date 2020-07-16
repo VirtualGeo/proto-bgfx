@@ -18,6 +18,8 @@
 //u_int64_t Texture::s_samplerFlags = 0 | BGFX_SAMPLER_NONE;
 uint64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE;
 //uint64_t Texture::s_textureSamplerFlags = 0 | BGFX_TEXTURE_NONE | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_ANISOTROPIC;
+bool Texture::s_initialized = false;
+bool Texture::s_shutdowned = false;
 
 static const uint8_t s_checkerBoardImage[12] = {0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF};
 static const uint8_t s_whiteImage[3] = {0xFF, 0xFF, 0xFF};
@@ -272,18 +274,23 @@ void Texture::createTextureHandle()
 
 void Texture::init()
 {
+    assert(! s_initialized);
     for (int i =0; i <Sample::Count; ++i) {
         m_sampleTextures[i].createTextureHandle();
     }
 
+    s_initialized = true;
 }
 
 void Texture::shutdown()
 {
+    assert(! s_shutdowned);
     for (int i =0; i <Sample::Count; ++i) {
 //        delete m_sampleTextures[i];
         bgfx::destroy(m_sampleTextures[i].textureHandle());
     }
+
+    s_shutdowned = true;
 }
 
 bgfx::TextureHandle Texture::getSampleTexture(Texture::Sample sample)

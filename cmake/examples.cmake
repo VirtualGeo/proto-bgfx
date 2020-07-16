@@ -13,20 +13,20 @@ function( add_example ARG_NAME )
 
     target_link_libraries(${EXAMPLE_PROJECT_NAME} PUBLIC
         src
-        )
+    )
 
 endfunction()
 
 
-set(
-    EXAMPLES
+set(EXAMPLES
     00-helloworld
     01-drawQuad
     02-sponza
     03-branchingTests
     04-nothingToDo
     05-shadow
-    )
+    06-sanMiguel
+)
 
 foreach(EXAMPLE ${EXAMPLES})
     add_example(${EXAMPLE})

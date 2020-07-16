@@ -76,6 +76,8 @@ private:
     //    bgfx::TextureInfo m_texInfo;
     //    bimg::Orientation::Enum m_orientation;
     bool m_last = true;
+    static bool s_initialized;
+    static bool s_shutdowned;
     //        static u_int64_t s_textureFlags;
     //        static u_int64_t s_samplerFlags;
 

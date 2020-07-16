@@ -48,9 +48,15 @@ bgfx::UniformHandle Program::m_uDirLights;
 bgfx::UniformHandle Program::m_uSpotLights;
 bgfx::UniformHandle Program::m_uPointLights;
 
+unsigned int Program::s_nDirLight = 0;
+unsigned int Program::s_nSpotLight = 0;
+unsigned int Program::s_nPointLight = 0;
+
+bool Program::s_initialized = false;
+bool Program::s_shutdowned = false;
 
 bgfx::UniformHandle Program::m_hasDiffuseTexture;
-bgfx::UniformHandle Program::m_diffuseTexture;
+//bgfx::UniformHandle Program::m_diffuseTexture;
 //bgfx::UniformHandle Program::m_nAdditionalTexture;
 
 //bgfx::ShaderHandle loadShader(const char* filename);
@@ -58,6 +64,7 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
 
 void Program::init()
 {
+    assert(! s_initialized);
 //    m_caps = caps;
 
     //    const char * buff[256];
@@ -126,13 +133,14 @@ void Program::init()
     }
 
 
-    m_diffuseTexture = bgfx::createUniform("diffuseTexture", bgfx::UniformType::Sampler);
+//    m_diffuseTexture = bgfx::createUniform("diffuseTexture", bgfx::UniformType::Sampler);
     m_hasDiffuseTexture = bgfx::createUniform("hasDiffuseTexture", bgfx::UniformType::Vec4);
 //    m_nAdditionalTexture = bgfx::createUniform("nAdditionalTexture", bgfx::UniformType::Vec4);
 
 
     for (int i = 0; i < Shading::Count; ++i) {
         m_programs[i] = BGFX_INVALID_HANDLE;
+        std::string defines = "";
         //        if (i == Shading::RENDERED)
         //            continue;
 //        if (i != Shading::MATERIAL)
@@ -142,9 +150,15 @@ void Program::init()
         if (i == Shading::EMISSIVE)
             continue;
 
-        const std::string& shadingFileName = shadingFileNames[i];
+        if (i == Shading::RENDERED) {
+//            defines = "N_SPOT_LIGHT=2;";
+            defines = "N_POINT_LIGHT=" + std::to_string(s_nPointLight)
+                    + ";N_DIR_LIGHT=" + std::to_string(s_nDirLight)
+                    + ";N_SPOT_LIGHT=" + std::to_string(s_nSpotLight);
+        }
 
-        m_programs[i] = loadProgram(shadingFileName, "");
+        const std::string& shadingFileName = shadingFileNames[i];
+        m_programs[i] = loadProgram(shadingFileName, defines.c_str());
     }
 
 
@@ -155,10 +169,13 @@ void Program::init()
     }
     bgfx::setUniform(m_uDepthScaleOffset, depthScaleOffset);
     bgfx::touch(0);
+
+    s_initialized = true;
 }
 
 void Program::shutdown()
 {
+    assert(! s_shutdowned);
     //        int i= Shading::NORMAL;
     for (int i = 0; i < Shading::Count; ++i) {
         if (bgfx::isValid(m_programs[i]))
@@ -207,9 +224,10 @@ void Program::shutdown()
 //    bgfx::destroy(m_diffuseColor);
 //    bgfx::destroy(m_specularTexture);
 
-    bgfx::destroy(m_diffuseTexture);
+//    bgfx::destroy(m_diffuseTexture);
     bgfx::destroy(m_hasDiffuseTexture);
 //    bgfx::destroy(m_nAdditionalTexture);
+    s_shutdowned = true;
 }
 
 void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material, const Textures& textures)
@@ -248,7 +266,7 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
             // const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
             float vec4[4] = {1.0f};
             bgfx::setUniform(m_hasDiffuseTexture, vec4);
-            bgfx::setTexture(0, m_diffuseTexture, texture.textureHandle(), Texture::s_textureSamplerFlags);
+//            bgfx::setTexture(0, m_diffuseTexture, texture.textureHandle(), Texture::s_textureSamplerFlags);
 
             bgfx::setTexture(0, m_sDiffuse,
                 texture.textureHandle(), Texture::s_textureSamplerFlags);
@@ -263,7 +281,7 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
             float vec4[4] = {0.0f};
             bgfx::setUniform(m_hasDiffuseTexture, vec4);
             //            bgfx::setTexture(0, m_sDiffuse, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
-            bgfx::setTexture(0, m_diffuseTexture, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
+//            bgfx::setTexture(0, m_diffuseTexture, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
 
             bgfx::setTexture(0, m_sDiffuse, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
         }
@@ -456,13 +474,14 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
     strStream << file.rdbuf();
     file.close();
     //    const uint32_t srcShaderNameHash = bx::hash<bx::HashMurmur2A>(srcShaderName);
+    // shader can include other file, we need to hash all called files
     const uint32_t srcShaderHash = bx::hash<bx::HashMurmur2A>(strStream.str().c_str());
     //    std::ifstream file;
     //    std::string typeStr = ShaderType::Vertex ? ".vert" : ".frag";
     const uint32_t shaderDefinesHash = bx::hash<bx::HashMurmur2A>(pShaderDefines);
     const std::string binShaderName = filename
-        + "." + std::to_string(srcShaderHash)
-        + "." + std::to_string(shaderDefinesHash)
+//        + "." + std::to_string(srcShaderHash)
+//        + "." + std::to_string(shaderDefinesHash)
         + (shaderType == ShaderType::Vertex ? ".vert" : ".frag");
 
     //    std::string typeStr = "";
@@ -478,8 +497,8 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
         g_binShaderLoaded.insert(binFilePath);
 
         file = std::ifstream(binFilePath, std::ios::binary);
-        if (!file.is_open()) {
-            std::cout << "[PROGRAM] no system bin file : " << binFilePath << std::endl;
+//        if (!file.is_open()) {
+//            std::cout << "[PROGRAM] no system bin file : " << binFilePath << std::endl;
 
             //            std::cout << "[main] Failed to load '" << filePath << "' '" << shaderName << "'"
             //                      << std::endl;
@@ -495,7 +514,7 @@ bgfx::ShaderHandle loadShader(const std::string& filename, ShaderType shaderType
             //            file.close();
             //            exit(1);
             //            return BGFX_INVALID_HANDLE;
-        }
+//        }
         binFile = true;
     }
     long begin = file.tellg();

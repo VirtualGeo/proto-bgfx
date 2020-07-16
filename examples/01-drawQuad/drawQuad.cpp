@@ -2,8 +2,6 @@
 #include <entry/entry.h>
 #include <engine/geometry.h>
 
-//class ExampleHelloWorld : public entry::AppI {
-//public:
 namespace entry {
     int s_nWindow = 1;
 
@@ -25,7 +23,6 @@ void preRender()
 {
 }
 
-
 void render(const View & view)
 {
 //    const Camera & camera = entry::s_scene.m_cameras[view.iCamera];
@@ -43,12 +40,3 @@ void render(const View & view)
 }
 
 } // entry
-
-//private:
-//};
-
-//int main() {
-//    ExampleHelloWorld app;
-////    return entry::runApp(&app);
-//    return 0;
-//}
