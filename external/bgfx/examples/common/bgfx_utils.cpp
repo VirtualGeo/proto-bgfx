@@ -592,7 +592,6 @@ MeshB* meshLoad(bx::ReaderSeekerI* _reader, bool _ramcopy)
 
 MeshB* meshLoad(const char* _filePath, bool _ramcopy)
 {
-#ifdef AUTO_GIT_PARTITION
     std::ifstream sourceFile;
     sourceFile.open(_filePath, std::ios::in | std::ios::ate | std::ios::binary);
     //        assert(sourceFile.is_open());
@@ -602,34 +601,8 @@ MeshB* meshLoad(const char* _filePath, bool _ramcopy)
     char buff[lenBuff];
     const std::string filePath(_filePath);
 
-    // generate partition if file is to big for git repo
-    if (sourceFile.is_open()) {
-        size_t fileSize = sourceFile.tellg();
-        if (fileSize > maxPartSize) {
-            std::cout << "to big file for git repo (generating partition) : fileSize = " << fileSize << std::endl;
-            sourceFile.seekg(0);
-//            size_t counter = 0;
-            int i = 0;
-            do {
-                std::ofstream partFile(filePath + ".part" + std::to_string(i), std::ios::out | std::ios::binary);
-                size_t cpt = 0;
-                do {
-                    sourceFile.read(buff, lenBuff);
-                    partFile.write(buff, sourceFile.gcount());
-
-                    cpt += sourceFile.gcount();
-//                    counter += sourceFile.gcount();
-                } while (sourceFile.gcount() > 0 && cpt < maxPartSize);
-                partFile.close();
-                ++i;
-            } while (sourceFile.gcount() > 0);
-
-//            std::cout << "counter = " << counter << std::endl;
-        }
-        sourceFile.close();
-
     // if file not exist, create single file from partitions
-    } else {
+    if (! sourceFile.is_open()) {
         sourceFile.close();
         std::ofstream outFile(_filePath, std::ios::out | std::ios::binary);
         assert(outFile.is_open());
@@ -655,8 +628,35 @@ MeshB* meshLoad(const char* _filePath, bool _ramcopy)
         }
         outFile.close();
 //        std::cout << "counter = " << counter << std::endl;
-    }
+
+#ifdef AUTO_GIT_PARTITION
+    // generate partition if file is to big for git repo
+    } else {
+        size_t fileSize = sourceFile.tellg();
+        if (fileSize > maxPartSize) {
+            std::cout << "to big file for git repo (generating partition) : fileSize = " << fileSize << std::endl;
+            sourceFile.seekg(0);
+//            size_t counter = 0;
+            int i = 0;
+            do {
+                std::ofstream partFile(filePath + ".part" + std::to_string(i), std::ios::out | std::ios::binary);
+                size_t cpt = 0;
+                do {
+                    sourceFile.read(buff, lenBuff);
+                    partFile.write(buff, sourceFile.gcount());
+
+                    cpt += sourceFile.gcount();
+//                    counter += sourceFile.gcount();
+                } while (sourceFile.gcount() > 0 && cpt < maxPartSize);
+                partFile.close();
+                ++i;
+            } while (sourceFile.gcount() > 0);
+
+//            std::cout << "counter = " << counter << std::endl;
+        }
+        sourceFile.close();
 #endif
+    }
 
     bx::FileReaderI* reader = entry::getFileReader();
     if (bx::open(reader, _filePath)) {
