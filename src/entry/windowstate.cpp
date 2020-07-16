@@ -220,6 +220,7 @@ void WindowState::printDebugMessage()
         //        if (m_iWig)
         //        const bgfx::Stats* stats = bgfx::getStats();
         int line = -1;
+        line = 20;
         bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats | F2:Vsync | F3:Msaa | F4:Sampler | F5:Shading | F6: | F7:");
         //        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.2f", g_fps);
         //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Viewport shading: %s", g_viewportShading.c_str());

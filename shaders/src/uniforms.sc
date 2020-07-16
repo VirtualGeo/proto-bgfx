@@ -1,7 +1,9 @@
 
 // source: https://learnopengl.com/code_viewer_gh.php?code=src/2.lighting/6.multiple_lights/6.multiple_lights.fs
 // ------------------------------------ DIR_LIGHT
-#define N_DIR_LIGHT 0
+#ifndef N_DIR_LIGHT
+#define N_DIR_LIGHT 1
+#endif
 #if N_DIR_LIGHT > 0
 struct DirLight {
     vec3 ambient;
@@ -22,10 +24,10 @@ uniform vec4 u_dirLights[N_DIR_LIGHT_VEC4 * N_DIR_LIGHT];
 #endif
 
 
-
-
 // ------------------------------------ SPOT_LIGHT
-#define N_SPOT_LIGHT 2
+#ifndef N_SPOT_LIGHT
+#define N_SPOT_LIGHT 0
+#endif
 #if N_SPOT_LIGHT > 0
 struct SpotLight {
     vec3 ambient;
@@ -82,7 +84,9 @@ varName.lightSpaceMatrix = mat4(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 5], \
 
 
 // ------------------------------------ POINT_LIGHT
+#ifndef N_POINT_LIGHT
 #define N_POINT_LIGHT 0
+#endif
 #if N_POINT_LIGHT > 0
 struct PointLight {
     vec3 ambient;
@@ -107,6 +111,8 @@ uniform vec4 u_pointLights[N_POINT_LIGHT_VEC4 * N_POINT_LIGHT];
 #endif
 //#define nbPointLights u_pointLights[0].w
 
+#define N_LIGHT (N_SPOT_LIGHT + N_POINT_LIGHT + N_DIR_LIGHT)
+
 
 // ------------------------------------ MATERIAL
 struct Material {
@@ -126,16 +132,20 @@ uniform vec4 u_material[4];
 #define material_hasDiffuseTexture u_material[3].y
 #define material_hasOpacityTexture u_material[3].z
 
+// ------------------------------------ SHADOW MAPS
+//#ifdef HAS_SHADOW
+SAMPLER2D(s_shadowMap_light_0, 4);
+SAMPLER2D(s_shadowMap_light_1, 5);
+//#endif
+//SAMPLER2D(s_shadowMap_light_2, 6);
+
+uniform mat4 u_lightSpaceMatrix;
+
 
 // ------------------------------------ OTHERS
 uniform vec4 u_viewPos;
 uniform mat4 u_invModel;
 #define viewPos u_viewPos.xyz
 //SAMPLER2D(s_shadowMap, 3);
-SAMPLER2D(s_shadowMap_light_0, 4);
-SAMPLER2D(s_shadowMap_light_1, 5);
-SAMPLER2D(s_shadowMap_light_2, 6);
-
-uniform mat4 u_lightSpaceMatrix;
 
 

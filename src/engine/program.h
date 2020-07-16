@@ -45,15 +45,18 @@ public:
     static constexpr unsigned int s_num_vec4_material = 4;
 
     static constexpr unsigned int s_num_vec4_dirLight = 4;
-    static constexpr unsigned int s_numDirLightMax = 2;
+    static constexpr unsigned int s_numDirLightMax = 1;
+    static unsigned int s_nDirLight;
     static constexpr unsigned int s_dirLightSizeMax = s_num_vec4_dirLight * s_numDirLightMax * 4;
 
     static constexpr unsigned int s_num_vec4_spotLight = 9;
-    static constexpr unsigned int s_numSpotLightMax = 20;
+    static constexpr unsigned int s_numSpotLightMax = 2;
+    static unsigned int s_nSpotLight;
     static constexpr unsigned int s_spotLightSizeMax = s_num_vec4_spotLight * s_numSpotLightMax * 4;
 
     static constexpr unsigned int s_num_vec4_pointLight = 4;
-    static constexpr unsigned int s_numPointLightMax = 20;
+    static constexpr unsigned int s_numPointLightMax = 1;
+    static unsigned int s_nPointLight;
     static constexpr unsigned int s_pointLightSizeMax = s_num_vec4_pointLight * s_numPointLightMax * 4;
 
     static constexpr unsigned int s_num_lightMax = s_numDirLightMax + s_numSpotLightMax + s_numSpotLightMax;
@@ -127,7 +130,7 @@ public:
 //    static bgfx::UniformHandle m_diffuseColor;
 //    static bgfx::UniformHandle m_specularTexture;
     static bgfx::UniformHandle m_hasDiffuseTexture;
-    static bgfx::UniformHandle m_diffuseTexture;
+//    static bgfx::UniformHandle m_diffuseTexture;
 
 
 //    uint16_t m_shadowMapSize = 512;
@@ -138,6 +141,9 @@ public:
 //    bgfx::ProgramHandle handleProgram(Shading & shading) const;
     //    void setShading(Shading shading);
 //    Shading shading() const;
+private:
+    static bool s_initialized;
+    static bool s_shutdowned;
 };
 
 #endif // PROGRAM_H

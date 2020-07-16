@@ -38,6 +38,9 @@ public:
 private:
     static void initUVSphere();
 
+    static bool s_initialized;
+    static bool s_shutdowned;
+
 };
 
 #endif // GEOMETRY_H

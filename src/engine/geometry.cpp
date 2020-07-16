@@ -21,6 +21,9 @@ bgfx::IndexBufferHandle Geometry::m_cubeIbh;
 bgfx::VertexBufferHandle Geometry::m_uvSphereVbh;
 bgfx::IndexBufferHandle Geometry::m_uvSphereIbh;
 
+bool Geometry::s_initialized = false;
+bool Geometry::s_shutdowned = false;
+
 Vertex Geometry::s_planeVertices[] = {
     { -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
     { 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f },
@@ -59,6 +62,8 @@ const uint16_t Geometry::s_cubeIndices[] {
 
 void Geometry::init()
 {
+    assert(! s_initialized);
+
     m_layout.begin()
         .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
         .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
@@ -86,10 +91,13 @@ void Geometry::init()
     //        Program::m_layout);
 
     g_isInit = true;
+
+    s_initialized = true;
 }
 
 void Geometry::shutdown()
 {
+    assert(! s_shutdowned);
     //    bgfx::destroy(m_layout);
 
     bgfx::destroy(m_planeVbh);
@@ -100,6 +108,8 @@ void Geometry::shutdown()
 
     bgfx::destroy(m_uvSphereVbh);
     bgfx::destroy(m_uvSphereIbh);
+
+    s_shutdowned = true;
 }
 
 void Geometry::drawQuad()

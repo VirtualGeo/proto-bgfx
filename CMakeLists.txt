@@ -32,7 +32,7 @@ set(BGFX_ROOT "" CACHE PATH "Path of bgfx-install (bgfx library) on your system"
 #      ]
 
 add_definitions(-DAUTO_GENERATE_BIN_MODEL)
-#add_definitions(-DMODEL_LOADER_INFO)
+add_definitions(-DMODEL_LOADER_INFO)
 set(USE_SHADERC_LIBRARY False)
 
 # select graphic user interface
