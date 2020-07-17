@@ -68,7 +68,7 @@ public:
     //    void init(const char* shaderName);
     static void init();
     static void shutdown();
-    static void submit(const bgfx::ViewId id, const Shading & shading, const Material& material, const Textures& textures);
+    static void submit(const bgfx::ViewId id, const Shading & shading, const Material& material);
 //    static bgfx::ProgramHandle handleProgram(const Shading &shading);
     static const char *filename(const Shading & shading) ;
 

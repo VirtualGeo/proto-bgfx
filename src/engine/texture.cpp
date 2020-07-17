@@ -55,13 +55,15 @@ Texture Texture::m_sampleTextures[Count] {
 
 };
 // Texture::Texture(const char *filename) {
-Texture::Texture(const std::string& texName, const std::string& baseDir)
+Texture::Texture(const std::string& texName, const std::string& baseDir, Type type)
 {
     //                    GLuint texture_id;
     m_name = texName;
     m_baseDir = baseDir;
+    m_type = type;
 
     const std::string absoluteTexName = baseDir + texName;
+    std::cout << absoluteTexName << std::endl;
 
     //    uint texture_id;
     //    int w, h;
@@ -128,7 +130,18 @@ Texture::Texture(const std::string& texName, const std::string& baseDir)
 //    free(m_image); // not possible because scene.save() need image data to save bin model
 //    m_image = nullptr;
 #ifdef MODEL_LOADER_INFO
-    std::cout << "    [Material] Load texture : '" << m_name << "', width=" << m_width << ", height=" << m_height << ", nbChannel=" << m_nChannels << ", textureSize=" << m_textureSize << ", bitPerPixel=" << m_nChannels << std::endl;
+    std::cout << "    [Material] Load texture (";
+    switch (m_type) {
+    case Type::DIFFUSE:
+        std::cout << "diffuse";
+        break;
+    case Type::OPACITY:
+        std::cout << "opacity";
+        break;
+    default:
+        assert(false);
+    }
+    std::cout << "): '" << m_name << "', width=" << m_width << ", height=" << m_height << ", nbChannel=" << m_nChannels << ", textureSize=" << m_textureSize << ", nb channel=" << m_nChannels << std::endl;
 //    PRINT_MSG("    [Material] Load texture : '", m_name, "', width=", m_width, ", height=", m_height, ", nbChannel=", m_nChannels, ", textureSize=", m_textureSize, ", bitPerPixel=", m_nChannels);
 #endif
 }
@@ -162,6 +175,7 @@ Texture::Texture(Texture&& texture)
     , m_textureSize(texture.m_textureSize)
     , m_image(texture.m_image)
     , m_nMips(texture.m_nMips)
+    , m_type(texture.m_type)
 
 {
     texture.m_last = false;
@@ -253,11 +267,14 @@ void Texture::createTextureHandle()
     case 3:
         texFormat = bgfx::TextureFormat::RGB8;
         break;
+    case 2:
+        texFormat = bgfx::TextureFormat::RG8;
+        break;
     case 4:
         texFormat = bgfx::TextureFormat::RGBA8;
         break;
     default:
-        std::cout << "unknown format" << std::endl;
+        std::cout << "unknown format with " << m_nChannels << " channels" << std::endl;
         exit(1);
     }
 
@@ -270,6 +287,7 @@ void Texture::createTextureHandle()
     m_textureHandle = bgfx::createTexture2D(
         m_width, m_height, hasMips, 1, texFormat,
                 s_textureSamplerFlags, bgfx::copy(m_image, m_textureSize));
+    assert(bgfx::isValid(m_textureHandle));
 }
 
 void Texture::init()

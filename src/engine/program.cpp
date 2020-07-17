@@ -230,8 +230,10 @@ void Program::shutdown()
     s_shutdowned = true;
 }
 
-void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material, const Textures& textures)
+void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material)
 {
+    const Textures & textures = Material::s_textures;
+
     //    float vec4[4] = { 0.0, 1.0, 1.0, 1.0 };
     int iTexDiffuse;
 

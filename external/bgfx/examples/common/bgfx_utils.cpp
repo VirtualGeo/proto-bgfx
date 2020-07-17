@@ -27,6 +27,7 @@ namespace stl = tinystl;
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <engine/scene.h>
 
 void* load(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const char* _filePath, uint32_t* _size)
 {
@@ -461,6 +462,7 @@ void MeshB::load(bx::ReaderSeekerI* _reader, bool _ramcopy)
 				stl::string material;
 				material.resize(len);
 				read(_reader, const_cast<char*>(material.c_str() ), len);
+                group.m_material = material;
 				
 				uint16_t num;
 				read(_reader, num);
@@ -474,6 +476,7 @@ void MeshB::load(bx::ReaderSeekerI* _reader, bool _ramcopy)
 					read(_reader, const_cast<char*>(name.c_str() ), len);
 					
 					Primitive prim;
+                    prim.m_name = name;
 					read(_reader, prim.m_startIndex);
 					read(_reader, prim.m_numIndices);
 					read(_reader, prim.m_startVertex);
@@ -495,6 +498,7 @@ void MeshB::load(bx::ReaderSeekerI* _reader, bool _ramcopy)
 				break;
 		}
 	}
+    std::cout << "nbGroups : " << m_groups.size() << std::endl;
 }
 
 void MeshB::unload()
@@ -533,22 +537,29 @@ void MeshB::submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* 
 		| BGFX_STATE_WRITE_A
 		| BGFX_STATE_WRITE_Z
 		| BGFX_STATE_DEPTH_TEST_LESS
-		| BGFX_STATE_CULL_CCW
+        | BGFX_STATE_CULL_CCW
 		| BGFX_STATE_MSAA
 		;
 	}
 	
 	bgfx::setTransform(_mtx);
-	bgfx::setState(_state);
+//	bgfx::setState(_state);
 	
 	for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it)
 	{
-		const Group& group = *it;
+        bgfx::setState(_state);
+
+        const Group& group = *it;
+        const Material & material = Scene::m_materials[Scene::m_matName2id[group.m_material.c_str()]];
+        material.submit();
 		
 		bgfx::setIndexBuffer(group.m_ibh);
 		bgfx::setVertexBuffer(0, group.m_vbh);
-		bgfx::submit(_id, _program, 0, (it == itEnd-1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_NONE);
-	}
+//        bgfx::submit(_id, _program, 0, (it == itEnd-1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_NONE);
+//        bgfx::submit(_id, _program, 0, (it == itEnd-1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_STATE);
+//        bgfx::submit(_id, _program, 0, BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE);
+        bgfx::submit(_id, _program, 0, BGFX_DISCARD_STATE);
+    }
 }
 
 void MeshB::submit(const MeshState*const* _state, uint8_t _numPasses, const float* _mtx, uint16_t _numMatrices) const
@@ -613,6 +624,7 @@ MeshB* meshLoad(const char* _filePath, bool _ramcopy)
             std::ifstream partFile(filePath + ".part" + std::to_string(i), std::ios::in | std::ios::binary);
 
             if (!partFile.is_open()) {
+                assert(i != 0);
                 break;
             }
 

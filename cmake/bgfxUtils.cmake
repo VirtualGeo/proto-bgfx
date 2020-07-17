@@ -1,6 +1,7 @@
-project(bgfxUtils)
+#project(bgfxUtils)
 
 
+set(PROJECT_NAME bgfxUtils)
 
 set(BGFX_UTILS_DIR "${PROJECT_SOURCE_DIR}/external/bgfx/examples/common/")
 
@@ -9,6 +10,7 @@ add_library(${PROJECT_NAME} ${SOURCES})
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
+    src
     BGFX::BGFX
     meshoptimizer
 )

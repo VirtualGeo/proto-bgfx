@@ -1,6 +1,7 @@
-$input v_pos, v_view, v_normal
+$input v_pos, v_view, v_normal, v_texcoord0
 
 #include <bgfx_shader.sh>
+#include "shaderlib.sh"
 
 struct DirLight
 {
@@ -57,6 +58,8 @@ vec3 calculateSingleLightShading(DirLight dir_light, Material material, vec3 nor
     return diffuse + specular;
 }
 
+SAMPLER2D(s_diffuse, 0);
+
 void main()
 {
     vec3 linear_color = vec3(0.0, 0.0, 0.0);
@@ -75,6 +78,7 @@ void main()
     );
 
 
+
     // When the triangle is back-facing, the normal direction will be flipped
     vec3 view_dir = normalize(- v_view);
     vec3 normal = dot(v_normal, view_dir) > 0.0 ? normalize(v_normal) : normalize(- v_normal);
@@ -83,6 +87,7 @@ void main()
 //    linear_color += calculateSingleLightShading(DirLight(u_dir_light_1_dir, u_dir_light_1_color), material, normal, view_dir);
 
     linear_color += material.ambient;
+    linear_color = toLinear(texture2D(s_diffuse, v_texcoord0)).xyz;
 
     vec3 corrected_color = pow(linear_color, vec3_splat(1.0 / gamma));
 

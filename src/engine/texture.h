@@ -34,11 +34,18 @@ public:
         Count
     };
 
+    enum Type {
+        None,
+        DIFFUSE,
+        OPACITY,
+    };
+
 
     static uint64_t s_textureSamplerFlags;
+//    static std::map<std::string, int> s_name2id;
 
 public:
-    Texture(const std::string& texName, const std::string& baseDir);
+    Texture(const std::string& texName, const std::string& baseDir, Type type);
     Texture(int width, int height, int nChannel, size_t textureSize, const uint8_t * image, int nMip);
     Texture(Texture&&);
     //    Texture(Texture &&) noexcept = default;
@@ -60,7 +67,7 @@ public:
 
 private:
     //	bgfx::UniformHandle m_sampler;
-    bgfx::TextureHandle m_textureHandle;
+    bgfx::TextureHandle m_textureHandle = BGFX_INVALID_HANDLE;
     std::string m_name;
     std::string m_baseDir;
 
@@ -78,6 +85,8 @@ private:
     bool m_last = true;
     static bool s_initialized;
     static bool s_shutdowned;
+
+
     //        static u_int64_t s_textureFlags;
     //        static u_int64_t s_samplerFlags;
 
@@ -85,6 +94,8 @@ public: // ---------------------------------------------- getters
     const bgfx::TextureHandle& textureHandle() const;
     std::string name() const;
     size_t textureSize() const;
+
+    Type m_type;
 
     //    static u_int64_t get_textureSamplerFlags();
 };

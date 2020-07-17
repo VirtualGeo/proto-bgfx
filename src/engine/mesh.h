@@ -30,8 +30,7 @@ public:
     void save(std::ofstream& file) const;
 
     void draw(const bgfx::ViewId id, const Shading & shading, const float* mtx,
-        const uint64_t state, const Materials& materials,
-        const Textures& textures) const;
+        const uint64_t state, const Materials& materials) const;
 
     //    std::vector<uint16_t> indices() const;
     friend std::ostream& operator<<(std::ostream& os, const Mesh& mesh);

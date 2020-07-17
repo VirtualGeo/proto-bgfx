@@ -9,7 +9,10 @@
 class Material
 {
 public:
-    Material(const tinyobj::material_t & tinyobjMaterial, Textures & textures, const std::string & baseDir);
+    static std::vector<Texture> s_textures;
+
+public:
+    Material(const tinyobj::material_t & tinyobjMaterial, const std::string & baseDir);
     Material(const Material & file) = delete;
 //    Material(Material &&) noexcept = default;
     Material(Material && material);
@@ -19,6 +22,7 @@ public:
     void save(std::ofstream & file) const;
 
     void updateData();
+    void submit() const;
 
 
     friend std::ostream & operator <<(std::ostream & os, const Material & material);
@@ -38,6 +42,9 @@ public:
     int m_iTexOpacity = -1;
 
     float m_data[4][4];
+
+    static bgfx::UniformHandle s_sDiffuseUH;
+    static bool s_initialized;
 
 //public: // ------------------------- getters
 //    const float * diffuse() const;

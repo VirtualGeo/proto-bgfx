@@ -16,6 +16,8 @@
 #include "pointlight.h"
 #include "camerafps.h"
 #include <entry/windowstate.h>
+//#include <map>
+//#include <string>
 
 class Scene
 {
@@ -60,9 +62,10 @@ public:
     std::vector<Object> m_objects;
 
 //    std::vector<Material> m_materials;
-    Materials m_materials;
+    static Materials m_materials;
+    static std::map<std::string, int> m_matName2id;
 //    std::vector<Texture> m_textures;
-    Textures m_textures;
+//    Textures m_textures;
 
     DirLights m_dirLights;
 //    Lights m_lights;

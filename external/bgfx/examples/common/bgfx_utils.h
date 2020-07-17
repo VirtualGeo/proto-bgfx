@@ -13,6 +13,7 @@
 
 #include <tinystl/allocator.h>
 #include <tinystl/vector.h>
+#include <tinystl/string.h>
 namespace stl = tinystl;
 
 
@@ -94,6 +95,8 @@ struct Primitive
 	Sphere m_sphere;
 	Aabb m_aabb;
 	Obb m_obb;
+
+    stl::string m_name;
 };
 
 typedef stl::vector<Primitive> PrimitiveArray;
@@ -113,6 +116,9 @@ struct Group
 	Aabb m_aabb;
 	Obb m_obb;
 	PrimitiveArray m_prims;
+
+//    stl::string m_name;
+    stl::string m_material;
 };
 typedef stl::vector<Group> GroupArray;
 

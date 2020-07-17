@@ -12,6 +12,9 @@
 #include <cstring>
 #include <fstream>
 
+Materials Scene::m_materials;
+std::map<std::string, int> Scene::m_matName2id;
+
 Scene::Scene()
 {
 }
@@ -21,9 +24,9 @@ void Scene::addModel(const std::string& filename)
 {
     //    std::string absoluteFilename(std::string(PROJECT_DIR) + filename);
     std::string absoluteFilename(filename);
-    std::string bin = absoluteFilename.substr(0, absoluteFilename.find_last_of('.')) + ".bin";
-    bool loadBinFailed = false;
 #ifdef AUTO_GENERATE_BIN_MODEL
+    std::string bin = absoluteFilename.substr(0, absoluteFilename.find_last_of('.')) + ".texBin";
+    bool loadBinFailed = false;
     if (FileExists(bin)) {
         std::ifstream file;
         file.open(bin, std::ios::binary | std::ios::in);
@@ -45,7 +48,8 @@ void Scene::addModel(const std::string& filename)
         if (loadBinFailed) {
             m_objects.clear();
             m_materials.clear();
-            m_textures.clear();
+//            m_textures.clear();
+            Material::s_textures.clear();
         } else {
             return;
         }
@@ -70,17 +74,18 @@ void Scene::addModel(const std::string& filename)
 #else
     base_dir += "/";
 #endif
+    std::cout << "[Scene] Base dir: " << base_dir << std::endl;
 
     std::string warn;
     std::string err;
     bool ret = tinyobj::LoadObj(&tinyObjAttrib, &tinyObjShapes, &tinyObjMaterials, &warn, &err, absoluteFilename.c_str(),
         base_dir.c_str());
     if (!warn.empty()) {
-        std::cout << "[Scene] WARN: " << warn << std::endl;
-        exit(1);
+        std::cout << "[Scene] tinyObj WARN: " << warn << std::endl;
+//        exit(1);
     }
     if (!err.empty()) {
-        std::cerr << "[Scene] " << err << std::endl;
+        std::cerr << "[Scene] tinyObj ERR " << err << std::endl;
         exit(1);
     }
 
@@ -120,7 +125,7 @@ void Scene::addModel(const std::string& filename)
     //    {
     //    for (const tinyobj::material_t& material : tinyObjMaterials) {
     m_materials.reserve(tinyObjMaterials.size());
-    m_textures.reserve(tinyObjMaterials.size());
+    Material::s_textures.reserve(tinyObjMaterials.size());
 
     //    timerutil tm;
     //    tm.start();
@@ -129,14 +134,18 @@ void Scene::addModel(const std::string& filename)
     //    const size_t nbMaterials = tinyObjMaterials.size();
     for (size_t i = 0; i < nbMaterials; i++) {
         const tinyobj::material_t& tinyObj_material = tinyObjMaterials[i];
+//        m_matName2id[tinyObj_material.name] = i;
+        assert(m_matName2id.find(tinyObj_material.name) == m_matName2id.end());
+//        m_matName2id.at(tinyObj_material.name) = i;
+        m_matName2id[tinyObj_material.name] = i;
 
         //        printf("material[%d].difname = %s\n", int(i),
         //            material.name.c_str());
         //        m_materials.push_back(Material(material, m_textures, base_dir));
-        m_materials.emplace_back(tinyObj_material, m_textures, base_dir);
+        m_materials.emplace_back(tinyObj_material, base_dir);
 #ifdef MODEL_LOADER_INFO
         const Material& material = m_materials.back();
-        std::cout << "[Scene] Load material[" << i << "/" << nbMaterials << "] : " << material << std::endl;
+        std::cout << "[Scene] Loaded material[" << i << "/" << nbMaterials << "] : " << material << std::endl;
 #endif
     }
     //    for (const auto & texture : m_textures) {
@@ -155,21 +164,25 @@ void Scene::addModel(const std::string& filename)
 
     //    size_t nbIndices =0;
     //    size_t nbMeshes = 0;
-    m_objects.reserve(nbObjects);
-    bgfx::frame();
-    for (size_t i = 0; i < nbObjects; ++i) {
-        const tinyobj::shape_t& tinyObj_shape = tinyObjShapes[i];
-        //        m_objects.push_back(Object(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i));
-        m_objects.emplace_back(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i);
-        //        nbIndices += m_objects[i].nbTriangles() * 3;
-        //        nbMeshes += m_objects[i].nbMeshes();
-#ifdef MODEL_LOADER_INFO
-        const Object& object = m_objects.back();
-        std::cout << "[Scene] Load object[" << i << "/" << nbObjects << "] : " << object << std::endl;
-#endif
-        bgfx::frame();
-    }
-    assert(nbObjects == m_objects.size());
+
+
+//    // -------------------------------------- OBJECTS
+//    m_objects.reserve(nbObjects);
+////    bgfx::frame();
+//    for (size_t i = 0; i < nbObjects; ++i) {
+//        const tinyobj::shape_t& tinyObj_shape = tinyObjShapes[i];
+//        //        m_objects.push_back(Object(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i));
+//        m_objects.emplace_back(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i);
+//        //        nbIndices += m_objects[i].nbTriangles() * 3;
+//        //        nbMeshes += m_objects[i].nbMeshes();
+//#ifdef MODEL_LOADER_INFO
+//        const Object& object = m_objects.back();
+//        std::cout << "[Scene] Load object[" << i << "/" << nbObjects << "] : " << object << std::endl;
+//#endif
+//        bgfx::frame();
+//    }
+//    assert(nbObjects == m_objects.size());
+
 
     //    tm.end();
     //    m_loadingObjectsTime = tm.msec();
@@ -206,7 +219,7 @@ void Scene::clear()
     ////        const auto & texture = pair.second;
     //        assert(bgfx::isValid(texture.textureHandle()));
     //    }
-    m_textures.clear(); // bgfx::TextureHandle
+    Material::s_textures.clear(); // bgfx::TextureHandle
     m_objects.clear(); // bgfx::VertexBufferHandle
     //    m_materials.clear();
 }
@@ -225,13 +238,18 @@ void Scene::load(std::ifstream& file)
         //            m_materials.emplace_back(file, &m_textures);
         //        m_materials.push_back(file);
         m_materials.emplace_back(file);
+        const Material& material = m_materials.back();
+        assert(m_matName2id.find(material.m_name) == m_matName2id.end());
+//        m_matName2id.at(tinyObj_material.name) = i;
+        m_matName2id[material.m_name] = i;
 #ifdef MODEL_LOADER_INFO
         std::cout << "[Scene] Load material[" << i << "/" << size << "] : " << m_materials.back() << std::endl;
 #endif
+//        bgfx::frame();
     }
 
     FileIO::read(size, file);
-    m_textures.reserve(size);
+    Material::s_textures.reserve(size);
     for (int i = 0; i < size; ++i) {
         //        std::string texName;
         //        std::string baseDir;
@@ -239,11 +257,12 @@ void Scene::load(std::ifstream& file)
         //        FileIO::read(baseDir, file);
         //        m_textures.push_back(file);
         //        m_textures.emplace_back(texName, baseDir);
-        m_textures.emplace_back(file);
+        Material::s_textures.emplace_back(file);
 #ifdef MODEL_LOADER_INFO
-        const Texture& texture = m_textures.back();
+        const Texture& texture = Material::s_textures.back();
         std::cout << "[Scene] Load texture[" << i << "/" << size << "] : " << texture << std::endl;
 #endif
+//        bgfx::frame();
     }
 
     //    tm.end();
@@ -252,20 +271,22 @@ void Scene::load(std::ifstream& file)
     m_loadingMaterialsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     //    tm.start();
     start = std::chrono::steady_clock::now();
+//    bgfx::frame();
 
-    FileIO::read(size, file);
-    m_objects.reserve(size);
-    //    bgfx::frame();
-    for (size_t i = 0; i < size; ++i) {
-        //        m_objects.push_back(Object(file, i, m_layout));
-        //        const Object && object = Object(file, i, m_layout);
-        m_objects.emplace_back(file, i);
-#ifdef MODEL_LOADER_INFO
-        const Object& object = m_objects.back();
-        std::cout << "[Scene] Load object[" << i << "/" << size << "] : " << object << std::endl;
-#endif
-        bgfx::frame();
-    }
+
+//    FileIO::read(size, file);
+//    m_objects.reserve(size);
+//    //    bgfx::frame();
+//    for (size_t i = 0; i < size; ++i) {
+//        //        m_objects.push_back(Object(file, i, m_layout));
+//        //        const Object && object = Object(file, i, m_layout);
+//        m_objects.emplace_back(file, i);
+//#ifdef MODEL_LOADER_INFO
+//        const Object& object = m_objects.back();
+//        std::cout << "[Scene] Load object[" << i << "/" << size << "] : " << object << std::endl;
+//#endif
+//        bgfx::frame();
+//    }
 
     //    tm.end();
     end = std::chrono::steady_clock::now();
@@ -291,23 +312,25 @@ void Scene::save(std::ofstream& file) const
         m_materials[i].save(file);
     }
 
-    size = m_textures.size();
+    size = Material::s_textures.size();
     FileIO::write(size, file);
     //    m_textures.reserve(size);
     for (int i = 0; i < size; ++i) {
         //        m_textures.push_back(file);
         //        m_textures.save(file);
-        m_textures[i].save(file);
+        Material::s_textures[i].save(file);
     }
 
-    size = m_objects.size();
-    FileIO::write(size, file);
-    //    m_objects.reserve(size);
-    for (int i = 0; i < size; ++i) {
-        //        m_objects.push_back(file);
-        //        m_objects.save(file);
-        m_objects[i].save(file);
-    }
+
+//    size = m_objects.size();
+//    FileIO::write(size, file);
+//    //    m_objects.reserve(size);
+//    for (int i = 0; i < size; ++i) {
+//        //        m_objects.push_back(file);
+//        //        m_objects.save(file);
+//        m_objects[i].save(file);
+//    }
+
 
     //    FileIO::write(m_parsingTime, file);
     //    FileIO::write(m_loadingMaterialsTime, file);
@@ -535,7 +558,7 @@ void Scene::renderView(const View& view, const float mtx[16])
 void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx, const uint64_t state) const
 {
     for (const Object& object : m_objects) {
-        object.draw(id, shading, mtx, state, m_materials, m_textures);
+        object.draw(id, shading, mtx, state, m_materials);
 //        bgfx::submit(id, Program::m_programs[shading]);
     }
 
@@ -580,12 +603,12 @@ void Scene::updateStats()
     }
 
     m_texturesSize = 0;
-    for (const Texture& texture : m_textures) {
+    for (const Texture& texture : Material::s_textures) {
         m_texturesSize += texture.textureSize();
     }
     m_texturesSize /= 1000000.0f;
 
-    m_nbTextures = m_textures.size();
+    m_nbTextures = Material::s_textures.size();
 
     m_totalLoadingTime = m_parsingTime + m_loadingMaterialsTime + m_loadingObjectsTime;
     m_nbVertexBuffer = m_nbObjects;

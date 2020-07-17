@@ -39,7 +39,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
     if (m_view.id == 0) { // Call bgfx::renderFrame before bgfx::init to signal to bgfx not to create a render thread.
         // Most graphics APIs must be used on the same thread that created the window.
         bgfx::renderFrame();
-//        std::cout << "[THREAD] bgfx init: " << std::this_thread::get_id() << std::endl;
+        //        std::cout << "[THREAD] bgfx init: " << std::this_thread::get_id() << std::endl;
 
         bgfx::Init bgfxInit = {};
         bgfxInit.platformData.ndt = const_cast<void*>(m_ndt);
@@ -61,8 +61,8 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
 
         bgfxInit.resolution.width = width;
         bgfxInit.resolution.height = height;
-        bgfxInit.resolution.reset = BGFX_RESET_NONE;
-        //        bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+//        bgfxInit.resolution.reset = BGFX_RESET_NONE;
+//                bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
         bgfxInit.vendorId = BGFX_PCI_ID_NONE;
         //        bgfxInit.deviceId;
         if (!bgfx::init(bgfxInit)) {
@@ -103,7 +103,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF, 1.0f, 0);
         bgfx::touch(0);
 
-        //        bgfx::frame();
+//        bgfx::frame();
 
         //        Q_ASSERT(m_iWindow == 0);
         bx::mtxIdentity(entry::s_worldTransform);
@@ -120,7 +120,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
 
     s_windows.emplace_back(this);
     entry::s_lastTime = std::chrono::high_resolution_clock::now();
-//    m_init = true;
+    //    m_init = true;
 }
 
 WindowState::~WindowState()
@@ -147,7 +147,6 @@ WindowState::~WindowState()
     s_windows.remove(this);
 }
 
-
 void WindowState::render() const
 {
     bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
@@ -168,7 +167,7 @@ void WindowState::render() const
 
 uintptr_t WindowState::renderAllWindow()
 {
-//    assert(m_init);
+    //    assert(m_init);
     assert(entry::s_bgfxInitialized);
 
     const auto currentTime = std::chrono::high_resolution_clock::now();
@@ -270,23 +269,23 @@ void WindowState::updateCameraPos()
 
 //void WindowState::resizeOffscreenFB()
 //{
-    //    if (bgfx::isValid(m_offscreenFB)) {
-    //        bgfx::destroy(m_offscreenFB);
-    //        m_offscreenFB = BGFX_INVALID_HANDLE;
-    //    }
-    //    if (bgfx::isValid(m_offScreenFBH)) {
-    //        bgfx::destroy(m_offScreenFBH);
-    //        m_offScreenFBH = BGFX_INVALID_HANDLE;
-    //    }
-    //    if (bgfx::isValid(m_depthBuffer)) {
-    //        bgfx::destroy(m_depthBuffer);
-    //        m_depthBuffer = BGFX_INVALID_HANDLE;
-    //    }
+//    if (bgfx::isValid(m_offscreenFB)) {
+//        bgfx::destroy(m_offscreenFB);
+//        m_offscreenFB = BGFX_INVALID_HANDLE;
+//    }
+//    if (bgfx::isValid(m_offScreenFBH)) {
+//        bgfx::destroy(m_offScreenFBH);
+//        m_offScreenFBH = BGFX_INVALID_HANDLE;
+//    }
+//    if (bgfx::isValid(m_depthBuffer)) {
+//        bgfx::destroy(m_depthBuffer);
+//        m_depthBuffer = BGFX_INVALID_HANDLE;
+//    }
 
-    //    m_offScreenFBH = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT, NULL);
-    //    m_depthBuffer = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT, NULL);
-    //    bgfx::TextureHandle fbtextures[2] = { m_offScreenFBH, m_depthBuffer };
-    //    m_offscreenFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, false);
+//    m_offScreenFBH = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT, NULL);
+//    m_depthBuffer = bgfx::createTexture2D(m_width, m_height, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT, NULL);
+//    bgfx::TextureHandle fbtextures[2] = { m_offScreenFBH, m_depthBuffer };
+//    m_offscreenFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, false);
 //}
 
 void WindowState::resetWindow()
@@ -318,7 +317,7 @@ void WindowState::resizeEvent(int width, int height)
         resetWindow();
     }
 
-//    resizeOffscreenFB();
+    //    resizeOffscreenFB();
 
     const float ratio = float(m_width) / m_height;
     m_view.ratio = ratio;
