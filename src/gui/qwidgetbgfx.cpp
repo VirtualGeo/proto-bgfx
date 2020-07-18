@@ -43,7 +43,7 @@ QWidgetBgfx::QWidgetBgfx(QWidget* parent)
 
 //    m_window = &WindowState::s_windows.back();
 
-    qDebug() << "QWidgetBgfx(" << parent << ")";
+//    qDebug() << "QWidgetBgfx(" << parent << ")";
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_NoSystemBackground);
@@ -118,7 +118,7 @@ QPaintEngine* QWidgetBgfx::paintEngine() const
 
 void QWidgetBgfx::resizeEvent(QResizeEvent* event)
 {
-    qDebug() << "QWidgetBgfx::resizeEvent(" << event << ")";
+//    qDebug() << "QWidgetBgfx::resizeEvent(" << event << ")";
     QWidget::resizeEvent(event);
 
     //   if (m_isInit == false) {

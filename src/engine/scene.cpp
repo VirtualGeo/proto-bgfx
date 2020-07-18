@@ -20,12 +20,19 @@ Scene::Scene()
 }
 
 //void Scene::addModel(const char* filename)
+// obj filename
 void Scene::addModel(const std::string& filename)
 {
+    m_mesh = meshLoad(filename.c_str());
+    assert(m_mesh != nullptr);
+
     //    std::string absoluteFilename(std::string(PROJECT_DIR) + filename);
     std::string absoluteFilename(filename);
 #ifdef AUTO_GENERATE_BIN_MODEL
-    std::string bin = absoluteFilename.substr(0, absoluteFilename.find_last_of('.')) + ".texBin";
+    std::string bin = absoluteFilename.substr(0, absoluteFilename.find_last_of('.')) + ".tex";
+    if (! FileExists(bin)) {
+        parts2bin(bin.c_str());
+    }
     bool loadBinFailed = false;
     if (FileExists(bin)) {
         std::ifstream file;
@@ -45,12 +52,16 @@ void Scene::addModel(const std::string& filename)
 
         file.close();
 
+
         if (loadBinFailed) {
-            m_objects.clear();
+//            m_objects.clear();
             m_materials.clear();
 //            m_textures.clear();
             Material::s_textures.clear();
         } else {
+#ifdef AUTO_GIT_PARTITION
+            bin2parts(bin.c_str());
+#endif
             return;
         }
     }
@@ -208,6 +219,9 @@ void Scene::addModel(const std::string& filename)
         file.close();
     }
 #endif
+
+//    m_mesh = meshLoad(filename.c_str());
+//    assert(m_mesh != nullptr);
 }
 
 void Scene::clear()
@@ -220,7 +234,11 @@ void Scene::clear()
     //        assert(bgfx::isValid(texture.textureHandle()));
     //    }
     Material::s_textures.clear(); // bgfx::TextureHandle
-    m_objects.clear(); // bgfx::VertexBufferHandle
+//    m_objects.clear(); // bgfx::VertexBufferHandle
+//    m_meshes.clear();
+    meshUnload(m_mesh);
+//    delete m_mesh;
+    m_mesh = nullptr;
     //    m_materials.clear();
 }
 
@@ -557,10 +575,13 @@ void Scene::renderView(const View& view, const float mtx[16])
 
 void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx, const uint64_t state) const
 {
-    for (const Object& object : m_objects) {
-        object.draw(id, shading, mtx, state, m_materials);
-//        bgfx::submit(id, Program::m_programs[shading]);
-    }
+//    for (const Object& object : m_objects) {
+//        object.draw(id, shading, mtx, state, m_materials);
+////        bgfx::submit(id, Program::m_programs[shading]);
+//    }
+
+    assert(m_mesh != nullptr);
+    meshSubmit(m_mesh, id, Program::m_programs[shading], mtx);
 
     //    const uint nbObjects = m_objects.size();
     //            bgfx::setTransform(mtx);
@@ -585,22 +606,22 @@ void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx
 
 void Scene::updateStats()
 {
-    m_nbVertices = 0;
-    for (const Object& object : m_objects) {
-        m_nbVertices += object.nbVertices();
-    }
+//    m_nbVertices = 0;
+//    for (const Object& object : m_objects) {
+//        m_nbVertices += object.nbVertices();
+//    }
 
-    m_nbTriangles = 0;
-    for (const Object& object : m_objects) {
-        m_nbTriangles += object.nbTriangles();
-    }
+//    m_nbTriangles = 0;
+//    for (const Object& object : m_objects) {
+//        m_nbTriangles += object.nbTriangles();
+//    }
 
-    m_nbObjects = m_objects.size();
+//    m_nbObjects = m_objects.size();
 
-    m_nbMeshes = 0;
-    for (const auto& object : m_objects) {
-        m_nbMeshes += object.nbMeshes();
-    }
+//    m_nbMeshes = 0;
+//    for (const auto& object : m_objects) {
+//        m_nbMeshes += object.nbMeshes();
+//    }
 
     m_texturesSize = 0;
     for (const Texture& texture : Material::s_textures) {

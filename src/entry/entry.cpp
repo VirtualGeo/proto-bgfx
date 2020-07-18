@@ -14,7 +14,7 @@ std::chrono::time_point<std::chrono::high_resolution_clock> s_lastTime;
 bool s_showStats = false;
 std::string s_renderer;
 std::string s_vendorID;
-bool s_vsyncEnable = true;
+bool s_vsyncEnable = false;
 int s_mssaLevel = 0;
 int s_textureSamplerFlags = 0;
 

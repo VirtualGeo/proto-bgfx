@@ -16,6 +16,7 @@
 #include <tinystl/string.h>
 namespace stl = tinystl;
 
+//#include <string>
 
 ///
 void* load(const char* _filePath, uint32_t* _size = NULL);
@@ -135,6 +136,9 @@ struct MeshB
 
 ///
 MeshB* meshLoad(const char* _filePath, bool _ramcopy = false);
+
+void parts2bin(const char * filePath);
+void bin2parts(const char * filePath);
 
 ///
 void meshUnload(MeshB* _mesh);

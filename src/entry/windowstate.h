@@ -67,7 +67,7 @@ public:
     ~WindowState();
 
 private:
-    void render() const;
+//    void render() const;
 
 public:
     uintptr_t renderAllWindow(); // only first window is able to do that

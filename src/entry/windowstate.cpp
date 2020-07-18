@@ -70,7 +70,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         }
 
         const bgfx::InternalData* internalData = bgfx::getInternalData();
-        std::cout << "[CONTEXT] bgfx init: " << internalData->context << std::endl;
+//        std::cout << "[WindowState] bgfx init: " << internalData->context << std::endl;
         //        if (m_context != nullptr) {
         //        assert(m_context == nullptr || bgfx::getInternalData()->context == m_context);
         //        assert(m_context == nullptr || bgfx::getInternalData()->context == nullptr);
@@ -147,28 +147,30 @@ WindowState::~WindowState()
     s_windows.remove(this);
 }
 
-void WindowState::render() const
-{
-    bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
+//void WindowState::render() const
+//{
+////    bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
 
-    bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
-    // This dummy draw call is here to make sure that view 0 is cleared
-    // if no other draw calls are submitted to view 0.
-    //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+////    bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
 
-    bgfx::setViewClear(m_view.id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
-    bgfx::touch(m_view.id);
+////    // This dummy draw call is here to make sure that view 0 is cleared
+////    // if no other draw calls are submitted to view 0.
+////    //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
 
-    //    const float ratio = float(m_width) / m_height;
-    entry::render(m_view);
-    //    entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
-    return;
-}
+////    bgfx::setViewClear(m_view.id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+////    bgfx::touch(m_view.id);
+
+//    //    const float ratio = float(m_width) / m_height;
+//    entry::render(m_view);
+//    //    entry::s_scene.renderFromCamera(m_iCamera, ratio, m_id, m_shading, entry::g_mtx);
+//    return;
+//}
 
 uintptr_t WindowState::renderAllWindow()
 {
     //    assert(m_init);
     assert(entry::s_bgfxInitialized);
+
 
     const auto currentTime = std::chrono::high_resolution_clock::now();
     //    //    s_currentTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime).count();
@@ -176,17 +178,18 @@ uintptr_t WindowState::renderAllWindow()
 
     entry::s_deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - entry::s_lastTime).count() / 1000000.0;
     entry::s_lastTime = currentTime;
-    entry::s_sum += entry::s_deltaTime;
 
-    if (entry::s_counter >= entry::s_epoch) {
-        //        entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum) / 2; // update g_fps each 0.5 sec
-        entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum);
-        //        entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum) * 2;
-        entry::s_sum = 0.0;
-        entry::s_counter = 0;
-    }
-    ++entry::s_counter;
+//    entry::s_sum += entry::s_deltaTime;
+//    if (entry::s_counter >= entry::s_epoch) {
+//        //        entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum) / 2; // update g_fps each 0.5 sec
+//        entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum);
+//        //        entry::s_epoch = (entry::s_fps = entry::s_epoch / entry::s_sum) * 2;
+//        entry::s_sum = 0.0;
+//        entry::s_counter = 0;
+//    }
+//    ++entry::s_counter;
     printDebugMessage();
+
 
     for (WindowState* window : s_windows) {
         window->updateCameraPos();
@@ -195,7 +198,8 @@ uintptr_t WindowState::renderAllWindow()
     entry::preRender();
 
     for (const WindowState* window : s_windows) {
-        window->render();
+//        window->render();
+        entry::render(window->m_view);
     }
 
     // Advance to next frame. Process submitted rendering primitives.
@@ -213,14 +217,17 @@ void WindowState::printDebugMessage()
     if (entry::s_showStats) {
         bgfx::setDebug(BGFX_DEBUG_STATS);
     } else {
+//        bgfx::setDebug(BGFX_DEBUG_NONE);
+//        return;
         bgfx::setDebug(BGFX_DEBUG_TEXT);
         //        if (m_iWidget == 0) {
         bgfx::dbgTextClear();
         //        if (m_iWig)
         //        const bgfx::Stats* stats = bgfx::getStats();
         int line = -1;
-        line = 20;
+//        line = 20;
         bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats | F2:Vsync | F3:Msaa | F4:Sampler | F5:Shading | F6: | F7:");
+        line = 3;
         //        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps:%.2f", g_fps);
         //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Viewport shading: %s", g_viewportShading.c_str());
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Arch: " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ");
@@ -233,14 +240,15 @@ void WindowState::printDebugMessage()
         //            const auto& window = *s_windows[i];
         //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window.m_fps, window.m_width, window.m_height, Program::filename(window.m_shading));
         //        }
-        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps: %.2f", entry::s_fps);
+
+//        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps: %.2f", entry::s_fps);
         int i = 0;
         for (const auto& window : s_windows) {
             //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window->m_fps, window->m_width, window->m_height, Program::filename(window->m_shading));
             bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Backbuffer: %dx%d, Viewport shading: %s", i, window->m_width, window->m_height, Program::filename(window->m_view.shading));
             ++i;
         }
-        entry::s_scene.printStats(line);
+//        entry::s_scene.printStats(line);
     }
 }
 
@@ -298,7 +306,7 @@ void WindowState::resetWindow()
 void WindowState::resizeEvent(int width, int height)
 {
     const bgfx::InternalData* internalData = bgfx::getInternalData();
-    std::cout << "[CONTEXT] bgfx resizeEvent: " << internalData->context << std::endl;
+//    std::cout << "[WindowState] bgfx resizeEvent: " << internalData->context << std::endl;
 
     //    g_width = size.width();
     m_width = width;
@@ -321,6 +329,18 @@ void WindowState::resizeEvent(int width, int height)
 
     const float ratio = float(m_width) / m_height;
     m_view.ratio = ratio;
+
+
+    bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
+    bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
+
+    // This dummy draw call is here to make sure that view 0 is cleared
+    // if no other draw calls are submitted to view 0.
+    //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+
+    bgfx::setViewClear(m_view.id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+    bgfx::touch(m_view.id);
+    bgfx::frame(); // avoid startup artefact, with long scene charging
 }
 
 void WindowState::mouseMoveEvent(int x, int y)
