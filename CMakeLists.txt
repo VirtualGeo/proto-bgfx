@@ -71,7 +71,7 @@ endif()
 set(EXTERNAL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external)
 add_subdirectory(modules/tinyobjloader)
 #add_subdirectory(modules/optick)
-add_subdirectory(modules/meshoptimizer)
+add_subdirectory(modules/meshoptimizer) # bgfxUtils needs to decode vertex and index buffer file
 include(cmake/bgfxUtils.cmake)
 
 # add_subdirectory(Modules/stb)

@@ -10,6 +10,7 @@ void init(View& view)
     Texture::init();
     Program::s_nDirLight = 1;
     Program::init();
+//    bx::mtxScale(entry::s_worldTransform, 0.01f);
     // ------------------------------- LOAD MODEL
     //                 g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
     entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/sponza/sponza.obj");

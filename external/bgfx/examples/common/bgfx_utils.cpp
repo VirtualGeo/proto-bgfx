@@ -25,9 +25,15 @@ namespace stl = tinystl;
 #include <bimg/decode.h>
 
 #include <cmath>
+#include <cstring>
 #include <engine/scene.h>
 #include <fstream>
 #include <iostream>
+#include <system.h>
+#include <fileIO.h>
+
+static std::vector<Material> s_materials;
+static std::map<std::string, int> s_matName2id;
 
 void* load(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const char* _filePath, uint32_t* _size)
 {
@@ -491,7 +497,7 @@ void MeshB::load(bx::ReaderSeekerI* _reader, bool _ramcopy)
             break;
         }
     }
-//    std::cout << "nbGroups : " << m_groups.size() << std::endl;
+    //    std::cout << "nbGroups : " << m_groups.size() << std::endl;
 }
 
 void MeshB::unload()
@@ -536,7 +542,8 @@ void MeshB::submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* 
         bgfx::setState(_state);
 
         const Group& group = *it;
-        const Material& material = Scene::m_materials[Scene::m_matName2id[group.m_material.c_str()]];
+        //        const Material& material = Scene::m_materials[Scene::m_matName2id[group.m_material.c_str()]];
+        const Material& material = s_materials[s_matName2id[group.m_material.c_str()]];
         material.submit();
 
         bgfx::setIndexBuffer(group.m_ibh);
@@ -653,14 +660,164 @@ void bin2parts(const char* _filePath)
     //            std::cout << "counter = " << counter << std::endl;
 }
 
+void saveMatFile(std::ofstream& file)
+{
+    size_t size;
+    size = s_materials.size();
+    FileIO::write(size, file);
+    //    s_materials.reserve(size);
+    for (int i = 0; i < size; ++i) {
+        //            s_materials.emplace_back(file, &m_textures);
+        //        m_materials.push_back(file);
+        s_materials[i].save(file);
+    }
+
+    size = Material::s_textures.size();
+    FileIO::write(size, file);
+    //    m_textures.reserve(size);
+    for (int i = 0; i < size; ++i) {
+        //        m_textures.push_back(file);
+        //        m_textures.save(file);
+        Material::s_textures[i].save(file);
+    }
+}
+
+
+//static std::vector<tinyobj::material_t> s_materials;
+
+void loadMatFile(std::ifstream & file)
+{
+    //        auto start = std::chrono::steady_clock::now();
+
+    size_t size;
+    FileIO::read(size, file);
+    s_materials.reserve(size);
+    for (int i = 0; i < size; ++i) {
+        //            m_materials.emplace_back(file, &m_textures);
+        //        m_materials.push_back(file);
+        s_materials.emplace_back(file);
+        const Material& material = s_materials.back();
+        assert(s_matName2id.find(material.m_name) == s_matName2id.end());
+        //        s_matName2id.at(tinyObj_material.name) = i;
+        s_matName2id[material.m_name] = i;
+#ifdef MODEL_LOADER_INFO
+        std::cout << "[Scene] Load material[" << i << "/" << size << "] : " << s_materials.back() << std::endl;
+#endif
+        //        bgfx::frame();
+    }
+
+    FileIO::read(size, file);
+    Material::s_textures.reserve(size);
+    for (int i = 0; i < size; ++i) {
+        //        std::string texName;
+        //        std::string baseDir;
+        //        FileIO::read(texName, file);
+        //        FileIO::read(baseDir, file);
+        //        m_textures.push_back(file);
+        //        m_textures.emplace_back(texName, baseDir);
+        Material::s_textures.emplace_back(file);
+#ifdef MODEL_LOADER_INFO
+        const Texture& texture = Material::s_textures.back();
+        std::cout << "[Scene] Load texture[" << i << "/" << size << "] : " << texture << std::endl;
+#endif
+        //        bgfx::frame();
+    }
+
+    //    tm.end();
+//    auto end = std::chrono::steady_clock::now();
+    //    m_loadingMaterialsTime = tm.msec();
+//    m_loadingMaterialsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    //    tm.start();
+//    start = std::chrono::steady_clock::now();
+    //    bgfx::frame();
+}
+
+void loadMat(const std::string & filePath) {
+    std::string base_dir = GetBaseDir(filePath);
+    // load materials (textures)
+    std::vector<tinyobj::material_t> tinyObjMaterials;
+
+    std::string warn;
+    std::string err;
+    std::string tex = filePath.substr(0, filePath.find_last_of('.')) + ".tex";
+    //    assert(FileExists(mat));
+    if (FileExists(tex)) {
+        std::ifstream texFile(tex);
+        assert(texFile.is_open());
+        loadMatFile(texFile);
+        texFile.close();
+        return;
+    }
+    std::string mat = filePath.substr(0, filePath.find_last_of('.')) + ".mtl";
+    std::ifstream matFile(mat, std::ios::in | std::ios::binary);
+    tinyobj::LoadMtl(&s_matName2id, &tinyObjMaterials, &matFile, &warn, &err);
+    matFile.close();
+    if (!warn.empty()) {
+        std::cout << "[BgfxUtils] tinyObj loadMat WARN: " << warn << std::endl;
+        //        exit(1);
+    }
+    if (!err.empty()) {
+        std::cerr << "[BgfxUtils] tinyObj loadMat ERR " << err << std::endl;
+        exit(1);
+    }
+    const int nbMaterials = tinyObjMaterials.size();
+
+#ifdef MODEL_LOADER_INFO
+    printf("[Scene] materials = %d\n", nbMaterials);
+#endif
+    s_materials.reserve(tinyObjMaterials.size());
+    Material::s_textures.reserve(tinyObjMaterials.size());
+
+    //    timerutil tm;
+    //    tm.start();
+    //    start = std::chrono::steady_clock::now();
+
+    //    const size_t nbMaterials = tinyObjMaterials.size();
+    for (size_t i = 0; i < nbMaterials; i++) {
+        const tinyobj::material_t& tinyObj_material = tinyObjMaterials[i];
+        //        m_matName2id[tinyObj_material.name] = i;
+        //        assert(m_matName2id.find(tinyObj_material.name) == m_matName2id.end());
+        //        m_matName2id.at(tinyObj_material.name) = i;
+        //        m_matName2id[tinyObj_material.name] = i;
+
+        //        printf("material[%d].difname = %s\n", int(i),
+        //            material.name.c_str());
+        //        s_materials.push_back(Material(material, m_textures, base_dir));
+        s_materials.emplace_back(tinyObj_material, base_dir);
+#ifdef MODEL_LOADER_INFO
+        const Material& material = s_materials.back();
+        std::cout << "[Scene] Loaded material[" << i << "/" << nbMaterials << "] : " << material << std::endl;
+#endif
+    }
+
+#ifdef AUTO_GENERATE_BIN_MODEL
+    //    save(file);
+    if (!FileExists(tex)) {
+        std::ofstream file(tex, std::ios::binary | std::ios::out);
+        if (!file.is_open()) {
+            std::cerr << "cannot open file" << std::endl;
+            exit(1);
+        }
+        saveMatFile(file);
+        file.close();
+    }
+#endif
+}
+
 MeshB* meshLoad(const char* _filePath, bool _ramcopy)
 {
-    //    std::string absoluteFilename(_filePath);
     const std::string filePath(_filePath);
+
+    loadMat(filePath);
+
+    // load geometry
+    //    std::string absoluteFilename(_filePath);
     std::string bin = filePath.substr(0, filePath.find_last_of('.')) + ".geom";
+//    assert(FileExists(bin));
 
     std::ifstream sourceFile;
     sourceFile.open(bin, std::ios::in | std::ios::ate | std::ios::binary);
+
     //        assert(sourceFile.is_open());
     //    constexpr size_t maxPartSize = 100'000'000;
     //    constexpr size_t nbBuffPerPart = 20;
@@ -674,8 +831,8 @@ MeshB* meshLoad(const char* _filePath, bool _ramcopy)
         parts2bin(bin.c_str());
 
 #ifdef AUTO_GIT_PARTITION
-        // generate partition if file is to big for git repo
     } else {
+        // generate partition if file is to big for git repo
         sourceFile.close();
         bin2parts(bin.c_str());
 #endif

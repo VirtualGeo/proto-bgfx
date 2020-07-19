@@ -459,11 +459,17 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 	bx::FileReaderI* getFileReader()
 	{
+        if (s_fileReader == nullptr) {
+            initFileReaderWriter();
+        }
 		return s_fileReader;
 	}
 
 	bx::FileWriterI* getFileWriter()
 	{
+        if (s_fileWriter == nullptr) {
+            initFileReaderWriter();
+        }
 		return s_fileWriter;
 	}
 

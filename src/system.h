@@ -5,9 +5,20 @@
 
 static std::string GetBaseDir(const std::string& filepath)
 {
+    std::string ret = "";
     if (filepath.find_last_of("/\\") != std::string::npos)
-        return filepath.substr(0, filepath.find_last_of("/\\"));
-    return "";
+        ret = filepath.substr(0, filepath.find_last_of("/\\"));
+//    return "";
+
+    if (ret.empty()) {
+        ret = ".";
+    }
+#ifdef _WIN32
+    ret += "\\";
+#else
+    ret += "/";
+#endif
+    return ret;
 }
 
 static bool FileExists(const std::string& abs_filename)

@@ -28,7 +28,7 @@ Material::Material(const tinyobj::material_t& material, const std::string& baseD
 {
     if (! s_initialized) {
         s_sDiffuseUH = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
-        s_textures.reserve(100);
+//        s_textures.reserve(100);
         s_initialized = true;
     }
 
@@ -124,7 +124,7 @@ Material::Material(std::ifstream& file)
 {
     if (! s_initialized) {
         s_sDiffuseUH = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
-        s_textures.reserve(100);
+//        s_textures.reserve(100);
         s_initialized = true;
     }
 

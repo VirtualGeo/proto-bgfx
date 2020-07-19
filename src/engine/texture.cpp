@@ -63,7 +63,7 @@ Texture::Texture(const std::string& texName, const std::string& baseDir, Type ty
     m_type = type;
 
     const std::string absoluteTexName = baseDir + texName;
-    std::cout << absoluteTexName << std::endl;
+//    std::cout << absoluteTexName << std::endl;
 
     //    uint texture_id;
     //    int w, h;

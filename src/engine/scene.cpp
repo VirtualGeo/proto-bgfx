@@ -23,16 +23,16 @@ Scene::Scene()
 // obj filename
 void Scene::addModel(const std::string& filename)
 {
-    m_mesh = meshLoad(filename.c_str());
-    assert(m_mesh != nullptr);
+//    m_mesh = meshLoad(filename.c_str());
+//    assert(m_mesh != nullptr);
 
     //    std::string absoluteFilename(std::string(PROJECT_DIR) + filename);
     std::string absoluteFilename(filename);
 #ifdef AUTO_GENERATE_BIN_MODEL
-    std::string bin = absoluteFilename.substr(0, absoluteFilename.find_last_of('.')) + ".tex";
-    if (! FileExists(bin)) {
-        parts2bin(bin.c_str());
-    }
+    std::string bin = absoluteFilename.substr(0, absoluteFilename.find_last_of('.')) + ".bin";
+//    if (! FileExists(bin)) {
+//        parts2bin(bin.c_str());
+//    }
     bool loadBinFailed = false;
     if (FileExists(bin)) {
         std::ifstream file;
@@ -59,9 +59,9 @@ void Scene::addModel(const std::string& filename)
 //            m_textures.clear();
             Material::s_textures.clear();
         } else {
-#ifdef AUTO_GIT_PARTITION
-            bin2parts(bin.c_str());
-#endif
+//#ifdef AUTO_GIT_PARTITION
+//            bin2parts(bin.c_str());
+//#endif
             return;
         }
     }
@@ -77,18 +77,11 @@ void Scene::addModel(const std::string& filename)
     auto start = std::chrono::steady_clock::now();
 
     std::string base_dir = GetBaseDir(absoluteFilename);
-    if (base_dir.empty()) {
-        base_dir = ".";
-    }
-#ifdef _WIN32
-    base_dir += "\\";
-#else
-    base_dir += "/";
-#endif
     std::cout << "[Scene] Base dir: " << base_dir << std::endl;
 
     std::string warn;
     std::string err;
+    assert(FileExists(absoluteFilename));
     bool ret = tinyobj::LoadObj(&tinyObjAttrib, &tinyObjShapes, &tinyObjMaterials, &warn, &err, absoluteFilename.c_str(),
         base_dir.c_str());
     if (!warn.empty()) {
@@ -178,21 +171,21 @@ void Scene::addModel(const std::string& filename)
 
 
 //    // -------------------------------------- OBJECTS
-//    m_objects.reserve(nbObjects);
-////    bgfx::frame();
-//    for (size_t i = 0; i < nbObjects; ++i) {
-//        const tinyobj::shape_t& tinyObj_shape = tinyObjShapes[i];
-//        //        m_objects.push_back(Object(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i));
-//        m_objects.emplace_back(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i);
-//        //        nbIndices += m_objects[i].nbTriangles() * 3;
-//        //        nbMeshes += m_objects[i].nbMeshes();
-//#ifdef MODEL_LOADER_INFO
-//        const Object& object = m_objects.back();
-//        std::cout << "[Scene] Load object[" << i << "/" << nbObjects << "] : " << object << std::endl;
-//#endif
+    m_objects.reserve(nbObjects);
+//    bgfx::frame();
+    for (size_t i = 0; i < nbObjects; ++i) {
+        const tinyobj::shape_t& tinyObj_shape = tinyObjShapes[i];
+        //        m_objects.push_back(Object(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i));
+        m_objects.emplace_back(tinyObj_shape, tinyObjAttrib, tinyObjMaterials, i);
+        //        nbIndices += m_objects[i].nbTriangles() * 3;
+        //        nbMeshes += m_objects[i].nbMeshes();
+#ifdef MODEL_LOADER_INFO
+        const Object& object = m_objects.back();
+        std::cout << "[Scene] Load object[" << i << "/" << nbObjects << "] : " << object << std::endl;
+#endif
 //        bgfx::frame();
-//    }
-//    assert(nbObjects == m_objects.size());
+    }
+    assert(nbObjects == m_objects.size());
 
 
     //    tm.end();
@@ -234,12 +227,12 @@ void Scene::clear()
     //        assert(bgfx::isValid(texture.textureHandle()));
     //    }
     Material::s_textures.clear(); // bgfx::TextureHandle
-//    m_objects.clear(); // bgfx::VertexBufferHandle
+    m_objects.clear(); // bgfx::VertexBufferHandle
 //    m_meshes.clear();
-    meshUnload(m_mesh);
+//    meshUnload(m_mesh);
 //    delete m_mesh;
-    m_mesh = nullptr;
-    //    m_materials.clear();
+//    m_mesh = nullptr;
+        m_materials.clear();
 }
 
 void Scene::load(std::ifstream& file)
@@ -292,19 +285,19 @@ void Scene::load(std::ifstream& file)
 //    bgfx::frame();
 
 
-//    FileIO::read(size, file);
-//    m_objects.reserve(size);
-//    //    bgfx::frame();
-//    for (size_t i = 0; i < size; ++i) {
-//        //        m_objects.push_back(Object(file, i, m_layout));
-//        //        const Object && object = Object(file, i, m_layout);
-//        m_objects.emplace_back(file, i);
-//#ifdef MODEL_LOADER_INFO
-//        const Object& object = m_objects.back();
-//        std::cout << "[Scene] Load object[" << i << "/" << size << "] : " << object << std::endl;
-//#endif
-//        bgfx::frame();
-//    }
+    FileIO::read(size, file);
+    m_objects.reserve(size);
+    //    bgfx::frame();
+    for (size_t i = 0; i < size; ++i) {
+        //        m_objects.push_back(Object(file, i, m_layout));
+        //        const Object && object = Object(file, i, m_layout);
+        m_objects.emplace_back(file, i);
+#ifdef MODEL_LOADER_INFO
+        const Object& object = m_objects.back();
+        std::cout << "[Scene] Load object[" << i << "/" << size << "] : " << object << std::endl;
+#endif
+        bgfx::frame();
+    }
 
     //    tm.end();
     end = std::chrono::steady_clock::now();
@@ -340,14 +333,14 @@ void Scene::save(std::ofstream& file) const
     }
 
 
-//    size = m_objects.size();
-//    FileIO::write(size, file);
-//    //    m_objects.reserve(size);
-//    for (int i = 0; i < size; ++i) {
-//        //        m_objects.push_back(file);
-//        //        m_objects.save(file);
-//        m_objects[i].save(file);
-//    }
+    size = m_objects.size();
+    FileIO::write(size, file);
+    //    m_objects.reserve(size);
+    for (int i = 0; i < size; ++i) {
+        //        m_objects.push_back(file);
+        //        m_objects.save(file);
+        m_objects[i].save(file);
+    }
 
 
     //    FileIO::write(m_parsingTime, file);
@@ -575,13 +568,14 @@ void Scene::renderView(const View& view, const float mtx[16])
 
 void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx, const uint64_t state) const
 {
-//    for (const Object& object : m_objects) {
-//        object.draw(id, shading, mtx, state, m_materials);
-////        bgfx::submit(id, Program::m_programs[shading]);
-//    }
+    for (const Object& object : m_objects) {
+        object.draw(id, shading, mtx, state, m_materials);
+//        bgfx::submit(id, Program::m_programs[shading]);
+    }
 
-    assert(m_mesh != nullptr);
-    meshSubmit(m_mesh, id, Program::m_programs[shading], mtx);
+//    assert(m_mesh != nullptr);
+//    meshSubmit(m_mesh, id, Program::m_programs[shading], mtx);
+
 
     //    const uint nbObjects = m_objects.size();
     //            bgfx::setTransform(mtx);

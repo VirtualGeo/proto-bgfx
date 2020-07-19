@@ -2,9 +2,9 @@
 #include <entry/entry.h>
 
 #include <bgfx/examples/common/bgfx_utils.h>
-#include <bgfx/examples/common/entry/entry.h>
+//#include <bgfx/examples/common/entry/entry.h>
 
-//MeshB* g_mesh = nullptr;
+MeshB* g_mesh = nullptr;
 CameraFps* g_camera = nullptr;
 bgfx::ProgramHandle g_program;
 //float g_mtx[16];
@@ -14,7 +14,7 @@ int s_nWindow = 1;
 
 void init(View& view)
 {
-    entry::initFileReaderWriter();
+    //    entry::initFileReaderWriter();
 
     //    bx::mtxIdentity(g_mtx);
     //    bx::mtxScale(g_mtx, 0.01f);
@@ -40,7 +40,10 @@ void init(View& view)
     //        entry::s_scene.addModel("/home/gauthier/Downloads/AmazonLumberyardBistro/exterior.obj");
     //    g_mesh = meshLoad("/home/gauthier/tmp/bgfx.cmake/bgfx/examples/runtime/meshes/sanMiguel.bin");
 
-    entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/San_Miguel/san-miguel.obj");
+    //    entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/San_Miguel/san-miguel.obj");
+
+    g_mesh = meshLoad((std::string(PROJECT_DIR) + "examples/assets/San_Miguel/san-miguel.obj").c_str());
+
     //    g_mesh = meshLoad((std::string(PROJECT_DIR) + "examples/runtime/meshes/sanMiguel.bin").c_str());
 
     //    entry::s_scene.addModel("/home/gauthier/Downloads/San_Miguel/san-miguel.obj");
@@ -64,7 +67,7 @@ void shutdown()
     //    Texture::shutdown();
     //    Geometry::shutdown();
 
-    //    meshUnload(g_mesh);
+    meshUnload(g_mesh);
     //    bgfx::destroy(g_program);
 }
 
@@ -75,8 +78,8 @@ void preRender()
 void render(const View& view)
 {
     g_camera->setViewTransform(view);
-    meshSubmit(entry::s_scene.m_mesh, 0, g_program, entry::s_worldTransform);
-    //        meshSubmit(g_mesh, 0, g_program, g_mtx);
+    //    meshSubmit(entry::s_scene.m_mesh, 0, g_program, entry::s_worldTransform);
+    meshSubmit(g_mesh, 0, g_program, entry::s_worldTransform);
 
     //    entry::s_scene.renderView(view, entry::s_worldTransform);
 

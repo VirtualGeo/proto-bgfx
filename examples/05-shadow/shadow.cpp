@@ -8,7 +8,7 @@ void init(View& view)
 {
     // ------------------------------- LOAD MODEL
     //                 g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
-    if (view.id == 0) {
+    if (view.id == VIEW_ID_START_WINDOW) {
         Geometry::init();
         Texture::init();
         Program::s_nSpotLight = 2;

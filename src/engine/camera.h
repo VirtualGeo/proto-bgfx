@@ -32,7 +32,7 @@ public:
 
 //private:
     bx::Vec3 m_pos;
-    float m_fov = 100.0f;
+    float m_fov = 60.0f;
     bx::Vec3 m_front;
     bx::Vec3 m_right;
     bx::Vec3 m_up = {0.0f, 1.0f, 0.0f}; // Euler camera

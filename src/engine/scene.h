@@ -18,7 +18,7 @@
 #include <entry/windowstate.h>
 //#include <map>
 //#include <string>
-#include <bgfx/examples/common/bgfx_utils.h>
+//#include <bgfx/examples/common/bgfx_utils.h>
 
 class Scene
 {
@@ -60,9 +60,9 @@ public:
 //    Cameras m_cameras;
     std::vector<CameraFps> m_cameras;
 //    bgfx::VertexLayout m_layout;
-//    std::vector<Object> m_objects;
+    std::vector<Object> m_objects;
 //    std::vector<MeshB*> m_meshes;
-    MeshB * m_mesh = nullptr;
+//    MeshB * m_mesh = nullptr;
 
 //    std::vector<Material> m_materials;
     static Materials m_materials;
