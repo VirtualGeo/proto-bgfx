@@ -54,7 +54,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         //        bgfxInit.type = bgfx::RendererType::Direct3D9;
         //        bgfxInit.type = bgfx::RendererType::Direct3D11;
         //        bgfxInit.type = bgfx::RendererType::Direct3D12;
-        bgfxInit.type = bgfx::RendererType::OpenGL;
+        //        bgfxInit.type = bgfx::RendererType::OpenGL;
         //        bgfxInit.type = bgfx::RendererType::OpenGLES;
         //        bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
         //        bgfxInit.type = bgfx::RendererType::Metal;
@@ -150,17 +150,16 @@ WindowState::~WindowState()
 
 void WindowState::render() const
 {
-//    bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
+    bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
 
-//    bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
+    bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
 
-//    // This dummy draw call is here to make sure that view 0 is cleared
-//    // if no other draw calls are submitted to view 0.
-//    //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+    // This dummy draw call is here to make sure that view 0 is cleared
+    // if no other draw calls are submitted to view 0.
+    //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
 
-//    bgfx::setViewClear(m_view.id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
-//    bgfx::touch(m_view.id);
-
+    bgfx::setViewClear(m_view.id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+    bgfx::touch(m_view.id);
 
     //    const float ratio = float(m_width) / m_height;
     entry::render(m_view);
@@ -240,7 +239,7 @@ void WindowState::printDebugMessage()
         //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window.m_fps, window.m_width, window.m_height, Program::filename(window.m_shading));
         //        }
 
-//        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps: %.2f", entry::s_fps);
+        //        bgfx::dbgTextPrintf(0, ++line, 0x0F, "Fps: %.2f", entry::s_fps);
         int i = 0;
         for (const auto& window : s_windows) {
             //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Window: %d, Fps: %.2f, Backbuffer: %dx%d, Viewport shading: %s", i, window->m_fps, window->m_width, window->m_height, Program::filename(window->m_shading));
@@ -330,16 +329,16 @@ void WindowState::resizeEvent(int width, int height)
     const float ratio = float(m_width) / m_height;
     m_view.ratio = ratio;
 
-        bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
-        bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
+    //        bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
+    //        bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
 
-        // This dummy draw call is here to make sure that view 0 is cleared
-        // if no other draw calls are submitted to view 0.
-        //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+    //        // This dummy draw call is here to make sure that view 0 is cleared
+    //        // if no other draw calls are submitted to view 0.
+    //        //    bgfx::setViewClear(m_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
 
-        bgfx::setViewClear(m_view.id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
-        bgfx::touch(m_view.id);
-        bgfx::frame(); // avoid startup artefact, with long scene charging
+    //        bgfx::setViewClear(m_view.id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0X555555FF);
+    //        bgfx::touch(m_view.id);
+    bgfx::frame(); // avoid startup artefact, with long scene charging
 }
 
 void WindowState::mouseMoveEvent(int x, int y)
