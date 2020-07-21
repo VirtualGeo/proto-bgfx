@@ -70,12 +70,18 @@ void main()
 //        u_ambient,
 //        u_shininess
 //    );
-    Material material = Material(
-        vec3(0.5, 0.5, 0.5),
-        vec3(1.0, 1.0, 1.0),
-        vec3(0.0, 0.0, 0.0),
-        128.0
-    );
+//    Material material = Material(
+//        vec3(0.5, 0.5, 0.5),
+//        vec3(1.0, 1.0, 1.0),
+//        vec3(0.0, 0.0, 0.0),
+//        128.0
+//    );
+    Material material;
+    material.diffuse = vec3_splat(0.5);
+    material.diffuse = toLinear(texture2D(s_diffuse, v_texcoord0)).xyz;
+    material.specular = vec3_splat(1.0);
+    material.ambient = vec3_splat(0.0);
+    material.shininess = 128.0;
 
 
 
@@ -83,11 +89,16 @@ void main()
     vec3 view_dir = normalize(- v_view);
     vec3 normal = dot(v_normal, view_dir) > 0.0 ? normalize(v_normal) : normalize(- v_normal);
 
-    linear_color += calculateSingleLightShading(DirLight(u_dir_light_0_dir, u_dir_light_0_color), material, normal, view_dir);
+    DirLight dirLight;
+    dirLight.dir = u_dir_light_0_dir;
+    dirLight.intensity = u_dir_light_0_color;
+
+//    linear_color += calculateSingleLightShading(DirLight(u_dir_light_0_dir, u_dir_light_0_color), material, normal, view_dir);
+    linear_color += calculateSingleLightShading(dirLight, material, normal, view_dir);
 //    linear_color += calculateSingleLightShading(DirLight(u_dir_light_1_dir, u_dir_light_1_color), material, normal, view_dir);
 
-    linear_color += material.ambient;
-    linear_color = toLinear(texture2D(s_diffuse, v_texcoord0)).xyz;
+//    linear_color += material.ambient;
+//    linear_color = toLinear(texture2D(s_diffuse, v_texcoord0)).xyz;
 
     vec3 corrected_color = pow(linear_color, vec3_splat(1.0 / gamma));
 

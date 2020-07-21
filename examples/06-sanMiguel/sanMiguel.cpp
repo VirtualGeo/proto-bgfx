@@ -43,6 +43,7 @@ void init(View& view)
     //    entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/San_Miguel/san-miguel.obj");
 
     g_mesh = meshLoad((std::string(PROJECT_DIR) + "examples/assets/San_Miguel/san-miguel.obj").c_str());
+//    g_mesh = meshLoad((std::string(PROJECT_DIR) + "examples/assets/sponza/sponza.obj").c_str());
 
     //    g_mesh = meshLoad((std::string(PROJECT_DIR) + "examples/runtime/meshes/sanMiguel.bin").c_str());
 

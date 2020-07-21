@@ -148,7 +148,9 @@ vec3 blinnPhongSpecular(vec3 normal, vec3 viewDir, vec3 lightDir, vec3 lightSpec
 // calculates the color when using a directional light.
 vec3 CalcDirLight(int iLight, vec3 normal, vec3 viewDir)
 {
-    DirLight light = dirLights(iLight);
+//    DirLight light = dirLights(iLight);
+//    spotLights(light, iLight);
+    dirLights(light, iLight);
     vec3 lightDir = normalize(-light.direction);
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);

@@ -137,8 +137,8 @@ struct MeshB
 ///
 MeshB* meshLoad(const char* _filePath, bool _ramcopy = false);
 
-void parts2bin(const char * filePath);
-void bin2parts(const char * filePath);
+//void parts2bin(const char * filePath);
+//void bin2parts(const char * filePath);
 
 ///
 void meshUnload(MeshB* _mesh);

@@ -61,9 +61,10 @@ public:
         assert(val.empty());
         size_t size;
         read(size, file);
+        assert(0 < size && size < 100);
         val.resize(size);
-        // file.read(const_cast<char*>(val.data()), size * sizeof(char));
-        file.read(&val[0], size * sizeof(char));
+         file.read(const_cast<char*>(val.data()), size * sizeof(char));
+        //file.read(&val[0], size * sizeof(char));
     }
 
     // ---------------------------------- WRITE
@@ -105,9 +106,10 @@ public:
     {
         size_t size = val.size();
         write(size, file);
+        assert(0 < size && size < 100);
         //        val.resize(size);
-        // file.write(const_cast<const char*>(val.data()), size * sizeof(char));
-        file.write(&val[0], size * sizeof(char));
+         file.write(const_cast<const char*>(val.data()), size * sizeof(char));
+        //file.write(&val[0], size * sizeof(char));
     }
 
     //    static void read(int & val, std::ifstream & file) {

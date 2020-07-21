@@ -15,10 +15,16 @@ struct DirLight {
 #define N_DIR_LIGHT_VEC4 4
 //#if N_DIR_LIGHT > 0
 uniform vec4 u_dirLights[N_DIR_LIGHT_VEC4 * N_DIR_LIGHT];
-#define dirLights(i) DirLight(vec3(u_dirLights[i * N_DIR_LIGHT_VEC4]), \
-                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 1]), \
-                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 2]), \
-                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 3]))
+//#define dirLights(i) DirLight(vec3(u_dirLights[i * N_DIR_LIGHT_VEC4]), \
+//                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 1]), \
+//                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 2]), \
+//                vec3(u_dirLights[i * N_DIR_LIGHT_VEC4 + 3]))
+#define dirLights(varName, i) DirLight varName; \
+varName.ambient = u_dirLights[i * N_DIR_LIGHT_VEC4].xyz; \
+varName.diffuse = u_dirLights[i * N_DIR_LIGHT_VEC4 + 1].xyz; \
+varName.specular = u_dirLights[i * N_DIR_LIGHT_VEC4 + 2].xyz; \
+varName.direction = u_dirLights[i * N_DIR_LIGHT_VEC4 + 3].xyz;
+
 //#endif
 //#define nbDirLights u_dirLights[0].w
 #endif

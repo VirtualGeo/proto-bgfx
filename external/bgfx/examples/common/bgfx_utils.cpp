@@ -587,13 +587,17 @@ MeshB* meshLoad(bx::ReaderSeekerI* _reader, bool _ramcopy)
     return mesh;
 }
 
-void parts2bin(const char* _filePath)
+static void parts2bin(const char* _filePath)
+//static void parts2bin()
+//void parts2bin(const std::string & filePath)
 {
+//    const std::string filePath(PROJECT_DIR "examples/assets/San_Miguel/san-miguel.geom");
     const std::string filePath(_filePath);
     constexpr size_t maxPartSize = 100'000'000; // max git file
-    constexpr size_t nbBuffPerPart = 20;
+    constexpr size_t nbBuffPerPart = 100;
     constexpr size_t lenBuff = maxPartSize / nbBuffPerPart;
-    char buff[lenBuff];
+    // on linux lenBuff = 5 000 000
+    char buff[lenBuff]; // on win lenBuff = 1 000 000
 
     std::ofstream outFile(filePath, std::ios::out | std::ios::binary);
     assert(outFile.is_open());
@@ -624,11 +628,11 @@ void parts2bin(const char* _filePath)
     //        std::cout << "counter = " << counter << std::endl;
 }
 
-void bin2parts(const char* _filePath)
+static void bin2parts(const char* _filePath)
 {
     const std::string filePath(_filePath);
     constexpr size_t maxPartSize = 100'000'000; // max git file
-    constexpr size_t nbBuffPerPart = 20;
+    constexpr size_t nbBuffPerPart = 100;
     constexpr size_t lenBuff = maxPartSize / nbBuffPerPart;
     char buff[lenBuff];
     //            size_t counter = 0;
@@ -660,7 +664,7 @@ void bin2parts(const char* _filePath)
     //            std::cout << "counter = " << counter << std::endl;
 }
 
-void saveMatFile(std::ofstream& file)
+static void saveMatFile(std::ofstream& file)
 {
     size_t size;
     size = s_materials.size();
@@ -685,12 +689,14 @@ void saveMatFile(std::ofstream& file)
 
 //static std::vector<tinyobj::material_t> s_materials;
 
-void loadMatFile(std::ifstream & file)
+static void loadMatFile(std::ifstream & file)
 {
+    assert(file.is_open());
     //        auto start = std::chrono::steady_clock::now();
 
     size_t size;
     FileIO::read(size, file);
+
     s_materials.reserve(size);
     for (int i = 0; i < size; ++i) {
         //            m_materials.emplace_back(file, &m_textures);
@@ -732,7 +738,7 @@ void loadMatFile(std::ifstream & file)
     //    bgfx::frame();
 }
 
-void loadMat(const std::string & filePath) {
+static void loadMat(const std::string & filePath) {
     std::string base_dir = GetBaseDir(filePath);
     // load materials (textures)
     std::vector<tinyobj::material_t> tinyObjMaterials;
@@ -742,7 +748,8 @@ void loadMat(const std::string & filePath) {
     std::string tex = filePath.substr(0, filePath.find_last_of('.')) + ".tex";
     //    assert(FileExists(mat));
     if (FileExists(tex)) {
-        std::ifstream texFile(tex);
+        std::ifstream texFile(tex, std::ios::binary | std::ios::in);
+//        std::ofstream file(tex, std::ios::binary | std::ios::out);
         assert(texFile.is_open());
         loadMatFile(texFile);
         texFile.close();
@@ -812,31 +819,39 @@ MeshB* meshLoad(const char* _filePath, bool _ramcopy)
 
     // load geometry
     //    std::string absoluteFilename(_filePath);
-    std::string bin = filePath.substr(0, filePath.find_last_of('.')) + ".geom";
+    const std::string bin = filePath.substr(0, filePath.find_last_of('.')) + ".geom";
 //    assert(FileExists(bin));
 
-    std::ifstream sourceFile;
-    sourceFile.open(bin, std::ios::in | std::ios::ate | std::ios::binary);
+    //std::ifstream sourceFile;
+    //sourceFile.open(bin, std::ios::in | std::ios::ate | std::ios::binary);
 
     //        assert(sourceFile.is_open());
     //    constexpr size_t maxPartSize = 100'000'000;
     //    constexpr size_t nbBuffPerPart = 20;
     //    constexpr size_t lenBuff = maxPartSize / nbBuffPerPart;
     //    char buff[lenBuff];
+    char str[128];
+    memcpy(str, bin.c_str(), bin.size() * sizeof (char));
+
 
     // if file not exist, create single file from partitions
-    if (!sourceFile.is_open()) {
+    //if (!sourceFile.is_open()) {
+    if (! FileExists(bin)) {
         //        sourceFile.close();
 
         parts2bin(bin.c_str());
+//        parts2bin(str);
+//        parts2bin();
 
-#ifdef AUTO_GIT_PARTITION
     } else {
         // generate partition if file is to big for git repo
-        sourceFile.close();
+        //sourceFile.close();
+#ifdef AUTO_GIT_PARTITION
         bin2parts(bin.c_str());
 #endif
     }
+
+    assert(FileExists(bin));
 
     bx::FileReaderI* reader = entry::getFileReader();
     if (bx::open(reader, bin.c_str())) {
