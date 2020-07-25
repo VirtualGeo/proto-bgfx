@@ -463,7 +463,8 @@ void MeshB::load(bx::ReaderSeekerI* _reader, bool _ramcopy)
             stl::string material;
             material.resize(len);
             read(_reader, const_cast<char*>(material.c_str()), len);
-            group.m_material = material;
+//            group.m_material = material;
+            group.m_iMaterial = s_matName2id[material.c_str()];
 
             uint16_t num;
             read(_reader, num);
@@ -523,6 +524,68 @@ void MeshB::unload()
     m_groups.clear();
 }
 
+//void MeshB::submit(bgfx::ViewId _id, const float* _mtx, uint64_t _state) const
+//{
+//    if (BGFX_STATE_MASK == _state) {
+//        _state = 0
+//            | BGFX_STATE_WRITE_RGB
+//            | BGFX_STATE_WRITE_A
+//            | BGFX_STATE_WRITE_Z
+//            | BGFX_STATE_DEPTH_TEST_LESS
+//            | BGFX_STATE_CULL_CCW
+//            | BGFX_STATE_MSAA;
+//    }
+
+//    bgfx::setTransform(_mtx);
+//    //	bgfx::setState(_state);
+
+//    for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it) {
+//        bgfx::setState(_state);
+
+//        const Group& group = *it;
+
+//        bgfx::setIndexBuffer(group.m_ibh);
+//        bgfx::setVertexBuffer(0, group.m_vbh);
+////                bgfx::submit(_id, BGFX_INVALID_HANDLE, 0, (it == itEnd-1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_NONE);
+//        //        bgfx::submit(_id, _program, 0, (it == itEnd-1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_STATE);
+//        //        bgfx::submit(_id, _program, 0, BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE);
+//        bgfx::submit(_id, BGFX_INVALID_HANDLE, 0, BGFX_DISCARD_STATE);
+//    }
+//}
+
+void MeshB::submit(bgfx::ViewId _id, Shading _shading, const float* _mtx, uint64_t _state) const
+{
+    if (BGFX_STATE_MASK == _state) {
+        _state = 0
+            | BGFX_STATE_WRITE_RGB
+            | BGFX_STATE_WRITE_A
+            | BGFX_STATE_WRITE_Z
+            | BGFX_STATE_DEPTH_TEST_LESS
+            | BGFX_STATE_CULL_CCW
+            | BGFX_STATE_MSAA;
+    }
+
+    bgfx::setTransform(_mtx);
+    //	bgfx::setState(_state);
+
+    for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it) {
+        bgfx::setState(_state);
+
+        const Group& group = *it;
+        //        const Material& material = Scene::m_materials[Scene::m_matName2id[group.m_material.c_str()]];
+//        const Material& material = s_materials[s_matName2id[group.m_material.c_str()]];
+
+        bgfx::setIndexBuffer(group.m_ibh);
+        bgfx::setVertexBuffer(0, group.m_vbh);
+        //        bgfx::submit(_id, _program, 0, (it == itEnd-1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_NONE);
+        //        bgfx::submit(_id, _program, 0, (it == itEnd-1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_STATE);
+        //        bgfx::submit(_id, _program, 0, BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE);
+        const Material& material = s_materials[group.m_iMaterial];
+        Program::submit(_id, _shading, material);
+    }
+}
+
+
 void MeshB::submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* _mtx, uint64_t _state) const
 {
     if (BGFX_STATE_MASK == _state) {
@@ -543,8 +606,13 @@ void MeshB::submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* 
 
         const Group& group = *it;
         //        const Material& material = Scene::m_materials[Scene::m_matName2id[group.m_material.c_str()]];
-        const Material& material = s_materials[s_matName2id[group.m_material.c_str()]];
+//        const Material& material = s_materials[s_matName2id[group.m_material.c_str()]];
+        const Material& material = s_materials[group.m_iMaterial];
+#ifdef FAST_BLINN
+        material.submitDiffuseTexture();
+#else
         material.submit();
+#endif
 
         bgfx::setIndexBuffer(group.m_ibh);
         bgfx::setVertexBuffer(0, group.m_vbh);

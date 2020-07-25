@@ -22,7 +22,8 @@ public:
 
 //public:
     Camera(bx::Vec3 pos);
-//    Camera(const Camera & camera) = delete;
+    Camera(const Camera & camera) = delete;
+    Camera(Camera && camera);
 
     virtual void move(Direction direction, float distance);
     virtual void mouseMove(float xoffset, float yoffset) = 0;

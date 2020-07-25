@@ -1,5 +1,9 @@
 #include "pointlight.h"
 
+size_t PointLight::s_nPointLight = 0;
+static const int s_shadowMapSize = 2048;
+//static bgfx::UniformHandle s_sShadowMapUH = BGFX_INVALID_HANDLE;
+
 PointLight::PointLight(bx::Vec3 && position, float constant, float linear, float quadratic)
     : m_position(std::move(position))
     , m_constant(constant)
@@ -13,9 +17,31 @@ PointLight::PointLight(bx::Vec3 && position, float constant, float linear, float
 //    , Light(bx::Vec3(0.0f), bx::Vec3(0.8f), bx::Vec3(1.0f))
 {
 
+    ++s_nPointLight;
+}
+
+PointLight::~PointLight()
+{
+
+    --s_nPointLight;
 }
 
 void PointLight::updateLightShadowMaps(int viewId)
 {
 
+}
+
+
+void PointLight::drawDebug()
+{
+//    int viewId = VIEW_ID_START_DEBUG_SHADOW + m_id;
+
+//    bgfx::setViewRect(viewId, 50 + m_id *210, 200, 200, 200);
+//    bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
+
+//    bgfx::setTexture(3, s_sShadowMapUH, m_shadowMapTH);
+////    bgfx::setTexture(3, Program::m_sShadowMap, Texture::getSampleTexture(Texture::CHECKER_BOARD));
+//    Geometry::drawQuad();
+
+//    bgfx::submit(viewId, Program::m_programs[DEBUG_QUAD]);
 }

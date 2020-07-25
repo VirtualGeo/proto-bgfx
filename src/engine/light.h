@@ -18,13 +18,14 @@ public:
 
 //protected:
     virtual void updateLightShadowMaps(int viewId) = 0;
-    void drawDebug();
+    virtual void drawDebug() = 0;
 
     //private:
     bx::Vec3 m_ambient;
     bx::Vec3 m_diffuse;
     bx::Vec3 m_specular;
 
+//    static size_t s_counter;
 
 //    bgfx::FrameBufferHandle m_shadowMapFB;
 //    bgfx::TextureHandle m_shadowMapTexture;
@@ -38,7 +39,7 @@ protected:
     int m_id;
     bool m_last = true;
 private:
-    static int m_nbLight;
+//    static int m_nbLight;
 };
 
 

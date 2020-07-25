@@ -8,7 +8,9 @@
 //#include <entry/entry.h>
 //#include <shaderc/shaderc.h>
 
-#define VIEW_ID_START_WINDOW 0
+#define VIEW_ID_START_WINDOW 30
+#define VIEW_ID_START_SHADOW 10
+#define VIEW_ID_START_DEBUG_SHADOW 20
 
 struct MouseButton {
     enum Enum {

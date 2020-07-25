@@ -4,16 +4,24 @@
 #include <iostream>
 #include "program.h"
 #include "geometry.h"
+#include <entry/windowstate.h>
 
-int Light::m_nbLight = 0;
+static size_t s_nLight = 0;
+static bgfx::UniformHandle s_sShadowMapUH = BGFX_INVALID_HANDLE;
+
+//size_t s_counter;
 
 Light::Light(bx::Vec3 ambient, bx::Vec3 diffuse, bx::Vec3 specular)
     : m_ambient(ambient)
     , m_diffuse(diffuse)
     , m_specular(specular)
-    , m_id(m_nbLight)
+    , m_id(s_nLight)
 {
-    ++m_nbLight;
+
+    if (s_nLight == 0) {
+        s_sShadowMapUH = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
+    }
+    ++s_nLight;
 }
 
 Light::Light(Light&& light)
@@ -27,25 +35,13 @@ Light::Light(Light&& light)
     std::cout << "\033[34m";
     std::cout << "[Light] " << this << " right moving from " << &light << std::endl;
     std::cout << "\033[0m";
-    std::cout << "nbLight : " << m_nbLight << std::endl;
+    std::cout << "nbLight : " << s_nLight << std::endl;
+    assert(false);
 }
 
 Light::~Light()
 {
     if (m_last) {
-        --m_nbLight;
+        --s_nLight;
     }
-}
-
-void Light::drawDebug()
-{
-    int viewId = VIEWID_SHADOW + m_id;
-
-    bgfx::setViewRect(viewId, 50 + m_id *210, 200, 200, 200);
-    bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
-    bgfx::setTexture(3, Program::m_sShadowMap, Program::m_shadowMapTexture[m_id]);
-//    bgfx::setTexture(3, Program::m_sShadowMap, Texture::getSampleTexture(Texture::CHECKER_BOARD));
-    Geometry::drawQuad();
-
-    bgfx::submit(viewId, Program::m_programs[DEBUG_QUAD]);
 }

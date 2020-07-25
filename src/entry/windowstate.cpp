@@ -297,7 +297,7 @@ void WindowState::updateCameraPos()
 
 void WindowState::resetWindow()
 {
-    assert(m_view.id == VIEW_ID_START_WINDOW);
+//    assert(m_view.id == VIEW_ID_START_WINDOW);
     bgfx::reset(m_width, m_height, entry::getResetFlags());
 }
 

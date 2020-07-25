@@ -15,6 +15,7 @@
 #include <tinystl/vector.h>
 #include <tinystl/string.h>
 namespace stl = tinystl;
+#include <engine/program.h>
 
 //#include <string>
 
@@ -119,7 +120,8 @@ struct Group
 	PrimitiveArray m_prims;
 
 //    stl::string m_name;
-    stl::string m_material;
+//    stl::string m_material;
+    uint16_t m_iMaterial;
 };
 typedef stl::vector<Group> GroupArray;
 
@@ -127,11 +129,15 @@ struct MeshB
 {
 	void load(bx::ReaderSeekerI* _reader, bool _ramcopy);
 	void unload();
-	void submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* _mtx, uint64_t _state) const;
+    void submit(bgfx::ViewId _id, Shading _shading, const float *_mtx, uint64_t _state) const;
+    void submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* _mtx, uint64_t _state) const;
 	void submit(const MeshState*const* _state, uint8_t _numPasses, const float* _mtx, uint16_t _numMatrices) const;
+//    void submit(bgfx::ViewId _id, const float *_mtx, uint64_t _state = BGFX_STATE_MASK) const;
 
 	bgfx::VertexLayout m_layout;
-	GroupArray m_groups;
+    GroupArray m_groups;
+
+public:
 };
 
 ///

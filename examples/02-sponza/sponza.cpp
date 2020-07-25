@@ -10,6 +10,7 @@ void init(View& view)
     Texture::init();
     Program::s_nDirLight = 1;
     Program::init();
+    Material::init();
 //    bx::mtxScale(entry::s_worldTransform, 0.01f);
     // ------------------------------- LOAD MODEL
     //                 g_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");
@@ -17,7 +18,8 @@ void init(View& view)
     //    entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
     //    if (view.id == 0) {
     entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
-    s_scene.addDirLight(DirLight({ 0.0f, -1.0f, 0.5f }));
+//    s_scene.addDirLight(DirLight({ 0.0f, -1.0f, 0.5f }));
+    s_scene.addDirLight(bx::Vec3{ 0.0f, -1.0f, 0.5f });
 
     //    } else {
     //        entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
@@ -49,15 +51,18 @@ void shutdown()
     Geometry::shutdown();
     Texture::shutdown();
     Program::shutdown();
+    Material::shutdown();
 }
 
 void preRender()
 {
     entry::s_scene.setLightUniforms();
+    entry::s_scene.updateLightShadowMaps();
 }
 
 void render(const View& view)
 {
+    entry::s_scene.setLightShadowSamplers();
     entry::s_scene.renderView(view, entry::s_worldTransform);
     //    entry::s_scene.renderFromCamera(m_view.iCamera, ratio, m_id, m_shading, entry::g_mtx);
     //    bgfx::dbgTextClear();

@@ -26,9 +26,13 @@ set(EXAMPLES
     03-branchingTests
     04-nothingToDo
     05-shadow
-    06-sanMiguel
+    06-sanMiguel-fastBlinn
+    07-sanMiguel
 )
 
 foreach(EXAMPLE ${EXAMPLES})
+    if (${EXAMPLE} STREQUAL "06-sanMiguel")
+        add_definitions("-DFAST_BLINN")
+    endif()
     add_example(${EXAMPLE})
 endforeach()

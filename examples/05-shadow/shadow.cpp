@@ -13,8 +13,10 @@ void init(View& view)
         Texture::init();
         Program::s_nSpotLight = 2;
         Program::init();
+        Material::init();
 
         entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/sponza/sponza.obj");
+        entry::s_scene.m_cameras.reserve(2);
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
     } else {
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
@@ -47,6 +49,7 @@ void shutdown()
     Geometry::shutdown();
     Texture::shutdown();
     Program::shutdown();
+    Material::shutdown();
 }
 
 void preRender()

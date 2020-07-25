@@ -15,7 +15,8 @@ $input v_posLightSpace_1
 #include <bgfx_shader.sh>
 #include "shaderlib.sh" // do not include shaderlib.sh before bgfx_shader.sh
 
-#include "uniforms.sc"
+#include "light.sc"
+#include "material.sc"
 
 // function prototypes
 #if N_DIR_LIGHT > 0

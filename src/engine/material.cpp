@@ -7,8 +7,15 @@
 #include <cstring>
 
 std::vector<Texture> Material::s_textures;
-bgfx::UniformHandle Material::s_sDiffuseUH = BGFX_INVALID_HANDLE;
-bool Material::s_initialized = false;
+//bgfx::UniformHandle Material::s_sDiffuseUH = BGFX_INVALID_HANDLE;
+
+static bgfx::UniformHandle s_sDiffuseUH = BGFX_INVALID_HANDLE; // question: static better access than member class attribute ?
+static bgfx::UniformHandle s_sOpacityUH = BGFX_INVALID_HANDLE; // question: static better access than member class attribute ?
+//static bgfx::UniformHandle s_hasDiffuseTextureUH = BGFX_INVALID_HANDLE;
+static bgfx::UniformHandle s_uMaterialUH = BGFX_INVALID_HANDLE;
+static constexpr unsigned int s_num_vec4_material = 4;
+
+static bool s_initialized = false;
 
 bool hasLoaded(const std::string& texName, const Textures& textures, int& iTex)
 {
@@ -26,14 +33,9 @@ bool hasLoaded(const std::string& texName, const Textures& textures, int& iTex)
 
 Material::Material(const tinyobj::material_t& material, const std::string& baseDir)
 {
-    if (! s_initialized) {
-        s_sDiffuseUH = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
-//        s_textures.reserve(100);
-        s_initialized = true;
-    }
 
     m_name = material.name;
-//    std::cout << "        [Material] Loading material: '" << m_name << "' " << std::endl;
+    //    std::cout << "        [Material] Loading material: '" << m_name << "' " << std::endl;
 
     memcpy(m_diffuse, material.diffuse, 3 * sizeof(float));
     memcpy(m_specular, material.specular, 3 * sizeof(float));
@@ -42,10 +44,10 @@ Material::Material(const tinyobj::material_t& material, const std::string& baseD
 
     std::string diffuseTexName = material.diffuse_texname;
     //    material.diffuse_texopt.;
-//        std::cout << "        [Material] Loading texture: '" << diffuseTexName << "' " << std::endl;
+    //        std::cout << "        [Material] Loading texture: '" << diffuseTexName << "' " << std::endl;
     std::replace(diffuseTexName.begin(), diffuseTexName.end(), '\\', '/');
 
-//    assert(diffuseTexName.length() > 0);
+    //    assert(diffuseTexName.length() > 0);
     if (diffuseTexName.length() > 0) {
         m_diffuse[3] = 1.0f;
         // Only load the texture if it is not already loaded
@@ -70,7 +72,7 @@ Material::Material(const tinyobj::material_t& material, const std::string& baseD
 
     std::string opacityTexName = material.alpha_texname;
     std::replace(opacityTexName.begin(), opacityTexName.end(), '\\', '/');
-//    assert(opacityTexName.length() > 0);
+    //    assert(opacityTexName.length() > 0);
     if (opacityTexName.length() > 0) {
         //        m_texturesEnable[0] = 1.0f;
 
@@ -122,11 +124,6 @@ Material::~Material()
 
 Material::Material(std::ifstream& file)
 {
-    if (! s_initialized) {
-        s_sDiffuseUH = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
-//        s_textures.reserve(100);
-        s_initialized = true;
-    }
 
     FileIO::read(m_name, file);
     FileIO::read(m_iTexDiffuse, file);
@@ -154,6 +151,22 @@ void Material::save(std::ofstream& file) const
     FileIO::write(m_iTexOpacity, file);
 }
 
+void Material::init()
+{
+    s_sDiffuseUH = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
+    s_sOpacityUH = bgfx::createUniform("s_opacity", bgfx::UniformType::Sampler);
+    s_uMaterialUH = bgfx::createUniform("u_material", bgfx::UniformType::Vec4, s_num_vec4_material);
+    s_initialized = true;
+    //        s_textures.reserve(100);
+}
+
+void Material::shutdown()
+{
+    bgfx::destroy(s_sDiffuseUH);
+    bgfx::destroy(s_sOpacityUH);
+    bgfx::destroy(s_uMaterialUH);
+}
+
 void Material::updateData()
 {
 
@@ -167,29 +180,61 @@ void Material::updateData()
     memcpy(m_data, temp, sizeof(m_data));
 }
 
-void Material::submit() const
-{
-//    assert(0 <= m_iTexDiffuse && m_iTexDiffuse < s_textures.size());
+void Material::submitDiffuseTexture() const {
+    assert(s_initialized);
+
     if (m_iTexDiffuse >= 0) {
+
         assert(m_iTexDiffuse < s_textures.size());
         const Texture& texture = s_textures[m_iTexDiffuse];
 
-        //        float vec4[4] = { 1.0f };
+        bgfx::setTexture(0, s_sDiffuseUH,
+            texture.textureHandle(), Texture::s_textureSamplerFlags);
+
+        //    } else {
+        //        float vec4[4] = { 0.0f };
         //        bgfx::setUniform(m_hasDiffuseTexture, vec4);
+        //            bgfx::setTexture(0, m_sDiffuse, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+        //            bgfx::setTexture(0, m_diffuseTexture, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
 
-        assert(bgfx::isValid(texture.textureHandle()));
-        bgfx::setTexture(0, s_sDiffuseUH, texture.textureHandle());
-//        std::cout << texture << std::endl;
-
-//    } else {
-//        //        float vec4[4] = { 0.0f };
-//        //        bgfx::setUniform(m_hasDiffuseTexture, vec4);
-
-//        bgfx::setTexture(0, s_sDiffuseUH, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(),
-//                Texture::s_textureSamplerFlags);
+        //        bgfx::setTexture(0, s_sDiffuseUH, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
     }
 
-    //    bgfx::setUniform(m_uMaterial, material.m_data, s_num_vec4_material);
+//    if (m_iTexOpacity >= 0) {
+//        assert(m_iTexOpacity < s_textures.size());
+//        const Texture& texture = s_textures[m_iTexOpacity];
+
+//        bgfx::setTexture(1, s_sOpacityUH, texture.textureHandle(), Texture::s_textureSamplerFlags);
+//        //        } else {
+//        //            bgfx::setTexture(1, m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+//        //            bgfx::setTexture(1, m_sOpacity, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
+//    }
+
+
+}
+
+void Material::submitOpacityTexture() const {
+    assert(s_initialized);
+    if (m_iTexOpacity >= 0) {
+        assert(m_iTexOpacity < s_textures.size());
+        const Texture& texture = s_textures[m_iTexOpacity];
+
+        bgfx::setTexture(1, s_sOpacityUH, texture.textureHandle(), Texture::s_textureSamplerFlags);
+        //        } else {
+        //            bgfx::setTexture(1, m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+        //            bgfx::setTexture(1, m_sOpacity, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
+    }
+}
+
+
+void Material::submit() const
+{
+    assert(s_initialized);
+
+//    submitDiffuseTexture();
+//    submitOpacityTexture();
+
+    bgfx::setUniform(s_uMaterialUH, m_data, s_num_vec4_material);
 }
 
 std::ostream& operator<<(std::ostream& os, const Material& material)

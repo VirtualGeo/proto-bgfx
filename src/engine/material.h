@@ -21,8 +21,14 @@ public:
     Material(std::ifstream & file);
     void save(std::ofstream & file) const;
 
+    static void init();
+    static void shutdown();
+
     void updateData();
     void submit() const;
+    void submitDiffuseTexture() const;
+    void submitOpacityTexture() const;
+
 
 
     friend std::ostream & operator <<(std::ostream & os, const Material & material);
@@ -43,8 +49,8 @@ public:
 
     float m_data[4][4];
 
-    static bgfx::UniformHandle s_sDiffuseUH;
-    static bool s_initialized;
+//    static bool s_initialized;
+
 
 //public: // ------------------------- getters
 //    const float * diffuse() const;

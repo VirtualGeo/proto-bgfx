@@ -17,7 +17,8 @@ $input v_texcoord0
 //    float z = depth * 2.0 - 1.0; // back to NDC
 //    return (2.0 * near * far) / (far + near - z * (far - near));
 //}
-#include "uniforms.sc"
+#include "light.sc"
+#include "material.sc"
 
 
 void main()

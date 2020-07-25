@@ -35,7 +35,7 @@ public:
     };
 
     enum Type {
-        None,
+        None = 0,
         DIFFUSE,
         OPACITY,
     };

@@ -21,7 +21,8 @@ $output v_posLightSpace_1
 
 #include <bgfx_shader.sh>
 
-#include "uniforms.sc"
+//#include "uniforms.sc"
+#include "light.sc"
 
 //#define spotLights_fragPos(i) (v_posLightSpace_##i)
     //#define fragPosLightSpaces(i) (v_posLightSpace_ ## i)

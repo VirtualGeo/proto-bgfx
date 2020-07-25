@@ -9,6 +9,7 @@ class SpotLight : public Light
 {
 public:
     SpotLight(bx::Vec3 direction, bx::Vec3 position, float cutOff =17.0f, float outerCutOff = 20.0f, float constant = 1.0, float linear = 0.09, float quadratic = 0.032);
+    ~SpotLight();
 
 //private:
 //protected:
@@ -17,6 +18,8 @@ public:
     void updatePos(bx::Vec3 position);
     void updateDirection(bx::Vec3 direction);
     void updateData();
+
+    void drawDebug() override;
 
 
     bx::Vec3 m_direction;
@@ -29,11 +32,19 @@ public:
 
     float m_lightSpaceMatrix[16];
 
-    float m_data[4 * Program::s_num_vec4_spotLight];
+    static constexpr unsigned int s_num_vec4_spotLight = 9;
+    float m_data[4 * s_num_vec4_spotLight];
+
+    static size_t s_nSpotLight;
 
 private:
     float m_near = 0.01f;
     float m_far = 100.0f;
+
+    bgfx::UniformHandle m_sShadowMapUH = BGFX_INVALID_HANDLE;
+    bgfx::FrameBufferHandle m_shadowMapFBH = BGFX_INVALID_HANDLE;
+    bgfx::TextureHandle m_shadowMapTH = BGFX_INVALID_HANDLE;
+
 
 };
 

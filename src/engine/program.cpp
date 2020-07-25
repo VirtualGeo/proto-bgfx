@@ -9,6 +9,9 @@
 #include <bx/hash.h>
 #include <cstring>
 #include <sstream>
+#include <engine/pointlight.h>
+#include <engine/spotlight.h>
+#include <engine/dirLight.h>
 
 #ifdef USE_SHADERC_LIBRARY
 #include <shaderc/shaderc.h>
@@ -21,41 +24,41 @@ enum ShaderType {
 
 const std::string shadingFileNames[Shading::Count] { "normal", "material", "rendered", "emissive", "shadow", "debugQuad" };
 
-bgfx::UniformHandle Program::m_sDiffuse;
-bgfx::UniformHandle Program::m_sOpacity;
+//bgfx::UniformHandle Program::m_sDiffuse;
+//bgfx::UniformHandle Program::m_sOpacity;
 bgfx::ProgramHandle Program::m_programs[Shading::Count];
-bgfx::UniformHandle Program::m_uMaterial;
+//bgfx::UniformHandle Program::m_uMaterial;
 //bgfx::UniformHandle Program::m_vrMaterialParameters;
 bgfx::UniformHandle Program::m_uViewPos;
 bgfx::UniformHandle Program::m_uInvModel;
 //bgfx::UniformHandle Program::m_diffuse;
-bgfx::UniformHandle Program::m_sShadowMap;
+//bgfx::UniformHandle Program::m_sShadowMap;
 //bgfx::UniformHandle Program::m_sShadowMap_light_0;
 //bgfx::UniformHandle Program::m_sShadowMap_light_1;
 //bgfx::UniformHandle Program::m_sShadowMap_light_2;
-bgfx::UniformHandle Program::m_sShadowMaps[s_num_lightMax];
-bgfx::UniformHandle Program::m_uLightSpaceMatrix;
-bgfx::UniformHandle Program::m_uLightPos;
-bgfx::UniformHandle Program::m_uLightMtx;
-bgfx::UniformHandle Program::m_uDepthScaleOffset;
+//bgfx::UniformHandle Program::m_sShadowMaps[s_num_lightMax];
+//bgfx::UniformHandle Program::m_uLightSpaceMatrix;
+//bgfx::UniformHandle Program::m_uLightPos;
+//bgfx::UniformHandle Program::m_uLightMtx;
+//bgfx::UniformHandle Program::m_uDepthScaleOffset;
 //const bgfx::Caps* Program::m_caps = nullptr;
 //bgfx::ProgramHandle Program::m_progShadow;
-bgfx::FrameBufferHandle Program::m_shadowMapFB[s_num_lightMax];
-bgfx::TextureHandle Program::m_shadowMapTexture[s_num_lightMax];
+//bgfx::FrameBufferHandle Program::m_shadowMapFB[s_num_lightMax];
+//bgfx::TextureHandle Program::m_shadowMapTexture[s_num_lightMax];
 
 //bgfx::UniformHandle Program::m_uDirLights[s_numDirLightMax][s_num_vec4_dirLight];
-bgfx::UniformHandle Program::m_uDirLights;
-bgfx::UniformHandle Program::m_uSpotLights;
-bgfx::UniformHandle Program::m_uPointLights;
+//bgfx::UniformHandle Program::m_uDirLights;
+//bgfx::UniformHandle Program::m_uSpotLights;
+//bgfx::UniformHandle Program::m_uPointLights;
 
-unsigned int Program::s_nDirLight = 0;
-unsigned int Program::s_nSpotLight = 0;
-unsigned int Program::s_nPointLight = 0;
+//unsigned int Program::s_nDirLight = 0;
+//unsigned int Program::s_nSpotLight = 0;
+//unsigned int Program::s_nPointLight = 0;
 
 bool Program::s_initialized = false;
 bool Program::s_shutdowned = false;
 
-bgfx::UniformHandle Program::m_hasDiffuseTexture;
+//bgfx::UniformHandle Program::m_hasDiffuseTexture;
 //bgfx::UniformHandle Program::m_diffuseTexture;
 //bgfx::UniformHandle Program::m_nAdditionalTexture;
 
@@ -70,13 +73,13 @@ void Program::init()
     //    const char * buff[256];
     //    shaderc::compileShader(5, buff);
 
-    m_sDiffuse = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
-    m_sOpacity = bgfx::createUniform("s_opacity", bgfx::UniformType::Sampler);
-    m_uMaterial = bgfx::createUniform("u_material", bgfx::UniformType::Vec4, s_num_vec4_material);
+//    m_sDiffuse = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
+//    m_sOpacity = bgfx::createUniform("s_opacity", bgfx::UniformType::Sampler);
+//    m_uMaterial = bgfx::createUniform("u_material", bgfx::UniformType::Vec4, s_num_vec4_material);
 
-    m_uDirLights = bgfx::createUniform("u_dirLights", bgfx::UniformType::Vec4, s_numDirLightMax * s_num_vec4_dirLight);
-    m_uSpotLights = bgfx::createUniform("u_spotLights", bgfx::UniformType::Vec4, s_numSpotLightMax * s_num_vec4_spotLight);
-    m_uPointLights = bgfx::createUniform("u_pointLights", bgfx::UniformType::Vec4, s_numPointLightMax * s_num_vec4_pointLight);
+//    m_uDirLights = bgfx::createUniform("u_dirLights", bgfx::UniformType::Vec4, s_numDirLightMax * s_num_vec4_dirLight);
+//    m_uSpotLights = bgfx::createUniform("u_spotLights", bgfx::UniformType::Vec4, s_numSpotLightMax * s_num_vec4_spotLight);
+//    m_uPointLights = bgfx::createUniform("u_pointLights", bgfx::UniformType::Vec4, s_numPointLightMax * s_num_vec4_pointLight);
 
     //    std::string dirLight = "u_dirLights[";
     //    for (int i = 0; i < s_numDirLightMax; ++i) {
@@ -91,50 +94,50 @@ void Program::init()
     m_uViewPos = bgfx::createUniform("u_viewPos", bgfx::UniformType::Vec4);
     m_uInvModel = bgfx::createUniform("u_invModel", bgfx::UniformType::Mat4);
 
-    m_sShadowMap = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
-    for (int i = 0; i < s_num_lightMax; ++i) {
-        m_sShadowMaps[i] = bgfx::createUniform((std::string("s_shadowMap_light_") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
-    }
+//    m_sShadowMap = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
+//    for (int i = 0; i < s_num_lightMax; ++i) {
+//        m_sShadowMaps[i] = bgfx::createUniform((std::string("s_shadowMap_light_") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
+//    }
 
     //    m_sShadowMap_light_0 = bgfx::createUniform("s_shadowMap_light_0", bgfx::UniformType::Sampler);
     //    m_sShadowMap_light_1 = bgfx::createUniform("s_shadowMap_light_1", bgfx::UniformType::Sampler);
     //    m_sShadowMap_light_2 = bgfx::createUniform("s_shadowMap_light_2", bgfx::UniformType::Sampler);
 
     //    m_sShadowMaps = bgfx::createUniform("s_shadowMaps", bgfx::UniformType::Sampler, s_num_lightMax);
-    m_uLightSpaceMatrix = bgfx::createUniform("u_lightSpaceMatrix", bgfx::UniformType::Mat4);
+//    m_uLightSpaceMatrix = bgfx::createUniform("u_lightSpaceMatrix", bgfx::UniformType::Mat4);
 
-    m_uLightPos = bgfx::createUniform("u_lightPos", bgfx::UniformType::Vec4);
-    m_uLightMtx = bgfx::createUniform("u_lightMtx", bgfx::UniformType::Mat4);
-    m_uDepthScaleOffset = bgfx::createUniform("u_depthScaleOffset", bgfx::UniformType::Vec4);
+//    m_uLightPos = bgfx::createUniform("u_lightPos", bgfx::UniformType::Vec4);
+//    m_uLightMtx = bgfx::createUniform("u_lightMtx", bgfx::UniformType::Mat4);
+//    m_uDepthScaleOffset = bgfx::createUniform("u_depthScaleOffset", bgfx::UniformType::Vec4);
 
-    for (int i = 0; i < s_num_lightMax; ++i) {
-        bgfx::TextureHandle fbtextures[] = {
-            bgfx::createTexture2D(
-                m_shadowMapSize,
-                m_shadowMapSize,
-                false,
-                1,
-//                bgfx::TextureFormat::BGRA32,
-                bgfx::TextureFormat::RGBA16,
-                BGFX_TEXTURE_RT),
+//    for (int i = 0; i < s_num_lightMax; ++i) {
+//        bgfx::TextureHandle fbtextures[] = {
+//            bgfx::createTexture2D(
+//                m_shadowMapSize,
+//                m_shadowMapSize,
+//                false,
+//                1,
+////                bgfx::TextureFormat::BGRA32,
+//                bgfx::TextureFormat::RGBA16,
+//                BGFX_TEXTURE_RT),
 
-            bgfx::createTexture2D(
-                m_shadowMapSize,
-                m_shadowMapSize,
-                false,
-                1,
-                bgfx::TextureFormat::D16,
-//                bgfx::TextureFormat::D32F,
-                BGFX_TEXTURE_RT_WRITE_ONLY),
-        };
-        m_shadowMapTexture[i] = fbtextures[0];
-        assert(BX_COUNTOF(fbtextures) == 2);
-        m_shadowMapFB[i] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
-    }
+//            bgfx::createTexture2D(
+//                m_shadowMapSize,
+//                m_shadowMapSize,
+//                false,
+//                1,
+//                bgfx::TextureFormat::D16,
+////                bgfx::TextureFormat::D32F,
+//                BGFX_TEXTURE_RT_WRITE_ONLY),
+//        };
+//        m_shadowMapTexture[i] = fbtextures[0];
+//        assert(BX_COUNTOF(fbtextures) == 2);
+//        m_shadowMapFB[i] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
+//    }
 
 
 //    m_diffuseTexture = bgfx::createUniform("diffuseTexture", bgfx::UniformType::Sampler);
-    m_hasDiffuseTexture = bgfx::createUniform("hasDiffuseTexture", bgfx::UniformType::Vec4);
+//    m_hasDiffuseTexture = bgfx::createUniform("hasDiffuseTexture", bgfx::UniformType::Vec4);
 //    m_nAdditionalTexture = bgfx::createUniform("nAdditionalTexture", bgfx::UniformType::Vec4);
 
 
@@ -152,9 +155,9 @@ void Program::init()
 
         if (i == Shading::RENDERED) {
 //            defines = "N_SPOT_LIGHT=2;";
-            defines = "N_POINT_LIGHT=" + std::to_string(s_nPointLight)
-                    + ";N_DIR_LIGHT=" + std::to_string(s_nDirLight)
-                    + ";N_SPOT_LIGHT=" + std::to_string(s_nSpotLight);
+            defines = "N_POINT_LIGHT=" + std::to_string(PointLight::s_nPointLight)
+                    + ";N_DIR_LIGHT=" + std::to_string(DirLight::s_nDirLight)
+                    + ";N_SPOT_LIGHT=" + std::to_string(SpotLight::s_nSpotLight);
         }
 
         const std::string& shadingFileName = shadingFileNames[i];
@@ -162,13 +165,13 @@ void Program::init()
     }
 
 
-    float depthScaleOffset[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
-    const bgfx::Caps * caps = bgfx::getCaps();
-    if (caps->homogeneousDepth) {
-        depthScaleOffset[0] = depthScaleOffset[1] = 0.5f;
-    }
-    bgfx::setUniform(m_uDepthScaleOffset, depthScaleOffset);
-    bgfx::touch(0);
+//    float depthScaleOffset[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
+//    const bgfx::Caps * caps = bgfx::getCaps();
+//    if (caps->homogeneousDepth) {
+//        depthScaleOffset[0] = depthScaleOffset[1] = 0.5f;
+//    }
+//    bgfx::setUniform(m_uDepthScaleOffset, depthScaleOffset);
+//    bgfx::touch(0);
 
     s_initialized = true;
 }
@@ -183,37 +186,37 @@ void Program::shutdown()
     }
     //    bgfx::destroy(m_handle);
     //    bgfx::destroy(m_uDiffuse);
-    bgfx::destroy(m_sDiffuse);
+//    bgfx::destroy(m_sDiffuse);
 
-    bgfx::destroy(m_sOpacity);
+//    bgfx::destroy(m_sOpacity);
     //    bgfx::destroy(m_uTexturesEnable);
 
-    bgfx::destroy(m_uMaterial);
+//    bgfx::destroy(m_uMaterial);
     //    bgfx::destroy(m_vrMaterialParameters);
     bgfx::destroy(m_uViewPos);
     bgfx::destroy(m_uInvModel);
 
     //    bgfx::destroy(m_diffuse);
-    bgfx::destroy(m_sShadowMap);
-    for (int i = 0; i < s_num_lightMax; ++i) {
-        bgfx::destroy(m_sShadowMaps[i]);
-    }
+//    bgfx::destroy(m_sShadowMap);
+//    for (int i = 0; i < s_num_lightMax; ++i) {
+//        bgfx::destroy(m_sShadowMaps[i]);
+//    }
     //    bgfx::destroy(m_sShadowMap_light_0);
     //    bgfx::destroy(m_sShadowMap_light_1);
     //    bgfx::destroy(m_sShadowMap_light_2);
 
     //    bgfx::destroy(m_sShadowMaps);
-    for (int i = 0; i < s_num_lightMax; ++i) {
-        bgfx::destroy(m_shadowMapTexture[i]);
-        bgfx::destroy(m_shadowMapFB[i]);
-    }
-    bgfx::destroy(m_uLightSpaceMatrix);
-    bgfx::destroy(m_uLightPos);
-    bgfx::destroy(m_uLightMtx);
-    bgfx::destroy(m_uDepthScaleOffset);
-    bgfx::destroy(m_uDirLights);
-    bgfx::destroy(m_uSpotLights);
-    bgfx::destroy(m_uPointLights);
+//    for (int i = 0; i < s_num_lightMax; ++i) {
+//        bgfx::destroy(m_shadowMapTexture[i]);
+//        bgfx::destroy(m_shadowMapFB[i]);
+//    }
+//    bgfx::destroy(m_uLightSpaceMatrix);
+//    bgfx::destroy(m_uLightPos);
+//    bgfx::destroy(m_uLightMtx);
+//    bgfx::destroy(m_uDepthScaleOffset);
+//    bgfx::destroy(m_uDirLights);
+//    bgfx::destroy(m_uSpotLights);
+//    bgfx::destroy(m_uPointLights);
     //    for (int i = 0; i < s_numDirLightMax; ++i) {
     //        bgfx::destroy(m_uDirLights[i][0]);
     //        bgfx::destroy(m_uDirLights[i][1]);
@@ -225,26 +228,51 @@ void Program::shutdown()
 //    bgfx::destroy(m_specularTexture);
 
 //    bgfx::destroy(m_diffuseTexture);
-    bgfx::destroy(m_hasDiffuseTexture);
+//    bgfx::destroy(m_hasDiffuseTexture);
 //    bgfx::destroy(m_nAdditionalTexture);
     s_shutdowned = true;
 }
 
 void Program::submit(const bgfx::ViewId id, const Shading& shading, const Material& material)
 {
-    const Textures & textures = Material::s_textures;
+//    const Textures & textures = Material::s_textures;
 
     //    float vec4[4] = { 0.0, 1.0, 1.0, 1.0 };
-    int iTexDiffuse;
+//    int iTexDiffuse;
 
     switch (shading) {
     case Shading::NORMAL:
-        //        break;
     case Shading::EMISSIVE:
         break;
 
     case Shading::MATERIAL:
     case Shading::RENDERED:
+        material.submit();
+        material.submitDiffuseTexture();
+
+    case Shading::SHADOW:
+        material.submitOpacityTexture();
+
+        break;
+
+    default:
+        assert(false);
+//        const int iTexOpacity = material.m_iTexOpacity;
+//        if (iTexOpacity >= 0) {
+//            assert(iTexOpacity < textures.size());
+//            const Texture& texture = textures[iTexOpacity];
+
+//            bgfx::setTexture(1, m_sOpacity, texture.textureHandle(), Texture::s_textureSamplerFlags);
+//        } else {
+//            //            bgfx::setTexture(1, m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+//            bgfx::setTexture(1, m_sOpacity, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
+//        }
+    }
+
+    bgfx::submit(id, m_programs[shading]);
+//    bgfx::submit(id, m_programs[shading], 1.0);
+
+//        material.submit(Texture::DIFFUSE);
         //    const int iMaterial = m_iMaterial;
 
         //        bgfx::setUniform(m_uDiffuse, material.diffuse());
@@ -252,90 +280,73 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
         //    		if (group.m_texture != nullptr) {
         //        const int iTexDiffuse = material.iTexDiffuse();
         //        static const int iTexDiffuse = material.m_iTexDiffuse; // question: why not work ?
-        iTexDiffuse = material.m_iTexDiffuse;
-        if (iTexDiffuse >= 0) {
+//        iTexDiffuse = material.m_iTexDiffuse;
+//        if (iTexDiffuse >= 0) {
 
-            assert(iTexDiffuse < textures.size());
-            const Texture& texture = textures[iTexDiffuse];
-            //                }
-            // uint32_t flags = UINT32_MAX;
-            // uint32_t flags = BGFX_TEXTURE_USE_DEFAULT;
+//            assert(iTexDiffuse < textures.size());
+//            const Texture& texture = textures[iTexDiffuse];
+//            //                }
+//            // uint32_t flags = UINT32_MAX;
+//            // uint32_t flags = BGFX_TEXTURE_USE_DEFAULT;
 
-            // const uint64_t textureFlags =
-            // 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
-            // const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
-            //        const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MAG_ANISOTROPIC | BGFX_SAMPLER_MIN_ANISOTROPIC;
-            // const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
-            float vec4[4] = {1.0f};
-            bgfx::setUniform(m_hasDiffuseTexture, vec4);
-//            bgfx::setTexture(0, m_diffuseTexture, texture.textureHandle(), Texture::s_textureSamplerFlags);
+//            // const uint64_t textureFlags =
+//            // 0 | BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN;
+//            // const uint64_t textureFlags = 0 | BGFX_TEXTURE_NONE;
+//            //        const uint64_t samplerFlags = 0 | BGFX_SAMPLER_MAG_ANISOTROPIC | BGFX_SAMPLER_MIN_ANISOTROPIC;
+//            // const uint64_t samplerFlags = 0 | BGFX_SAMPLER_NONE;
+//            float vec4[4] = {1.0f};
+//            bgfx::setUniform(m_hasDiffuseTexture, vec4);
+////            bgfx::setTexture(0, m_diffuseTexture, texture.textureHandle(), Texture::s_textureSamplerFlags);
 
-            bgfx::setTexture(0, m_sDiffuse,
-                texture.textureHandle(), Texture::s_textureSamplerFlags);
+//            bgfx::setTexture(0, m_sDiffuse,
+//                texture.textureHandle(), Texture::s_textureSamplerFlags);
 
-            //  textureFlags | samplerFlags);
+//            //  textureFlags | samplerFlags);
 
-            //                 bgfx::setUniform(m_uHasDiffuseTexture, (void*)true);
-            //        float temp[1] = { 1.0 };
-            //        bgfx::setUniform(m_uHasDiffuseTexture, temp);
-            //                 bgfx::setUniform(m_uHasDiffuseTexture);
-        } else {
-            float vec4[4] = {0.0f};
-            bgfx::setUniform(m_hasDiffuseTexture, vec4);
-            //            bgfx::setTexture(0, m_sDiffuse, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
-//            bgfx::setTexture(0, m_diffuseTexture, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
+//            //                 bgfx::setUniform(m_uHasDiffuseTexture, (void*)true);
+//            //        float temp[1] = { 1.0 };
+//            //        bgfx::setUniform(m_uHasDiffuseTexture, temp);
+//            //                 bgfx::setUniform(m_uHasDiffuseTexture);
+//        } else {
+//            float vec4[4] = {0.0f};
+//            bgfx::setUniform(m_hasDiffuseTexture, vec4);
+//            //            bgfx::setTexture(0, m_sDiffuse, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
+////            bgfx::setTexture(0, m_diffuseTexture, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
 
-            bgfx::setTexture(0, m_sDiffuse, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
-        }
+//            bgfx::setTexture(0, m_sDiffuse, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
+//        }
 
-        //        bgfx::setUniform(m_uTexturesEnable, material.texturesEnable());
-        //        const int iTexOpacity = material.iTexOpacity();
+//        //        bgfx::setUniform(m_uTexturesEnable, material.texturesEnable());
+//        //        const int iTexOpacity = material.iTexOpacity();
 
-        //        const SpotLight& spotLight = spotLights[0];
-        //        const std::array<float[4], s_num_vec4_uniforms> buffer = {{
+//        //        const SpotLight& spotLight = spotLights[0];
+//        //        const std::array<float[4], s_num_vec4_uniforms> buffer = {{
 
-        //        const float buffer[s_num_vec4_material][4] = {
-        //            { material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3] }, // question how do smaller, without glm::vec4
-        //            { material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_specular[3] }, // question how do smaller, without glm::vec4
-        //            { material.m_ambient[0], material.m_ambient[1], material.m_ambient[2], material.m_ambient[3] }, // question how do smaller, without glm::vec4
-        //            { material.m_shininess, (float)material.m_iTexDiffuse, (float)material.m_iTexOpacity },
-        //        };
+//        //        const float buffer[s_num_vec4_material][4] = {
+//        //            { material.m_diffuse[0], material.m_diffuse[1], material.m_diffuse[2], material.m_diffuse[3] }, // question how do smaller, without glm::vec4
+//        //            { material.m_specular[0], material.m_specular[1], material.m_specular[2], material.m_specular[3] }, // question how do smaller, without glm::vec4
+//        //            { material.m_ambient[0], material.m_ambient[1], material.m_ambient[2], material.m_ambient[3] }, // question how do smaller, without glm::vec4
+//        //            { material.m_shininess, (float)material.m_iTexDiffuse, (float)material.m_iTexOpacity },
+//        //        };
 
-        //        buffer[0] = material.m_diffuse;
-        //        bgfx::setUniform(m_uMaterial, buffer, s_num_vec4_material);
-        bgfx::setUniform(m_uMaterial, material.m_data, s_num_vec4_material);
+//        //        buffer[0] = material.m_diffuse;
+//        //        bgfx::setUniform(m_uMaterial, buffer, s_num_vec4_material);
+//        bgfx::setUniform(m_uMaterial, material.m_data, s_num_vec4_material);
 
-        //        bgfx::setUniform(m_uniformArray, buffer.data(), s_num_vec4_uniforms);
+//        //        bgfx::setUniform(m_uniformArray, buffer.data(), s_num_vec4_uniforms);
 
-        //        const float temp[s_numDirLightMax][s_num_vec4_dirLight][4] {
-        //            {{0.0f, -1.0f, 0.5f, 1.0f},
-        //            {1.0f, 1.0f, 1.0f, 0.0f}},
-        //            {{0.0f, 0.0f, 0.0f, 0.0f},
-        //            {1.0f, 1.0f, 1.0f, 0.0f}}
-        //        };
-        //        bgfx::setUniform(Program::m_uDirLights, temp, 4);
+//        //        const float temp[s_numDirLightMax][s_num_vec4_dirLight][4] {
+//        //            {{0.0f, -1.0f, 0.5f, 1.0f},
+//        //            {1.0f, 1.0f, 1.0f, 0.0f}},
+//        //            {{0.0f, 0.0f, 0.0f, 0.0f},
+//        //            {1.0f, 1.0f, 1.0f, 0.0f}}
+//        //        };
+//        //        bgfx::setUniform(Program::m_uDirLights, temp, 4);
 
-        //        for (int i = 0; i < s_numDirLightMax; ++i) {
-        //            bgfx::setUniform(m_uDirLights[i][0], temp);
+//        //        for (int i = 0; i < s_numDirLightMax; ++i) {
+//        //            bgfx::setUniform(m_uDirLights[i][0], temp);
         //            bgfx::setUniform(m_uDirLights[i][1], temp);
         //        }
-    case Shading::SHADOW:
-        const int iTexOpacity = material.m_iTexOpacity;
-        if (iTexOpacity >= 0) {
-            assert(iTexOpacity < textures.size());
-            const Texture& texture = textures[iTexOpacity];
-
-            bgfx::setTexture(1, m_sOpacity, texture.textureHandle(), Texture::s_textureSamplerFlags);
-        } else {
-            //            bgfx::setTexture(1, m_sOpacity, textures.front().textureHandle(), Texture::s_textureSamplerFlags);
-            bgfx::setTexture(1, m_sOpacity, Texture::m_sampleTextures[Texture::CHECKER_BOARD].textureHandle(), Texture::s_textureSamplerFlags);
-        }
-        break;
-    }
-
-//    bgfx::submit(id, m_programs[shading], 1.0);
-    bgfx::submit(id, m_programs[shading]);
-
     //    bgfx::submit(id, m_programs[shading], 0, BGFX_DISCARD_NONE | BGFX_CLEAR_DISCARD_COLOR_0);
 }
 

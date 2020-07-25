@@ -10,7 +10,8 @@ $output v_texcoord0
 //#include "../common/common.sh"
 #include <bgfx_shader.sh>
 
-#include "uniforms.sc"
+//#include "uniforms.sc"
+#include "light.sc"
 
 
 void main()
