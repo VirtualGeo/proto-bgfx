@@ -27,10 +27,10 @@ namespace stl = tinystl;
 #include <cmath>
 #include <cstring>
 #include <engine/scene.h>
+#include <fileIO.h>
 #include <fstream>
 #include <iostream>
 #include <system.h>
-#include <fileIO.h>
 
 static std::vector<Material> s_materials;
 static std::map<std::string, int> s_matName2id;
@@ -463,7 +463,7 @@ void MeshB::load(bx::ReaderSeekerI* _reader, bool _ramcopy)
             stl::string material;
             material.resize(len);
             read(_reader, const_cast<char*>(material.c_str()), len);
-//            group.m_material = material;
+            //            group.m_material = material;
             group.m_iMaterial = s_matName2id[material.c_str()];
 
             uint16_t num;
@@ -573,7 +573,7 @@ void MeshB::submit(bgfx::ViewId _id, Shading _shading, const float* _mtx, uint64
 
         const Group& group = *it;
         //        const Material& material = Scene::m_materials[Scene::m_matName2id[group.m_material.c_str()]];
-//        const Material& material = s_materials[s_matName2id[group.m_material.c_str()]];
+        //        const Material& material = s_materials[s_matName2id[group.m_material.c_str()]];
 
         bgfx::setIndexBuffer(group.m_ibh);
         bgfx::setVertexBuffer(0, group.m_vbh);
@@ -584,7 +584,6 @@ void MeshB::submit(bgfx::ViewId _id, Shading _shading, const float* _mtx, uint64
         Program::submit(_id, _shading, material);
     }
 }
-
 
 void MeshB::submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* _mtx, uint64_t _state) const
 {
@@ -606,7 +605,7 @@ void MeshB::submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* 
 
         const Group& group = *it;
         //        const Material& material = Scene::m_materials[Scene::m_matName2id[group.m_material.c_str()]];
-//        const Material& material = s_materials[s_matName2id[group.m_material.c_str()]];
+        //        const Material& material = s_materials[s_matName2id[group.m_material.c_str()]];
         const Material& material = s_materials[group.m_iMaterial];
 #ifdef FAST_BLINN
         material.submitDiffuseTexture();
@@ -659,7 +658,7 @@ static void parts2bin(const char* _filePath)
 //static void parts2bin()
 //void parts2bin(const std::string & filePath)
 {
-//    const std::string filePath(PROJECT_DIR "examples/assets/San_Miguel/san-miguel.geom");
+    //    const std::string filePath(PROJECT_DIR "examples/assets/San_Miguel/san-miguel.geom");
     const std::string filePath(_filePath);
     constexpr size_t maxPartSize = 100'000'000; // max git file
     constexpr size_t nbBuffPerPart = 100;
@@ -754,10 +753,9 @@ static void saveMatFile(std::ofstream& file)
     }
 }
 
-
 //static std::vector<tinyobj::material_t> s_materials;
 
-static void loadMatFile(std::ifstream & file)
+static void loadMatFile(std::ifstream& file)
 {
     assert(file.is_open());
     //        auto start = std::chrono::steady_clock::now();
@@ -798,15 +796,16 @@ static void loadMatFile(std::ifstream & file)
     }
 
     //    tm.end();
-//    auto end = std::chrono::steady_clock::now();
+    //    auto end = std::chrono::steady_clock::now();
     //    m_loadingMaterialsTime = tm.msec();
-//    m_loadingMaterialsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    //    m_loadingMaterialsTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     //    tm.start();
-//    start = std::chrono::steady_clock::now();
+    //    start = std::chrono::steady_clock::now();
     //    bgfx::frame();
 }
 
-static void loadMat(const std::string & filePath) {
+static void loadMat(const std::string& filePath)
+{
     std::string base_dir = GetBaseDir(filePath);
     // load materials (textures)
     std::vector<tinyobj::material_t> tinyObjMaterials;
@@ -817,7 +816,7 @@ static void loadMat(const std::string & filePath) {
     //    assert(FileExists(mat));
     if (FileExists(tex)) {
         std::ifstream texFile(tex, std::ios::binary | std::ios::in);
-//        std::ofstream file(tex, std::ios::binary | std::ios::out);
+        //        std::ofstream file(tex, std::ios::binary | std::ios::out);
         assert(texFile.is_open());
         loadMatFile(texFile);
         texFile.close();
@@ -888,7 +887,8 @@ MeshB* meshLoad(const char* _filePath, bool _ramcopy)
     // load geometry
     //    std::string absoluteFilename(_filePath);
     const std::string bin = filePath.substr(0, filePath.find_last_of('.')) + ".geom";
-//    assert(FileExists(bin));
+    const std::string part = bin + ".part0";
+    //    assert(FileExists(bin));
 
     //std::ifstream sourceFile;
     //sourceFile.open(bin, std::ios::in | std::ios::ate | std::ios::binary);
@@ -899,24 +899,26 @@ MeshB* meshLoad(const char* _filePath, bool _ramcopy)
     //    constexpr size_t lenBuff = maxPartSize / nbBuffPerPart;
     //    char buff[lenBuff];
     char str[128];
-    memcpy(str, bin.c_str(), bin.size() * sizeof (char));
-
+    memcpy(str, bin.c_str(), bin.size() * sizeof(char));
 
     // if file not exist, create single file from partitions
     //if (!sourceFile.is_open()) {
-    if (! FileExists(bin)) {
+    if (!FileExists(bin)) {
         //        sourceFile.close();
 
+        assert(FileExists(part));
         parts2bin(bin.c_str());
-//        parts2bin(str);
-//        parts2bin();
+        //        parts2bin(str);
+        //        parts2bin();
 
     } else {
         // generate partition if file is to big for git repo
         //sourceFile.close();
-#ifdef AUTO_GIT_PARTITION
-        bin2parts(bin.c_str());
-#endif
+        //#ifdef AUTO_GIT_PARTITION
+        if (!FileExists(part)) {
+            bin2parts(bin.c_str());
+        }
+        //#endif
     }
 
     assert(FileExists(bin));

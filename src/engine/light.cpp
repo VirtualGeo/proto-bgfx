@@ -24,20 +24,20 @@ Light::Light(bx::Vec3 ambient, bx::Vec3 diffuse, bx::Vec3 specular)
     ++s_nLight;
 }
 
-Light::Light(Light&& light)
-    : m_ambient(light.m_ambient)
-    , m_diffuse(light.m_diffuse)
-    , m_specular(light.m_specular)
+//Light::Light(Light&& light)
+//    : m_ambient(light.m_ambient)
+//    , m_diffuse(light.m_diffuse)
+//    , m_specular(light.m_specular)
 
-    , m_id(light.m_id)
-{
-    light.m_last = false;
-    std::cout << "\033[34m";
-    std::cout << "[Light] " << this << " right moving from " << &light << std::endl;
-    std::cout << "\033[0m";
-    std::cout << "nbLight : " << s_nLight << std::endl;
-    assert(false);
-}
+//    , m_id(light.m_id)
+//{
+//    light.m_last = false;
+//    std::cout << "\033[34m";
+//    std::cout << "[Light] " << this << " right moving from " << &light << std::endl;
+//    std::cout << "\033[0m";
+//    std::cout << "nbLight : " << s_nLight << std::endl;
+//    assert(false);
+//}
 
 Light::~Light()
 {

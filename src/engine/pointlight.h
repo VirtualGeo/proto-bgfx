@@ -16,6 +16,12 @@ public:
     void updateLightShadowMaps(int viewId) override;
     void drawDebug() override;
 
+    static constexpr unsigned int s_num_vec4_pointLight = 4;
+    static constexpr unsigned int s_numPointLightMax = 1;
+    static constexpr unsigned int s_pointLightSizeMax = s_num_vec4_pointLight * s_numPointLightMax * 4;
+
+    static bgfx::UniformHandle s_uPointLightsUH;
+
     bx::Vec3 m_position;
     float m_constant;
     float m_linear;

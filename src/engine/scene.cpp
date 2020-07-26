@@ -17,6 +17,7 @@ std::map<std::string, int> Scene::m_matName2id;
 
 Scene::Scene()
 {
+//    m_cameras.reserve(4);
 }
 
 //void Scene::addModel(const char* filename)
@@ -461,54 +462,54 @@ void Scene::setLightUniforms()
 {
     int nLight = 0;
     if (!m_dirLights.empty()) {
-        float buffer[Program::s_dirLightSizeMax] = { 0.0f };
+        float buffer[DirLight::s_dirLightSizeMax] = { 0.0f };
         int i = 0;
         for (const auto& dirLight : m_dirLights) {
-            memcpy(&buffer[i], dirLight.m_data, 4 * Program::s_num_vec4_dirLight * sizeof(float));
-            i += 4 * Program::s_num_vec4_dirLight;
+            memcpy(&buffer[i], dirLight.m_data, 4 * DirLight::s_num_vec4_dirLight * sizeof(float));
+            i += 4 * DirLight::s_num_vec4_dirLight;
             //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
             ++nLight;
         }
         //            buffer[3] = m_dirLights.size();
-        bgfx::setUniform(Program::m_uDirLights, buffer, Program::s_num_vec4_dirLight * m_dirLights.size());
+        bgfx::setUniform(DirLight::s_uDirLightsUH, buffer, DirLight::s_num_vec4_dirLight * m_dirLights.size());
     }
 
-    if (!m_pointLights.empty()) {
-        float buffer[Program::s_pointLightSizeMax] = { 0.0f };
-        int i = 0;
-        for (const auto& pointLight : m_pointLights) {
-            memcpy(&buffer[i], pointLight.m_data, 4 * Program::s_num_vec4_pointLight * sizeof(float));
-            i += 4 * Program::s_num_vec4_pointLight;
-            //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
-            ++nLight;
-        }
-        //            buffer[3] = m_pointLights.size();
-        bgfx::setUniform(Program::m_uPointLights, buffer, Program::s_num_vec4_pointLight * m_pointLights.size());
-    }
+//    if (!m_pointLights.empty()) {
+//        float buffer[PointLight::s_pointLightSizeMax] = { 0.0f };
+//        int i = 0;
+//        for (const auto& pointLight : m_pointLights) {
+//            memcpy(&buffer[i], pointLight.m_data, 4 * PointLight::s_num_vec4_pointLight * sizeof(float));
+//            i += 4 * PointLight::s_num_vec4_pointLight;
+//            //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+//            ++nLight;
+//        }
+//        //            buffer[3] = m_pointLights.size();
+//        bgfx::setUniform(PointLight::s_uPointLightsUH, buffer, PointLight::s_num_vec4_pointLight * m_pointLights.size());
+//    }
 
-    float buffer[Program::s_spotLightSizeMax] = { 0.0f };
+    float buffer[SpotLight::s_spotLightSizeMax] = { 0.0f };
     int i = 0;
     if (!m_spotLights.empty()) {
         //            buffer[0] = m_spotLights.size();
         for (const auto& spotLight : m_spotLights) {
-            memcpy(&buffer[i], spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
-            i += 4 * Program::s_num_vec4_spotLight;
-            //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            memcpy(&buffer[i], spotLight.m_data, 4 * SpotLight::s_num_vec4_spotLight * sizeof(float));
+            i += 4 * SpotLight::s_num_vec4_spotLight;
+            //            bgfx::setTexture(4 + nLight, SpotLight::m_sShadowMaps[nLight], SpotLight::m_shadowMapTexture[nLight]);
             ++nLight;
         }
     }
     int nSpotLightCameraEnable = 0;
     for (const auto& camera : m_cameras) {
         if (camera.m_spotLightEnable) {
-            memcpy(&buffer[i], camera.m_spotLight.m_data, 4 * Program::s_num_vec4_spotLight * sizeof(float));
-            i += 4 * Program::s_num_vec4_spotLight;
+            memcpy(&buffer[i], camera.m_spotLight.m_data, 4 * SpotLight::s_num_vec4_spotLight * sizeof(float));
+            i += 4 * SpotLight::s_num_vec4_spotLight;
             ++nSpotLightCameraEnable;
             //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
             ++nLight;
         }
     }
     if (i > 0) {
-        bgfx::setUniform(Program::m_uSpotLights, buffer, Program::s_num_vec4_spotLight * (m_spotLights.size() + nSpotLightCameraEnable));
+        bgfx::setUniform(SpotLight::s_uSpotLightsUH, buffer, SpotLight::s_num_vec4_spotLight * (m_spotLights.size() + nSpotLightCameraEnable));
     }
     //        }
 }
@@ -518,26 +519,27 @@ void Scene::setLightShadowSamplers()
     int nLight = 0;
     if (!m_dirLights.empty()) {
         for (const auto& dirLight : m_dirLights) {
-            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            bgfx::setTexture(4 + nLight, dirLight.m_sShadowMapUH, dirLight.m_shadowMapTH);
             ++nLight;
         }
     }
-    if (!m_pointLights.empty()) {
-        for (const auto& pointLight : m_pointLights) {
-            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
-            ++nLight;
-        }
-    }
+//    if (!m_pointLights.empty()) {
+//        for (const auto& pointLight : m_pointLights) {
+//            bgfx::setTexture(4 + nLight, pointLight.m_sShadowMapUH, pointLight.m);
+//            ++nLight;
+//        }
+//    }
 
     if (!m_spotLights.empty()) {
         for (const auto& spotLight : m_spotLights) {
-            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            bgfx::setTexture(4 + nLight, spotLight.m_sShadowMapUH, spotLight.m_shadowMapTH);
             ++nLight;
         }
     }
     for (const auto& camera : m_cameras) {
         if (camera.m_spotLightEnable) {
-            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+            const auto & spotLight = camera.m_spotLight;
+            bgfx::setTexture(4 + nLight, spotLight.m_sShadowMapUH, spotLight.m_shadowMapTH);
             ++nLight;
         }
     }

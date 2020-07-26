@@ -12,10 +12,9 @@
 bx::Vec3 g_up = { 0.0, 1.0, 0.0 };
 
 static const int s_shadowMapSize = 2048;
-static constexpr unsigned int s_numSpotLightMax = 2;
 size_t SpotLight::s_nSpotLight = 0;
 
-static bgfx::UniformHandle s_uSpotLights = BGFX_INVALID_HANDLE;
+bgfx::UniformHandle SpotLight::s_uSpotLightsUH = BGFX_INVALID_HANDLE;
 static bgfx::UniformHandle s_uLightSpaceMatrixUH = BGFX_INVALID_HANDLE;
 static bgfx::UniformHandle s_sShadowMapUH = BGFX_INVALID_HANDLE;
 
@@ -32,7 +31,7 @@ SpotLight::SpotLight(bx::Vec3 direction, bx::Vec3 position, float cutOff, float 
 
     if (s_nSpotLight == 0) {
         //        assert(! bgfx::isValid(m_sShadowMap));
-        s_uSpotLights = bgfx::createUniform("u_spotLights", bgfx::UniformType::Vec4, s_numSpotLightMax * s_num_vec4_spotLight);
+        s_uSpotLightsUH = bgfx::createUniform("u_spotLights", bgfx::UniformType::Vec4, s_numSpotLightMax * s_num_vec4_spotLight);
         s_uLightSpaceMatrixUH = bgfx::createUniform("u_lightSpaceMatrix", bgfx::UniformType::Mat4);
         s_sShadowMapUH = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
         //        m_sShadowMap = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
@@ -74,7 +73,7 @@ SpotLight::~SpotLight()
 
     --s_nSpotLight;
     if (s_nSpotLight == 0) {
-        bgfx::destroy(s_uSpotLights);
+        bgfx::destroy(s_uSpotLightsUH);
         bgfx::destroy(s_uLightSpaceMatrixUH);
         bgfx::destroy(s_sShadowMapUH);
     }

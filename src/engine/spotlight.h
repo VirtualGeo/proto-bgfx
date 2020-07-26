@@ -33,11 +33,15 @@ public:
     float m_lightSpaceMatrix[16];
 
     static constexpr unsigned int s_num_vec4_spotLight = 9;
+    static constexpr unsigned int s_numSpotLightMax = 2;
+    static constexpr unsigned int s_spotLightSizeMax = s_num_vec4_spotLight * s_numSpotLightMax * 4;
+
+    static bgfx::UniformHandle s_uSpotLightsUH;
     float m_data[4 * s_num_vec4_spotLight];
 
     static size_t s_nSpotLight;
 
-private:
+//private:
     float m_near = 0.01f;
     float m_far = 100.0f;
 

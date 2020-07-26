@@ -7,9 +7,8 @@
 
 size_t DirLight::s_nDirLight = 0;
 static const int s_shadowMapSize = 2048;
-static constexpr unsigned int s_numDirLightMax = 1;
 
-static bgfx::UniformHandle s_uDirLights = BGFX_INVALID_HANDLE;
+bgfx::UniformHandle DirLight::s_uDirLightsUH = BGFX_INVALID_HANDLE;
 static bgfx::UniformHandle s_uLightSpaceMatrixUH = BGFX_INVALID_HANDLE;
 static bgfx::UniformHandle s_sShadowMapUH = BGFX_INVALID_HANDLE;
 
@@ -39,7 +38,7 @@ DirLight::DirLight(bx::Vec3 direction)
 
     if (s_nDirLight == 0) {
         //        assert(! bgfx::isValid(m_sShadowMap));
-        s_uDirLights = bgfx::createUniform("u_dirLights", bgfx::UniformType::Vec4, s_numDirLightMax * s_num_vec4_dirLight);
+        s_uDirLightsUH = bgfx::createUniform("u_dirLights", bgfx::UniformType::Vec4, s_numDirLightMax * s_num_vec4_dirLight);
         s_uLightSpaceMatrixUH = bgfx::createUniform("u_lightSpaceMatrix", bgfx::UniformType::Mat4);
         s_sShadowMapUH = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
         //        m_sShadowMap = bgfx::createUniform("s_shadowMap", bgfx::UniformType::Sampler);
@@ -80,12 +79,12 @@ DirLight::~DirLight()
     bgfx::destroy(m_shadowMapTH);
     bgfx::destroy(m_shadowMapFBH);
 
+    --s_nDirLight;
     if (s_nDirLight == 0) {
-        bgfx::destroy(s_uDirLights);
+        bgfx::destroy(s_uDirLightsUH);
         bgfx::destroy(s_uLightSpaceMatrixUH);
         bgfx::destroy(s_sShadowMapUH);
     }
-    --s_nDirLight;
 }
 
 void DirLight::updateLightShadowMaps(int viewId)

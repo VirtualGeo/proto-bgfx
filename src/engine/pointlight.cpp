@@ -3,6 +3,7 @@
 size_t PointLight::s_nPointLight = 0;
 static const int s_shadowMapSize = 2048;
 //static bgfx::UniformHandle s_sShadowMapUH = BGFX_INVALID_HANDLE;
+bgfx::UniformHandle PointLight::s_uPointLightsUH = BGFX_INVALID_HANDLE;
 
 PointLight::PointLight(bx::Vec3 && position, float constant, float linear, float quadratic)
     : m_position(std::move(position))
@@ -17,6 +18,9 @@ PointLight::PointLight(bx::Vec3 && position, float constant, float linear, float
 //    , Light(bx::Vec3(0.0f), bx::Vec3(0.8f), bx::Vec3(1.0f))
 {
 
+    if (s_nPointLight == 0) {
+        s_uPointLightsUH = bgfx::createUniform("u_pointLights", bgfx::UniformType::Vec4, s_numPointLightMax * s_num_vec4_pointLight);
+    }
     ++s_nPointLight;
 }
 
@@ -24,6 +28,9 @@ PointLight::~PointLight()
 {
 
     --s_nPointLight;
+    if (s_nPointLight == 0) {
+        bgfx::destroy(s_uPointLightsUH);
+    }
 }
 
 void PointLight::updateLightShadowMaps(int viewId)

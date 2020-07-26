@@ -11,17 +11,19 @@ void init(View& view)
     if (view.id == VIEW_ID_START_WINDOW) {
         Geometry::init();
         Texture::init();
-        Program::s_nSpotLight = 2;
-        Program::init();
+//        Program::s_nSpotLight = 2;
         Material::init();
 
         entry::s_scene.addModel(std::string(PROJECT_DIR) + "examples/assets/sponza/sponza.obj");
-        entry::s_scene.m_cameras.reserve(2);
+//        entry::s_scene.m_cameras.reserve(2);
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
+//        entry::s_scene.m_cameras.push_back(bx::Vec3{-5.0f, 1.0f, -0.5f});
     } else {
         entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
+//        entry::s_scene.m_cameras.push_back(bx::Vec3 { 5.0, 1.0f, -1.0f }); // question : push_back ?
     }
     //    entry::s_scene.m_cameras[0].setPos(bx::Vec3 { -5.0f, 1.0f, -0.5f }); // question : push_back ?
+    Program::init();
 
 //    entry::s_nWindow = 2;
     //                entry::s_scene.addModel("/home/gauthier/Downloads/Cougar2/cougar.obj");

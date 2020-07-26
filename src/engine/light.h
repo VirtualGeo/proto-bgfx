@@ -11,8 +11,8 @@ public:
           bx::Vec3 diffuse = bx::Vec3(1.0f),
           bx::Vec3 specular = bx::Vec3(1.0f));
     //    Light(bx::Vec3 ambient, bx::Vec3 diffuse, bx::Vec3 specular);
-    Light(const Light & light) = delete;
-    Light(Light && light);
+//    Light(const Light & light) = delete;
+//    Light(Light && light);
 
     ~Light();
 

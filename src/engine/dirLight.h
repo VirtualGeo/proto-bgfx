@@ -19,9 +19,15 @@ public:
     bx::Vec3 m_direction;
 
     float m_lightSpaceMatrix[16];
+    static constexpr unsigned int s_numDirLightMax = 1;
     static constexpr unsigned int s_num_vec4_dirLight = 4;
+    static constexpr unsigned int s_dirLightSizeMax = s_num_vec4_dirLight * s_numDirLightMax * 4;
+
     float m_data[4 * s_num_vec4_dirLight];
     static size_t s_nDirLight;
+
+    static bgfx::UniformHandle s_uDirLightsUH;
+
 
     bgfx::UniformHandle m_sShadowMapUH = BGFX_INVALID_HANDLE;
     bgfx::FrameBufferHandle m_shadowMapFBH = BGFX_INVALID_HANDLE;
