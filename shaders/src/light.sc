@@ -11,8 +11,9 @@ struct DirLight {
     vec3 specular;
 
     vec3 direction;
+    mat4 lightSpaceMatrix;
 };
-#define N_DIR_LIGHT_VEC4 4
+#define N_DIR_LIGHT_VEC4 8
 //#if N_DIR_LIGHT > 0
 uniform vec4 u_dirLights[N_DIR_LIGHT_VEC4 * N_DIR_LIGHT];
 //#define dirLights(i) DirLight(vec3(u_dirLights[i * N_DIR_LIGHT_VEC4]), \
@@ -23,7 +24,11 @@ uniform vec4 u_dirLights[N_DIR_LIGHT_VEC4 * N_DIR_LIGHT];
 varName.ambient = u_dirLights[i * N_DIR_LIGHT_VEC4].xyz; \
 varName.diffuse = u_dirLights[i * N_DIR_LIGHT_VEC4 + 1].xyz; \
 varName.specular = u_dirLights[i * N_DIR_LIGHT_VEC4 + 2].xyz; \
-varName.direction = u_dirLights[i * N_DIR_LIGHT_VEC4 + 3].xyz;
+varName.direction = u_dirLights[i * N_DIR_LIGHT_VEC4 + 3].xyz; \
+varName.lightSpaceMatrix = mat4(u_dirLights[i * N_DIR_LIGHT_VEC4 + 4], \
+                                u_dirLights[i * N_DIR_LIGHT_VEC4 + 5], \
+                                u_dirLights[i * N_DIR_LIGHT_VEC4 + 6], \
+                                u_dirLights[i * N_DIR_LIGHT_VEC4 + 7])
 
 //#endif
 //#define nbDirLights u_dirLights[0].w
@@ -140,8 +145,10 @@ uniform vec4 u_pointLights[N_POINT_LIGHT_VEC4 * N_POINT_LIGHT];
 
 // ------------------------------------ SHADOW MAPS
 //#ifdef HAS_SHADOW
-SAMPLER2D(s_shadowMap_light_0, 4);
-SAMPLER2D(s_shadowMap_light_1, 5);
+//SAMPLER2D(s_shadowMap_light_0, 4);
+//SAMPLER2D(s_shadowMap_light_1, 5);
+SAMPLER2D(s_shadowMap_dirLight_0, 4);
+SAMPLER2D(s_shadowMap_dirLight_1, 5);
 //#endif
 //SAMPLER2D(s_shadowMap_light_2, 6);
 

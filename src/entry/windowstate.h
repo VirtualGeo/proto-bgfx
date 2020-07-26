@@ -10,7 +10,7 @@
 
 #define VIEW_ID_START_WINDOW 30
 #define VIEW_ID_START_SHADOW 10
-#define VIEW_ID_START_DEBUG_SHADOW 20
+#define VIEW_ID_START_DEBUG_SHADOW 40
 
 struct MouseButton {
     enum Enum {
@@ -42,6 +42,7 @@ struct Key {
         E,
         //        Q,
         Control,
+        Shift,
 
         Count
     };
@@ -136,6 +137,7 @@ private:
     bool m_firstMouse = true;
 
     bool m_ctrlPressed = false;
+    bool m_shiftPressed = false;
 
 };
 

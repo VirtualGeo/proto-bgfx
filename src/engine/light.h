@@ -25,6 +25,8 @@ public:
     bx::Vec3 m_diffuse;
     bx::Vec3 m_specular;
 
+
+    bool m_enable = false;
 //    static size_t s_counter;
 
 //    bgfx::FrameBufferHandle m_shadowMapFB;

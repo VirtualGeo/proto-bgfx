@@ -4,9 +4,11 @@
 #include <cassert>
 #include <entry/windowstate.h>
 #include <engine/geometry.h>
+#include <engine/scene.h>
 
 size_t DirLight::s_nDirLight = 0;
-static const int s_shadowMapSize = 2048;
+static const int s_shadowMapSize = 8192;
+//static const int s_shadowMapSize = 16384;
 
 bgfx::UniformHandle DirLight::s_uDirLightsUH = BGFX_INVALID_HANDLE;
 static bgfx::UniformHandle s_uLightSpaceMatrixUH = BGFX_INVALID_HANDLE;
@@ -22,18 +24,7 @@ DirLight::DirLight(bx::Vec3 direction)
               }
 {
 
-    const bx::Vec3 center {0.0f};
-    const float radius = 10.0f;
-
-    bx::Vec3 eye = bx::sub(center, bx::mul(direction, radius));
-    float lightView[16];
-    bx::mtxLookAt(lightView, eye, center);
-
-    float lightProj[16];
-//    bx::mtxProj(lightProj, 2 * m_outerCutOff, 1.0f, m_near, m_far, bgfx::getCaps()->homogeneousDepth);
-    bx::mtxOrtho(lightProj, -radius, radius, -radius, radius, 0.1f, 2 * radius, 0.0f, bgfx::getCaps()->homogeneousDepth);
-
-    bx::mtxMul(m_lightSpaceMatrix, lightView, lightProj);
+    updateLightSpaceMatrix();
 
 
     if (s_nDirLight == 0) {
@@ -106,7 +97,7 @@ void DirLight::drawDebug()
 {
     int viewId = VIEW_ID_START_DEBUG_SHADOW + m_id;
 
-    bgfx::setViewRect(viewId, 50 + m_id *210, 200, 200, 200);
+    bgfx::setViewRect(viewId, 50 + m_id *210, 400, 400, 400);
     bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
 
     bgfx::setTexture(3, s_sShadowMapUH, m_shadowMapTH);
@@ -114,4 +105,52 @@ void DirLight::drawDebug()
     Geometry::drawQuad();
 
     bgfx::submit(viewId, Program::m_programs[DEBUG_QUAD]);
+}
+
+void DirLight::mouseMove(float dx, float dy)
+{
+    float speed = 0.02f;
+    auto qX = bx::rotateX(dx * speed);
+    m_direction = bx::mul(m_direction, qX);
+
+    auto qY = bx::rotateY(dy * speed);
+    m_direction = bx::mul(m_direction, qY);
+
+    updateLightSpaceMatrix();
+}
+
+void DirLight::updateLightSpaceMatrix()
+{
+//    const bx::Vec3 center {0.0f, 0.0f, 0.0f};
+//    const Aabb & aabb = Scene::m_mesh->m_aabb;
+    const Sphere & sphere = Scene::m_mesh->m_sphere;
+
+    const bx::Vec3 center = sphere.center;
+//    Scene::m_mesh->
+//    const float radius = 100.0f;
+    const float radius = sphere.radius;
+
+
+    bx::Vec3 eye = bx::sub(center, bx::mul(m_direction, radius));
+    float lightView[16];
+    bx::mtxLookAt(lightView, eye, center);
+
+    float lightProj[16];
+//    bx::mtxProj(lightProj, 2 * m_outerCutOff, 1.0f, m_near, m_far, bgfx::getCaps()->homogeneousDepth);
+    bx::mtxOrtho(lightProj, -radius, radius, -radius, radius, 0.1f, 2.0f * radius, 0.0f, bgfx::getCaps()->homogeneousDepth);
+
+    bx::mtxMul(m_lightSpaceMatrix, lightView, lightProj);
+
+    updateData();
+}
+
+void DirLight::updateData()
+{
+    float data[16] {m_ambient.x, m_ambient.y, m_ambient.z, 0.0f,
+              m_diffuse.x, m_diffuse.y, m_diffuse.z, 0.0f,
+              m_specular.x, m_specular.y, m_specular.z, 0.0f,
+              m_direction.x, m_direction.y, m_direction.z, 0.0f,
+              };
+    memcpy(&m_data[0], data, sizeof (data));
+    memcpy(&m_data[16], m_lightSpaceMatrix, sizeof(m_lightSpaceMatrix));
 }

@@ -14,6 +14,7 @@
 
 Materials Scene::m_materials;
 std::map<std::string, int> Scene::m_matName2id;
+MeshB * Scene::m_mesh = nullptr;
 
 Scene::Scene()
 {
@@ -415,7 +416,7 @@ void Scene::updateLightShadowMaps()
     }
 
     for (auto& camera : m_cameras) {
-        if (camera.m_spotLightEnable) {
+        if (camera.m_spotLight.m_enable) {
             camera.m_spotLight.updateLightShadowMaps(viewId);
             //            const float ratio = 1.0f;
             //            camera.setViewTransform(ratio, viewId);
@@ -433,18 +434,18 @@ void Scene::updateLightShadowMaps()
         }
     }
     //    bgfx::frame();
-//    return;
+    return;
 
     for (auto & dirLight : m_dirLights) {
         dirLight.drawDebug();
     }
-    return;
+//    return;
 
     for (auto& spotLight : m_spotLights) {
         spotLight.drawDebug();
     }
     for (auto& camera : m_cameras) {
-        if (camera.m_spotLightEnable) {
+        if (camera.m_spotLight.m_enable) {
             camera.m_spotLight.drawDebug();
         }
     }
@@ -500,7 +501,7 @@ void Scene::setLightUniforms()
     }
     int nSpotLightCameraEnable = 0;
     for (const auto& camera : m_cameras) {
-        if (camera.m_spotLightEnable) {
+        if (camera.m_spotLight.m_enable) {
             memcpy(&buffer[i], camera.m_spotLight.m_data, 4 * SpotLight::s_num_vec4_spotLight * sizeof(float));
             i += 4 * SpotLight::s_num_vec4_spotLight;
             ++nSpotLightCameraEnable;
@@ -537,12 +538,23 @@ void Scene::setLightShadowSamplers()
         }
     }
     for (const auto& camera : m_cameras) {
-        if (camera.m_spotLightEnable) {
+        if (camera.m_spotLight.m_enable) {
             const auto & spotLight = camera.m_spotLight;
             bgfx::setTexture(4 + nLight, spotLight.m_sShadowMapUH, spotLight.m_shadowMapTH);
             ++nLight;
         }
     }
+}
+
+int Scene::getEnableSpotLight()
+{
+    int sum = 0;
+    for (const auto & light : m_spotLights) {
+        if (light.m_enable) {
+            ++sum;
+        }
+    }
+    return sum;
 }
 
 void Scene::renderView(const View& view, const float mtx[16])

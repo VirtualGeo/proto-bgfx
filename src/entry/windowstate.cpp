@@ -7,6 +7,7 @@
 #include <engine/geometry.h>
 #include <entry/entry.h>
 #include <list>
+#include <engine/dirLight.h>
 
 #include <cstring>
 
@@ -51,12 +52,12 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         //    bgfxInit.platformData.session = nullptr;
         //    bgfx::setPlatformData(pd);
         bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
-//                bgfxInit.type = bgfx::RendererType::Direct3D9;
-//                bgfxInit.type = bgfx::RendererType::Direct3D11;
-//                bgfxInit.type = bgfx::RendererType::Direct3D12;
-                bgfxInit.type = bgfx::RendererType::OpenGL;
+        //                bgfxInit.type = bgfx::RendererType::Direct3D9;
+        //                bgfxInit.type = bgfx::RendererType::Direct3D11;
+        //                bgfxInit.type = bgfx::RendererType::Direct3D12;
+        bgfxInit.type = bgfx::RendererType::OpenGL;
         //        bgfxInit.type = bgfx::RendererType::OpenGLES;
-//                bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
+        //                bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
         //        bgfxInit.type = bgfx::RendererType::Metal;
 
         bgfxInit.resolution.width = width;
@@ -297,7 +298,7 @@ void WindowState::updateCameraPos()
 
 void WindowState::resetWindow()
 {
-//    assert(m_view.id == VIEW_ID_START_WINDOW);
+    //    assert(m_view.id == VIEW_ID_START_WINDOW);
     bgfx::reset(m_width, m_height, entry::getResetFlags());
 }
 
@@ -370,9 +371,16 @@ void WindowState::mouseMoveEvent(int x, int y)
         yoffset *= sensitivity;
 
         //        auto& camera = *entry::s_scene.m_cameras[m_view.iCamera];
-        auto& camera = entry::s_scene.m_cameras[m_view.iCamera];
-        //        auto& camera = entry::s_scene.m_cameras.at(m_view.iCamera);
-        camera.mouseMove(xoffset, yoffset);
+        if (m_shiftPressed) {
+            auto & light = entry::s_scene.m_dirLights[0];
+            light.mouseMove(xoffset, yoffset);
+
+
+        } else {
+            auto& camera = entry::s_scene.m_cameras[m_view.iCamera];
+            //        auto& camera = entry::s_scene.m_cameras.at(m_view.iCamera);
+            camera.mouseMove(xoffset, yoffset);
+        }
         //        camera.rotate(xoffset, yoffset);
     }
 }
@@ -435,6 +443,10 @@ void WindowState::keyReleaseEvent(Key::Enum key)
 
     case Key::Control:
         m_ctrlPressed = false;
+        break;
+
+    case Key::Shift:
+        m_shiftPressed = false;
         break;
 
     case Key::NONE:
@@ -541,6 +553,9 @@ void WindowState::keyPressEvent(Key::Enum key)
         m_slowMotion = !m_slowMotion;
         break;
 
+    case Key::Shift:
+        m_shiftPressed = true;
+        break;
         //    case Key::NONE:
         //    default:
         //        std::cout << "[WindowState] unknown key " << key << std::endl;

@@ -12,6 +12,7 @@
 #include <engine/pointlight.h>
 #include <engine/spotlight.h>
 #include <engine/dirLight.h>
+#include <entry/entry.h>
 
 #ifdef USE_SHADERC_LIBRARY
 #include <shaderc/shaderc.h>
@@ -157,7 +158,8 @@ void Program::init()
 //            defines = "N_SPOT_LIGHT=2;";
             defines = "N_POINT_LIGHT=" + std::to_string(PointLight::s_nPointLight)
                     + ";N_DIR_LIGHT=" + std::to_string(DirLight::s_nDirLight)
-                    + ";N_SPOT_LIGHT=" + std::to_string(SpotLight::s_nSpotLight);
+//                    + ";N_SPOT_LIGHT=" + std::to_string(SpotLight::s_nSpotLight);
+                    + ";N_SPOT_LIGHT=" + std::to_string(entry::s_scene.getEnableSpotLight());
         }
 
         const std::string& shadingFileName = shadingFileNames[i];
@@ -248,9 +250,9 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
     case Shading::MATERIAL:
     case Shading::RENDERED:
         material.submit();
-        material.submitDiffuseTexture();
 
     case Shading::SHADOW:
+        material.submitDiffuseTexture();
         material.submitOpacityTexture();
 
         break;

@@ -47,6 +47,10 @@ void main()
 
 //        SpotLight spotLight_0 = spotLights(0);
     //    SpotLight spotLight_1 = spotLights(1);
+#if N_DIR_LIGHT > 0
+    dirLights(dirLight0, 0);
+    v_posLightSpace_0 = mul(dirLight0.lightSpaceMatrix, vec4(v_pos, 1.0));
+#endif
 
 #if N_SPOT_LIGHT > 0
     spotLights(spotLight0, 0);

@@ -41,6 +41,11 @@ void main() {
 
     if (material_hasDiffuseTexture > -0.5) {
         diffColor = texture2D(s_diffuse, v_texcoord0);
+
+//        vec4 tex = texture2D(s_diffuse, v_texcoord0);
+        if (diffColor.w < 0.5)
+            discard;
+
     }
     else {
         diffColor = vec4(material_diffuse, 1.0);

@@ -22,7 +22,7 @@ public:
 
 public:
     SpotLight m_spotLight;
-    bool m_spotLightEnable = true;
+//    bool m_spotLightEnable = false;
 
 
 private:

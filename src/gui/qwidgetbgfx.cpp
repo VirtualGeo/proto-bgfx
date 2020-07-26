@@ -31,6 +31,7 @@ static std::map<int, Key::Enum> s_translateKey = {
     { Qt::Key_R, Key::R },
     { Qt::Key_E, Key::E },
     { Qt::Key_Control, Key::Control },
+    { Qt::Key_Shift, Key::Shift },
 };
 
 QWidgetBgfx::QWidgetBgfx(QWidget* parent)

@@ -34,6 +34,20 @@ void main()
     }
 
 
+    if (material_hasDiffuseTexture > -0.5) {
+        vec4 tex = texture2D(s_diffuse, v_texcoord0);
+        if (tex.w < 0.5)
+            discard;
+    }
+
+//        color = toLinear(tex).xyz;
+
+        //                color = texture2D(s_diffuse, v_texcoord0).xyz;
+//        color = toLinear(texture2D(s_diffuse, v_texcoord0)).xyz;
+//    } else {
+//        color = material_diffuse;
+
+
 //    gl_FragColor = vec4_splat(0.0);
 //    return;
 //    gl_FragColor.xyz = vec3_splat(gl_FragCoord.z);

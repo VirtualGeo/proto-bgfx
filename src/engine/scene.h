@@ -50,6 +50,7 @@ public:
     void setLightShadowSamplers();
 
     void renderView(const View & view, const float * mtx);
+    int getEnableSpotLight();
 
 private:
     void draw(const bgfx::ViewId id, const Shading &shading, const float *mtx,
@@ -62,7 +63,8 @@ public:
 //    bgfx::VertexLayout m_layout;
 //    std::vector<Object> m_objects;
 //    std::vector<MeshB*> m_meshes;
-    MeshB * m_mesh = nullptr;
+//    MeshB * m_mesh = nullptr;
+    static MeshB * m_mesh;
 
 //    std::vector<Material> m_materials;
     static Materials m_materials;

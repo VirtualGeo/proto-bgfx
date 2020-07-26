@@ -137,6 +137,9 @@ struct MeshB
 	bgfx::VertexLayout m_layout;
     GroupArray m_groups;
 
+    Aabb m_aabb;
+    Sphere m_sphere;
+
 public:
 };
 

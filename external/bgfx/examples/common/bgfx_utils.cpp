@@ -565,10 +565,11 @@ void MeshB::submit(bgfx::ViewId _id, Shading _shading, const float* _mtx, uint64
             | BGFX_STATE_MSAA;
     }
 
-    bgfx::setTransform(_mtx);
-    //	bgfx::setState(_state);
+    //    bgfx::setTransform(_mtx);
+    //    bgfx::setState(_state);
 
     for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it) {
+        bgfx::setTransform(_mtx);
         bgfx::setState(_state);
 
         const Group& group = *it;
@@ -660,9 +661,10 @@ static void parts2bin(const char* _filePath)
 {
     //    const std::string filePath(PROJECT_DIR "examples/assets/San_Miguel/san-miguel.geom");
     const std::string filePath(_filePath);
-    constexpr size_t maxPartSize = 100'000'000; // max git file
-    constexpr size_t nbBuffPerPart = 100;
-    constexpr size_t lenBuff = maxPartSize / nbBuffPerPart;
+    constexpr size_t maxPartSize = 50'000'000; // max git file
+    //    constexpr size_t nbBuffPerPart = 100;
+    //    constexpr size_t lenBuff = maxPartSize / nbBuffPerPart;
+    constexpr size_t lenBuff = 1'000'000;
     // on linux lenBuff = 5 000 000
     char buff[lenBuff]; // on win lenBuff = 1 000 000
 
@@ -698,9 +700,10 @@ static void parts2bin(const char* _filePath)
 static void bin2parts(const char* _filePath)
 {
     const std::string filePath(_filePath);
-    constexpr size_t maxPartSize = 100'000'000; // max git file
-    constexpr size_t nbBuffPerPart = 100;
-    constexpr size_t lenBuff = maxPartSize / nbBuffPerPart;
+    constexpr size_t maxPartSize = 50'000'000; // max git file
+    //    constexpr size_t nbBuffPerPart = 50;
+    //    constexpr size_t lenBuff = maxPartSize / nbBuffPerPart;
+    constexpr size_t lenBuff = 1'000'000;
     char buff[lenBuff];
     //            size_t counter = 0;
     std::ifstream sourceFile(filePath, std::ios::in | std::ios::ate | std::ios::binary);
@@ -927,6 +930,15 @@ MeshB* meshLoad(const char* _filePath, bool _ramcopy)
     if (bx::open(reader, bin.c_str())) {
         MeshB* mesh = meshLoad(reader, _ramcopy);
         bx::close(reader);
+
+        for (const auto& group : mesh->m_groups) {
+            aabbExpand(mesh->m_aabb, group.m_aabb.max);
+            aabbExpand(mesh->m_aabb, group.m_aabb.min);
+        }
+//        mesh->m_sphere.center = bx::mul(bx::add(mesh->m_aabb.min, mesh->m_aabb.max), 0.5f);
+        mesh->m_sphere.center = getCenter(mesh->m_aabb);
+        mesh->m_sphere.radius = bx::length(bx::sub(mesh->m_aabb.max, mesh->m_aabb.min)) * 0.5f;
+
         return mesh;
     }
 
