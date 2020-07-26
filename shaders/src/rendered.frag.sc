@@ -190,20 +190,20 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, DirLight light, int
 //        float bias = max(0.00001 * (1.0 - dot(normal, light.direction)), 0.00005);
         float bias = 0.00001 * (1.0 - dot(normal, light.direction));
 
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+//    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
     // PCF
-//        float shadow = 0.0;
-////        textureSize(s_shadowMap_dirLight_0, 3);
-//        vec2 texelSize = vec2_splat(1.0 / 512.0);
-//        const int size = 1;
-//        for (int x = -size; x <= size; ++x) {
-//            for (int y = -size; y <= size; ++y) {
-//                float pcfDepth = unpackRgbaToFloat(texture2D(s_shadowMap_dirLight_0, projCoords.xy + vec2(x, y) * texelSize));
-//                shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
-//            }
-//        }
-//        const int side = size * 2 + 1;
-//        shadow /= side * side;
+        float shadow = 0.0;
+//        textureSize(s_shadowMap_dirLight_0, 3);
+        vec2 texelSize = vec2_splat(1.0 / 8192.0);
+        const int size = 2;
+        for (int x = -size; x <= size; ++x) {
+            for (int y = -size; y <= size; ++y) {
+                float pcfDepth = unpackRgbaToFloat(texture2D(s_shadowMap_dirLight_0, projCoords.xy + vec2(x, y) * texelSize));
+                shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+            }
+        }
+        const int side = size * 2 + 1;
+        shadow /= side * side;
 
     return shadow;
 }

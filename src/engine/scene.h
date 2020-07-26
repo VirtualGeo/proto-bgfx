@@ -65,6 +65,7 @@ public:
 //    std::vector<MeshB*> m_meshes;
 //    MeshB * m_mesh = nullptr;
     static MeshB * m_mesh;
+    bool m_drawDebug = false;
 
 //    std::vector<Material> m_materials;
     static Materials m_materials;

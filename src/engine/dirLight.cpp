@@ -97,7 +97,7 @@ void DirLight::drawDebug()
 {
     int viewId = VIEW_ID_START_DEBUG_SHADOW + m_id;
 
-    bgfx::setViewRect(viewId, 50 + m_id *210, 400, 400, 400);
+    bgfx::setViewRect(viewId, 50 + m_id *210, 200, 200, 200);
     bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
 
     bgfx::setTexture(3, s_sShadowMapUH, m_shadowMapTH);

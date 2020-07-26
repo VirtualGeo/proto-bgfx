@@ -226,7 +226,7 @@ void WindowState::printDebugMessage()
         //        const bgfx::Stats* stats = bgfx::getStats();
         int line = -1;
         //        line = 20;
-        bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats | F2:Vsync | F3:Msaa | F4:Sampler | F5:Shading | F6: | F7:");
+        bgfx::dbgTextPrintf(0, ++line, 0x2F, "F1:Stats | F2:Vsync | F3:Msaa | F4:Sampler | F5:Shading | F6:Debug | F7:");
         line = 3;
         //            bgfx::dbgTextPrintf(0, ++line, 0x0F, "Viewport shading: %s", g_viewportShading.c_str());
         bgfx::dbgTextPrintf(0, ++line, 0x0F, "Arch: " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " ");
@@ -512,6 +512,9 @@ void WindowState::keyPressEvent(Key::Enum key)
     case Key::F5:
         ++m_view.shading;
         //                shading = ++shading % Program::Shading::Count;
+        break;
+    case Key::F6:
+        entry::s_scene.m_drawDebug = !entry::s_scene.m_drawDebug;
         break;
     case Key::Up:
         m_cameraMoveFront = 1;

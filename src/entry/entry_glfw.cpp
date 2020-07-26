@@ -54,6 +54,13 @@ static std::map<int, Key::Enum> s_translateKey = {
     { GLFW_KEY_F3, Key::F3 },
     { GLFW_KEY_F4, Key::F4 },
     { GLFW_KEY_F5, Key::F5 },
+    { GLFW_KEY_F6, Key::F6 },
+    { GLFW_KEY_F7, Key::F7 },
+    { GLFW_KEY_F8, Key::F8 },
+    { GLFW_KEY_F9, Key::F9 },
+    { GLFW_KEY_F10, Key::F10 },
+    { GLFW_KEY_F11, Key::F11 },
+    { GLFW_KEY_F12, Key::F12 },
     { GLFW_KEY_L, Key::N }, // qwerty to dvorak
     { GLFW_KEY_M, Key::M }, // qwerty to dvorak
     { GLFW_KEY_O, Key::R }, // qwerty to dvorak

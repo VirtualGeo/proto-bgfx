@@ -14,11 +14,11 @@
 
 Materials Scene::m_materials;
 std::map<std::string, int> Scene::m_matName2id;
-MeshB * Scene::m_mesh = nullptr;
+MeshB* Scene::m_mesh = nullptr;
 
 Scene::Scene()
 {
-//    m_cameras.reserve(4);
+    //    m_cameras.reserve(4);
 }
 
 //void Scene::addModel(const char* filename)
@@ -54,7 +54,6 @@ void Scene::addModel(const std::string& filename)
 //        //        }
 
 //        file.close();
-
 
 //        if (loadBinFailed) {
 ////            m_objects.clear();
@@ -172,7 +171,6 @@ void Scene::addModel(const std::string& filename)
 //    //    size_t nbIndices =0;
 //    //    size_t nbMeshes = 0;
 
-
 ////    // -------------------------------------- OBJECTS
 //    m_objects.reserve(nbObjects);
 ////    bgfx::frame();
@@ -189,7 +187,6 @@ void Scene::addModel(const std::string& filename)
 ////        bgfx::frame();
 //    }
 //    assert(nbObjects == m_objects.size());
-
 
 //    //    tm.end();
 //    //    m_loadingObjectsTime = tm.msec();
@@ -230,12 +227,12 @@ void Scene::clear()
     //        assert(bgfx::isValid(texture.textureHandle()));
     //    }
     Material::s_textures.clear(); // bgfx::TextureHandle
-//    m_objects.clear(); // bgfx::VertexBufferHandle
-//    m_meshes.clear();
+    //    m_objects.clear(); // bgfx::VertexBufferHandle
+    //    m_meshes.clear();
     meshUnload(m_mesh);
-//    delete m_mesh;
-//    m_mesh = nullptr;
-        m_materials.clear();
+    //    delete m_mesh;
+    //    m_mesh = nullptr;
+    m_materials.clear();
 }
 
 //void Scene::load(std::ifstream& file)
@@ -287,7 +284,6 @@ void Scene::clear()
 //    start = std::chrono::steady_clock::now();
 ////    bgfx::frame();
 
-
 //    FileIO::read(size, file);
 //    m_objects.reserve(size);
 //    //    bgfx::frame();
@@ -335,7 +331,6 @@ void Scene::clear()
 //        Material::s_textures[i].save(file);
 //    }
 
-
 //    size = m_objects.size();
 //    FileIO::write(size, file);
 //    //    m_objects.reserve(size);
@@ -344,7 +339,6 @@ void Scene::clear()
 //        //        m_objects.save(file);
 //        m_objects[i].save(file);
 //    }
-
 
 //    //    FileIO::write(m_parsingTime, file);
 //    //    FileIO::write(m_loadingMaterialsTime, file);
@@ -390,16 +384,18 @@ void Scene::updateLightShadowMaps()
     //        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
     //        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
     const uint64_t state = 0
-        | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
-        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
-        | BGFX_STATE_MSAA
+        | BGFX_STATE_WRITE_RGB
+        | BGFX_STATE_WRITE_A
+        | BGFX_STATE_WRITE_Z
+        | BGFX_STATE_DEPTH_TEST_LESS
+        | BGFX_STATE_CULL_CCW
+        | BGFX_STATE_MSAA;
         //            | BGFX_STATE_CULL_MASK
-        | BGFX_STATE_CULL_CCW;
 
     //        | BGFX_STATE_FRONT_CCW;
 
     int viewId = VIEW_ID_START_SHADOW;
-    for (auto & dirLight : m_dirLights) {
+    for (auto& dirLight : m_dirLights) {
         dirLight.updateLightShadowMaps(viewId);
         draw(viewId, Shading::SHADOW, mtx, state);
         ++viewId;
@@ -434,19 +430,21 @@ void Scene::updateLightShadowMaps()
         }
     }
     //    bgfx::frame();
-    return;
+    //    return;
 
-    for (auto & dirLight : m_dirLights) {
-        dirLight.drawDebug();
-    }
-//    return;
+    if (m_drawDebug) {
+        for (auto& dirLight : m_dirLights) {
+            dirLight.drawDebug();
+        }
+        //    return;
 
-    for (auto& spotLight : m_spotLights) {
-        spotLight.drawDebug();
-    }
-    for (auto& camera : m_cameras) {
-        if (camera.m_spotLight.m_enable) {
-            camera.m_spotLight.drawDebug();
+        for (auto& spotLight : m_spotLights) {
+            spotLight.drawDebug();
+        }
+        for (auto& camera : m_cameras) {
+            if (camera.m_spotLight.m_enable) {
+                camera.m_spotLight.drawDebug();
+            }
         }
     }
     //    bgfx::setTexture(4, Program::m_sShadowMaps, );
@@ -475,18 +473,18 @@ void Scene::setLightUniforms()
         bgfx::setUniform(DirLight::s_uDirLightsUH, buffer, DirLight::s_num_vec4_dirLight * m_dirLights.size());
     }
 
-//    if (!m_pointLights.empty()) {
-//        float buffer[PointLight::s_pointLightSizeMax] = { 0.0f };
-//        int i = 0;
-//        for (const auto& pointLight : m_pointLights) {
-//            memcpy(&buffer[i], pointLight.m_data, 4 * PointLight::s_num_vec4_pointLight * sizeof(float));
-//            i += 4 * PointLight::s_num_vec4_pointLight;
-//            //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
-//            ++nLight;
-//        }
-//        //            buffer[3] = m_pointLights.size();
-//        bgfx::setUniform(PointLight::s_uPointLightsUH, buffer, PointLight::s_num_vec4_pointLight * m_pointLights.size());
-//    }
+    //    if (!m_pointLights.empty()) {
+    //        float buffer[PointLight::s_pointLightSizeMax] = { 0.0f };
+    //        int i = 0;
+    //        for (const auto& pointLight : m_pointLights) {
+    //            memcpy(&buffer[i], pointLight.m_data, 4 * PointLight::s_num_vec4_pointLight * sizeof(float));
+    //            i += 4 * PointLight::s_num_vec4_pointLight;
+    //            //            bgfx::setTexture(4 + nLight, Program::m_sShadowMaps[nLight], Program::m_shadowMapTexture[nLight]);
+    //            ++nLight;
+    //        }
+    //        //            buffer[3] = m_pointLights.size();
+    //        bgfx::setUniform(PointLight::s_uPointLightsUH, buffer, PointLight::s_num_vec4_pointLight * m_pointLights.size());
+    //    }
 
     float buffer[SpotLight::s_spotLightSizeMax] = { 0.0f };
     int i = 0;
@@ -524,12 +522,12 @@ void Scene::setLightShadowSamplers()
             ++nLight;
         }
     }
-//    if (!m_pointLights.empty()) {
-//        for (const auto& pointLight : m_pointLights) {
-//            bgfx::setTexture(4 + nLight, pointLight.m_sShadowMapUH, pointLight.m);
-//            ++nLight;
-//        }
-//    }
+    //    if (!m_pointLights.empty()) {
+    //        for (const auto& pointLight : m_pointLights) {
+    //            bgfx::setTexture(4 + nLight, pointLight.m_sShadowMapUH, pointLight.m);
+    //            ++nLight;
+    //        }
+    //    }
 
     if (!m_spotLights.empty()) {
         for (const auto& spotLight : m_spotLights) {
@@ -539,7 +537,7 @@ void Scene::setLightShadowSamplers()
     }
     for (const auto& camera : m_cameras) {
         if (camera.m_spotLight.m_enable) {
-            const auto & spotLight = camera.m_spotLight;
+            const auto& spotLight = camera.m_spotLight;
             bgfx::setTexture(4 + nLight, spotLight.m_sShadowMapUH, spotLight.m_shadowMapTH);
             ++nLight;
         }
@@ -549,7 +547,7 @@ void Scene::setLightShadowSamplers()
 int Scene::getEnableSpotLight()
 {
     int sum = 0;
-    for (const auto & light : m_spotLights) {
+    for (const auto& light : m_spotLights) {
         if (light.m_enable) {
             ++sum;
         }
@@ -559,9 +557,14 @@ int Scene::getEnableSpotLight()
 
 void Scene::renderView(const View& view, const float mtx[16])
 {
-    const uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A
-        | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS
-        | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_NORMAL | BGFX_STATE_MSAA;
+    const uint64_t state = 0
+        | BGFX_STATE_WRITE_RGB
+        | BGFX_STATE_WRITE_A
+        | BGFX_STATE_WRITE_Z
+        | BGFX_STATE_DEPTH_TEST_LESS
+        //            | BGFX_STATE_CULL_CCW
+        //            | BGFX_STATE_BLEND_NORMAL
+        | BGFX_STATE_MSAA;
     //        | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA;
 
     //    assert(0 <= m_iCamera && m_iCamera < entry::s_cameras.size());
@@ -596,32 +599,31 @@ void Scene::renderView(const View& view, const float mtx[16])
 
 void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx, const uint64_t state) const
 {
-//    for (const Object& object : m_objects) {
-//        object.draw(id, shading, mtx, state, m_materials);
-////        bgfx::submit(id, Program::m_programs[shading]);
-//    }
+    //    for (const Object& object : m_objects) {
+    //        object.draw(id, shading, mtx, state, m_materials);
+    ////        bgfx::submit(id, Program::m_programs[shading]);
+    //    }
 
     assert(m_mesh != nullptr);
-//    meshSubmit(m_mesh, id, Program::m_programs[shading], mtx, state);
+    //    meshSubmit(m_mesh, id, Program::m_programs[shading], mtx, state);
     m_mesh->submit(id, shading, mtx, state);
 
-//    m_mesh->submit(id, mtx);
-//    m_mesh->submit(id, Program::m_programs[shading], mtx);
-
+    //    m_mesh->submit(id, mtx);
+    //    m_mesh->submit(id, Program::m_programs[shading], mtx);
 
     //    const uint nbObjects = m_objects.size();
     //            bgfx::setTransform(mtx);
     //            bgfx::setState(state);
     //    for (int i = 0; i < nbObjects; ++i) {
-//    for (auto it = m_objects.begin(), itEnd = m_objects.end(); it != itEnd; ++it) {
-//        //        const Object& object = m_objects[i];
-//        const Object& object = *it;
+    //    for (auto it = m_objects.begin(), itEnd = m_objects.end(); it != itEnd; ++it) {
+    //        //        const Object& object = m_objects[i];
+    //        const Object& object = *it;
 
-//        object.draw(id, shading, mtx, state, m_materials, m_textures);
+    //        object.draw(id, shading, mtx, state, m_materials, m_textures);
 
-//        //             bgfx::submit(id, program, 0, i != nbObjects - 1);
-//        bgfx::submit(id, Program::m_programs[shading], 0, (it == itEnd - 1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_NONE);
-//    }
+    //        //             bgfx::submit(id, program, 0, i != nbObjects - 1);
+    //        bgfx::submit(id, Program::m_programs[shading], 0, (it == itEnd - 1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_NONE);
+    //    }
 }
 
 //void Scene::addLight(Light &&light)
@@ -632,22 +634,22 @@ void Scene::draw(const bgfx::ViewId id, const Shading& shading, const float* mtx
 
 void Scene::updateStats()
 {
-//    m_nbVertices = 0;
-//    for (const Object& object : m_objects) {
-//        m_nbVertices += object.nbVertices();
-//    }
+    //    m_nbVertices = 0;
+    //    for (const Object& object : m_objects) {
+    //        m_nbVertices += object.nbVertices();
+    //    }
 
-//    m_nbTriangles = 0;
-//    for (const Object& object : m_objects) {
-//        m_nbTriangles += object.nbTriangles();
-//    }
+    //    m_nbTriangles = 0;
+    //    for (const Object& object : m_objects) {
+    //        m_nbTriangles += object.nbTriangles();
+    //    }
 
-//    m_nbObjects = m_objects.size();
+    //    m_nbObjects = m_objects.size();
 
-//    m_nbMeshes = 0;
-//    for (const auto& object : m_objects) {
-//        m_nbMeshes += object.nbMeshes();
-//    }
+    //    m_nbMeshes = 0;
+    //    for (const auto& object : m_objects) {
+    //        m_nbMeshes += object.nbMeshes();
+    //    }
 
     m_texturesSize = 0;
     for (const Texture& texture : Material::s_textures) {
