@@ -53,11 +53,11 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         //    bgfx::setPlatformData(pd);
         bgfxInit.type = bgfx::RendererType::Count; // Automatically choose renderer
         //                bgfxInit.type = bgfx::RendererType::Direct3D9;
-        //                bgfxInit.type = bgfx::RendererType::Direct3D11;
-        //                bgfxInit.type = bgfx::RendererType::Direct3D12;
-        bgfxInit.type = bgfx::RendererType::OpenGL;
+//                        bgfxInit.type = bgfx::RendererType::Direct3D11;
+//                        bgfxInit.type = bgfx::RendererType::Direct3D12;
+//        bgfxInit.type = bgfx::RendererType::OpenGL;
         //        bgfxInit.type = bgfx::RendererType::OpenGLES;
-        //                bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
+                        bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
         //        bgfxInit.type = bgfx::RendererType::Metal;
 
         bgfxInit.resolution.width = width;

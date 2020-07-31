@@ -133,9 +133,9 @@ static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name
     case bgfx::RendererType::Vulkan:
         shaderPath = PROJECT_DIR "shaders/bin/spirv/";
         break;
-    case bgfx::RendererType::WebGPU:
-        shaderPath = PROJECT_DIR "shaders/bin/spirv/";
-        break;
+//    case bgfx::RendererType::WebGPU:
+//        shaderPath = PROJECT_DIR "shaders/bin/spirv/";
+//        break;
 
     case bgfx::RendererType::Count:
         BX_CHECK(false, "You should not be here!");
@@ -932,13 +932,17 @@ MeshB* meshLoad(const char* _filePath, bool _ramcopy)
         MeshB* mesh = meshLoad(reader, _ramcopy);
         bx::close(reader);
 
+//        group.m_aabb
+        mesh->m_aabb.max = bx::Vec3(bx::kFloatMin);
+        mesh->m_aabb.min = bx::Vec3(bx::kFloatMax);
         for (const auto& group : mesh->m_groups) {
             aabbExpand(mesh->m_aabb, group.m_aabb.max);
             aabbExpand(mesh->m_aabb, group.m_aabb.min);
         }
 //        mesh->m_sphere.center = bx::mul(bx::add(mesh->m_aabb.min, mesh->m_aabb.max), 0.5f);
         mesh->m_sphere.center = getCenter(mesh->m_aabb);
-        mesh->m_sphere.radius = bx::length(bx::sub(mesh->m_aabb.max, mesh->m_aabb.min)) * 0.5f;
+//        mesh->m_sphere.radius = bx::length(bx::sub(mesh->m_aabb.max, mesh->m_aabb.min)) * 0.5f;
+        mesh->m_sphere.radius = bx::length(getExtents(mesh->m_aabb));
 
         return mesh;
     }

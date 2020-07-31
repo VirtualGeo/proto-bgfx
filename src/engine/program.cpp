@@ -141,6 +141,7 @@ void Program::init()
 //    m_hasDiffuseTexture = bgfx::createUniform("hasDiffuseTexture", bgfx::UniformType::Vec4);
 //    m_nAdditionalTexture = bgfx::createUniform("nAdditionalTexture", bgfx::UniformType::Vec4);
 
+    bgfx::frame();
 
     for (int i = 0; i < Shading::Count; ++i) {
         m_programs[i] = BGFX_INVALID_HANDLE;
@@ -164,6 +165,7 @@ void Program::init()
 
         const std::string& shadingFileName = shadingFileNames[i];
         m_programs[i] = loadProgram(shadingFileName, defines.c_str());
+        bgfx::frame();
     }
 
 

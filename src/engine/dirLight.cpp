@@ -89,7 +89,7 @@ void DirLight::updateLightShadowMaps(int viewId)
     bgfx::setUniform(s_uLightSpaceMatrixUH, m_lightSpaceMatrix);
 
 
-    bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0xFF00FFFF);
+    bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00FF00FF);
 }
 
 

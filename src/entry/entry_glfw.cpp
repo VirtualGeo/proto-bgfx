@@ -66,7 +66,7 @@ static std::map<int, Key::Enum> s_translateKey = {
     { GLFW_KEY_O, Key::R }, // qwerty to dvorak
     { GLFW_KEY_D, Key::E }, // qwerty to dvorak
     { GLFW_KEY_RIGHT_CONTROL, Key::Control },
-    { GLFW_KEY_SHIFT, Key::Control },
+    { GLFW_KEY_RIGHT_SHIFT, Key::Shift },
 };
 
 int main(int argc, char const* argv[])

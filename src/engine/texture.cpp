@@ -288,6 +288,7 @@ void Texture::createTextureHandle()
         m_width, m_height, hasMips, 1, texFormat,
                 s_textureSamplerFlags, bgfx::copy(m_image, m_textureSize));
     assert(bgfx::isValid(m_textureHandle));
+    bgfx::frame();
 }
 
 void Texture::init()
