@@ -9,6 +9,8 @@ class SpotLight : public Light
 {
 public:
     SpotLight(bx::Vec3 direction, bx::Vec3 position, float cutOff =17.0f, float outerCutOff = 20.0f, float constant = 1.0, float linear = 0.09, float quadratic = 0.032);
+    SpotLight(const SpotLight & spotLight) = delete;
+    SpotLight(SpotLight && spotLight);
     ~SpotLight();
 
 //private:

@@ -16,6 +16,7 @@ public:
     Material(const Material & file) = delete;
 //    Material(Material &&) noexcept = default;
     Material(Material && material);
+    Material();
     ~Material();
 
     Material(std::ifstream & file);

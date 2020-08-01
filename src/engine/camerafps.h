@@ -8,8 +8,10 @@ class CameraFps : public Camera
 {
 public:
     CameraFps(bx::Vec3 pos, bx::Vec3 target = bx::Vec3(0.0));
-//    CameraFps(const CameraFps & camera) = delete;
-//    CameraFps(CameraFps && camera) noexcept = default;
+    CameraFps(const CameraFps & camera) = delete;
+    CameraFps(CameraFps && camera);
+//    CameraFps(const CameraFps & cameraFps) = delete;
+//    ~CameraFps();
 
     void updateCameraFront();
     void setTarget(bx::Vec3 target = bx::Vec3(0.0f));

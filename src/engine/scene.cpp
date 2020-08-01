@@ -552,6 +552,11 @@ int Scene::getEnableSpotLight()
             ++sum;
         }
     }
+    for (const auto& camera : m_cameras) {
+        if (camera.m_spotLight.m_enable) {
+            ++sum;
+        }
+    }
     return sum;
 }
 

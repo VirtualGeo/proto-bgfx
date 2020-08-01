@@ -19,8 +19,8 @@ SAMPLER2D(s_shadowMap, 3);
 
 //#define Sampler sampler2DShadow
 
-float near = 100.0;
-float far  = 200.0;
+float near = 1.0;
+float far  = 100.0;
 
 float LinearizeDepth(float depth)
 {

@@ -1,8 +1,8 @@
 $input a_position
-//$input a_normal
+$input a_normal
 //$input a_texcoord0 // vec2
 
-//$output v_normal
+$output v_normal
 
 
 /*
@@ -23,7 +23,7 @@ void main()
 
     //vec3 normal = a_normal.xyz*2.0 - 1.0;
 //    vec3 normal = a_normal;
-//    v_normal = a_normal;
+    v_normal = a_normal;
 
 //    v_normal = mul(u_modelView, vec4(a_normal, 0.0) ).xyz;
 

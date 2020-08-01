@@ -65,6 +65,16 @@ SpotLight::SpotLight(bx::Vec3 direction, bx::Vec3 position, float cutOff, float 
     ++s_nSpotLight;
 }
 
+SpotLight::SpotLight(SpotLight &&spotLight)
+{
+#ifdef DEBUG
+    std::cout << "\033[34m";
+    std::cout << "[CameraFps] " << this << "  right moving from " << &spotLight << std::endl;
+    std::cout << "\033[0m" << std::endl;
+#endif
+    assert(false);
+}
+
 SpotLight::~SpotLight()
 {
     bgfx::destroy(m_sShadowMapUH);
@@ -77,6 +87,11 @@ SpotLight::~SpotLight()
         bgfx::destroy(s_uLightSpaceMatrixUH);
         bgfx::destroy(s_sShadowMapUH);
     }
+#ifdef DEBUG
+    std::cout << "\033[31m";
+    std::cout << "[SpotLight] " << this << " deleted" << std::endl;
+    std::cout << "\033[0m";
+#endif
 }
 
 void SpotLight::updateLightShadowMaps(int viewId)

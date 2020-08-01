@@ -595,7 +595,7 @@ void MeshB::submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* 
             | BGFX_STATE_WRITE_A
             | BGFX_STATE_WRITE_Z
             | BGFX_STATE_DEPTH_TEST_LESS
-//            | BGFX_STATE_CULL_CCW
+            | BGFX_STATE_CULL_CCW
             | BGFX_STATE_MSAA;
     }
 
@@ -608,9 +608,11 @@ void MeshB::submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* 
         const Group& group = *it;
         //        const Material& material = Scene::m_materials[Scene::m_matName2id[group.m_material.c_str()]];
         //        const Material& material = s_materials[s_matName2id[group.m_material.c_str()]];
+        assert(group.m_iMaterial < s_materials.size());
         const Material& material = s_materials[group.m_iMaterial];
 #ifdef FAST_BLINN
         material.submitDiffuseTexture();
+//        material.submit();
 #else
         material.submit();
 #endif
@@ -620,7 +622,8 @@ void MeshB::submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* 
         //        bgfx::submit(_id, _program, 0, (it == itEnd-1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_NONE);
         //        bgfx::submit(_id, _program, 0, (it == itEnd-1) ? (BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE) : BGFX_DISCARD_STATE);
         //        bgfx::submit(_id, _program, 0, BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE);
-        bgfx::submit(_id, _program, 0, BGFX_DISCARD_STATE);
+//        bgfx::submit(_id, _program, 0, BGFX_DISCARD_STATE);
+        bgfx::submit(_id, _program);
     }
 }
 

@@ -291,9 +291,9 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, SpotLight light, in
 
     if (iLight == 0) {
 
-        closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_0, vec2(projCoords.x, projCoords.y)));
+        closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_spotLight_0, vec2(projCoords.x, projCoords.y)));
     } else if (iLight == 1) {
-        closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_1, vec2(projCoords.x, projCoords.y)));
+        closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_spotLight_1, vec2(projCoords.x, projCoords.y)));
 //    } else {
 //        closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_2, vec2(projCoords.x, projCoords.y)));
     }

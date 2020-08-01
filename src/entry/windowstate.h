@@ -66,8 +66,8 @@ public:
     int iCamera;
     float ratio;
     int id;
-//    Shading shading = Shading::RENDERED;
-    Shading shading = Shading::NORMAL;
+    Shading shading = Shading::RENDERED;
+//    Shading shading = Shading::NORMAL;
     Projection projection = PERSPECTIVE;
 };
 

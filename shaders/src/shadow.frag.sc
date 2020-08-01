@@ -64,6 +64,7 @@ void main()
     float depth = v_position.z / v_position.w * 0.5 + 0.5;
 //    float depth = v_position.z / v_position.w;
     gl_FragColor = packFloatToRgba(depth);
+//    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 //    gl_FragColor = packFloatToRgba(0.0);
 //    float depth = v_position.z;
 //    depth = 1.1;

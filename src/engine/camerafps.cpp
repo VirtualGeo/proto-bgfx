@@ -1,6 +1,7 @@
 #include "camerafps.h"
 #include <iostream>
 //#include <bx/math.h>
+#include <cassert>
 
 CameraFps::CameraFps(bx::Vec3 pos, bx::Vec3 target)
     : Camera(pos)
@@ -12,6 +13,27 @@ CameraFps::CameraFps(bx::Vec3 pos, bx::Vec3 target)
 
     updateCameraFront();
 }
+
+CameraFps::CameraFps(CameraFps &&camera)
+    : Camera(camera.m_pos)
+    , m_spotLight(bx::Vec3{0.0, 1.0, 0.0}, camera.m_pos) // random value for direction
+{
+#ifdef DEBUG
+    std::cout << "\033[34m";
+    std::cout << "[CameraFps] " << this << "  right moving from " << &camera << std::endl;
+    std::cout << "\033[0m" << std::endl;
+#endif
+    assert(false);
+}
+
+//CameraFps::~CameraFps()
+//{
+//#ifdef DEBUG
+//    std::cout << "\033[31m";
+//    std::cout << "[CameraFPS] " << this << " deleted" << std::endl;
+//    std::cout << "\033[0m";
+//#endif
+//}
 
 void CameraFps::updateCameraFront()
 {

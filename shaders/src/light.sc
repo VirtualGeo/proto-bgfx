@@ -30,6 +30,8 @@ varName.lightSpaceMatrix = mat4(u_dirLights[i * N_DIR_LIGHT_VEC4 + 4], \
                                 u_dirLights[i * N_DIR_LIGHT_VEC4 + 6], \
                                 u_dirLights[i * N_DIR_LIGHT_VEC4 + 7])
 
+SAMPLER2D(s_shadowMap_dirLight_0, 4);
+SAMPLER2D(s_shadowMap_dirLight_1, 5);
 //#endif
 //#define nbDirLights u_dirLights[0].w
 #endif
@@ -37,7 +39,7 @@ varName.lightSpaceMatrix = mat4(u_dirLights[i * N_DIR_LIGHT_VEC4 + 4], \
 
 // ------------------------------------ SPOT_LIGHT
 #ifndef N_SPOT_LIGHT
-#define N_SPOT_LIGHT 0
+#define N_SPOT_LIGHT 2
 #endif
 #if N_SPOT_LIGHT > 0
 struct SpotLight {
@@ -90,6 +92,8 @@ varName.lightSpaceMatrix = mat4(u_spotLights[i * N_SPOT_LIGHT_VEC4 + 5], \
 //                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 7], \
 //                     u_spotLights[i * N_SPOT_LIGHT_VEC4 + 8]))
 
+SAMPLER2D(s_shadowMap_spotLight_0, 4);
+SAMPLER2D(s_shadowMap_spotLight_1, 5);
 //#define nbSpotLights u_spotLights[0].x
 #endif
 
@@ -147,8 +151,6 @@ uniform vec4 u_pointLights[N_POINT_LIGHT_VEC4 * N_POINT_LIGHT];
 //#ifdef HAS_SHADOW
 //SAMPLER2D(s_shadowMap_light_0, 4);
 //SAMPLER2D(s_shadowMap_light_1, 5);
-SAMPLER2D(s_shadowMap_dirLight_0, 4);
-SAMPLER2D(s_shadowMap_dirLight_1, 5);
 //#endif
 //SAMPLER2D(s_shadowMap_light_2, 6);
 

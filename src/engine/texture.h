@@ -35,7 +35,7 @@ public:
     };
 
     enum Type {
-        None = 0,
+//        None = 0, // question: why error on linux ?
         DIFFUSE,
         OPACITY,
     };

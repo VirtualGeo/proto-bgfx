@@ -22,7 +22,11 @@ public:
 
 //public:
     Camera(bx::Vec3 pos);
-//    Camera(const Camera & camera) = delete;
+//    Camera() = delete;
+//    virtual ~Camera() = 0;
+//    ~Camera() = delete;
+    Camera(const Camera & camera) = delete;
+//    Camera(Camera && camera);
 //    Camera(Camera && camera);
 
     virtual void move(Direction direction, float distance);
@@ -32,6 +36,7 @@ public:
     void setViewTransform(const View &view) const;
 
 //private:
+//protected:
     bx::Vec3 m_pos;
     float m_fov = 60.0f;
     bx::Vec3 m_front;
@@ -45,6 +50,6 @@ protected:
     virtual void setPos(const bx::Vec3 &&pos);
 };
 
-using Cameras = std::vector<std::unique_ptr<Camera>>; // question : Camera* ?
+//using Cameras = std::vector<std::unique_ptr<Camera>>; // question : Camera* ?
 
 #endif // CAMERA_H

@@ -161,6 +161,7 @@ void Program::init()
                     + ";N_DIR_LIGHT=" + std::to_string(DirLight::s_nDirLight)
 //                    + ";N_SPOT_LIGHT=" + std::to_string(SpotLight::s_nSpotLight);
                     + ";N_SPOT_LIGHT=" + std::to_string(entry::s_scene.getEnableSpotLight());
+            std::cout << defines << std::endl;
         }
 
         const std::string& shadingFileName = shadingFileNames[i];
@@ -273,7 +274,8 @@ void Program::submit(const bgfx::ViewId id, const Shading& shading, const Materi
 //        }
     }
 
-    bgfx::submit(id, m_programs[shading], 0, BGFX_DISCARD_ALL);
+    bgfx::submit(id, m_programs[shading]);
+//    bgfx::submit(id, m_programs[shading], 0, BGFX_DISCARD_ALL);
 //    bgfx::submit(id, m_programs[shading], 1.0);
 
 //        material.submit(Texture::DIFFUSE);

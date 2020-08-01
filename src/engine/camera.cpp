@@ -21,6 +21,16 @@ Camera::Camera(bx::Vec3 pos)
 //    std::cout << "\033[0m";
 //#endif
 //    assert(false);
+//}
+
+//Camera::Camera(Camera &&camera)
+//{
+//#ifdef DEBUG
+//    std::cout << "\033[34m";
+//    std::cout << "[Camera] " << this << "  right moving from " << &camera << std::endl;
+//    std::cout << "\033[0m";
+//#endif
+//    assert(false);
 
 //}
 

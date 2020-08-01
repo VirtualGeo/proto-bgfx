@@ -113,6 +113,11 @@ Material::Material(Material&& material)
 #endif
 }
 
+Material::Material()
+{
+
+}
+
 Material::~Material()
 {
     //#ifdef DEBUG
@@ -188,9 +193,11 @@ void Material::submitDiffuseTexture() const {
         assert(m_iTexDiffuse < s_textures.size());
         const Texture& texture = s_textures[m_iTexDiffuse];
 
+        assert(bgfx::isValid(texture.textureHandle()));
         bgfx::setTexture(0, s_sDiffuseUH,
             texture.textureHandle(), Texture::s_textureSamplerFlags);
 
+//        bgfx::setTexture(0, s_sDiffuseUH, Texture::m_sampleTextures[Texture::Sample(Texture::BLUE)].textureHandle(), Texture::s_textureSamplerFlags);
         //    } else {
         //        float vec4[4] = { 0.0f };
         //        bgfx::setUniform(m_hasDiffuseTexture, vec4);
