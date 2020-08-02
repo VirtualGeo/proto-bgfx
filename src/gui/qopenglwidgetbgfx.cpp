@@ -157,7 +157,7 @@ void QOpenGLWidgetBgfx::paintGL()
 
     GLint qtFbo = -1;
     QOpenGLExtraFunctions * gl = currentContext->extraFunctions();
-    gl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &qtFbo);
+    gl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &qtFbo); GL_CHECK();
 
 //    std::cout << "[OpenGLWidgetBgfx] GL_FRAMEBUFFER_BINDING Qt: " << qtFbo << std::endl;
 //    GLint renderbufferId = -1;
@@ -180,20 +180,20 @@ void QOpenGLWidgetBgfx::paintGL()
 //    gl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &srcFB);
 
     GLuint srcFB;
-    gl->glGenFramebuffers(1, &srcFB);
-    gl->glBindFramebuffer(GL_FRAMEBUFFER, srcFB);
-    gl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, backBufferId, 0);
-    GLenum status = gl->glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    gl->glGenFramebuffers(1, &srcFB); GL_CHECK();
+    gl->glBindFramebuffer(GL_FRAMEBUFFER, srcFB); GL_CHECK();
+    gl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, backBufferId, 0); GL_CHECK();
+    GLenum status = gl->glCheckFramebufferStatus(GL_FRAMEBUFFER); GL_CHECK();
     assert(status == GL_FRAMEBUFFER_COMPLETE);
-    gl->glBindFramebuffer(GL_READ_FRAMEBUFFER, srcFB);
+    gl->glBindFramebuffer(GL_READ_FRAMEBUFFER, srcFB); GL_CHECK();
 
 //    gl->glBindFramebuffer(GL_READ_FRAMEBUFFER, backBufferId);
-    gl->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, qtFbo);
-    gl->glBlitFramebuffer(0, 0, width(), height(), 0, 0, width(), height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    gl->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, qtFbo); GL_CHECK();
+    gl->glBlitFramebuffer(0, 0, width(), height(), 0, 0, width(), height(), GL_COLOR_BUFFER_BIT, GL_NEAREST); GL_CHECK();
     gl->glBindFramebuffer(GL_FRAMEBUFFER, qtFbo); GL_CHECK();
 //    gl->glGetError();
 
-    gl->glDeleteFramebuffers(1, &srcFB);
+    gl->glDeleteFramebuffers(1, &srcFB); GL_CHECK();
 
 
 //    std::cout << "[QOpenGLWidgetBgfx] attch0:" << attch0 << std::endl;

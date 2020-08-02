@@ -610,12 +610,12 @@ void MeshB::submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* 
         //        const Material& material = s_materials[s_matName2id[group.m_material.c_str()]];
         assert(group.m_iMaterial < s_materials.size());
         const Material& material = s_materials[group.m_iMaterial];
-#ifdef FAST_BLINN
+//#ifdef FAST_BLINN
         material.submitDiffuseTexture();
 //        material.submit();
-#else
-        material.submit();
-#endif
+//#else
+//        material.submit();
+//#endif
 
         bgfx::setIndexBuffer(group.m_ibh);
         bgfx::setVertexBuffer(0, group.m_vbh);

@@ -79,9 +79,9 @@ void main()
     Material material;
     material.diffuse = vec3_splat(0.5);
     material.diffuse = toLinear(texture2D(s_diffuse, v_texcoord0)).xyz;
-    gl_FragColor.xyz = material.diffuse;
-    gl_FragColor.w = 1.0;
-    return;
+//    gl_FragColor.xyz = material.diffuse;
+//    gl_FragColor.w = 1.0;
+//    return;
 //    material.diffuse = texture2D(s_diffuse, v_texcoord0).xyz;
 
     material.specular = vec3_splat(1.0);

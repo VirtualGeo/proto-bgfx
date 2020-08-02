@@ -87,7 +87,7 @@ void render(const View& view)
 {
     g_camera->setViewTransform(view);
     //    meshSubmit(entry::s_scene.m_mesh, 0, g_program, entry::s_worldTransform);
-    meshSubmit(g_mesh, VIEW_ID_START_WINDOW, g_program, entry::s_worldTransform);
+    meshSubmit(g_mesh, view.id, g_program, entry::s_worldTransform);
 
 //    entry::s_scene.renderView(view, entry::s_worldTransform);
     //    entry::s_scene.renderView(view, entry::s_worldTransform);
