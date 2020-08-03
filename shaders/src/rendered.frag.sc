@@ -108,9 +108,10 @@ void main()
     // phase 1: directional lighting
     vec3 result = vec3_splat(0.0);
     int iLight = 0;
+    int i;
 #if N_DIR_LIGHT > 0
-    for (int i = 0; i < N_DIR_LIGHT; i++)
-        result = CalcDirLight(i, norm, viewDir, v_posLightSpace_0);
+//    for (int i = 0; i < N_DIR_LIGHT; i++)
+    result = CalcDirLight(0, norm, viewDir, v_posLightSpace_0);
 #endif
         // phase 2: point lights
 #if N_POINT_LIGHT > 0
@@ -119,16 +120,10 @@ void main()
 #endif
         // phase 3: spot light
 #if N_SPOT_LIGHT > 0
-    for (int i = 0; i < N_SPOT_LIGHT; i++) {
-        if (i == 0) {
-            result += CalcSpotLight(i, norm, v_pos, viewDir, v_posLightSpace_0);
-
-        } else if (i == 1) {
-            result += CalcSpotLight(i, norm, v_pos, viewDir, v_posLightSpace_1);
-//        } else {
-//            result += CalcSpotLight(i, norm, v_pos, viewDir, v_posLightSpace_2);
-        }
-    }
+    result += CalcSpotLight(0, norm, v_pos, viewDir, v_posLightSpace_0);
+    #if N_SPOT_LIGHT > 1
+        result += CalcSpotLight(1, norm, v_pos, viewDir, v_posLightSpace_1);
+    #endif
 #endif
 
     result *= color;
@@ -290,13 +285,15 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, SpotLight light, in
     float closestDepth;
 
     if (iLight == 0) {
-
         closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_spotLight_0, vec2(projCoords.x, projCoords.y)));
-    } else if (iLight == 1) {
+    }
+#if N_SPOT_LIGHT > 1
+    else if (iLight == 1) {
         closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_spotLight_1, vec2(projCoords.x, projCoords.y)));
 //    } else {
 //        closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_2, vec2(projCoords.x, projCoords.y)));
     }
+#endif
     //    closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_1, vec2(projCoords.x, projCoords.y)));
     //    float closestDepth = unpackRgbaToFloat(texture2D(s_shadowMap_light_0, vec2(projCoords.x, projCoords.y)));
     //    float depth = unpackRgbaToFloat(texture2D(s_shadowMap, v_texcoord0));

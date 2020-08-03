@@ -380,6 +380,42 @@ bool callShaderc(const char* pFilename, const char* pOutput, bgfx::RendererType:
     //    bool bVertex = !bx::strFind(pFilename, ".vert.sc").isEmpty();
     //    bool bFragment = !bx::strFind(pFilename, ".frag.sc").isEmpty();
     //    if (bVertex || bFragment)
+    std::string platform;
+    std::string profile;
+    switch (bgfx::getRendererType()) {
+    case bgfx::RendererType::Direct3D9:
+    case bgfx::RendererType::Direct3D11:
+    case bgfx::RendererType::Direct3D12:
+        platform = "windows";
+        switch (pShaderType) {
+        case ShaderType::Vertex:
+            profile = "vs_5_0";
+            break;
+        case ShaderType::Fragment:
+            profile = "ps_5_0";
+            break;
+        }
+        break;
+    case bgfx::RendererType::OpenGL:
+        platform = "linux";
+        profile = "120";
+        break;
+    case bgfx::RendererType::OpenGLES:
+        platform = "android";
+        profile = "120";
+        break;
+    case bgfx::RendererType::Vulkan:
+        platform = "linux";
+        profile = "spirv";
+        break;
+    case bgfx::RendererType::Metal:
+        platform = "osx";
+        profile = "metal";
+        break;
+
+    default:
+        assert(false);
+    }
     //    {
     // PATH should be bgfx\examples\runtime
     constexpr int argvSize = 15;
@@ -390,15 +426,17 @@ bool callShaderc(const char* pFilename, const char* pOutput, bgfx::RendererType:
         "-o",
         pOutput,
         "--platform",
-        pRendererType == bgfx::RendererType::Direct3D11 ? "windows" : "linux",
+        platform.c_str(),
+//        pRendererType == bgfx::RendererType::Direct3D11 ? "windows" : "linux",
         "--type",
         (pShaderType == ShaderType::Vertex) ? "vertex" : "fragment",
         "--profile",
-        pRendererType == bgfx::RendererType::Direct3D11
-            ? (pShaderType == ShaderType::Vertex)
-                ? "vs_5_0"
-                : "ps_5_0"
-            : "120",
+        profile.c_str(),
+//        pRendererType == bgfx::RendererType::Direct3D11
+//            ? (pShaderType == ShaderType::Vertex)
+//                ? "vs_5_0"
+//                : "ps_5_0"
+//            : "120",
         "-i",
         SHADER_INCLUDE_DIR,
         //        "-O", // DX9, DX11 only

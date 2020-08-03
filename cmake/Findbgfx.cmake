@@ -148,6 +148,7 @@ macro(COMPILE_SHADER_INTERNAL SHADER_IN SHADER_OUT PLATFORM PROFILE)
         ${PROFILE}
         -i ${SHADER_INCLUDE_DIR}
         --varyingdef ${SHADER_VARYING_DEF}
+#        --verbose
         MAIN_DEPENDENCY ${SHADER_IN}
         DEPENDS ${SHADER_DEPENDS}
         COMMENT "Compiling ${SHADER_IN} to ${SHADER_OUT}"
