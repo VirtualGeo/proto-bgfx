@@ -167,8 +167,8 @@ void QOpenGLWidgetBgfx::paintGL()
 //    assert(m_windowState != nullptr);
     m_windowState->renderAllWindow();
 
-//    uintptr_t backBufferId = bgfx::getInternal(m_backBuffer);
-    uintptr_t backBufferId = 0;
+    uintptr_t backBufferId = bgfx::getInternal(m_backBuffer);
+//    uintptr_t backBufferId = 0;
 
 //    uintptr_t srcFB = bgfx::getInternal(m_windowState->m_offScreenFBH);
 //    assert(gl->glIsFramebuffer(srcFB));

@@ -2,19 +2,23 @@
 #include <entry/entry.h>
 
 //#define SMART
+#define UNSORTED
+//#define DRAW_SPHERE
 #include <cassert>
 #include <cstring>
 #include <math.h>
 
 //#include <algorithm>
-//#include <random>
+#include <random>
 
 namespace entry {
     int s_nWindow = 1;
 
 //    static constexpr int s_nArea = 2;
 //static unsigned int s_nTexture;
-constexpr unsigned int s_nMaxTexture = 6;
+constexpr unsigned int s_nMaxTexture = 8;
+//constexpr unsigned int s_nMaxTexture = 8;
+//constexpr unsigned int s_nMaxTexture = 3;
 //static bgfx::UniformHandle m_hasTexture;
 //static bgfx::UniformHandle m_texture[];
 //    static bgfx::UniformHandle m_nAdditionalTexture;
@@ -91,8 +95,8 @@ void render(const View& view)
         initCubeScene();
         bgfx::frame();
         s_testStart = std::chrono::high_resolution_clock::now();
-        std::cout << "num texture\t| 1\t| 2\t| 3\t| 4\t| 5\t| 6" << std::endl;
-        std::cout << "test 0";
+        std::cout << "num texture\t| 1\t| 2\t| 3\t| 4\t| 5\t| 6\t| 7\t| 8\t| 9\t| 10" << std::endl;
+        std::cout << "test 0\t";
     }
     //            if (m_id != 0)
     //                return;
@@ -115,7 +119,7 @@ void render(const View& view)
                 exit(0);
             }
             std::cout << std::endl
-                      << "test " << m_iBranchingTest;
+                      << "test " << m_iBranchingTest << "\t";
         }
         initCubeScene();
         //        bgfx::frame();
@@ -223,8 +227,11 @@ void render(const View& view)
             //            buffer[1] = s_nAditionalTexture;
 
             //            Geometry::drawCube(cube.mtx);
+#ifdef DRAW_SPHERE
+            Geometry::drawUVSphere(cube.mtx);
+#else
             Geometry::drawCube(cube.mtx);
-            //            Geometry::drawUVSphere(cube.mtx);
+#endif
             bgfx::submit(view.id, m_branchingTests[m_iBranchingTest]);
         }
 
@@ -278,8 +285,13 @@ void render(const View& view)
                 iShader = cube.iShader;
             }
 #endif
+//            Geometry::drawCube(cube.mtx);
+#ifdef DRAW_SPHERE
+            Geometry::drawUVSphere(cube.mtx);
+#else
             Geometry::drawCube(cube.mtx);
-            //            Geometry::drawUVSphere(cube.mtx);
+#endif
+//            Geometry::drawUVSphere(cube.mtx);
             //            bgfx::submit(m_id, m_branchingTests[m_iBranchingTest]);
             bgfx::submit(view.id, m_branchingTests[m_iBranchingTest]);
         }
@@ -328,8 +340,14 @@ void render(const View& view)
                 iShader = cube.iShader;
             }
 #endif
+
+#ifdef DRAW_SPHERE
+            Geometry::drawUVSphere(cube.mtx);
+#else
             Geometry::drawCube(cube.mtx);
-            //            Geometry::drawUVSphere(cube.mtx);
+#endif
+//            Geometry::drawCube(cube.mtx);
+//            Geometry::drawUVSphere(cube.mtx);
             //            assert(iShader < 4)
             bgfx::submit(view.id, m_branching3Tests[cube.iShader]);
             //            continue;
@@ -420,9 +438,11 @@ void initCubeScene()
         }
     }
 
-    //                    std::random_device rd;
-    //                    std::mt19937 g(rd());
-    //                    std::shuffle(m_cubes.begin(), m_cubes.end(), g);
+#ifdef UNSORTED
+                        std::random_device rd;
+                        std::mt19937 g(rd());
+                        std::shuffle(m_cubes.begin(), m_cubes.end(), g);
+#endif
 
     m_branchingTests[0] = Program::loadProgram("branchingTest1", ("N_TEXTURE=" + std::to_string(s_nTexture)).c_str());
     m_branchingTests[1] = Program::loadProgram("branchingTest2", ("N_TEXTURE=" + std::to_string(s_nTexture)).c_str());
