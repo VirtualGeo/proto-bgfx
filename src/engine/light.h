@@ -7,7 +7,7 @@
 
 class Light {
 public:
-    Light(bx::Vec3 ambient = bx::Vec3(0.0f),
+    Light(bx::Vec3 ambient = bx::Vec3(0.2f),
           bx::Vec3 diffuse = bx::Vec3(1.0f),
           bx::Vec3 specular = bx::Vec3(1.0f));
     //    Light(bx::Vec3 ambient, bx::Vec3 diffuse, bx::Vec3 specular);

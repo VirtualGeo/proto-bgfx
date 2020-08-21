@@ -4,6 +4,7 @@
 //#define SMART
 #define UNSORTED
 //#define DRAW_SPHERE
+
 #include <cassert>
 #include <cstring>
 #include <math.h>
@@ -12,12 +13,17 @@
 #include <random>
 
 namespace entry {
-    int s_nWindow = 1;
+int s_nWindow = 1;
 
 //    static constexpr int s_nArea = 2;
 //static unsigned int s_nTexture;
-constexpr unsigned int s_nMaxTexture = 8;
-//constexpr unsigned int s_nMaxTexture = 8;
+constexpr unsigned int s_nMaxTexture = 3;
+//constexpr unsigned int s_nMaxTexture = 6;
+//constexpr unsigned int s_nMaxTexture = 7;
+//constexpr unsigned int s_nMaxTexture = 14;
+//constexpr unsigned int s_nMaxTexture = 16;
+constexpr uint32_t s_nbCubePerLine = 128;
+constexpr size_t s_nbCubes = s_nbCubePerLine * s_nbCubePerLine;
 //constexpr unsigned int s_nMaxTexture = 3;
 //static bgfx::UniformHandle m_hasTexture;
 //static bgfx::UniformHandle m_texture[];
@@ -50,22 +56,129 @@ static const int s_nbTestFrame = 100;
 void initCubeScene();
 void clearCubeScene();
 
+int bitSum(size_t number) {
+    int sum = 0;
+    while (number != 0) {
+        int bit = number % 2;
+        sum += bit;
+        number >>= 1;
+    }
+    return sum;
+}
+
 void init(View& view)
 {
+    m_cubes.clear();
+    m_cubes.reserve(s_nbCubes);
+
     Geometry::init();
     Texture::init();
     Program::init();
-//        initCubeScene();
+    //        initCubeScene();
     //    assert(entry::s_scene.m_cameras.size() != 0);
     entry::s_scene.m_cameras.emplace_back(bx::Vec3 { 0.0f, 0.0f, 200.0f }); // question : push_back ?
-//    entry::s_scene.m_cameras[0].setTarget();
+    //    entry::s_scene.m_cameras[0].setTarget();
 
     view.projection = Projection::ORTHOGRAPHIC;
 
     m_hasTexture = bgfx::createUniform("hasTexture", bgfx::UniformType::Vec4, s_nMaxTexture);
-    for (int i = 0; i < s_nMaxTexture; ++i) {
+    for (int i = 1; i <= s_nMaxTexture; ++i) {
         m_texture[i] = bgfx::createUniform((std::string("texture") + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
     }
+
+    std::cout << "theorical prediction of branching comparizon due of number of operation per test" << std::endl;
+    //    std::cout << "num texture\t| 1\t| 2\t| 3\t| 4\t| 5\t| 6\t| 7\t| 8\t| 9\t| 10" << std::endl;
+    std::cout << "num texture\t| ";
+    for (int i =0; i <s_nMaxTexture; ++i) {
+        std::cout << std::to_string(i) << "\t| ";
+    }
+    std::cout << std::endl;
+
+    const int testPrices[]{2, 2, 2};
+    const int setTexturePrice = 3;
+//    const int nbCubes = s_nbCubePerLine * s_nbCubePerLine;
+#ifdef	UNSORTED
+    //    for (int iTest = 0; iTest <2; ++iTest) {
+    //        std::cout << "test " << std::to_string(iTest) << "\t";
+    std::cout << "test 0\t";
+    for (int iNTexture = 1; iNTexture <= s_nMaxTexture; ++iNTexture) {
+        const size_t nbCombination = pow(2, iNTexture);
+        size_t sum = 0;
+        for (size_t i = 0; i < nbCombination; ++i) {
+            for (size_t j = 0; j < nbCombination; ++j) {
+                size_t k = ~i & j;
+                sum += bitSum(k);
+            }
+        }
+        float res;
+        //            res = (sum * setTexturePrice + nbCombination * nbCombination * (testPrices[iTest] + (2 - iTest) * iNTexture)) / float(nbCombination * nbCombination);
+        res = sum / float(nbCombination * nbCombination) * setTexturePrice + testPrices[0] + 2 * iNTexture;
+        std::cout << "\t" << res;
+    }
+    std::cout << std::endl;
+    //    }
+    std::cout << "test 1\t";
+    for (int iNTexture = 1; iNTexture <= s_nMaxTexture; ++iNTexture) {
+        const size_t nbCombination = pow(2, iNTexture);
+        size_t sum = 0;
+        for (size_t i = 0; i < nbCombination; ++i) {
+            for (size_t j = 0; j < nbCombination; ++j) {
+                size_t k = i ^ j;
+                sum += bitSum(k);
+            }
+        }
+        float res;
+        //            res = (sum * setTexturePrice + nbCombination * nbCombination * (testPrices[iTest] + (2 - iTest) * iNTexture)) / float(nbCombination * nbCombination);
+        res = sum / float(nbCombination * nbCombination) * setTexturePrice + testPrices[1] + iNTexture;
+        std::cout << "\t" << res;
+    }
+    std::cout << std::endl;
+#else
+        std::cout << "test 0\t";
+        for (int iNTexture = 1; iNTexture <= s_nMaxTexture; ++iNTexture) {
+            size_t sum = 0;
+            const size_t nbCombination = pow(2, iNTexture);
+            for (size_t i = 0; i < nbCombination - 1; ++i) {
+                size_t k = ~i & (i + 1);
+                sum += bitSum(k);
+            }
+            float res = (sum * setTexturePrice + s_nbCubes * (2 + 2 * iNTexture)) / (float)s_nbCubes;
+            std::cout << "\t" << res;
+        }
+        std::cout << std::endl;
+
+        std::cout << "test 1\t";
+        for (int iNTexture = 1; iNTexture <= s_nMaxTexture; ++iNTexture) {
+            size_t sum = 0;
+            const size_t nbCombination = pow(2, iNTexture);
+            for (size_t i = 0; i < nbCombination - 1; ++i) {
+                size_t k = i ^ (i + 1);
+                sum += bitSum(k);
+            }
+            float res = (sum * setTexturePrice + s_nbCubes * (2 +  iNTexture)) / (float)s_nbCubes;
+            std::cout << "\t" << res;
+        }
+        std::cout << std::endl;
+
+#endif
+
+    std::cout << "test 2\t";
+    for (int iNTexture = 1; iNTexture <= s_nMaxTexture; ++iNTexture) {
+        size_t sum = 0;
+        const size_t nbCombination = pow(2, iNTexture);
+        for (size_t i = 0; i < nbCombination; ++i) {
+            sum += (bitSum(i) + testPrices[2]);
+        }
+        float res = (((sum * s_nbCubes) / (float)nbCombination) + (10 + iNTexture * setTexturePrice) * nbCombination) / s_nbCubes;
+        //        sum = sum / (float)nbCombination + 13.0f * (float)nbCombination / (s_nbCubePerLine * s_nbCubePerLine);
+        //        float res = (sum * s_nbCubes + 13 * nbCombination * nbCombination) / float(s_nbCubes * nbCombination);
+        //        sum /= (float)nbCombination;
+        //        sum += 13.0f * nbCombination;
+        std::cout << "\t" << res;
+    }
+    std::cout << std::endl;
+
+//    exit(0);
 }
 
 void shutdown()
@@ -95,6 +208,7 @@ void render(const View& view)
         initCubeScene();
         bgfx::frame();
         s_testStart = std::chrono::high_resolution_clock::now();
+        std::cout << "practical branching comparizon" << std::endl;
         std::cout << "num texture\t| 1\t| 2\t| 3\t| 4\t| 5\t| 6\t| 7\t| 8\t| 9\t| 10" << std::endl;
         std::cout << "test 0\t";
     }
@@ -230,7 +344,7 @@ void render(const View& view)
 #ifdef DRAW_SPHERE
             Geometry::drawUVSphere(cube.mtx);
 #else
-            Geometry::drawCube(cube.mtx);
+                Geometry::drawCube(cube.mtx);
 #endif
             bgfx::submit(view.id, m_branchingTests[m_iBranchingTest]);
         }
@@ -291,7 +405,7 @@ void render(const View& view)
 #else
             Geometry::drawCube(cube.mtx);
 #endif
-//            Geometry::drawUVSphere(cube.mtx);
+            //            Geometry::drawUVSphere(cube.mtx);
             //            bgfx::submit(m_id, m_branchingTests[m_iBranchingTest]);
             bgfx::submit(view.id, m_branchingTests[m_iBranchingTest]);
         }
@@ -344,10 +458,10 @@ void render(const View& view)
 #ifdef DRAW_SPHERE
             Geometry::drawUVSphere(cube.mtx);
 #else
-            Geometry::drawCube(cube.mtx);
+                Geometry::drawCube(cube.mtx);
 #endif
-//            Geometry::drawCube(cube.mtx);
-//            Geometry::drawUVSphere(cube.mtx);
+            //            Geometry::drawCube(cube.mtx);
+            //            Geometry::drawUVSphere(cube.mtx);
             //            assert(iShader < 4)
             bgfx::submit(view.id, m_branching3Tests[cube.iShader]);
             //            continue;
@@ -363,7 +477,6 @@ void initCubeScene()
 {
 
     //    const uint32_t nbCube = 64;
-    const uint32_t nbCube = 128;
     //        const uint32_t nbCube = 256;
     //                const uint32_t nbCube = s_nTexture * 4;
     //        const uint32_t nbCube = s_nTexture;
@@ -383,18 +496,18 @@ void initCubeScene()
     for (int iArea = 0; iArea < nIArea; ++iArea) {
         for (int jArea = 0; jArea < nJArea; ++jArea) {
             //                std::string hasAdditional = "N_TEXTURE=" + (std::to_string(s_nTexture));
-            for (uint32_t iCube = 0; iCube < nbCube / nIArea; ++iCube) {
-                const int i = iCube + (nbCube / nIArea) * iArea;
-                for (uint32_t jCube = 0; jCube < nbCube / nJArea; ++jCube) {
-                    const int j = jCube + (nbCube / nJArea) * jArea;
+            for (uint32_t iCube = 0; iCube < s_nbCubePerLine / nIArea; ++iCube) {
+                const int i = iCube + (s_nbCubePerLine / nIArea) * iArea;
+                for (uint32_t jCube = 0; jCube < s_nbCubePerLine / nJArea; ++jCube) {
+                    const int j = jCube + (s_nbCubePerLine / nJArea) * jArea;
                     float mtx[16];
                     //                bgfx::setTexture(0, m_sDiffuse,
                     //                    Texture::m_sampleTextures[Texture::Sample((i + j) % 3 + Texture::RED)].textureHandle(), Texture::s_textureSamplerFlags);
                     //            bx::mtxIdentity(mtx);
                     bx::mtxIdentity(mtx);
                     //                bx::mtxRotateXY(mtx, s_iFrame * 0.021f, s_iFrame * 0.037f);
-                    mtx[12] = -(float)nbCube / 2.0f * 3.0f + float(i) * 3.0f;
-                    mtx[13] = -(float)nbCube / 2.0f * 3.0f + float(j) * 3.0f;
+                    mtx[12] = -(float)s_nbCubePerLine / 2.0f * 3.0f + float(i) * 3.0f;
+                    mtx[13] = -(float)s_nbCubePerLine / 2.0f * 3.0f + float(j) * 3.0f;
                     mtx[14] = 0.0f;
 
                     //                        const float color[] { 0.5f, 0.5f, 0.5f, 0.0f };
@@ -425,6 +538,7 @@ void initCubeScene()
                     }
                     cube.iShader = iShader;
 
+                    assert(m_cubes.size() < s_nbCubes);
                     m_cubes.push_back(cube);
                     //                Geometry::drawCube(mtx);
                     //                bgfx::submit(m_id, m_programs[m_shading]);
@@ -439,9 +553,9 @@ void initCubeScene()
     }
 
 #ifdef UNSORTED
-                        std::random_device rd;
-                        std::mt19937 g(rd());
-                        std::shuffle(m_cubes.begin(), m_cubes.end(), g);
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(m_cubes.begin(), m_cubes.end(), g);
 #endif
 
     m_branchingTests[0] = Program::loadProgram("branchingTest1", ("N_TEXTURE=" + std::to_string(s_nTexture)).c_str());
@@ -471,7 +585,7 @@ void initCubeScene()
 
             iTemp /= 2;
         }
-//        std::cout << "[WINDOWSTATE] loadProgram branchingTest3 " << hasAdditional << std::endl;
+        //        std::cout << "[WINDOWSTATE] loadProgram branchingTest3 " << hasAdditional << std::endl;
         m_branching3Tests[i] = Program::loadProgram("branchingTest3", (hasAdditional).c_str());
 
         //            m_branching3Tests[i] = loadProgram("branchingTest3", "");

@@ -189,8 +189,9 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, DirLight light, int
     // PCF
         float shadow = 0.0;
 //        textureSize(s_shadowMap_dirLight_0, 3);
-        vec2 texelSize = vec2_splat(1.0 / 8192.0);
-        const int size = 2;
+//        vec2 texelSize = vec2_splat(1.0 / 8192.0);
+        vec2 texelSize = vec2_splat(1.0 / 16384.0);
+        const int size = 1;
         for (int x = -size; x <= size; ++x) {
             for (int y = -size; y <= size; ++y) {
                 float pcfDepth = unpackRgbaToFloat(texture2D(s_shadowMap_dirLight_0, projCoords.xy + vec2(x, y) * texelSize));

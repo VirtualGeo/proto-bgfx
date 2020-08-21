@@ -7,8 +7,8 @@
 #include <engine/scene.h>
 
 size_t DirLight::s_nDirLight = 0;
-static const int s_shadowMapSize = 8192;
-//static const int s_shadowMapSize = 16384;
+//static const int s_shadowMapSize = 8192;
+static const int s_shadowMapSize = 16384;
 
 bgfx::UniformHandle DirLight::s_uDirLightsUH = BGFX_INVALID_HANDLE;
 static bgfx::UniformHandle s_uLightSpaceMatrixUH = BGFX_INVALID_HANDLE;

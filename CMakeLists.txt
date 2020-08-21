@@ -36,7 +36,7 @@ add_definitions(-DAUTO_GENERATE_BIN_MODEL)
 set(USE_SHADERC_LIBRARY False)
 
 # select graphic user interface
-set(GUI_QT True) #default: GLFW
+#set(GUI_QT True) #default: GLFW
 
 
 # -------------------------------------------------------------------

@@ -86,7 +86,7 @@ void QOpenGLWidgetBgfx::initializeGL()
     QOpenGLContext * qGLContext = QOpenGLContext::currentContext();
     bool success = qGLContext->nativeHandle().canConvert<NativeContext>();
     Q_ASSERT(success);
-    NativeContext native = qGLContext->nativeHandle().value<NativeContext>();
+    const NativeContext & native = qGLContext->nativeHandle().value<NativeContext>();
 //    void * native = qGLContext->nativeHandle().value<void *>();
     void * nativeGlContext = (void*)native.context();
 //    void * context = (void*)native;
@@ -103,8 +103,8 @@ void QOpenGLWidgetBgfx::initializeGL()
 //    void * backBuffer = (void*)framebufferId;
 
 //    m_windowState = new WindowState((void*)(uintptr_t)winId(), nullptr, width(), height());
-//    m_windowState = new WindowState(nullptr, nullptr, width(), height(), nativeGlContext);
-    m_windowState = new WindowState(nullptr, nullptr, width(), height());
+    m_windowState = new WindowState(nullptr, nullptr, width(), height(), nativeGlContext);
+//    m_windowState = new WindowState(nullptr, nullptr, width(), height());
 
 
 //    m_backBuffer = bgfx::createTexture2D(width(), height(), false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT, NULL);

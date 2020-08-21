@@ -31,9 +31,11 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
 //    const float ratio = float(m_width) / m_height;
 {
     m_view.id = VIEW_ID_START_WINDOW + s_windows.size();
+
     //    m_view.shading = Shading::MATERIAL;
 
-    m_offScreenFBH.idx = bgfx::kInvalidHandle;
+//    m_offScreenFBH.idx = bgfx::kInvalidHandle;
+    m_offScreenFBH = BGFX_INVALID_HANDLE; // default fbh created by bgfx init
     assert(!bgfx::isValid(m_offScreenFBH));
 
     // first created view call bgfx::init()
@@ -55,7 +57,7 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
         //                bgfxInit.type = bgfx::RendererType::Direct3D9;
 //                        bgfxInit.type = bgfx::RendererType::Direct3D11;
 //                        bgfxInit.type = bgfx::RendererType::Direct3D12;
-//        bgfxInit.type = bgfx::RendererType::OpenGL;
+        bgfxInit.type = bgfx::RendererType::OpenGL;
         //        bgfxInit.type = bgfx::RendererType::OpenGLES;
 //                        bgfxInit.type = bgfx::RendererType::Vulkan; // no swap chain
         //        bgfxInit.type = bgfx::RendererType::Metal;
@@ -119,7 +121,8 @@ WindowState::WindowState(void* nwh, void* ndt, int width, int height, void* cont
     m_view.iCamera = entry::s_scene.m_cameras.size() - 1;
     m_view.ratio = float(m_width) / m_height;
 
-    s_windows.emplace_back(this);
+//    s_windows.emplace_back(this); // question
+    s_windows.push_back(this);
     entry::s_lastTime = std::chrono::high_resolution_clock::now();
     //    m_init = true;
 }
@@ -151,7 +154,10 @@ WindowState::~WindowState()
 
 void WindowState::render() const
 {
+    // Passing `BGFX_INVALID_HANDLE` as frame buffer handle
+    // will draw primitives from this view into default back buffer.
     bgfx::setViewFrameBuffer(m_view.id, m_offScreenFBH);
+
 
     bgfx::setViewRect(m_view.id, 0, 0, uint16_t(m_width), uint16_t(m_height));
 
@@ -217,8 +223,8 @@ void WindowState::printDebugMessage()
     if (entry::s_showStats) {
         bgfx::setDebug(BGFX_DEBUG_STATS);
     } else {
-        //        bgfx::setDebug(BGFX_DEBUG_NONE);
-        //        return;
+//                bgfx::setDebug(BGFX_DEBUG_NONE);
+//                return;
         bgfx::setDebug(BGFX_DEBUG_TEXT);
         //        if (m_iWidget == 0) {
         bgfx::dbgTextClear();
@@ -486,7 +492,12 @@ void WindowState::keyPressEvent(Key::Enum key)
         resetWindow();
         break;
     case Key::F3:
-        entry::s_mssaLevel = ++entry::s_mssaLevel % 5;
+        if (m_shiftPressed) {
+            entry::s_mssaLevel = (entry::s_mssaLevel + 4) % 5;
+        }
+        else {
+            entry::s_mssaLevel = ++entry::s_mssaLevel % 5;
+        }
         resetWindow();
         break;
     case Key::F4:
